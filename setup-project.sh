@@ -153,6 +153,39 @@ else
     echo -e "${YELLOW}⚠${NC} docs/ai-use-cases/ already exists"
 fi
 
+# Install Claude Code slash commands
+CLAUDE_COMMANDS_SOURCE="$SCRIPT_DIR/.claude/commands"
+CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
+
+if [ -d "$CLAUDE_COMMANDS_SOURCE" ]; then
+    if [ ! -d "$CLAUDE_COMMANDS_DIR" ]; then
+        mkdir -p "$CLAUDE_COMMANDS_DIR"
+        echo -e "${GREEN}✓${NC} Created: .claude/commands/"
+    fi
+
+    # Copy all command files
+    COMMANDS_COPIED=0
+    for cmd_file in "$CLAUDE_COMMANDS_SOURCE"/*.md; do
+        if [ -f "$cmd_file" ]; then
+            cmd_name=$(basename "$cmd_file")
+            target_file="$CLAUDE_COMMANDS_DIR/$cmd_name"
+
+            if [ ! -f "$target_file" ]; then
+                cp "$cmd_file" "$target_file"
+                COMMANDS_COPIED=$((COMMANDS_COPIED + 1))
+            fi
+        fi
+    done
+
+    if [ $COMMANDS_COPIED -gt 0 ]; then
+        echo -e "${GREEN}✓${NC} Installed $COMMANDS_COPIED Claude Code slash command(s)"
+    else
+        echo -e "${YELLOW}⚠${NC} Claude Code slash commands already installed"
+    fi
+else
+    echo -e "${YELLOW}⚠${NC} Claude Code commands not found in CLI installation"
+fi
+
 # Install git hook
 GIT_HOOKS_DIR="$PROJECT_PATH/.git/hooks"
 POST_COMMIT_HOOK="$GIT_HOOKS_DIR/post-commit"
@@ -211,7 +244,19 @@ if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
     echo "2. Use format: YYYY-MM-DD_TICKET-XXXXX_description.md"
     echo "3. Commit changes - use cases will auto-sync!"
     echo ""
-    echo "Manual sync: $SYNC_SCRIPT"
+    echo "Available commands:"
+    echo "  ai-use-case document      # Document an AI session"
+    echo "  ai-use-case sync          # Manual sync"
+    echo "  ai-use-case search <term> # Search use cases"
+    echo ""
+    if [ -d "$CLAUDE_COMMANDS_DIR" ]; then
+        echo "Claude Code slash commands:"
+        echo "  /document-session    # Document AI session automatically"
+        echo "  /setup-project       # Setup another project"
+        echo "  /sync-usecases       # Sync to hub"
+        echo "  /search-usecases     # Search past use cases"
+        echo ""
+    fi
     echo "View synced: ls $CENTRAL_DIR/by-project/$PROJECT_NAME/"
 else
     echo -e "${RED}Initial sync failed${NC}"
