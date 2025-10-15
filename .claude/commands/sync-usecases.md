@@ -22,21 +22,18 @@ Run the sync script to copy use case documents from the current project to the c
 
 3. Run the sync:
    ```bash
-   ~/Documents/ai-use-case-hub/sync-ai-use-cases.sh
+   ai-use-case sync
    ```
 
 4. Show the results:
    ```bash
-   # Show where files were synced
-   PROJECT_NAME=$(basename $(git rev-parse --show-toplevel 2>/dev/null) || basename $(pwd))
-   echo "Synced to central repository:"
-   ls -lh ~/Documents/ai-use-case-hub/by-project/$PROJECT_NAME/
+   # Show synced files using CLI stats
+   ai-use-case stats
    ```
 
-5. Optionally show recent use cases across all projects:
+5. Optionally show recent use cases:
    ```bash
-   echo "Recent use cases (all projects):"
-   find ~/Documents/ai-use-case-hub/by-date -name "*.md" -type l -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -5 | cut -d' ' -f2- | xargs -I {} basename {}
+   ai-use-case list
    ```
 
 ## When to Use This

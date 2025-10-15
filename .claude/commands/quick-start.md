@@ -1,6 +1,6 @@
-# Quick Start - Setup AI Use Cases Hub
+# Quick Start - Setup AI Use Cases CLI
 
-You are helping the user get started with the AI Use Cases Hub for the first time.
+You are helping the user get started with the AI Use Cases CLI for the first time.
 
 ## Your Task
 
@@ -8,36 +8,35 @@ Guide the user through the complete setup process, from installation to document
 
 ## Steps
 
-### 1. Check if Hub is Already Installed
+### 1. Check if CLI is Already Installed
 
 ```bash
-ls -la ~/Documents/ai-use-case-hub 2>/dev/null && echo "✅ Hub installed" || echo "❌ Hub not found"
+which ai-use-case && echo "✅ CLI installed" || echo "❌ CLI not found"
 ```
 
-### 2. If Not Installed, Clone the Repository
+### 2. If Not Installed, Install the CLI
 
 ```bash
-cd ~/Documents
-git clone https://github.com/james401/ai-use-case-hub.git ai-use-case-hub
-cd ai-use-case-hub
+curl -fsSL https://raw.githubusercontent.com/james401/ai-use-case-cli/main/install.sh | bash
 ```
 
-### 3. Make Scripts Executable
+The installer will:
+- Clone CLI tools to `~/.local/share/ai-use-case-cli`
+- Create symlink at `~/.local/bin/ai-use-case`
+- Add `~/.local/bin` to PATH if needed
+- Optionally set up the documentation hub
+
+### 3. Reload Shell (if needed)
 
 ```bash
-chmod +x setup-project.sh sync-ai-use-cases.sh document-ai-session.sh
-ls -la *.sh | grep "rwx"
+source ~/.bashrc  # or source ~/.zshrc
 ```
 
 ### 4. Verify Installation
 
 ```bash
-# Test help flags
-./setup-project.sh --help
-./document-ai-session.sh --help
-
-# Check directory structure
-ls -la
+ai-use-case --version
+ai-use-case --help
 ```
 
 ### 5. Setup Current Project
@@ -49,7 +48,7 @@ If the user is in a project directory:
 git rev-parse --show-toplevel
 
 # Run setup
-~/Documents/ai-use-case-hub/setup-project.sh
+ai-use-case --init
 ```
 
 ### 6. Explain What Was Set Up
@@ -58,19 +57,27 @@ Tell the user:
 - ✅ `docs/ai-use-cases/` directory created in their project
 - ✅ Git post-commit hook installed for auto-syncing
 - ✅ `.gitignore` patterns added for draft files
-- ✅ Central hub ready at `~/Documents/ai-use-case-hub/`
+- ✅ CLI tools ready for use
 
 ### 7. Show Available Commands
 
-For Claude Code:
+CLI Commands:
+- `ai-use-case document` - Document an AI session interactively
+- `ai-use-case sync` - Manually sync to hub
+- `ai-use-case search <term>` - Search documented use cases
+- `ai-use-case stats` - View statistics
+- `ai-use-case list` - List all projects
+- `ai-use-case view` - Open hub in file explorer
+
+Claude Code Slash Commands:
 - `/document-session` - Document an AI session
 - `/setup-project` - Setup another project
 - `/sync-usecases` - Manual sync
 - `/search-usecases` - Search past use cases
 
-For VS Code:
+VS Code Extension:
 - `Ctrl+Alt+D` / `Cmd+Alt+D` - Document session
-- Command Palette → "AI Use Cases" commands
+- Command Palette → "AI Session: Document AI Session"
 - GitHub Copilot Chat → `@workspace document my AI session`
 
 ### 8. Suggest First Documentation
@@ -80,17 +87,19 @@ Offer to help them document:
 - A recent completed task
 - A test session to learn the workflow
 
+Run: `ai-use-case document`
+
 ## Key Points to Emphasize
 
-1. **Three Storage Views:**
-   - `by-project/` - Actual files (canonical)
-   - `by-date/` - Symlinks organized by date
-   - `by-topic/` - Symlinks organized by topic
+1. **Two-Repository Architecture:**
+   - CLI tools (ai-use-case-cli) - Commands and scripts
+   - Documentation hub (ai-use-case-hub) - Central storage
+   - Hub location: `~/Documents/ai-use-case-hub` (or `$AI_USECASES_DIR`)
 
 2. **Automatic Syncing:**
    - Happens on every git commit
-   - Files copied to central hub
-   - Symlinks created automatically
+   - Files copied from project to hub
+   - Organized by project, date, and topic automatically
 
 3. **Documentation Format:**
    - Filename: `YYYY-MM-DD_TICKET-XXXXX_description.md`
@@ -105,7 +114,19 @@ Offer to help them document:
 
 ## Troubleshooting Common Issues
 
+### CLI command not found
+
+```bash
+# Check PATH
+echo $PATH | grep ".local/bin"
+
+# Add to PATH manually
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
 ### Not a git repository
+
 ```bash
 cd /path/to/project
 git init
@@ -113,31 +134,40 @@ git add .
 git commit -m "Initial commit"
 ```
 
-### Scripts not executable
+### Hub not set up
+
+The CLI will work even without the hub, but to enable syncing:
+
 ```bash
-chmod +x ~/Documents/ai-use-case-hub/*.sh
+cd ~/Documents
+git clone https://github.com/james401/ai-use-case-hub.git ai-use-case-hub
+export AI_USECASES_DIR="$HOME/Documents/ai-use-case-hub"
 ```
 
+Or re-run the installer and answer 'Y' to set up the hub.
+
 ### VS Code extension not working
+
+- Install extension: `code --install-extension ~/.local/share/ai-use-case-cli/vscode-extension`
 - Check Settings → AI Session Documentor
-- Verify hubPath: `~/Documents/ai-use-case-hub`
+- Ensure CLI is in PATH
 - Reload VS Code window
 
 ## Next Steps
 
 After setup, suggest:
-1. Document current session if they just finished work
-2. Review the template: `~/Documents/ai-use-case-hub/TEMPLATE.md`
-3. Browse documentation: `README.md`, `QUICK-REFERENCE.md`
-4. Set up additional projects: `/setup-project` in each repo
-5. Configure VS Code extension if they use it
+1. Document current session: `ai-use-case document`
+2. View statistics: `ai-use-case stats`
+3. Set up additional projects: `ai-use-case --init` in each repo
+4. Install VS Code extension (optional)
+5. Explore slash commands in Claude Code
 
 ## Success Criteria
 
 User should have:
-- ✅ Hub cloned and scripts executable
+- ✅ CLI installed and in PATH
 - ✅ Current project set up (if applicable)
 - ✅ Understanding of how syncing works
 - ✅ Knowledge of how to document future sessions
-- ✅ Awareness of Claude Code slash commands
-- ✅ Awareness of VS Code extension commands
+- ✅ Awareness of available commands
+- ✅ Hub repository set up (optional but recommended)

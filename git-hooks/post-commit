@@ -10,7 +10,7 @@ if [ -n "$AI_USECASES_SYNC_SCRIPT" ]; then
 elif [ -n "$AI_USECASES_DIR" ]; then
     SYNC_SCRIPT="$AI_USECASES_DIR/sync-ai-use-cases.sh"
 else
-    SYNC_SCRIPT="$HOME/Documents/ai-use-cases/sync-ai-use-cases.sh"
+    SYNC_SCRIPT="$HOME/Documents/ai-use-case-hub/sync-ai-use-cases.sh"
 fi
 
 # Only sync if the sync script exists

@@ -4,107 +4,120 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Purpose
 
-This is a **centralized documentation repository** for tracking AI-assisted development workflows across multiple software projects. It is NOT a code repository - it's a knowledge management system that uses a symlink-based architecture for efficient storage and multiple view patterns.
+This repository contains the **CLI tools** for documenting AI-assisted development workflows across multiple software projects. These are the command-line utilities that work together with a separate documentation hub repository.
 
-## Onboarding for New Developers
+**Architecture:**
+- **This repo (ai-use-case-cli)**: CLI tools, scripts, VS Code extension
+- **Hub repo (ai-use-case-hub)**: Central documentation storage with symlink-based organization
 
-**If this repository is not yet installed on your machine**, follow these steps:
+The CLI tools in this repository provide commands for setting up projects, documenting AI sessions, syncing documentation, and searching use cases.
 
-### Step 1: Clone the Repository
+## Installation for End Users
 
-```bash
-cd ~/Documents
-git clone https://github.com/james401/ai-use-case-hub.git ai-use-cases
-cd ai-use-cases
-```
-
-### Step 2: Make Scripts Executable
+End users should install this CLI tool using:
 
 ```bash
-chmod +x setup-project.sh sync-ai-use-cases.sh document-ai-session.sh
+curl -fsSL https://raw.githubusercontent.com/james401/ai-use-case-cli/main/install.sh | bash
 ```
 
-### Step 3: Verify Installation
+Or clone and install manually:
 
 ```bash
-ls -l *.sh
-# Should show three executable scripts with -rwxr-xr-x permissions
+git clone https://github.com/james401/ai-use-case-cli.git ~/.local/share/ai-use-case-cli
+cd ~/.local/share/ai-use-case-cli
+./install.sh
 ```
 
-### Step 4: (Optional) Configure Environment
+This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
 
-Add to `~/.bashrc` or `~/.zshrc` for easier access:
+## What This Repository Contains
 
-```bash
-export AI_USECASES_DIR="$HOME/Documents/ai-use-cases"
-export PATH="$AI_USECASES_DIR:$PATH"
-```
+### Core CLI Tool
 
-Then reload: `source ~/.bashrc` (or `source ~/.zshrc`)
+- **`ai-use-case`**: Main CLI entry point with unified command interface
+  - `ai-use-case --init` - Setup a project
+  - `ai-use-case document` - Document an AI session
+  - `ai-use-case sync` - Sync to hub
+  - `ai-use-case search` - Search use cases
+  - `ai-use-case stats` - Show statistics
+  - `ai-use-case list` - List projects
+  - `ai-use-case view` - Open hub in file explorer
 
-### Step 5: Set Up Your First Project
-
-```bash
-cd /path/to/your/project
-~/Documents/ai-use-cases/setup-project.sh
-```
-
-You'll see:
-- ✓ Created: docs/ai-use-cases/
-- ✓ Git post-commit hook installed
-- ✓ Sync complete!
-
-**You're now ready to document AI sessions!**
-
-## Architecture Overview
-
-### Storage Model: Canonical + Views
-
-The repository uses a **single-source-of-truth with symlinked views** architecture:
-
-- **`by-project/`**: Canonical storage - all actual markdown files live here
-- **`by-date/`**: View layer - symlinks organized by YYYY/MM/
-- **`by-topic/`**: View layer - symlinks organized by topic slug
-
-**Critical principle**: Files are stored ONCE in `by-project/`. All other directories contain symlinks. This eliminates duplication while providing flexible browsing.
-
-### Automation System
-
-Projects are configured to auto-sync their AI use case documentation using:
+### Shell Scripts
 
 1. **`setup-project.sh`**: One-time setup for a project repository
    - Creates `docs/ai-use-cases/` directory in target project
    - Installs git post-commit hook
    - Adds `.gitignore` patterns for draft files
-   - Performs initial sync
+   - Performs initial sync to hub
 
-2. **`sync-ai-use-cases.sh`**: Syncs documents from project to central repo
-   - Copies files from project's `docs/ai-use-cases/` to `by-project/[project-name]/`
-   - Creates symlinks in `by-date/` based on YYYY-MM-DD prefix in filename
-   - Creates symlinks in `by-topic/` based on topic slug in filename
+2. **`sync-ai-use-cases.sh`**: Syncs documents from project to hub
+   - Copies files from project's `docs/ai-use-cases/` to hub's `by-project/[project-name]/`
+   - Creates symlinks in hub's `by-date/` based on YYYY-MM-DD prefix
+   - Creates symlinks in hub's `by-topic/` based on topic slug
    - Idempotent - safe to run multiple times
 
-3. **`git-hooks/post-commit`**: Installed in each project's `.git/hooks/`
-   - Detects when markdown files in `ai-use-cases/` directories are committed
-   - Automatically triggers sync script
-   - Non-blocking - sync failures don't prevent commits
-
-4. **`document-ai-session.sh`**: Interactive AI session documentor (NEW)
+3. **`document-ai-session.sh`**: Interactive AI session documentor
    - Guides you through documenting an AI-assisted coding session
    - Captures git changes, file modifications, timestamps
-   - Auto-populates TEMPLATE.md with session data
+   - Auto-populates template with session data
    - Can be triggered from shell or VS Code extension
    - Integrates with existing sync workflow
 
-5. **VS Code Extension**: `vscode-extension/` (NEW)
-   - One-click documentation from VS Code
-   - Triggered via Command Palette or keyboard shortcut (Ctrl+Alt+D)
-   - Can be invoked from GitHub Copilot chat: `@workspace document my AI session`
-   - Wraps the document-ai-session.sh script
+4. **`install.sh`**: Installs the CLI tool globally
+   - Creates symlink to `~/.local/bin/ai-use-case`
+   - Optionally adds environment variables to shell profile
+   - No system-wide changes - everything is user-scoped
+
+5. **`uninstall.sh`**: Removes the CLI tool
+   - Removes symlink from `~/.local/bin/`
+   - Optionally removes the CLI directory
+   - Optionally cleans shell profile entries
+
+### Git Hook Template
+
+- **`git-hooks/post-commit`**: Installed in each project's `.git/hooks/`
+  - Detects when markdown files in `ai-use-cases/` directories are committed
+  - Automatically triggers sync script to push docs to hub
+  - Non-blocking - sync failures don't prevent commits
+
+### VS Code Extension
+
+- **`vscode-extension/`**: VS Code extension for one-click documentation
+  - Triggered via Command Palette or keyboard shortcut (Ctrl+Alt+D)
+  - Can be invoked from GitHub Copilot chat: `@workspace document my AI session`
+  - Wraps the document-ai-session.sh script
+
+### Claude Code Integration
+
+- **`.claude/commands/`**: Slash commands for Claude Code
+  - `/quick-start` - Get started guide
+  - `/setup-project` - Setup a project
+  - `/document-session` - Document an AI session
+  - `/sync-usecases` - Sync to hub
+  - `/search-usecases` - Search use cases
+
+## Documentation Hub Repository
+
+The CLI tools sync documentation to a **separate hub repository** that provides:
+
+- **`by-project/`**: Canonical storage - all actual markdown files
+- **`by-date/`**: View layer - symlinks organized by YYYY/MM/
+- **`by-topic/`**: View layer - symlinks organized by topic slug
+- **`TEMPLATE.md`**: Comprehensive use case template
+- **`QUICK-REFERENCE.md`**: Command reference guide
+- **`CHANGELOG.md`**: Version history
+
+The hub repository should be cloned separately:
+
+```bash
+cd ~/Documents
+git clone https://github.com/james401/ai-use-case-hub.git ai-use-case-hub
+```
 
 ## File Naming Convention
 
-All use case documents MUST follow this pattern:
+All use case documents created by these tools MUST follow this pattern:
 ```
 YYYY-MM-DD_TICKET-XXXXX_brief-description.md
 ```
@@ -117,130 +130,140 @@ YYYY-MM-DD_TICKET-XXXXX_brief-description.md
 - Date extraction: `^([0-9]{4})-([0-9]{2})-([0-9]{2})`
 - Ticket and topic: `_([A-Z]+-[0-9]+)_(.+)\.md$`
 
-The sync script uses regex to parse filenames and organize symlinks accordingly.
+The sync script uses regex to parse filenames and organize symlinks in the hub.
 
-## Common Commands
+## Environment Variables
+
+The scripts support these optional environment variables:
+
+```bash
+# Location of the documentation hub (not this CLI repo)
+export AI_USECASES_DIR="$HOME/Documents/ai-use-case-hub"
+
+# Path to the sync script (auto-detected if AI_USECASES_DIR is set)
+export AI_USECASES_SYNC_SCRIPT="$AI_USECASES_DIR/sync-ai-use-cases.sh"
+```
+
+**Note**: If `AI_USECASES_DIR` is not set, scripts default to:
+1. Directory where the script is located (for development)
+2. `$HOME/Documents/ai-use-case-hub` (for installed hub)
+
+## Common Commands (End User Perspective)
 
 ### Setting Up a New Project
 
 ```bash
-# From within the project you want to configure
-~/Documents/ai-use-cases/setup-project.sh
-
-# Or specify a path
-~/Documents/ai-use-cases/setup-project.sh /path/to/project
+cd /path/to/your/project
+ai-use-case --init
 ```
 
-**What this does:**
+This runs `setup-project.sh` which:
 - Creates `docs/ai-use-cases/` in the project
 - Installs post-commit hook
 - Adds `.gitignore` patterns
-- Runs initial sync
+- Runs initial sync to hub
+
+### Documenting an AI Session
+
+```bash
+cd /path/to/your/project
+ai-use-case document
+```
+
+This runs `document-ai-session.sh` which:
+- Collects git changes and session statistics
+- Guides you through interactive prompts
+- Generates documentation using the hub's TEMPLATE.md
+- Saves to `docs/ai-use-cases/` with proper naming
+- Optionally commits and syncs automatically
 
 ### Manual Sync
 
 ```bash
-# Sync current directory
-~/Documents/ai-use-cases/sync-ai-use-cases.sh
-
-# Sync specific project
-~/Documents/ai-use-cases/sync-ai-use-cases.sh /path/to/project
+cd /path/to/your/project
+ai-use-case sync
 ```
 
-### Documenting AI Sessions (NEW)
-
-**From Shell:**
-```bash
-# Interactive session documentor
-~/Documents/ai-use-cases/document-ai-session.sh
-
-# Or for specific project
-~/Documents/ai-use-cases/document-ai-session.sh /path/to/project
-```
-
-**From VS Code:**
-- Command Palette: `AI Session: Document AI Session`
-- Keyboard: `Ctrl+Alt+D` (or `Cmd+Alt+D` on Mac)
-- Copilot Chat: `@workspace document my AI session`
-
-**What it does:**
-- Collects git changes and session statistics
-- Guides you through interactive prompts
-- Generates documentation using TEMPLATE.md
-- Saves to `docs/ai-use-cases/` with proper naming
-- Optionally commits and syncs automatically
-
-### Viewing Use Cases
+### Searching Use Cases
 
 ```bash
-# By project (canonical storage)
-ls ~/Documents/ai-use-cases/by-project/document-handler-srv/
-
-# By date (symlinks)
-ls ~/Documents/ai-use-cases/by-date/2025/10/
-
-# By topic (symlinks)
-ls ~/Documents/ai-use-cases/by-topic/
-
-# Recent use cases (last 10)
-find ~/Documents/ai-use-cases/by-date -name "*.md" -type f -printf '%T@ %p\n' | \
-  sort -rn | head -10 | cut -d' ' -f2-
+ai-use-case search authentication
 ```
 
-### Analyzing Use Cases
+### Viewing Statistics
 
 ```bash
-# Count use cases per project
-for dir in ~/Documents/ai-use-cases/by-project/*/; do
-  echo "$(basename "$dir"): $(find "$dir" -name "*.md" | wc -l)"
-done
-
-# Disk usage (actual files only, no symlink duplication)
-du -sh ~/Documents/ai-use-cases/by-project/
+ai-use-case stats
 ```
 
-## Environment Variables
+## Development Workflow
 
-The scripts respect these optional environment variables:
+When developing or modifying this CLI tool repository:
+
+### Script Development
+
+All scripts are self-contained bash scripts with embedded documentation. They:
+- Use `set -e` for fail-fast behavior
+- Include color-coded output for user feedback
+- Support both environment variables and auto-detection for paths
+- Are idempotent where applicable
+
+### Path Resolution Strategy
+
+Scripts resolve paths in this priority order:
+1. `AI_USECASES_DIR` environment variable (points to hub)
+2. Script's own directory (for development and installed scenarios)
+3. Default: `$HOME/Documents/ai-use-case-hub`
+
+### Testing Changes
 
 ```bash
-export AI_USECASES_DIR="$HOME/Documents/ai-use-cases"
-export AI_USECASES_SYNC_SCRIPT="$AI_USECASES_DIR/sync-ai-use-cases.sh"
+# Test CLI wrapper
+./ai-use-case --help
+
+# Test setup script
+./setup-project.sh /tmp/test-project
+
+# Test sync script
+./sync-ai-use-cases.sh /tmp/test-project
+
+# Test documentation script
+./document-ai-session.sh /tmp/test-project
 ```
 
-## Document Template
+### VS Code Extension Development
 
-Use cases should follow the comprehensive template in `TEMPLATE.md`, which includes:
-
-- Business context and objectives
-- Step-by-step workflow with time tracking
-- Technical details including tools and token usage
-- Cost efficiency analysis
-- Results and success metrics
-- Key learnings and best practices
-- Replicability framework
-- Implementation summary with file lists
-
-The template emphasizes measurable outcomes, cost analysis, and knowledge transfer.
+```bash
+cd vscode-extension
+npm install
+npm run compile
+# Press F5 in VS Code to launch Extension Development Host
+```
 
 ## Important Constraints
 
-1. **Never modify files in `by-date/` or `by-topic/`** - these are symlinks. Always edit files in `by-project/` or the original project location.
+1. **This repo contains tools only** - no `by-project/`, `by-date/`, or `by-topic/` directories. Those are in the hub repository.
 
 2. **Respect the naming convention** - the sync script regex depends on it:
    - Must start with YYYY-MM-DD
    - Must include TICKET-XXXXX format
    - Must have descriptive slug after ticket
 
-3. **Hub infrastructure versioning** - This repository uses git for version control of the hub infrastructure itself (scripts, documentation, templates). The synced use case files in `by-project/`, `by-date/`, and `by-topic/` directories are NOT version controlled here (they're gitignored). Use cases are versioned in their original project repositories.
+3. **CLI tools are version controlled here** - Scripts, documentation, and extension code are tracked in this repository.
 
-4. **Script paths are configurable** - The scripts support the `AI_USECASES_DIR` environment variable to specify the hub location. If not set, they default to `$HOME/Documents/ai-use-cases` or auto-detect based on script location.
+4. **Hub infrastructure is separate** - The documentation hub with its symlink architecture is a separate repository.
 
-## Workflow for Creating New Use Cases
+5. **Scripts must work in multiple contexts**:
+   - Installed globally via symlink
+   - Run directly from git clone
+   - Called from VS Code extension
+   - Invoked via Claude Code slash commands
+
+## Workflow for Creating New Use Cases (User Perspective)
 
 **Option 1: Automated (Recommended)**
 1. Complete your AI-assisted coding session
-2. Run `~/Documents/ai-use-cases/document-ai-session.sh` (or use VS Code command)
+2. Run `ai-use-case document` (or use VS Code command)
 3. Follow interactive prompts
 4. Script generates documentation, commits, and syncs automatically
 
@@ -249,29 +272,42 @@ The template emphasizes measurable outcomes, cost analysis, and knowledge transf
 2. Create markdown file in `docs/ai-use-cases/` with proper naming
 3. Document your AI-assisted work using the template
 4. Commit the file with git
-5. Post-commit hook automatically syncs to central repository
+5. Post-commit hook automatically syncs to hub
 
 **Result (both options):**
-File appears in:
+File appears in the hub at:
 - `by-project/[project-name]/[filename].md` (actual file)
 - `by-date/[year]/[month]/[project]_[filename].md` (symlink)
 - `by-topic/[topic-slug]/[project]_[filename].md` (symlink)
 
-## Key Files
+## Key Files in This Repository
 
-- **TEMPLATE.md**: Comprehensive use case template with all sections
-- **README.md**: Full documentation for the system
-- **QUICK-REFERENCE.md**: Condensed command reference
-- **CHANGELOG.md**: Version history (v2.0 introduced symlink architecture)
+- **ai-use-case**: Main CLI entry point
 - **setup-project.sh**: Project configuration script
-- **sync-ai-use-cases.sh**: Synchronization script (v2.0)
-- **document-ai-session.sh**: Interactive AI session documentor (NEW)
+- **sync-ai-use-cases.sh**: Synchronization script
+- **document-ai-session.sh**: Interactive AI session documentor
+- **install.sh**: Installation script
+- **uninstall.sh**: Uninstallation script
 - **git-hooks/post-commit**: Hook template for auto-sync
-- **vscode-extension/**: VS Code extension for one-click documentation (NEW)
+- **vscode-extension/**: VS Code extension for one-click documentation
+- **README.md**: User-facing documentation
+- **CLAUDE.md**: This file - guidance for Claude Code
 
 ## Troubleshooting
 
+### CLI command not found
+
+```bash
+# Check if ~/.local/bin is in PATH
+echo $PATH | grep ".local/bin"
+
+# Add to shell profile if missing
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
 ### Hook not executing
+
 ```bash
 # Check if executable
 ls -la /path/to/project/.git/hooks/post-commit
@@ -281,26 +317,31 @@ chmod +x /path/to/project/.git/hooks/post-commit
 ```
 
 ### Sync failing
+
 ```bash
 # Debug mode
-bash -x ~/Documents/ai-use-cases/sync-ai-use-cases.sh /path/to/project
+bash -x ~/.local/bin/ai-use-case sync
+
+# Check hub exists
+ls ~/Documents/ai-use-case-hub
 ```
 
-### Files not syncing
+### Hub repository not found
+
 ```bash
-# Verify naming pattern
-find /path/to/project -name "*.md" | grep ai-use-cases
-
-# Check for correct directory structure
-find /path/to/project -type d -name "ai-use-cases"
+# Clone the hub repository
+cd ~/Documents
+git clone https://github.com/james401/ai-use-case-hub.git ai-use-case-hub
 ```
 
-## Example Use Case
+## Version History
 
-See `by-project/document-handler-srv/2025-10-13_LSFB-63055_add-environment-parameter-message-flow.md` for a comprehensive example demonstrating:
-- Systematic refactoring across 15 files
-- Integration with Jira via Atlassian MCP
-- Detailed token usage and cost analysis (~106k tokens, $2.12)
-- Time savings quantification (45 min vs 3-4 hours manual)
-- Test-driven validation (43/43 tests passing)
-- Structured commit history (7 commits, 1 per Jira issue)
+- **v2.1.0**: Separated CLI tools from documentation hub, unified CLI interface
+- **v2.0.0**: Introduced symlink architecture (in hub repository)
+- **v1.0.0**: Initial release with basic sync functionality
+
+## Related Repositories
+
+- **[ai-use-case-hub](https://github.com/james401/ai-use-case-hub)** - Documentation hub with symlink-based organization
+- **[claude-code](https://claude.com/code)** - AI coding assistant
+- **[github-copilot](https://github.com/features/copilot)** - AI pair programmer

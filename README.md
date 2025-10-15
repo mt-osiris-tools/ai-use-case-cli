@@ -20,8 +20,8 @@ curl -fsSL https://raw.githubusercontent.com/james401/ai-use-case-cli/main/insta
 Or clone and install manually:
 
 ```bash
-git clone https://github.com/james401/ai-use-case-cli.git ~/ai-use-case-cli
-cd ~/ai-use-case-cli
+git clone https://github.com/james401/ai-use-case-cli.git ~/.local/share/ai-use-case-cli
+cd ~/.local/share/ai-use-case-cli
 ./install.sh
 ```
 
@@ -150,7 +150,7 @@ See the [template](https://github.com/james401/ai-use-case-hub/blob/main/TEMPLAT
 Install the VS Code extension for one-click documentation:
 
 ```bash
-code --install-extension ~/ai-use-case-cli/vscode-extension
+code --install-extension ~/.local/share/ai-use-case-cli/vscode-extension
 ```
 
 **Usage:**
@@ -161,7 +161,7 @@ code --install-extension ~/ai-use-case-cli/vscode-extension
 ## Uninstall
 
 ```bash
-cd ~/ai-use-case-cli
+cd ~/.local/share/ai-use-case-cli
 ./uninstall.sh
 ```
 

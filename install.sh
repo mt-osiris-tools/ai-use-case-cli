@@ -1,12 +1,12 @@
 #!/bin/bash
-# AI Use Case Hub - Installation Script
+# AI Use Case CLI - Installation Script
 #
 # Quick install:
-#   curl -fsSL https://raw.githubusercontent.com/james401/ai-use-case-hub/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/james401/ai-use-case-cli/main/install.sh | bash
 #
 # Or manual:
-#   git clone https://github.com/james401/ai-use-case-hub.git ~/Documents/ai-use-case-hub
-#   cd ~/Documents/ai-use-case-hub
+#   git clone https://github.com/james401/ai-use-case-cli.git ~/.local/share/ai-use-case-cli
+#   cd ~/.local/share/ai-use-case-cli
 #   ./install.sh
 
 set -e
@@ -41,7 +41,7 @@ if [ -f "ai-use-case" ] && [ -d ".git" ]; then
     echo -e "${GREEN}✓${NC} Detected existing repository"
 else
     # Need to clone
-    INSTALL_DIR="$HOME/Documents/ai-use-case-hub"
+    INSTALL_DIR="$HOME/.local/share/ai-use-case-cli"
 
     if [ -d "$INSTALL_DIR" ]; then
         echo -e "${YELLOW}Repository already exists at $INSTALL_DIR${NC}"
@@ -54,7 +54,8 @@ else
     fi
 
     echo -e "${CYAN}Cloning repository...${NC}"
-    git clone https://github.com/james401/ai-use-case-hub.git "$INSTALL_DIR"
+    mkdir -p "$(dirname "$INSTALL_DIR")"
+    git clone https://github.com/james401/ai-use-case-cli.git "$INSTALL_DIR"
     cd "$INSTALL_DIR"
 fi
 
@@ -98,7 +99,7 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     if [[ "$add_to_path" =~ ^[Yy]$ ]]; then
         if [ -f "$HOME/.bashrc" ]; then
             echo '' >> "$HOME/.bashrc"
-            echo '# AI Use Case Hub' >> "$HOME/.bashrc"
+            echo '# AI Use Case CLI' >> "$HOME/.bashrc"
             echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
             echo -e "${GREEN}✓${NC} Added to ~/.bashrc"
             echo -e "Run: ${CYAN}source ~/.bashrc${NC} to apply"
@@ -108,14 +109,35 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     fi
 fi
 
-# Setup environment variable (optional)
+# Setup documentation hub (optional)
 echo ""
-read -p "Add AI_USECASES_DIR to shell profile? (Y/n): " add_env
-add_env=${add_env:-y}
+echo -e "${YELLOW}Documentation Hub Setup:${NC}"
+echo "The CLI tools require a separate documentation hub repository."
+echo "Default location: ~/Documents/ai-use-case-hub"
+echo ""
+read -p "Set up documentation hub now? (Y/n): " setup_hub
+setup_hub=${setup_hub:-y}
 
-if [[ "$add_env" =~ ^[Yy]$ ]]; then
+if [[ "$setup_hub" =~ ^[Yy]$ ]]; then
+    HUB_DIR="$HOME/Documents/ai-use-case-hub"
+
+    if [ -d "$HUB_DIR" ]; then
+        echo -e "${GREEN}✓${NC} Hub already exists at $HUB_DIR"
+    else
+        echo -e "${CYAN}Cloning documentation hub...${NC}"
+        mkdir -p "$(dirname "$HUB_DIR")"
+        if git clone https://github.com/james401/ai-use-case-hub.git "$HUB_DIR" 2>/dev/null; then
+            echo -e "${GREEN}✓${NC} Hub repository cloned to $HUB_DIR"
+        else
+            echo -e "${YELLOW}Note: Hub repository not yet available publicly${NC}"
+            echo -e "Creating hub directory structure manually at $HUB_DIR"
+            mkdir -p "$HUB_DIR"/{by-project,by-date,by-topic}
+            echo -e "${GREEN}✓${NC} Hub directory created at $HUB_DIR"
+        fi
+    fi
+
+    # Add AI_USECASES_DIR to shell profile
     SHELL_PROFILE=""
-
     if [ -f "$HOME/.bashrc" ]; then
         SHELL_PROFILE="$HOME/.bashrc"
     elif [ -f "$HOME/.zshrc" ]; then
@@ -124,12 +146,18 @@ if [[ "$add_env" =~ ^[Yy]$ ]]; then
 
     if [ -n "$SHELL_PROFILE" ]; then
         if ! grep -q "AI_USECASES_DIR" "$SHELL_PROFILE"; then
-            echo "export AI_USECASES_DIR=\"$INSTALL_DIR\"" >> "$SHELL_PROFILE"
+            echo '' >> "$SHELL_PROFILE"
+            echo '# AI Use Case Hub' >> "$SHELL_PROFILE"
+            echo "export AI_USECASES_DIR=\"$HUB_DIR\"" >> "$SHELL_PROFILE"
             echo -e "${GREEN}✓${NC} Added AI_USECASES_DIR to $SHELL_PROFILE"
         else
             echo -e "${YELLOW}AI_USECASES_DIR already in $SHELL_PROFILE${NC}"
         fi
     fi
+else
+    echo -e "${YELLOW}Skipped hub setup.${NC} You can set it up later with:"
+    echo -e "  ${CYAN}git clone https://github.com/james401/ai-use-case-hub.git ~/Documents/ai-use-case-hub${NC}"
+    echo -e "  ${CYAN}export AI_USECASES_DIR=\"\$HOME/Documents/ai-use-case-hub\"${NC}"
 fi
 
 echo ""
