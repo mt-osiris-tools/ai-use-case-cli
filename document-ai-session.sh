@@ -23,12 +23,6 @@
 
 set -e
 
-# Configuration - Auto-detect hub location
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CENTRAL_DIR="${AI_USECASES_DIR:-$SCRIPT_DIR}"
-TEMPLATE_FILE="$CENTRAL_DIR/TEMPLATE.md"
-SYNC_SCRIPT="$CENTRAL_DIR/sync-ai-use-cases.sh"
-
 # Colors
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -36,6 +30,51 @@ BLUE='\033[0;34m'
 RED='\033[0;31m'
 CYAN='\033[0;36m'
 NC='\033[0m'
+
+# Function to ensure hub repository exists
+ensure_hub_exists() {
+    local hub_dir
+    local default_hub="$HOME/Documents/ai-use-case-hub"
+
+    # Check if AI_USECASES_DIR is set
+    if [ -n "$AI_USECASES_DIR" ]; then
+        hub_dir="$AI_USECASES_DIR"
+    else
+        hub_dir="$default_hub"
+    fi
+
+    # Check if hub exists
+    if [ ! -d "$hub_dir" ]; then
+        echo -e "${YELLOW}Hub repository not found at: $hub_dir${NC}" >&2
+        echo -e "${BLUE}Cloning ai-use-case-hub repository...${NC}" >&2
+
+        # Create parent directory if needed
+        mkdir -p "$(dirname "$hub_dir")"
+
+        # Clone the repository
+        if git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git "$hub_dir" 2>/dev/null; then
+            echo -e "${GREEN}✓${NC} Hub repository cloned successfully" >&2
+        else
+            echo -e "${RED}Error: Failed to clone hub repository${NC}" >&2
+            echo "Please clone manually:" >&2
+            echo "  git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git $hub_dir" >&2
+            exit 1
+        fi
+    fi
+
+    # Verify hub structure
+    if [ ! -d "$hub_dir/by-project" ]; then
+        mkdir -p "$hub_dir/by-project" "$hub_dir/by-date" "$hub_dir/by-topic"
+    fi
+
+    echo "$hub_dir"
+}
+
+# Configuration - Auto-detect hub location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CENTRAL_DIR=$(ensure_hub_exists)
+TEMPLATE_FILE="$CENTRAL_DIR/TEMPLATE.md"
+SYNC_SCRIPT="$CENTRAL_DIR/sync-ai-use-cases.sh"
 
 # Show help
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then

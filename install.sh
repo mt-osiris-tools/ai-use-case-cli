@@ -29,6 +29,7 @@ ${CYAN}
 ╚═╝  ╚═╝╚═╝     ╚═════╝ ╚══════╝╚══════╝     ╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝
 ${NC}
 ${YELLOW}        📊 AI-Assisted Development Session Documentator${NC}
+                                 Powered by Osiris${NC} 
 ${GREEN}        ═══════════════════════════════════════════════${NC}
 
 EOF
