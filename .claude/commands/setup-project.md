@@ -20,9 +20,9 @@ Configure the current project to automatically sync AI use case documentation to
    ls -la .git/hooks/post-commit 2>/dev/null && grep -q "AI Use Cases" .git/hooks/post-commit && echo "Hook installed" || echo "Hook not installed"
    ```
 
-3. Run the setup script:
+3. Run the CLI setup command:
    ```bash
-   ~/Documents/ai-use-case-hub/setup-project.sh
+   ai-use-case --init
    ```
 
 4. Verify the setup:
@@ -32,7 +32,7 @@ Configure the current project to automatically sync AI use case documentation to
    ls -la .git/hooks/post-commit
 
    # Show the user where files will be synced
-   echo "Files will sync to: ~/Documents/ai-use-case-hub/by-project/$(basename $(git rev-parse --show-toplevel))/"
+   echo "Files will sync to the hub at: \$AI_USECASES_DIR/by-project/$(basename $(git rev-parse --show-toplevel))/"
    ```
 
 5. Explain to the user:
@@ -50,6 +50,6 @@ Configure the current project to automatically sync AI use case documentation to
 ## Next Steps
 
 Suggest the user:
-1. Document their next AI-assisted session
-2. Review the template at `~/Documents/ai-use-case-hub/TEMPLATE.md`
-3. Use `/document-session` command after their next coding session
+1. Document their next AI-assisted session using `ai-use-case document`
+2. View the template in the hub repository (location shown during setup)
+3. Use `/document-session` slash command after their next coding session

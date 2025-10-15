@@ -17,9 +17,9 @@ Run the interactive AI session documentor script and guide the user through the 
    ls -la docs/ai-use-cases/ 2>/dev/null || echo "Not set up"
    ```
 
-2. If not set up, offer to run the setup script:
+2. If not set up, offer to run the setup:
    ```bash
-   ~/Documents/ai-use-case-hub/setup-project.sh
+   ai-use-case --init
    ```
 
 3. Gather context about the session by running:
@@ -32,7 +32,7 @@ Run the interactive AI session documentor script and guide the user through the 
 
 4. Run the interactive documentor:
    ```bash
-   ~/Documents/ai-use-case-hub/document-ai-session.sh
+   ai-use-case document
    ```
 
 5. After the script completes, offer to help the user:

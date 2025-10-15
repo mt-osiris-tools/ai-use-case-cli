@@ -10,17 +10,18 @@ Document your AI-assisted coding sessions with one command. Works seamlessly wit
 - **Multiple Triggers**:
   - Command Palette: `AI Session: Document AI Session`
   - Keyboard Shortcut: `Ctrl+Alt+D` (or `Cmd+Alt+D` on Mac)
-  - GitHub Copilot Chat: Type `@workspace /document-ai-session`
-- **Auto-Sync**: Integrates with ai-use-cases central repository
+  - GitHub Copilot Chat: Type `@workspace document my AI session`
+  - This will trigger the extension to start documenting your current AI-assisted coding session, guiding you through the workflow and automatically capturing relevant details.
+- **Auto-Sync**: Integrates with ai-use-case-hub central repository
 
 ## Installation
 
 ### From Source (Development)
 
-1. Clone the ai-use-cases repository:
+1. Clone the ai-use-case-cli repository:
    ```bash
-   git clone https://github.com/james401/ai-use-case-hub.git
-   cd ai-use-case-hub/vscode-extension
+   git clone https://github.com/james401/ai-use-case-cli.git
+   cd ai-use-case-cli/vscode-extension
    ```
 
 2. Install dependencies:
@@ -44,14 +45,14 @@ Document your AI-assisted coding sessions with one command. Works seamlessly wit
 
 ## Setup
 
-1. Ensure you have the ai-use-cases repository set up:
+1. Install the AI Use Case CLI tools:
    ```bash
-   git clone https://github.com/james401/ai-use-case-hub.git ~/Documents/ai-use-cases
+   curl -fsSL https://raw.githubusercontent.com/james401/ai-use-case-cli/main/install.sh | bash
    ```
 
-2. Set up your project with ai-use-cases:
+2. Set up your project for documentation:
    ```bash
-   ~/Documents/ai-use-cases/setup-project.sh
+   ai-use-case --init
    ```
 
 3. Configure the extension (optional):
@@ -77,14 +78,13 @@ Document your AI-assisted coding sessions with one command. Works seamlessly wit
 
 1. Open GitHub Copilot Chat
 2. Type: `@workspace document my AI session`
-3. Or use the command: `/document-ai-session`
-4. Follow the prompts
+3. Follow the prompts
 
 ### From Terminal (Direct)
 
-You can also run the script directly:
+You can also use the CLI tool directly:
 ```bash
-~/Documents/ai-use-cases/document-ai-session.sh
+ai-use-case document
 ```
 
 ## Configuration
@@ -92,7 +92,7 @@ You can also run the script directly:
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `aiSessionDocumentor.enabled` | `true` | Enable/disable the extension |
-| `aiSessionDocumentor.scriptPath` | `~/Documents/ai-use-cases/document-ai-session.sh` | Path to the documentation script |
+| `aiSessionDocumentor.cliCommand` | `ai-use-case` | CLI command to use for documentation |
 | `aiSessionDocumentor.autoOpenEditor` | `true` | Auto-open generated docs in editor |
 | `aiSessionDocumentor.autoCommit` | `false` | Auto-commit generated documentation |
 
@@ -133,29 +133,32 @@ This extension integrates with the [AI Use Cases Hub](https://github.com/james40
 
 ## Troubleshooting
 
-### Script not found
+### CLI command not found
 
-Ensure the ai-use-cases repository is cloned to the default location:
+Ensure the AI Use Case CLI is installed:
 ```bash
-ls ~/Documents/ai-use-cases/document-ai-session.sh
+which ai-use-case
 ```
 
-If it's in a different location, update the setting `aiSessionDocumentor.scriptPath`.
+If not found, install it:
+```bash
+curl -fsSL https://raw.githubusercontent.com/james401/ai-use-case-cli/main/install.sh | bash
+```
 
 ### Project not set up
 
-Run the setup script in your project:
+Initialize your project for AI use case documentation:
 ```bash
 cd /path/to/your/project
-~/Documents/ai-use-cases/setup-project.sh
+ai-use-case --init
 ```
 
 ### Terminal doesn't open
 
 The extension launches an integrated terminal. If it doesn't appear, check:
 - VS Code has permission to execute shell scripts
-- The script path is correct in settings
-- The script is executable: `chmod +x ~/Documents/ai-use-cases/document-ai-session.sh`
+- The CLI command is available in PATH
+- Your shell profile includes `~/.local/bin` in PATH
 
 ## Development
 
@@ -163,8 +166,8 @@ To contribute or modify this extension:
 
 ```bash
 # Clone and install
-git clone https://github.com/james401/ai-use-case-hub.git
-cd ai-use-case-hub/vscode-extension
+git clone https://github.com/james401/ai-use-case-cli.git
+cd ai-use-case-cli/vscode-extension
 npm install
 
 # Watch mode for development
@@ -184,6 +187,7 @@ MIT
 
 ## Links
 
-- [GitHub Repository](https://github.com/james401/ai-use-case-hub)
-- [Documentation](https://github.com/james401/ai-use-case-hub/blob/main/README.md)
-- [Issue Tracker](https://github.com/james401/ai-use-case-hub/issues)
+- [CLI Tools Repository](https://github.com/james401/ai-use-case-cli)
+- [Documentation Hub Repository](https://github.com/james401/ai-use-case-hub)
+- [Documentation](https://github.com/james401/ai-use-case-cli/blob/main/README.md)
+- [Issue Tracker](https://github.com/james401/ai-use-case-cli/issues)
