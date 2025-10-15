@@ -1,56 +1,132 @@
-# Document AI Session
+# Document AI Session - Automatic Mode
 
-You are helping the user document an AI-assisted coding session they just completed.
+**IMPORTANT**: You are Claude Code, and you should **automatically generate documentation** based on git history and conversation context. Do NOT run the interactive `document-ai-session.sh` script or ask the user to fill in details.
 
 ## Your Task
 
-Run the interactive AI session documentor script and guide the user through the process.
+Automatically document the AI-assisted coding session that just occurred by analyzing git history and the conversation you had with the user.
 
-## Steps
+## Automatic Documentation Workflow
 
-1. First, check if we're in a git repository and if it's set up for AI use cases:
-   ```bash
-   # Check if in git repo
-   git rev-parse --show-toplevel
+### Step 1: Verify Setup
 
-   # Check if ai-use-cases directory exists
-   ls -la docs/ai-use-cases/ 2>/dev/null || echo "Not set up"
-   ```
+Check if we're in a git repository with AI use cases configured:
+```bash
+git rev-parse --show-toplevel
+ls -la docs/ai-use-cases/ 2>/dev/null || echo "Not set up"
+```
 
-2. If not set up, offer to run the setup:
-   ```bash
-   ai-use-case --init
-   ```
+If not set up, offer to run: `bash ~/.local/share/ai-use-case-cli/setup-project.sh`
 
-3. Gather context about the session by running:
-   ```bash
-   # Get git status and recent changes
-   git status --short
-   git log --oneline --since="24 hours ago" | head -10
-   git diff --stat HEAD~1..HEAD
-   ```
+### Step 2: Analyze Git History (Run in Parallel)
 
-4. Run the interactive documentor:
-   ```bash
-   ai-use-case document
-   ```
+Gather comprehensive git data:
+```bash
+# Recent commits with relative time
+git log --since="24 hours ago" --pretty=format:"%h - %s (%ar)" | head -20
 
-5. After the script completes, offer to help the user:
-   - Fill in TODO sections in the generated document
-   - Add code snippets
-   - Calculate token usage if they tracked it
-   - Review the documentation before committing
+# Latest commit details and stats
+git show --stat HEAD
 
-## Additional Context
+# Full diff of latest changes
+git diff HEAD~1..HEAD
 
-- The user just completed an AI-assisted coding session using Claude Code, GitHub Copilot, or both
-- They want to document what was accomplished for future reference
-- Be proactive about filling in details from the git history
-- Help them quantify time saved and results achieved
+# Current status
+git status --short
+```
 
-## Output
+### Step 3: Extract Session Information
 
-After documenting, show them:
-- Where the file was saved
-- How to view it in the central repository
-- Next steps for completing the documentation
+From the data gathered, automatically determine:
+
+- **Date**: Use today's date in YYYY-MM-DD format
+- **Ticket/Issue**: Extract from commit messages (e.g., HUB-001, PROJ-1234) or infer logical next number
+- **Brief description**: Summarize main work from commit messages and conversation
+- **AI Tool Used**: "Claude Code (Sonnet 4.5)"
+- **Complexity**: Assess from scope (Low: 1-3 files, Medium: 4-10 files, High: 10+ files or architectural)
+- **Time saved**: Estimate based on complexity (Low: 0.5-1h, Medium: 1-3h, High: 3-8h)
+- **TL;DR - What**: Summarize from conversation context what was accomplished
+- **TL;DR - Result**: Describe outcome and impact
+- **Time spent**: Estimate from conversation (typically 15-60 minutes for AI-assisted)
+- **Objective**: Extract from conversation - what problem was being solved
+- **Background**: Extract from conversation - why this work was needed
+
+### Step 4: Generate Complete Documentation
+
+Create a comprehensive markdown file following TEMPLATE.md structure:
+
+**Filename**: `docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_brief-description-slug.md`
+
+**Content Requirements**:
+- ✅ All sections filled with real data (NO "TODO" or placeholders)
+- ✅ Actual git statistics (files changed, lines added/removed)
+- ✅ Code examples from conversation where relevant
+- ✅ Quantitative metrics (files, commits, tests, etc.)
+- ✅ Qualitative insights from conversation context
+- ✅ Professional formatting and completeness
+
+**Use the Write tool** to create the file with full content.
+
+### Step 5: Commit and Sync
+
+Commit the documentation and sync to hub:
+```bash
+git add docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_brief-description-slug.md
+git commit -m "docs: AI session YYYY-MM-DD - TICKET-XXX - Brief description
+
+[Additional details about what was documented...]
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+```
+
+Then sync to central hub:
+```bash
+bash ~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh .
+```
+
+## Key Principles
+
+1. **Be Automatic**: Don't ask the user to fill anything in - you have all the context
+2. **Be Complete**: Generate comprehensive documentation with all sections filled
+3. **Be Precise**: Use exact numbers from git (files changed, lines modified, commits)
+4. **Be Contextual**: Use conversation history to add qualitative insights
+5. **Be Professional**: Follow template structure, use proper formatting
+
+## Example Output
+
+After completion, inform the user:
+
+```
+✅ Documentation created and synced!
+
+File: docs/ai-use-cases/2025-10-14_HUB-002_update-github-organization-references.md
+
+Summary:
+- 5 files updated
+- 22 replacements made
+- Time saved: ~1 hour
+
+Available in hub at:
+- by-project/[project-name]/
+- by-date/2025/10/
+- by-topic/[topic-slug]/
+```
+
+## When NOT to Use Automatic Mode
+
+Only use manual/interactive mode if:
+- User explicitly runs `ai-use-case document` in shell (not through you)
+- No git history is available
+- User specifically requests to manually input details
+
+Otherwise, ALWAYS use automatic mode when `/document-session` is invoked.
+
+## Reference Examples
+
+See these auto-generated examples:
+- `docs/ai-use-cases/2025-10-14_HUB-001_fix-color-encoding-in-cli-tools.md`
+- `docs/ai-use-cases/2025-10-14_HUB-002_update-github-organization-references.md`
+
+Both demonstrate complete, professional documentation generated automatically by Claude Code.

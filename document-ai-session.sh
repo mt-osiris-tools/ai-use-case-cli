@@ -1,10 +1,25 @@
 #!/bin/bash
-# AI Session Documentor
+# AI Session Documentor - INTERACTIVE MODE
 # Captures AI-assisted coding session details and generates documentation
+#
+# IMPORTANT: This script is for MANUAL/INTERACTIVE mode only!
+# When using Claude Code, documentation is generated AUTOMATICALLY
+# via the /document-session command without running this script.
 #
 # Usage:
 #   ./document-ai-session.sh [project_path]
-#   If no path provided, uses current directory
+#   ai-use-case document [project_path]
+#
+# Mode Selection:
+#   - AUTOMATIC (Claude Code): Run /document-session command
+#     * No prompts required
+#     * Auto-extracts info from git + conversation
+#     * Generates complete documentation instantly
+#
+#   - INTERACTIVE (Manual/Shell): Run this script directly
+#     * Prompts for all details
+#     * Manual input required
+#     * Use when no AI context exists
 
 set -e
 
@@ -24,15 +39,27 @@ NC='\033[0m'
 
 # Show help
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-    echo "AI Session Documentor"
+    echo "AI Session Documentor - INTERACTIVE MODE"
     echo ""
     echo "Usage:"
     echo "  $0 [project_path]"
+    echo "  ai-use-case document [project_path]"
     echo ""
     echo "Description:"
     echo "  Interactive tool to document AI-assisted coding sessions."
     echo "  Captures git changes, guides you through prompts, and"
     echo "  generates documentation using the template."
+    echo ""
+    echo "IMPORTANT: Mode Selection"
+    echo "  AUTOMATIC MODE (Recommended when using Claude Code):"
+    echo "    - Use /document-session command in Claude Code"
+    echo "    - No prompts, fully automatic generation"
+    echo "    - Extracts info from git history + AI conversation"
+    echo ""
+    echo "  INTERACTIVE MODE (This script):"
+    echo "    - Run this script directly in terminal"
+    echo "    - Manual prompts for all details"
+    echo "    - Use when no AI context exists"
     echo ""
     echo "Arguments:"
     echo "  project_path    Path to project directory (default: current directory)"
@@ -40,6 +67,7 @@ if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
     echo "Examples:"
     echo "  $0                        # Document session in current directory"
     echo "  $0 /path/to/project       # Document session in specific project"
+    echo "  ai-use-case document      # Same, using CLI wrapper"
     echo ""
     echo "Workflow:"
     echo "  1. Analyzes git changes and statistics"
