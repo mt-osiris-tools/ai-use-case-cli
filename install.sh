@@ -126,7 +126,7 @@ if [[ "$setup_hub" =~ ^[Yy]$ ]]; then
     else
         echo -e "${CYAN}Cloning documentation hub...${NC}"
         mkdir -p "$(dirname "$HUB_DIR")"
-        if git clone https://github.com/james401/ai-use-case-hub.git "$HUB_DIR" 2>/dev/null; then
+        if git clone https://github.com/james401/ai-use-case-hub.git "$HUB_DIR"; then
             echo -e "${GREEN}✓${NC} Hub repository cloned to $HUB_DIR"
         else
             echo -e "${YELLOW}Note: Hub repository not yet available publicly${NC}"
