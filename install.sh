@@ -2,10 +2,10 @@
 # AI Use Case CLI - Installation Script
 #
 # Quick install:
-#   curl -fsSL https://raw.githubusercontent.com/james401/ai-use-case-cli/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/install.sh | bash
 #
 # Or manual:
-#   git clone https://github.com/james401/ai-use-case-cli.git ~/.local/share/ai-use-case-cli
+#   git clone https://github.com/mt-osiris-tools/ai-use-case-cli.git ~/.local/share/ai-use-case-cli
 #   cd ~/.local/share/ai-use-case-cli
 #   ./install.sh
 
@@ -55,7 +55,7 @@ else
 
     echo -e "${CYAN}Cloning repository...${NC}"
     mkdir -p "$(dirname "$INSTALL_DIR")"
-    git clone https://github.com/james401/ai-use-case-cli.git "$INSTALL_DIR"
+    git clone https://github.com/mt-osiris-tools/ai-use-case-cli.git "$INSTALL_DIR"
     cd "$INSTALL_DIR"
 fi
 
@@ -126,7 +126,7 @@ if [[ "$setup_hub" =~ ^[Yy]$ ]]; then
     else
         echo -e "${CYAN}Cloning documentation hub...${NC}"
         mkdir -p "$(dirname "$HUB_DIR")"
-        if git clone https://github.com/james401/ai-use-case-hub.git "$HUB_DIR"; then
+        if git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git "$HUB_DIR"; then
             echo -e "${GREEN}✓${NC} Hub repository cloned to $HUB_DIR"
         else
             echo -e "${YELLOW}Note: Hub repository not yet available publicly${NC}"
@@ -156,7 +156,7 @@ if [[ "$setup_hub" =~ ^[Yy]$ ]]; then
     fi
 else
     echo -e "${YELLOW}Skipped hub setup.${NC} You can set it up later with:"
-    echo -e "  ${CYAN}git clone https://github.com/james401/ai-use-case-hub.git ~/Documents/ai-use-case-hub${NC}"
+    echo -e "  ${CYAN}git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git ~/Documents/ai-use-case-hub${NC}"
     echo -e "  ${CYAN}export AI_USECASES_DIR=\"\$HOME/Documents/ai-use-case-hub\"${NC}"
 fi
 

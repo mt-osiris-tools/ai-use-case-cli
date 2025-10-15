@@ -20,7 +20,7 @@ Document your AI-assisted coding sessions with one command. Works seamlessly wit
 
 1. Clone the ai-use-case-cli repository:
    ```bash
-   git clone https://github.com/james401/ai-use-case-cli.git
+   git clone https://github.com/mt-osiris-tools/ai-use-case-cli.git
    cd ai-use-case-cli/vscode-extension
    ```
 
@@ -47,7 +47,7 @@ Document your AI-assisted coding sessions with one command. Works seamlessly wit
 
 1. Install the AI Use Case CLI tools:
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/james401/ai-use-case-cli/main/install.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/install.sh | bash
    ```
 
 2. Set up your project for documentation:
@@ -122,7 +122,7 @@ Generated documents follow a comprehensive template including:
 
 ## Integration with AI Use Cases Hub
 
-This extension integrates with the [AI Use Cases Hub](https://github.com/james401/ai-use-case-hub) system:
+This extension integrates with the [AI Use Cases Hub](https://github.com/mt-osiris-tools/ai-use-case-hub) system:
 
 1. Documents are saved to `docs/ai-use-cases/` in your project
 2. Post-commit hook automatically syncs to central repository
@@ -142,7 +142,7 @@ which ai-use-case
 
 If not found, install it:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/james401/ai-use-case-cli/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/install.sh | bash
 ```
 
 ### Project not set up
@@ -166,7 +166,7 @@ To contribute or modify this extension:
 
 ```bash
 # Clone and install
-git clone https://github.com/james401/ai-use-case-cli.git
+git clone https://github.com/mt-osiris-tools/ai-use-case-cli.git
 cd ai-use-case-cli/vscode-extension
 npm install
 
@@ -187,7 +187,7 @@ MIT
 
 ## Links
 
-- [CLI Tools Repository](https://github.com/james401/ai-use-case-cli)
-- [Documentation Hub Repository](https://github.com/james401/ai-use-case-hub)
-- [Documentation](https://github.com/james401/ai-use-case-cli/blob/main/README.md)
-- [Issue Tracker](https://github.com/james401/ai-use-case-cli/issues)
+- [CLI Tools Repository](https://github.com/mt-osiris-tools/ai-use-case-cli)
+- [Documentation Hub Repository](https://github.com/mt-osiris-tools/ai-use-case-hub)
+- [Documentation](https://github.com/mt-osiris-tools/ai-use-case-cli/blob/main/README.md)
+- [Issue Tracker](https://github.com/mt-osiris-tools/ai-use-case-cli/issues)

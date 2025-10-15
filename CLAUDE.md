@@ -17,13 +17,13 @@ The CLI tools in this repository provide commands for setting up projects, docum
 End users should install this CLI tool using:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/james401/ai-use-case-cli/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/install.sh | bash
 ```
 
 Or clone and install manually:
 
 ```bash
-git clone https://github.com/james401/ai-use-case-cli.git ~/.local/share/ai-use-case-cli
+git clone https://github.com/mt-osiris-tools/ai-use-case-cli.git ~/.local/share/ai-use-case-cli
 cd ~/.local/share/ai-use-case-cli
 ./install.sh
 ```
@@ -112,7 +112,7 @@ The hub repository should be cloned separately:
 
 ```bash
 cd ~/Documents
-git clone https://github.com/james401/ai-use-case-hub.git ai-use-case-hub
+git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git ai-use-case-hub
 ```
 
 ## File Naming Convention
@@ -331,7 +331,7 @@ ls ~/Documents/ai-use-case-hub
 ```bash
 # Clone the hub repository
 cd ~/Documents
-git clone https://github.com/james401/ai-use-case-hub.git ai-use-case-hub
+git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git ai-use-case-hub
 ```
 
 ## Version History
@@ -342,6 +342,6 @@ git clone https://github.com/james401/ai-use-case-hub.git ai-use-case-hub
 
 ## Related Repositories
 
-- **[ai-use-case-hub](https://github.com/james401/ai-use-case-hub)** - Documentation hub with symlink-based organization
+- **[ai-use-case-hub](https://github.com/mt-osiris-tools/ai-use-case-hub)** - Documentation hub with symlink-based organization
 - **[claude-code](https://claude.com/code)** - AI coding assistant
 - **[github-copilot](https://github.com/features/copilot)** - AI pair programmer

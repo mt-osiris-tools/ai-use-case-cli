@@ -4,7 +4,7 @@ This repository contains **CLI tools** for documenting AI-assisted development w
 
 ## Files in the Hub Repository
 
-The following files are maintained in the [ai-use-case-hub](https://github.com/james401/ai-use-case-hub) repository:
+The following files are maintained in the [ai-use-case-hub](https://github.com/mt-osiris-tools/ai-use-case-hub) repository:
 
 ### TEMPLATE.md
 Comprehensive template for documenting AI use cases. Includes sections for:
@@ -16,17 +16,17 @@ Comprehensive template for documenting AI use cases. Includes sections for:
 - Key learnings and best practices
 - Replicability framework
 
-**Location**: `https://github.com/james401/ai-use-case-hub/blob/main/TEMPLATE.md`
+**Location**: `https://github.com/mt-osiris-tools/ai-use-case-hub/blob/main/TEMPLATE.md`
 
 ### QUICK-REFERENCE.md
 Quick reference guide for common commands and workflows.
 
-**Location**: `https://github.com/james401/ai-use-case-hub/blob/main/QUICK-REFERENCE.md`
+**Location**: `https://github.com/mt-osiris-tools/ai-use-case-hub/blob/main/QUICK-REFERENCE.md`
 
 ### CHANGELOG.md
 Version history documenting changes to the hub infrastructure and organization system.
 
-**Location**: `https://github.com/james401/ai-use-case-hub/blob/main/CHANGELOG.md`
+**Location**: `https://github.com/mt-osiris-tools/ai-use-case-hub/blob/main/CHANGELOG.md`
 
 ## Why Separate Repositories?
 
@@ -57,14 +57,14 @@ To set up the documentation hub:
 
 ```bash
 cd ~/Documents
-git clone https://github.com/james401/ai-use-case-hub.git ai-use-case-hub
+git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git ai-use-case-hub
 export AI_USECASES_DIR="$HOME/Documents/ai-use-case-hub"
 ```
 
 Or let the installer do it for you:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/james401/ai-use-case-cli/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/install.sh | bash
 # Answer 'Y' when prompted to set up the documentation hub
 ```
 

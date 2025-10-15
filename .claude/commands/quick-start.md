@@ -17,7 +17,7 @@ which ai-use-case && echo "✅ CLI installed" || echo "❌ CLI not found"
 ### 2. If Not Installed, Install the CLI
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/james401/ai-use-case-cli/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/install.sh | bash
 ```
 
 The installer will:
@@ -140,7 +140,7 @@ The CLI will work even without the hub, but to enable syncing:
 
 ```bash
 cd ~/Documents
-git clone https://github.com/james401/ai-use-case-hub.git ai-use-case-hub
+git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git ai-use-case-hub
 export AI_USECASES_DIR="$HOME/Documents/ai-use-case-hub"
 ```
 

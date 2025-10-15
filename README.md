@@ -14,13 +14,13 @@ Command-line tools for documenting AI-assisted development workflows across mult
 ## Quick Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/james401/ai-use-case-cli/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/install.sh | bash
 ```
 
 Or clone and install manually:
 
 ```bash
-git clone https://github.com/james401/ai-use-case-cli.git ~/.local/share/ai-use-case-cli
+git clone https://github.com/mt-osiris-tools/ai-use-case-cli.git ~/.local/share/ai-use-case-cli
 cd ~/.local/share/ai-use-case-cli
 ./install.sh
 ```
@@ -77,7 +77,7 @@ The AI Use Case CLI works with a separate documentation hub repository:
 - **Documentation Hub**: Central storage for all use case documents
   - Default location: `~/Documents/ai-use-case-hub`
   - Configured via `AI_USECASES_DIR` environment variable
-  - Repository: [ai-use-case-hub](https://github.com/james401/ai-use-case-hub)
+  - Repository: [ai-use-case-hub](https://github.com/mt-osiris-tools/ai-use-case-hub)
 
 ### Workflow
 
@@ -119,7 +119,7 @@ To set up the hub:
 
 ```bash
 cd ~/Documents
-git clone https://github.com/james401/ai-use-case-hub.git ai-use-case-hub
+git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git ai-use-case-hub
 ```
 
 ## Project Setup Details
@@ -143,7 +143,7 @@ Use cases should capture:
 - **Key Learnings**: What worked, what didn't, improvements
 - **Replicability**: How others can apply this workflow
 
-See the [template](https://github.com/james401/ai-use-case-hub/blob/main/TEMPLATE.md) for full structure.
+See the [template](https://github.com/mt-osiris-tools/ai-use-case-hub/blob/main/TEMPLATE.md) for full structure.
 
 ## VS Code Integration
 
@@ -281,15 +281,15 @@ MIT License - see LICENSE file for details
 
 ## Related Projects
 
-- **[ai-use-case-hub](https://github.com/james401/ai-use-case-hub)** - Documentation hub repository
+- **[ai-use-case-hub](https://github.com/mt-osiris-tools/ai-use-case-hub)** - Documentation hub repository
 - **[claude-code](https://claude.com/code)** - AI coding assistant
 - **[github-copilot](https://github.com/features/copilot)** - AI pair programmer
 
 ## Support
 
-- **Issues**: [GitHub Issues](https://github.com/james401/ai-use-case-cli/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/james401/ai-use-case-cli/discussions)
-- **Documentation**: [Quick Reference](https://github.com/james401/ai-use-case-hub/blob/main/QUICK-REFERENCE.md)
+- **Issues**: [GitHub Issues](https://github.com/mt-osiris-tools/ai-use-case-cli/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/mt-osiris-tools/ai-use-case-cli/discussions)
+- **Documentation**: [Quick Reference](https://github.com/mt-osiris-tools/ai-use-case-hub/blob/main/QUICK-REFERENCE.md)
 
 ---
 
