@@ -54,11 +54,13 @@ ensure_hub_exists() {
     echo "$hub_dir"
 }
 
-# Configuration - Auto-detect hub location
+# Configuration - Auto-detect locations
+# SCRIPT_DIR = CLI installation directory (for scripts and hooks)
+# CENTRAL_DIR = Documentation hub directory (for storing use cases)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CENTRAL_DIR=$(ensure_hub_exists)
-HOOK_SOURCE="$CENTRAL_DIR/git-hooks/post-commit"
-SYNC_SCRIPT="$CENTRAL_DIR/sync-ai-use-cases.sh"
+HOOK_SOURCE="$SCRIPT_DIR/git-hooks/post-commit"
+SYNC_SCRIPT="$SCRIPT_DIR/sync-ai-use-cases.sh"
 
 # Show help
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then

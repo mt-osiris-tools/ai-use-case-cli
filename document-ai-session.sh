@@ -70,11 +70,13 @@ ensure_hub_exists() {
     echo "$hub_dir"
 }
 
-# Configuration - Auto-detect hub location
+# Configuration - Auto-detect locations
+# SCRIPT_DIR = CLI installation directory (for scripts)
+# CENTRAL_DIR = Documentation hub directory (for templates and storage)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CENTRAL_DIR=$(ensure_hub_exists)
 TEMPLATE_FILE="$CENTRAL_DIR/TEMPLATE.md"
-SYNC_SCRIPT="$CENTRAL_DIR/sync-ai-use-cases.sh"
+SYNC_SCRIPT="$SCRIPT_DIR/sync-ai-use-cases.sh"
 
 # Show help
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then

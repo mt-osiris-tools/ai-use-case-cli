@@ -57,8 +57,16 @@ ensure_hub_exists() {
     echo "$hub_dir"
 }
 
-# Detect script location and ensure hub exists
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Detect script location (follow symlinks to find actual script directory)
+SCRIPT_SOURCE="${BASH_SOURCE[0]}"
+while [ -L "$SCRIPT_SOURCE" ]; do
+    SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" && pwd)"
+    SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
+    [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$SCRIPT_DIR/$SCRIPT_SOURCE"
+done
+SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" && pwd)"
+
+# Ensure hub exists
 HUB_DIR=$(ensure_hub_exists)
 
 # Show version
@@ -118,19 +126,19 @@ EOF
 # Command: init (setup project)
 cmd_init() {
     echo -e "${BLUE}=== Setup AI Use Cases ===${NC}"
-    bash "$HUB_DIR/setup-project.sh" "${1:-.}"
+    bash "$SCRIPT_DIR/setup-project.sh" "${1:-.}"
 }
 
 # Command: document
 cmd_document() {
     echo -e "${BLUE}=== Document AI Session ===${NC}"
-    bash "$HUB_DIR/document-ai-session.sh" "${1:-.}"
+    bash "$SCRIPT_DIR/document-ai-session.sh" "${1:-.}"
 }
 
 # Command: sync
 cmd_sync() {
     echo -e "${BLUE}=== Sync AI Use Cases ===${NC}"
-    bash "$HUB_DIR/sync-ai-use-cases.sh" "${1:-.}"
+    bash "$SCRIPT_DIR/sync-ai-use-cases.sh" "${1:-.}"
 }
 
 # Command: search
