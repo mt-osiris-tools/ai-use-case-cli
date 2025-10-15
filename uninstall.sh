@@ -67,7 +67,7 @@ read -p "Remove entries from shell profile? (y/N): " clean_profile
 if [[ "$clean_profile" =~ ^[Yy]$ ]]; then
     for profile in "$HOME/.bashrc" "$HOME/.zshrc"; do
         if [ -f "$profile" ]; then
-            if grep -q "AI_USECASES_DIR\|AI Use Case CLI\|ai-use-case" "$profile"; then
+            if grep -qE "AI_USECASES_DIR|AI Use Case CLI|ai-use-case" "$profile"; then
                 # Create backup
                 cp "$profile" "${profile}.backup"
 
