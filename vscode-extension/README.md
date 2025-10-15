@@ -11,6 +11,7 @@ Document your AI-assisted coding sessions with one command. Works seamlessly wit
   - Command Palette: `AI Session: Document AI Session`
   - Keyboard Shortcut: `Ctrl+Alt+D` (or `Cmd+Alt+D` on Mac)
   - GitHub Copilot Chat: Type `@workspace document my AI session`
+    - This will trigger the extension to start documenting your current AI-assisted coding session, guiding you through the workflow and automatically capturing relevant details.
 - **Auto-Sync**: Integrates with ai-use-case-hub central repository
 
 ## Installation
