@@ -129,6 +129,7 @@ ${YELLOW}Commands:${NC}
   ${GREEN}document, doc${NC}             Document an AI-assisted session (interactive)
   ${GREEN}sync${NC}                      Sync use cases from current project to hub
   ${GREEN}push${NC}                      Commit and push hub changes to remote repository
+  ${GREEN}publish-confluence${NC}        Publish use case to Confluence as child page
   ${GREEN}search <term>${NC}             Search all use cases for a keyword/topic
   ${GREEN}view${NC}                      View use cases in hub (opens file explorer)
   ${GREEN}list${NC}                      List all projects with use cases
@@ -142,6 +143,11 @@ ${YELLOW}Examples:${NC}
 
   # Document your AI session
   ai-use-case document
+
+  # Publish to Confluence
+  ai-use-case publish-confluence \\
+    docs/ai-use-cases/2025-10-16_PROJ-123_auth.md \\
+    https://company.atlassian.net/wiki/spaces/DOCS/pages/123456/Parent
 
   # Search for authentication-related use cases
   ai-use-case search authentication
@@ -370,6 +376,12 @@ cmd_stats() {
     echo -e "${GREEN}Hub location:${NC} $HUB_DIR"
 }
 
+# Command: publish-confluence
+cmd_publish_confluence() {
+    echo -e "${BLUE}=== Publish to Confluence ===${NC}"
+    bash "$SCRIPT_DIR/publish-confluence.sh" "$@"
+}
+
 # Main command dispatcher
 main() {
     # Check for updates in background (non-blocking)
@@ -397,6 +409,10 @@ main() {
             ;;
         push)
             cmd_push
+            ;;
+        publish-confluence)
+            shift
+            cmd_publish_confluence "$@"
             ;;
         search)
             shift
