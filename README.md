@@ -10,6 +10,7 @@ Command-line tools for documenting AI-assisted development workflows across mult
 - 🎯 **Project setup** - Configure any project repository in minutes
 - 🔍 **Search & stats** - Find and analyze documented use cases
 - 🎨 **VS Code integration** - Document sessions from your editor
+- 📤 **Confluence publishing** - Publish use cases to Confluence as child pages
 - 🔔 **Update notifications** - Automatic version checking with smart caching
 
 ## Quick Install
@@ -62,6 +63,7 @@ ai-use-case --init              # Setup current project
 ai-use-case document            # Document an AI session (interactive)
 ai-use-case sync                # Sync use cases to hub (auto-commits/pushes)
 ai-use-case push                # Manually commit and push hub changes
+ai-use-case publish-confluence  # Publish use case to Confluence as child page
 ai-use-case search <term>       # Search documented use cases
 ai-use-case view                # Open hub in file explorer
 ai-use-case list                # List all projects with use cases
@@ -242,6 +244,35 @@ ai-use-case push
 # Useful when sync didn't auto-push or for manual updates
 ```
 
+### Publish to Confluence
+
+Publish AI use case documentation to Confluence as a child page:
+
+```bash
+ai-use-case publish-confluence \
+  docs/ai-use-cases/2025-10-16_PROJ-123_auth.md \
+  https://company.atlassian.net/wiki/spaces/DOCS/pages/123456/Parent
+
+# With custom title
+ai-use-case publish-confluence \
+  --title "PROJ-123: Complete Authentication Implementation" \
+  docs/ai-use-cases/2025-10-16_PROJ-123_auth.md \
+  https://company.atlassian.net/wiki/spaces/DOCS/pages/123456/Parent
+
+# Dry run (preview without publishing)
+ai-use-case publish-confluence --dry-run \
+  docs/ai-use-cases/2025-10-16_PROJ-123_auth.md \
+  https://company.atlassian.net/wiki/spaces/DOCS/pages/123456/Parent
+```
+
+**Prerequisites for Confluence publishing:**
+- Atlassian MCP server configured in Claude Code
+- Valid Confluence authentication (SSE or Personal Access Token)
+- Permission to create pages in the target Confluence space
+- The command provides instructions for using with Claude Code's MCP integration
+
+**Note:** This feature requires Claude Code with Atlassian MCP. The command validates your inputs and provides instructions for completing the publish via Claude Code.
+
 ## Requirements
 
 - **OS**: Linux, macOS, WSL on Windows
@@ -321,11 +352,16 @@ ai-use-case-cli/
 ├── setup-project.sh         # Project setup automation
 ├── sync-ai-use-cases.sh     # Sync logic
 ├── document-ai-session.sh   # Interactive documentor
+├── publish-confluence.sh    # Confluence publishing script
 ├── git-hooks/
 │   └── post-commit          # Auto-sync hook template
 ├── vscode-extension/        # VS Code extension
-├── .claude/                 # Claude Code configuration
+├── .claude/
+│   └── commands/
+│       ├── publish-confluence.md  # Claude Code slash command
+│       └── ...              # Other slash commands
 ├── CLAUDE.md                # Instructions for Claude Code
+├── CONFLUENCE-DESIGN.md     # Confluence feature design
 └── README.md                # This file
 ```
 
