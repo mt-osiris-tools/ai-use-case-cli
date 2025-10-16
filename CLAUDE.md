@@ -37,7 +37,8 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
 - **`ai-use-case`**: Main CLI entry point with unified command interface
   - `ai-use-case --init` - Setup a project
   - `ai-use-case document` - Document an AI session
-  - `ai-use-case sync` - Sync to hub
+  - `ai-use-case sync` - Sync to hub (auto-commits and pushes)
+  - `ai-use-case push` - Manually commit and push hub changes
   - `ai-use-case search` - Search use cases
   - `ai-use-case stats` - Show statistics
   - `ai-use-case list` - List projects
@@ -55,6 +56,8 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
    - Copies files from project's `docs/ai-use-cases/` to hub's `by-project/[project-name]/`
    - Creates symlinks in hub's `by-date/` based on YYYY-MM-DD prefix
    - Creates symlinks in hub's `by-topic/` based on topic slug
+   - **Automatically commits changes to hub's git repository**
+   - **Automatically pushes to remote repository** (if configured)
    - Idempotent - safe to run multiple times
 
 3. **`document-ai-session.sh`**: Interactive AI session documentor
@@ -274,6 +277,22 @@ cd /path/to/your/project
 ai-use-case sync
 ```
 
+This will:
+1. Copy documentation files to the hub
+2. Create appropriate symlinks
+3. Commit changes to the hub's git repository
+4. Push to the remote repository (if configured)
+
+### Manual Push (Hub Only)
+
+If you need to commit and push hub changes without syncing:
+
+```bash
+ai-use-case push
+```
+
+This interactively commits any uncommitted changes in the hub and pushes to the remote.
+
 ### Searching Use Cases
 
 ```bash
@@ -424,9 +443,29 @@ cd ~/Documents
 git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git ai-use-case-hub
 ```
 
+## Version Checking
+
+The CLI includes automatic version checking to keep users informed of updates:
+
+- **Automatic checks**: Runs once every 24 hours (cached in `~/.cache/ai-use-case-version-check`)
+- **Non-blocking**: Executes in background, doesn't delay command execution
+- **GitHub integration**: Fetches latest version from main branch via curl/wget
+- **Smart caching**: Only checks GitHub once per day to reduce network traffic
+- **Silent failures**: If GitHub is unreachable, continues without errors
+
+When an update is detected, users see:
+```
+╭────────────────────────────────────────────────────╮
+│ Update available: v2.2.0 (current: v2.1.0)        │
+│ Run: cd ~/.local/share/ai-use-case-cli && git pull│
+╰────────────────────────────────────────────────────╯
+```
+
+Implementation is in `ai-use-case:80-115` with the `check_for_updates()` function.
+
 ## Version History
 
-- **v2.1.0**: Separated CLI tools from documentation hub, unified CLI interface
+- **v2.1.0**: Separated CLI tools from documentation hub, unified CLI interface, added automatic git push, version checking
 - **v2.0.0**: Introduced symlink architecture (in hub repository)
 - **v1.0.0**: Initial release with basic sync functionality
 

@@ -72,6 +72,48 @@ HUB_DIR=$(ensure_hub_exists)
 # Show version
 VERSION="2.1.0"
 
+# Version check cache
+VERSION_CHECK_FILE="$HOME/.cache/ai-use-case-version-check"
+VERSION_CHECK_INTERVAL=86400  # 24 hours in seconds
+
+# Function to check for updates
+check_for_updates() {
+    # Skip if we checked recently
+    if [ -f "$VERSION_CHECK_FILE" ]; then
+        local last_check=$(cat "$VERSION_CHECK_FILE" 2>/dev/null || echo "0")
+        local now=$(date +%s)
+        local elapsed=$((now - last_check))
+
+        if [ $elapsed -lt $VERSION_CHECK_INTERVAL ]; then
+            return 0
+        fi
+    fi
+
+    # Try to fetch latest version from GitHub
+    local remote_version
+    if command -v curl &> /dev/null; then
+        remote_version=$(curl -s -m 2 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+    elif command -v wget &> /dev/null; then
+        remote_version=$(wget -qO- -T 2 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+    else
+        # No way to check, skip silently
+        return 0
+    fi
+
+    # Update check timestamp
+    mkdir -p "$(dirname "$VERSION_CHECK_FILE")"
+    date +%s > "$VERSION_CHECK_FILE" 2>/dev/null || true
+
+    # Compare versions if we got a remote version
+    if [ -n "$remote_version" ] && [ "$remote_version" != "$VERSION" ]; then
+        echo -e "${YELLOW}╭────────────────────────────────────────────────────╮${NC}" >&2
+        echo -e "${YELLOW}│${NC} Update available: ${GREEN}v$remote_version${NC} (current: v$VERSION)" >&2
+        echo -e "${YELLOW}│${NC} Run: ${BLUE}cd ~/.local/share/ai-use-case-cli && git pull${NC}" >&2
+        echo -e "${YELLOW}╰────────────────────────────────────────────────────╯${NC}" >&2
+        echo "" >&2
+    fi
+}
+
 # Show help
 show_help() {
     cat <<EOF
@@ -86,6 +128,7 @@ ${YELLOW}Commands:${NC}
   ${GREEN}--init, init${NC}              Setup current project for AI use cases
   ${GREEN}document, doc${NC}             Document an AI-assisted session (interactive)
   ${GREEN}sync${NC}                      Sync use cases from current project to hub
+  ${GREEN}push${NC}                      Commit and push hub changes to remote repository
   ${GREEN}search <term>${NC}             Search all use cases for a keyword/topic
   ${GREEN}view${NC}                      View use cases in hub (opens file explorer)
   ${GREEN}list${NC}                      List all projects with use cases
@@ -203,6 +246,83 @@ cmd_list() {
     done
 }
 
+# Command: push
+cmd_push() {
+    echo -e "${BLUE}=== Push Hub Changes ===${NC}"
+    echo ""
+
+    cd "$HUB_DIR"
+
+    # Check if hub is a git repository
+    if [ ! -d ".git" ]; then
+        echo -e "${RED}Error: Hub directory is not a git repository${NC}"
+        echo "  Location: $HUB_DIR"
+        echo "  To initialize git, run: cd $HUB_DIR && git init"
+        exit 1
+    fi
+
+    # Check for uncommitted changes
+    if ! git diff --quiet || ! git diff --cached --quiet; then
+        echo -e "${YELLOW}Uncommitted changes detected${NC}"
+        echo ""
+
+        # Show status
+        git status --short
+
+        echo ""
+        read -p "Commit these changes? (y/n) " -n 1 -r
+        echo
+
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            # Stage all changes
+            git add by-project/ by-date/ by-topic/ 2>/dev/null || true
+
+            # Get commit message
+            echo "Enter commit message (or press Enter for default):"
+            read -r COMMIT_MSG
+
+            if [ -z "$COMMIT_MSG" ]; then
+                COMMIT_MSG="sync: Manual update
+
+Synced at: $(date '+%Y-%m-%d %H:%M:%S')"
+            fi
+
+            if git commit -m "$COMMIT_MSG"; then
+                echo -e "${GREEN}✓${NC} Changes committed"
+            else
+                echo -e "${RED}✗ Failed to commit changes${NC}"
+                exit 1
+            fi
+        else
+            echo -e "${YELLOW}Skipping commit${NC}"
+            exit 0
+        fi
+    else
+        echo -e "${GREEN}✓ No uncommitted changes${NC}"
+    fi
+
+    # Push to remote
+    if git remote get-url origin &>/dev/null; then
+        echo ""
+        echo -e "${BLUE}Pushing to remote repository...${NC}"
+
+        if git push origin HEAD; then
+            echo -e "${GREEN}✓${NC} Changes pushed successfully"
+        else
+            echo -e "${RED}✗ Failed to push changes${NC}"
+            exit 1
+        fi
+    else
+        echo -e "${YELLOW}⚠ Warning${NC}: No remote repository configured"
+        echo "  To add a remote, run:"
+        echo "  cd $HUB_DIR && git remote add origin <repository-url>"
+        exit 1
+    fi
+
+    echo ""
+    echo -e "${GREEN}✓ Hub synchronized with remote${NC}"
+}
+
 # Command: stats
 cmd_stats() {
     echo -e "${BLUE}=== AI Use Cases Statistics ===${NC}"
@@ -252,6 +372,9 @@ cmd_stats() {
 
 # Main command dispatcher
 main() {
+    # Check for updates in background (non-blocking)
+    check_for_updates &
+
     # No arguments - show help
     if [ $# -eq 0 ]; then
         show_help
@@ -271,6 +394,9 @@ main() {
         sync)
             shift
             cmd_sync "$@"
+            ;;
+        push)
+            cmd_push
             ;;
         search)
             shift

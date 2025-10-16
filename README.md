@@ -10,6 +10,7 @@ Command-line tools for documenting AI-assisted development workflows across mult
 - 🎯 **Project setup** - Configure any project repository in minutes
 - 🔍 **Search & stats** - Find and analyze documented use cases
 - 🎨 **VS Code integration** - Document sessions from your editor
+- 🔔 **Update notifications** - Automatic version checking with smart caching
 
 ## Quick Install
 
@@ -59,7 +60,8 @@ cd ~/.local/share/ai-use-case-cli
 ```bash
 ai-use-case --init              # Setup current project
 ai-use-case document            # Document an AI session (interactive)
-ai-use-case sync                # Sync use cases to hub
+ai-use-case sync                # Sync use cases to hub (auto-commits/pushes)
+ai-use-case push                # Manually commit and push hub changes
 ai-use-case search <term>       # Search documented use cases
 ai-use-case view                # Open hub in file explorer
 ai-use-case list                # List all projects with use cases
@@ -84,7 +86,18 @@ The AI Use Case CLI works with a separate documentation hub repository:
 1. **Setup**: `ai-use-case --init` creates `docs/ai-use-cases/` in your project
 2. **Document**: Create markdown files following the naming convention
 3. **Commit**: Git hooks automatically sync to the central hub
-4. **Organize**: Hub organizes docs by project, date, and topic using symlinks
+4. **Push**: Changes are automatically committed and pushed to the hub repository
+5. **Organize**: Hub organizes docs by project, date, and topic using symlinks
+
+### Git Integration
+
+The sync process now automatically:
+- ✅ Copies files to the hub's `by-project/` directory
+- ✅ Creates symlinks in `by-date/` and `by-topic/`
+- ✅ **Commits changes to the hub's git repository**
+- ✅ **Pushes to the remote repository** (if configured)
+
+This ensures all documented use cases are automatically backed up and shared across your team.
 
 ### File Naming Convention
 
@@ -120,7 +133,16 @@ To set up the hub:
 ```bash
 cd ~/Documents
 git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git ai-use-case-hub
+cd ai-use-case-hub
+
+# Configure git remote if not already set
+git remote add origin <your-hub-repository-url>
 ```
+
+**Important**: Configure your hub's git remote to enable automatic pushing:
+- The sync script will automatically commit and push changes
+- Without a remote, changes are committed locally only
+- Use `ai-use-case push` to manually sync uncommitted changes
 
 ## Project Setup Details
 
@@ -210,12 +232,52 @@ ai-use-case stats
 # - Most common AI tools used
 ```
 
+### Push Hub Changes
+
+If you have uncommitted changes in your hub repository:
+
+```bash
+ai-use-case push
+# Interactively commits and pushes hub changes to remote
+# Useful when sync didn't auto-push or for manual updates
+```
+
 ## Requirements
 
 - **OS**: Linux, macOS, WSL on Windows
 - **Shell**: Bash 4.0+
 - **Git**: For version control and hooks
 - **Dependencies**: `realpath`, `find`, `grep` (standard Unix tools)
+
+## Updates
+
+The CLI automatically checks for updates once every 24 hours. If a new version is available, you'll see a notification message:
+
+```
+╭────────────────────────────────────────────────────╮
+│ Update available: v2.2.0 (current: v2.1.0)        │
+│ Run: cd ~/.local/share/ai-use-case-cli && git pull│
+╰────────────────────────────────────────────────────╯
+```
+
+To update manually:
+
+```bash
+cd ~/.local/share/ai-use-case-cli
+git pull
+```
+
+The version check is:
+- **Non-blocking** - Runs in background, doesn't slow down commands
+- **Cached** - Only checks once per 24 hours to minimize network calls
+- **Silent on failure** - If GitHub is unreachable, commands work normally
+
+To force a version check:
+
+```bash
+rm ~/.cache/ai-use-case-version-check
+ai-use-case --version
+```
 
 ## Troubleshooting
 

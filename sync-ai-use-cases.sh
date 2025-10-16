@@ -231,3 +231,53 @@ echo "  By date:  $BY_DATE_DIR/ (symlinks)"
 echo "  By topic: $BY_TOPIC_DIR/ (symlinks)"
 echo ""
 echo -e "${BLUE}💾 Disk usage:${NC} Files stored once, alternate views use symlinks"
+
+# Git commit and push to hub repository
+if [ $NEW_COUNT -gt 0 ] || [ $UPDATED_COUNT -gt 0 ]; then
+    echo ""
+    echo -e "${BLUE}=== Committing changes to hub repository ===${NC}"
+
+    cd "$CENTRAL_DIR"
+
+    # Check if hub is a git repository
+    if [ -d ".git" ]; then
+        # Stage all changes
+        git add by-project/ by-date/ by-topic/ 2>/dev/null || true
+
+        # Check if there are changes to commit
+        if ! git diff --cached --quiet 2>/dev/null; then
+            # Create commit message
+            COMMIT_MSG="sync: Update from $PROJECT_NAME
+
+- New files: $NEW_COUNT
+- Updated files: $UPDATED_COUNT
+
+Synced at: $(date '+%Y-%m-%d %H:%M:%S')"
+
+            if git commit -m "$COMMIT_MSG" 2>/dev/null; then
+                echo -e "${GREEN}✓${NC} Changes committed to hub repository"
+
+                # Push to remote if configured
+                if git remote get-url origin &>/dev/null; then
+                    echo -e "${BLUE}Pushing to remote repository...${NC}"
+
+                    if git push origin HEAD 2>&1 | grep -q "Everything up-to-date\|Total"; then
+                        echo -e "${GREEN}✓${NC} Changes pushed to remote repository"
+                    else
+                        echo -e "${YELLOW}⚠ Warning${NC}: Failed to push changes to remote"
+                        echo "  You can push manually later: cd $CENTRAL_DIR && git push"
+                    fi
+                else
+                    echo -e "${YELLOW}⚠ Note${NC}: No remote configured - changes committed locally only"
+                fi
+            else
+                echo -e "${RED}✗ Failed to commit changes${NC}"
+            fi
+        else
+            echo -e "${YELLOW}✓ No git changes to commit${NC} (files already in sync)"
+        fi
+    else
+        echo -e "${YELLOW}⚠ Note${NC}: Hub directory is not a git repository"
+        echo "  To enable git sync, run: cd $CENTRAL_DIR && git init"
+    fi
+fi
