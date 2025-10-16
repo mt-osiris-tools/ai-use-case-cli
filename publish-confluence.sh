@@ -295,12 +295,13 @@ ${YELLOW}Prerequisites:${NC}
 
 ${YELLOW}Configuration Help:${NC}
   To configure Atlassian MCP in Claude Code:
-  1. Open Claude Code settings
-  2. Navigate to MCP servers
-  3. Add Atlassian MCP server
-  4. Configure authentication (SSE or Personal Access Token)
+  1. Run: claude mcp add --transport sse atlassian https://mcp.atlassian.com/v1/sse
+  2. Follow OAuth prompts to authenticate
+  3. Grant access to your Confluence site
 
-  See: https://docs.claude.com/mcp for detailed instructions
+  Documentation:
+  - Claude Code MCP: https://docs.claude.com/en/docs/claude-code/mcp
+  - Atlassian MCP Setup: https://support.atlassian.com/atlassian-rovo-mcp-server/docs/setting-up-claude-ai/
 
 EOF
 }

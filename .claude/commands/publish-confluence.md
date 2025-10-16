@@ -70,10 +70,13 @@ If MCP tools are not available, inform the user:
 
 To use this feature, you need to:
 1. Install the Atlassian MCP server in Claude Code
+   Run: claude mcp add --transport sse atlassian https://mcp.atlassian.com/v1/sse
 2. Configure authentication (SSE or Personal Access Token)
 3. Ensure you have permission to create pages in the target space
 
-See: https://docs.claude.com/mcp for MCP setup instructions
+See:
+- Claude Code MCP: https://docs.claude.com/en/docs/claude-code/mcp
+- Atlassian MCP Setup: https://support.atlassian.com/atlassian-rovo-mcp-server/docs/setting-up-claude-ai/
 ```
 
 ### Step 5: Validate Parent Page Access
@@ -259,6 +262,7 @@ Run without --dry-run to publish.
 
 ## Reference
 
-- Atlassian MCP Documentation: https://docs.claude.com/mcp/atlassian
-- Confluence API: https://developer.atlassian.com/cloud/confluence/rest/v2/
-- Confluence Storage Format: https://confluence.atlassian.com/doc/confluence-storage-format-790796544.html
+- Claude Code MCP Documentation: <https://docs.claude.com/en/docs/claude-code/mcp>
+- Atlassian MCP Setup Guide: <https://support.atlassian.com/atlassian-rovo-mcp-server/docs/setting-up-claude-ai/>
+- Confluence REST API v2: <https://developer.atlassian.com/cloud/confluence/rest/v2/>
+- Confluence Storage Format: <https://confluence.atlassian.com/doc/confluence-storage-format-790796544.html>
