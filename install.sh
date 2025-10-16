@@ -19,20 +19,55 @@ CYAN=$'\033[0;36m'
 YELLOW=$'\033[1;33m'
 NC=$'\033[0m' # No Color
 
+# Function to get remote version
+get_remote_version() {
+    local remote_version=""
+    if command -v curl &> /dev/null; then
+        remote_version=$(curl -s -m 2 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+    elif command -v wget &> /dev/null; then
+        remote_version=$(wget -qO- -T 2 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+    fi
+    echo "$remote_version"
+}
+
+# Function to get installed version
+get_installed_version() {
+    local install_dir="$HOME/.local/share/ai-use-case-cli"
+    if [ -f "$install_dir/ai-use-case" ]; then
+        grep '^VERSION=' "$install_dir/ai-use-case" 2>/dev/null | head -1 | cut -d'"' -f2
+    else
+        echo ""
+    fi
+}
+
+# Get version info
+REMOTE_VERSION=$(get_remote_version)
+INSTALLED_VERSION=$(get_installed_version)
+
 cat <<EOF
 ${CYAN}
  █████╗ ██╗    ██╗   ██╗███████╗███████╗     ██████╗ █████╗ ███████╗███████╗
 ██╔══██╗██║    ██║   ██║██╔════╝██╔════╝    ██╔════╝██╔══██╗██╔════╝██╔════╝
-███████║██║    ██║   ██║███████╗█████╗█████╗██║     ███████║███████╗█████╗  
-██╔══██║██║    ██║   ██║╚════██║██╔══╝╚════╝██║     ██╔══██║╚════██║██╔══╝  
+███████║██║    ██║   ██║███████╗█████╗█████╗██║     ███████║███████╗█████╗
+██╔══██║██║    ██║   ██║╚════██║██╔══╝╚════╝██║     ██╔══██║╚════██║██╔══╝
 ██║  ██║██║    ╚██████╔╝███████║███████╗    ╚██████╗██║  ██║███████║███████╗
 ╚═╝  ╚═╝╚═╝     ╚═════╝ ╚══════╝╚══════╝     ╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝
 ${NC}
 ${YELLOW}        📊 AI-Assisted Development Session Documentator${NC}
-                          Powered by MedTrainer - Osiris${NC} 
+                          Powered by MedTrainer - Osiris${NC}
 ${GREEN}        ═══════════════════════════════════════════════${NC}
 
 EOF
+
+# Display version info
+if [ -n "$REMOTE_VERSION" ]; then
+    if [ -n "$INSTALLED_VERSION" ]; then
+        echo -e "${YELLOW}        Installing version: ${GREEN}v$REMOTE_VERSION${NC} ${YELLOW}(current: ${CYAN}v$INSTALLED_VERSION${YELLOW})${NC}"
+    else
+        echo -e "${YELLOW}        Installing version: ${GREEN}v$REMOTE_VERSION${NC}"
+    fi
+    echo ""
+fi
 echo -e "${NC}"
 
 # Determine install directory
@@ -41,23 +76,76 @@ if [ -f "ai-use-case" ] && [ -d ".git" ]; then
     INSTALL_DIR="$(pwd)"
     echo -e "${GREEN}✓${NC} Detected existing repository"
 else
-    # Need to clone
+    # Need to clone or update
     INSTALL_DIR="$HOME/.local/share/ai-use-case-cli"
 
     if [ -d "$INSTALL_DIR" ]; then
         echo -e "${YELLOW}Repository already exists at $INSTALL_DIR${NC}"
-        read -p "Reinstall? (y/N): " reinstall
-        if [[ ! "$reinstall" =~ ^[Yy]$ ]]; then
-            echo "Installation cancelled"
-            exit 0
-        fi
-        rm -rf "$INSTALL_DIR"
-    fi
 
-    echo -e "${CYAN}Cloning repository...${NC}"
-    mkdir -p "$(dirname "$INSTALL_DIR")"
-    git clone https://github.com/mt-osiris-tools/ai-use-case-cli.git "$INSTALL_DIR"
-    cd "$INSTALL_DIR"
+        # Check if it's a git repository
+        if [ -d "$INSTALL_DIR/.git" ]; then
+            # Check if update is needed
+            if [ -n "$REMOTE_VERSION" ] && [ -n "$INSTALLED_VERSION" ]; then
+                if [ "$REMOTE_VERSION" != "$INSTALLED_VERSION" ]; then
+                    echo -e "${BLUE}Update available: v$INSTALLED_VERSION → v$REMOTE_VERSION${NC}"
+                    read -p "Update now? (Y/n): " update_choice
+                    update_choice=${update_choice:-y}
+
+                    if [[ "$update_choice" =~ ^[Yy]$ ]]; then
+                        echo -e "${CYAN}Updating repository...${NC}"
+                        cd "$INSTALL_DIR"
+                        if git pull origin main 2>/dev/null || git pull origin master 2>/dev/null; then
+                            echo -e "${GREEN}✓${NC} Repository updated successfully"
+                        else
+                            echo -e "${RED}✗ Failed to update repository${NC}"
+                            echo "You may need to update manually:"
+                            echo "  cd $INSTALL_DIR && git pull"
+                            exit 1
+                        fi
+                    else
+                        echo -e "${YELLOW}Skipping update, continuing with current version${NC}"
+                        cd "$INSTALL_DIR"
+                    fi
+                else
+                    echo -e "${GREEN}✓${NC} Already up to date (v$INSTALLED_VERSION)"
+                    cd "$INSTALL_DIR"
+                fi
+            else
+                # Can't determine versions, ask user
+                read -p "Reinstall? (y/N): " reinstall
+                if [[ "$reinstall" =~ ^[Yy]$ ]]; then
+                    rm -rf "$INSTALL_DIR"
+                    echo -e "${CYAN}Cloning repository...${NC}"
+                    mkdir -p "$(dirname "$INSTALL_DIR")"
+                    git clone https://github.com/mt-osiris-tools/ai-use-case-cli.git "$INSTALL_DIR"
+                    cd "$INSTALL_DIR"
+                else
+                    echo -e "${YELLOW}Continuing with existing installation${NC}"
+                    cd "$INSTALL_DIR"
+                fi
+            fi
+        else
+            # Not a git repo, offer to reinstall
+            echo -e "${YELLOW}Warning: Not a git repository${NC}"
+            read -p "Reinstall? (y/N): " reinstall
+            if [[ "$reinstall" =~ ^[Yy]$ ]]; then
+                rm -rf "$INSTALL_DIR"
+                echo -e "${CYAN}Cloning repository...${NC}"
+                mkdir -p "$(dirname "$INSTALL_DIR")"
+                git clone https://github.com/mt-osiris-tools/ai-use-case-cli.git "$INSTALL_DIR"
+                cd "$INSTALL_DIR"
+            else
+                echo "Installation cancelled"
+                exit 0
+            fi
+        fi
+    else
+        # Fresh install
+        echo -e "${CYAN}Cloning repository...${NC}"
+        mkdir -p "$(dirname "$INSTALL_DIR")"
+        git clone https://github.com/mt-osiris-tools/ai-use-case-cli.git "$INSTALL_DIR"
+        cd "$INSTALL_DIR"
+    fi
 fi
 
 echo ""
