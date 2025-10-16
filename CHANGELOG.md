@@ -1,0 +1,79 @@
+# Changelog
+
+All notable changes to the AI Use Case CLI project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- Version display in install script banner showing current vs. new version
+- Automatic version detection from GitHub in install script
+- Smart update prompt when outdated version is detected
+- Automatic `git pull` for seamless updates when running install script
+
+### Changed
+- Install script now offers to update instead of showing "Installation cancelled"
+- Update prompt defaults to Yes for better user experience
+- Install script provides clear messaging about version status
+
+### Fixed
+- Users no longer stuck when running install script with existing installation
+- Better handling of various installation scenarios (git repo, non-git, missing versions)
+
+## [2.1.0] - 2025-10-14
+
+### Added
+- Unified CLI interface with `ai-use-case` command
+- Automatic version checking (once per 24 hours)
+- Update notifications with instructions
+- `push` command for manual hub synchronization
+- `publish-confluence` command for publishing to Atlassian Confluence
+- Confluence MCP integration for seamless wiki publishing
+- Non-blocking background version checks
+
+### Changed
+- Separated CLI tools from documentation hub repository
+- Sync command now automatically commits and pushes to hub remote
+- Improved error messages and user feedback
+- Enhanced documentation in CLAUDE.md and README.md
+
+### Fixed
+- Hub repository auto-cloning when not present
+- Path resolution for symlinked installations
+- Git push confirmation prompts
+
+## [2.0.0] - 2025-10-13
+
+### Added
+- Symlink-based architecture in hub repository
+- `by-date/` organization (YYYY/MM/ structure)
+- `by-topic/` organization (topic slug structure)
+- `by-project/` canonical storage
+- Post-commit git hook for automatic sync
+- VS Code extension for one-click documentation
+- Interactive `document-ai-session.sh` script
+
+### Changed
+- Complete restructure of hub organization
+- Moved from flat structure to multi-view symlink system
+- Enhanced template with comprehensive sections
+
+### Removed
+- Flat directory structure in hub
+
+## [1.0.0] - 2025-10-10
+
+### Added
+- Initial release of AI Use Case CLI
+- Basic `sync-ai-use-cases.sh` script
+- Project setup functionality
+- Simple documentation workflow
+- Git integration for tracking AI sessions
+- Basic template for use case documentation
+
+[Unreleased]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v2.0.0...v2.1.0
+[2.0.0]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v1.0.0...v2.0.0
+[1.0.0]: https://github.com/mt-osiris-tools/ai-use-case-cli/releases/tag/v1.0.0
