@@ -222,7 +222,7 @@ parse_confluence_url() {
 
 # Get file size in KB
 get_file_size() {
-    local size_bytes=$(stat -f%z "$MARKDOWN_FILE" 2>/dev/null || stat -c%s "$MARKDOWN_FILE" 2>/dev/null)
+    local size_bytes=$(stat -c%s "$MARKDOWN_FILE" 2>/dev/null || stat -f%z "$MARKDOWN_FILE" 2>/dev/null)
     echo "scale=1; $size_bytes / 1024" | bc
 }
 
