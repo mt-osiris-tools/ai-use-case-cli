@@ -259,13 +259,22 @@ Synced at: $(date '+%Y-%m-%d %H:%M:%S')"
 
                 # Push to remote if configured
                 if git remote get-url origin &>/dev/null; then
-                    echo -e "${BLUE}Pushing to remote repository...${NC}"
+                    echo ""
+                    read -p "Push changes to remote hub repository? (y/n) " -n 1 -r
+                    echo
 
-                    if git push origin HEAD 2>&1 | grep -q "Everything up-to-date\|Total"; then
-                        echo -e "${GREEN}✓${NC} Changes pushed to remote repository"
+                    if [[ $REPLY =~ ^[Yy]$ ]]; then
+                        echo -e "${BLUE}Pushing to remote repository...${NC}"
+
+                        if git push origin HEAD 2>&1 | grep -q "Everything up-to-date\|Total"; then
+                            echo -e "${GREEN}✓${NC} Changes pushed to remote repository"
+                        else
+                            echo -e "${YELLOW}⚠ Warning${NC}: Failed to push changes to remote"
+                            echo "  You can push manually later: cd $CENTRAL_DIR && git push"
+                        fi
                     else
-                        echo -e "${YELLOW}⚠ Warning${NC}: Failed to push changes to remote"
-                        echo "  You can push manually later: cd $CENTRAL_DIR && git push"
+                        echo -e "${YELLOW}⚠ Note${NC}: Changes committed locally only"
+                        echo "  To push later, run: ai-use-case push"
                     fi
                 else
                     echo -e "${YELLOW}⚠ Note${NC}: No remote configured - changes committed locally only"
