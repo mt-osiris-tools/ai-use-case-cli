@@ -211,7 +211,7 @@ find_next_research_ticket() {
 
     # Find the highest existing RESEARCH number (if any exist)
     # Check if any research files exist first to avoid empty pipeline issues
-    if ls "$AI_USECASES_DIR"/*_RESEARCH-*.md 2>/dev/null | grep -q .; then
+    if compgen -G "$AI_USECASES_DIR"/*_RESEARCH-*.md > /dev/null; then
         local highest_num=$(ls "$AI_USECASES_DIR"/*_RESEARCH-*.md 2>/dev/null | \
             grep -oE 'RESEARCH-[0-9]+' | \
             sed 's/RESEARCH-//' | \
@@ -235,7 +235,7 @@ find_next_research_ticket() {
         local candidate="RESEARCH-$(printf "%03d" $research_num)"
 
         # Check if any file with this ticket already exists in the directory
-        if ! ls "$AI_USECASES_DIR"/*_${candidate}_*.md 2>/dev/null | grep -q .; then
+        if ! compgen -G "$AI_USECASES_DIR"/*_${candidate}_*.md > /dev/null; then
             echo "$candidate"
             return 0
         fi
