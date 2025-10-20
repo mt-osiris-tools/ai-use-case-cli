@@ -48,12 +48,9 @@ Use conventional commit messages:
 
 ```bash
 git add .
-git commit -m "feat: add version checking to CLI
-
-Implements automatic version checking that runs once per day
-in the background. Notifies users when updates are available.
-
-Resolves #123"
+git commit -m "feat: add version checking to CLI" \
+  -m "Implements automatic version checking that runs once per day in the background. Notifies users when updates are available." \
+  -m "Resolves #123"
 ```
 
 **Commit message format:**
