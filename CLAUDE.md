@@ -299,10 +299,8 @@ When working on features or fixes in this repository:
 
 2. **Make changes with conventional commits**:
    ```bash
-   git commit -m "feat: add version checking to CLI
-
-   Implements automatic version checking that runs once per day
-   in the background. Notifies users when updates are available."
+   git commit -m "feat: add version checking to CLI" \
+     -m "Implements automatic version checking that runs once per day in the background. Notifies users when updates are available."
    ```
    - Use prefixes: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 
