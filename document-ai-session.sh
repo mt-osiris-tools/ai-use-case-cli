@@ -317,19 +317,21 @@ else
     GIT_DIFF=$(git show --stat HEAD 2>/dev/null || echo "No diff available")
 fi
 
-# Generate documentation based on session type
-if [ "$SESSION_TYPE" = "research" ]; then
-    # Generate research session template
-    cat > "$OUTPUT_FILE" <<EOF
-# 🔬 ${AI_TOOL}: ${BRIEF_DESC}
+# Helper function to generate common header
+generate_header() {
+    local icon=$1
+    local session_type_label=$2
+    local time_context=$3
+
+    cat <<EOF
+# ${icon} ${AI_TOOL}: ${BRIEF_DESC}
 
 **Date:** ${SESSION_DATE}
 **Repository/Project:** ${PROJECT_NAME}
 **Ticket:** [${TICKET}](https://your-jira-or-github/browse/${TICKET})
-**Session Type:** Research & Exploration
-**Agent Used:** ${AI_TOOL}
+${session_type_label}**Agent Used:** ${AI_TOOL}
 **Complexity:** ${COMPLEXITY}
-**Time Saved:** ~${TIME_SAVED} hours vs manual research
+**Time Saved:** ~${TIME_SAVED} hours vs ${time_context}
 
 ---
 
@@ -339,7 +341,31 @@ if [ "$SESSION_TYPE" = "research" ]; then
 
 **Result:** ${TLDR_RESULT}
 
-**Time:** ${TIME_SPENT} (AI-assisted research) vs ${TIME_SAVED} hours manual research
+**Time:** ${TIME_SPENT} (AI-assisted${time_context:+ $time_context}) vs ${TIME_SAVED} hours ${time_context}
+EOF
+}
+
+# Helper function to generate common footer
+generate_footer() {
+    cat <<EOF
+
+---
+
+**Created:** ${SESSION_DATE}
+**Last Updated:** ${SESSION_DATE}
+**Author:** [Your name]
+**Review Status:** Draft
+
+<!-- TODO: Fill in bracketed sections above -->
+EOF
+}
+
+# Generate documentation based on session type
+if [ "$SESSION_TYPE" = "research" ]; then
+    # Generate research session template
+    {
+        generate_header "🔬" "**Session Type:** Research & Exploration\n" "manual research"
+        cat <<'EOF'
 
 **Key Success:** Iterative query refinement led to actionable insights
 
@@ -473,38 +499,15 @@ ${APPROACHES_EVALUATED}
 3. **Document Insights:** Capture learnings in real-time
 4. **Evaluate Alternatives:** Consider multiple approaches
 5. **Quantify Impact:** Track time saved and value added
-
----
-
-**Created:** ${SESSION_DATE}
-**Last Updated:** ${SESSION_DATE}
-**Author:** [Your name]
-**Review Status:** Draft
-
-<!-- TODO: Fill in bracketed sections above -->
 EOF
+        generate_footer
+    } > "$OUTPUT_FILE"
 
 else
     # Generate implementation session template
-    cat > "$OUTPUT_FILE" <<EOF
-# 🎯 ${AI_TOOL}: ${BRIEF_DESC}
-
-**Date:** ${SESSION_DATE}
-**Repository/Project:** ${PROJECT_NAME}
-**Ticket:** [${TICKET}](https://your-jira-or-github/browse/${TICKET})
-**Agent Used:** ${AI_TOOL}
-**Complexity:** ${COMPLEXITY}
-**Time Saved:** ~${TIME_SAVED} hours vs manual approach
-
----
-
-## 📄 TL;DR
-
-**What:** ${TLDR_WHAT}
-
-**Result:** ${TLDR_RESULT}
-
-**Time:** ${TIME_SPENT} (AI-assisted) vs ${TIME_SAVED} hours manual approach
+    {
+        generate_header "🎯" "" "manual approach"
+        cat <<'EOF'
 
 **Cost:** ~[tokens/cost] for complete workflow
 
@@ -691,16 +694,9 @@ ${CHANGED_FILES}
 - **Repository:** ${PROJECT_NAME}
 - **Branch:** ${BRANCH}
 - **Documentation:** [Links to relevant docs]
-
----
-
-**Created:** ${SESSION_DATE}
-**Last Updated:** ${SESSION_DATE}
-**Author:** [Your name]
-**Review Status:** Draft
-
-<!-- TODO: Fill in bracketed sections above -->
 EOF
+        generate_footer
+    } > "$OUTPUT_FILE"
 fi
 
 echo -e "${GREEN}✓ Documentation created!${NC}"
