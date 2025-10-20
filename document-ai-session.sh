@@ -207,15 +207,28 @@ SESSION_DATE=${SESSION_DATE:-$(date +%Y-%m-%d)}
 find_next_research_ticket() {
     local max_attempts=100
     local attempt=0
+    local research_num=1
 
-    # Find the highest existing RESEARCH number
-    local highest_num=$(ls "$AI_USECASES_DIR"/*_RESEARCH-*.md 2>/dev/null | \
-        grep -oE 'RESEARCH-[0-9]+' | \
-        sed 's/RESEARCH-//' | sort -n | tail -1)
+    # Find the highest existing RESEARCH number (if any exist)
+    # Check if any research files exist first to avoid empty pipeline issues
+    if ls "$AI_USECASES_DIR"/*_RESEARCH-*.md 2>/dev/null | grep -q .; then
+        local highest_num=$(ls "$AI_USECASES_DIR"/*_RESEARCH-*.md 2>/dev/null | \
+            grep -oE 'RESEARCH-[0-9]+' | \
+            sed 's/RESEARCH-//' | \
+            sort -n | \
+            tail -1)
 
-    # Start from highest + 1, or 1 if no research docs exist
-    local research_num=${highest_num:-0}
-    research_num=$((research_num + 1))
+        # Validate that we got a numeric result
+        if [[ "$highest_num" =~ ^[0-9]+$ ]]; then
+            research_num=$((highest_num + 1))
+        else
+            # Fallback to 1 if parsing failed
+            research_num=1
+        fi
+    else
+        # No research files exist yet, start at 1
+        research_num=1
+    fi
 
     # Try to find an unused number (handles concurrent creation)
     while [ $attempt -lt $max_attempts ]; do
