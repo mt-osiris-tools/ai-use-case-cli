@@ -208,8 +208,16 @@ if [ "$SESSION_TYPE" = "research" ]; then
     read -p "Ticket/Issue (e.g., RESEARCH-001, or leave blank): " TICKET
     if [ -z "$TICKET" ]; then
         # Auto-generate research ticket number
-        EXISTING_RESEARCH=$(ls "$AI_USECASES_DIR"/*_RESEARCH-*.md 2>/dev/null | wc -l)
-        RESEARCH_NUM=$((EXISTING_RESEARCH + 1))
+        # Find the maximum existing RESEARCH-XXX number and increment it
+        MAX_RESEARCH_NUM=$(ls "$AI_USECASES_DIR"/*_RESEARCH-*.md 2>/dev/null | \
+            grep -oE 'RESEARCH-[0-9]+' | \
+            sed 's/RESEARCH-//' | \
+            awk 'max < $1 {max = $1} END {print max+0}' )
+        if [ -z "$MAX_RESEARCH_NUM" ] || [ "$MAX_RESEARCH_NUM" -eq 0 ]; then
+            RESEARCH_NUM=1
+        else
+            RESEARCH_NUM=$((MAX_RESEARCH_NUM + 1))
+        fi
         TICKET="RESEARCH-$(printf "%03d" $RESEARCH_NUM)"
         echo -e "${BLUE}Auto-generated: $TICKET${NC}"
     fi
