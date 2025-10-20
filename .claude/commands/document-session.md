@@ -38,7 +38,7 @@ If not set up, offer to run: `bash ~/.local/share/ai-use-case-cli/setup-project.
 Check for commits and file changes:
 ```bash
 # Check for recent commits
-git log --since="1 hour ago" --oneline | wc -l
+git log --since="24 hours ago" --oneline | wc -l
 
 # Check for uncommitted changes
 git status --porcelain | wc -l
