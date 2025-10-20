@@ -35,15 +35,15 @@ This prevents direct commits to main and requires all changes to go through PRs.
   - For solo development: You can set this to 0 and merge your own PRs
   - For team development: Set to 1+ to require peer reviews
 
-- [ ] Dismiss stale pull request approvals when new commits are pushed (optional)
-- [ ] Require review from Code Owners (optional, if you have CODEOWNERS file)
-- [ ] Restrict who can dismiss pull request reviews (optional)
+- Dismiss stale pull request approvals when new commits are pushed (optional)
+- Require review from Code Owners (optional, if you have CODEOWNERS file)
+- Restrict who can dismiss pull request reviews (optional)
 
 #### ✅ Require status checks to pass before merging (Optional - for CI/CD)
 
 Only enable this if you plan to add GitHub Actions or other CI/CD:
 
-- [ ] Require branches to be up to date before merging
+- Require branches to be up to date before merging
 - Search for status checks (if you have CI/CD workflows configured)
 
 **Note:** You can enable this later when you add automated tests.
