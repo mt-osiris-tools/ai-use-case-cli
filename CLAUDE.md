@@ -318,11 +318,18 @@ YYYY-MM-DD_TICKET-XXXXX_brief-description.md
 **Ticket Format Guidelines:**
 - Implementation sessions: Use project ticket (e.g., `PROJ-1234`, `HUB-001`)
 - Research sessions: Use `RESEARCH-XXX` (auto-generated or manual)
-- Format must be: `[A-Z]+-[0-9]+` (one or more uppercase letters, a single dash, one or more digits; e.g., `PROJ-1234`, `RESEARCH-001`). Multiple dashes are not allowed in the ticket segment.
+- Format requirements:
+  - Pattern: `[A-Z]+-[0-9]+`
+  - One or more uppercase letters: `[A-Z]+`
+  - Exactly one dash: `-` (literal character, not quantified)
+  - One or more digits: `[0-9]+`
+  - Valid examples: `PROJ-1234`, `RESEARCH-001`, `HUB-42`
+  - Invalid examples: `proj-123` (lowercase), `PROJ--123` (multiple dashes), `PROJ_123` (underscore)
 
 **Parsing logic:**
 - Date extraction: `^([0-9]{4})-([0-9]{2})-([0-9]{2})`
 - Ticket and topic: `_([A-Z]+-[0-9]+)_(.+)\.md$`
+- Full filename validation: `^[0-9]{4}-[0-9]{2}-[0-9]{2}_[A-Z]+-[0-9]+_.+\.md$`
 
 The sync script uses regex to parse filenames and organize symlinks in the hub.
 

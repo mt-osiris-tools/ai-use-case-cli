@@ -143,9 +143,16 @@ while IFS= read -r USE_CASE_DIR; do
         fi
 
         # Validate filename convention (warn but don't fail)
+        # Pattern breakdown:
+        #   ^[0-9]{4}-[0-9]{2}-[0-9]{2}  = Date: YYYY-MM-DD
+        #   _                             = Separator
+        #   [A-Z]+-[0-9]+                 = Ticket: UPPERCASE-DIGITS (exactly one dash)
+        #   _                             = Separator
+        #   .+\.md$                       = Description and .md extension
         if ! [[ "$FILENAME" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}_[A-Z]+-[0-9]+_.+\.md$ ]]; then
             echo -e "${YELLOW}⚠ Warning${NC}: $FILENAME doesn't follow naming convention"
             echo "  Expected: YYYY-MM-DD_TICKET-XXXXX_description.md"
+            echo "  Example: 2025-10-20_PROJ-1234_add-user-authentication.md"
         fi
 
         TARGET_FILE="$BY_PROJECT_DIR/$PROJECT_NAME/$FILENAME"
