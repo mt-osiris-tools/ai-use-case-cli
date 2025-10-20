@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Branch-based development workflow**: All changes now require pull requests
+  - CONTRIBUTING.md with comprehensive contribution guidelines
+  - Branch naming conventions (feature/, fix/, docs/, refactor/, test/)
+  - PR requirements checklist (CHANGELOG, testing, documentation)
+  - Conventional commit message guidelines
+- BRANCH-PROTECTION-SETUP.md with step-by-step GitHub configuration guide
+- Development workflow section in CLAUDE.md for AI assistant guidance
+- Automated PR workflow for Claude Code with approval prompts
+
+### Changed
+- Updated README.md Contributing section to reference new guidelines
+- Enhanced CLAUDE.md with mandatory branch/PR workflow for AI assistants
+- Repository now requires PR-based workflow (no direct commits to main)
+
 ## [2.2.0] - 2025-10-20
 
 ### Added

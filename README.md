@@ -424,11 +424,27 @@ ai-use-case-cli/
 
 ### Contributing
 
+We welcome contributions! This project follows a branch-based workflow with pull requests.
+
+**Quick Start:**
+
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'feat: Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+3. Make your changes and commit (`git commit -m 'feat: Add amazing feature'`)
+4. Update CHANGELOG.md under `## [Unreleased]`
+5. Test your changes locally
+6. Push to your fork (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+**Important:**
+- All changes require a pull request (no direct commits to `main`)
+- Use conventional commit messages (`feat:`, `fix:`, `docs:`, etc.)
+- Update CHANGELOG.md with all changes
+- Test changes before submitting PR
+
+For complete guidelines, see [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+For GitHub branch protection setup, see [BRANCH-PROTECTION-SETUP.md](./BRANCH-PROTECTION-SETUP.md).
 
 ## License
 
