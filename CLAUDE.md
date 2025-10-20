@@ -318,7 +318,7 @@ YYYY-MM-DD_TICKET-XXXXX_brief-description.md
 **Ticket Format Guidelines:**
 - Implementation sessions: Use project ticket (e.g., `PROJ-1234`, `HUB-001`)
 - Research sessions: Use `RESEARCH-XXX` (auto-generated or manual)
-- Format must be: `[A-Z]+-[0-9]+` (uppercase letters, dash, numbers)
+- Format must be: `[A-Z]+-[0-9]+` (one or more uppercase letters, a single dash, one or more digits; e.g., `PROJ-1234`, `RESEARCH-001`). Multiple dashes are not allowed in the ticket segment.
 
 **Parsing logic:**
 - Date extraction: `^([0-9]{4})-([0-9]{2})-([0-9]{2})`
