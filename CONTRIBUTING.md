@@ -227,7 +227,7 @@ When ready to release a new version:
 1. Create a release PR with version bump:
    ```bash
    git checkout -b release/v2.3.0
-   # Update version in ai-use-case script
+   # Update the VERSION constant in ./ai-use-case (at the top of the file)
    # Move "Unreleased" changes in CHANGELOG.md to new version section
    git commit -m "chore: prepare release v2.3.0"
    git push -u origin release/v2.3.0
