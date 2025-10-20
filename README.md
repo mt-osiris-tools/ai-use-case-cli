@@ -6,6 +6,7 @@ Command-line tools for documenting AI-assisted development workflows across mult
 
 - 🚀 **One-command installation** - Get started in seconds
 - 📝 **Interactive documentation** - Guided prompts for capturing AI sessions
+- 🔬 **Research session support** - Document exploratory sessions without code changes
 - 🔄 **Automatic syncing** - Git hooks sync docs to central hub automatically
 - 🎯 **Project setup** - Configure any project repository in minutes
 - 🔍 **Search & stats** - Find and analyze documented use cases
@@ -107,9 +108,65 @@ This ensures all documented use cases are automatically backed up and shared acr
 YYYY-MM-DD_TICKET-XXXXX_brief-description.md
 ```
 
-Example:
+**Implementation Session Examples:**
 ```
 2025-10-14_PROJ-1234_implement-user-authentication.md
+2025-10-14_HUB-001_fix-color-encoding-in-cli-tools.md
+```
+
+**Research Session Examples:**
+```
+2025-10-20_RESEARCH-001_evaluate-database-migration-strategies.md
+2025-10-20_RESEARCH-002_compare-authentication-approaches.md
+```
+
+The `RESEARCH-XXX` format is auto-generated for research sessions, or you can specify your own ticket format.
+
+### Session Types
+
+The CLI supports two types of AI sessions:
+
+#### 1. Implementation Sessions (🎯 Code Changes)
+
+For sessions that involve actual code modifications:
+- Requires git commits and file changes
+- Captures git statistics (files changed, lines added/removed)
+- Includes code snippets and technical implementation details
+- Uses project-specific tickets (e.g., `PROJ-1234`, `HUB-001`)
+
+**When to use:**
+- Implementing new features
+- Fixing bugs
+- Refactoring code
+- Writing tests
+
+#### 2. Research Sessions (🔬 Exploration)
+
+For exploratory sessions without code changes:
+- No git commits required
+- Focuses on query refinement and decision-making
+- Documents insights, approaches evaluated, and recommendations
+- Uses `RESEARCH-XXX` tickets (auto-generated)
+
+**When to use:**
+- Exploring architectural approaches
+- Evaluating multiple technical solutions
+- Understanding existing codebases
+- Making technology or design decisions
+- Investigating issues before implementing fixes
+- Back-and-forth conversations to refine complex queries
+
+**Example research session workflow:**
+```bash
+# Start exploring with Claude Code
+# Discuss approaches, refine queries, evaluate options
+# No code changes made
+
+# Document the research session
+ai-use-case document
+# > Select "Research" as session type
+# > CLI auto-generates RESEARCH-001 ticket
+# > Captures query evolution and insights
 ```
 
 ## Configuration

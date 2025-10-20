@@ -184,15 +184,41 @@ echo ""
 echo -e "${CYAN}Please provide session details:${NC}"
 echo ""
 
+# Session type
+echo "Session Type:"
+echo "1) Implementation (code changes, commits, file modifications)"
+echo "2) Research (exploratory, architecture discussions, no commits)"
+read -p "Select (1-2) [1]: " SESSION_TYPE_CHOICE
+SESSION_TYPE_CHOICE=${SESSION_TYPE_CHOICE:-1}
+
+case $SESSION_TYPE_CHOICE in
+    1) SESSION_TYPE="implementation" ;;
+    2) SESSION_TYPE="research" ;;
+    *) SESSION_TYPE="implementation" ;;
+esac
+
+echo ""
+
 # Date
 read -p "Date (YYYY-MM-DD) [$(date +%Y-%m-%d)]: " SESSION_DATE
 SESSION_DATE=${SESSION_DATE:-$(date +%Y-%m-%d)}
 
-# Ticket number
-read -p "Ticket/Issue (e.g., PROJ-1234): " TICKET
-if [ -z "$TICKET" ]; then
-    echo -e "${RED}Error: Ticket number is required${NC}"
-    exit 1
+# Ticket number (optional for research sessions)
+if [ "$SESSION_TYPE" = "research" ]; then
+    read -p "Ticket/Issue (e.g., RESEARCH-001, or leave blank): " TICKET
+    if [ -z "$TICKET" ]; then
+        # Auto-generate research ticket number
+        EXISTING_RESEARCH=$(ls "$AI_USECASES_DIR"/*_RESEARCH-*.md 2>/dev/null | wc -l)
+        RESEARCH_NUM=$((EXISTING_RESEARCH + 1))
+        TICKET="RESEARCH-$(printf "%03d" $RESEARCH_NUM)"
+        echo -e "${BLUE}Auto-generated: $TICKET${NC}"
+    fi
+else
+    read -p "Ticket/Issue (e.g., PROJ-1234): " TICKET
+    if [ -z "$TICKET" ]; then
+        echo -e "${RED}Error: Ticket number is required for implementation sessions${NC}"
+        exit 1
+    fi
 fi
 
 # Brief description
@@ -259,6 +285,18 @@ echo -e "${CYAN}Business Context:${NC}"
 read -p "Objective (what problem were you solving?): " OBJECTIVE
 read -p "Why was this work needed?: " BACKGROUND
 
+# Research-specific questions
+if [ "$SESSION_TYPE" = "research" ]; then
+    echo ""
+    echo -e "${CYAN}Research Details:${NC}"
+    read -p "Initial question/query: " INITIAL_QUERY
+    read -p "How many iterations to refine the query?: " QUERY_ITERATIONS
+    QUERY_ITERATIONS=${QUERY_ITERATIONS:-3}
+    read -p "Key insights gained (comma-separated): " KEY_INSIGHTS
+    read -p "Approaches evaluated (comma-separated): " APPROACHES_EVALUATED
+    read -p "Final decision/recommendation: " FINAL_DECISION
+fi
+
 # Generate filename
 FILENAME="${SESSION_DATE}_${TICKET}_${SLUG}.md"
 OUTPUT_FILE="$AI_USECASES_DIR/$FILENAME"
@@ -273,9 +311,176 @@ else
     GIT_DIFF=$(git show --stat HEAD 2>/dev/null || echo "No diff available")
 fi
 
-# Generate documentation
-# TODO: Refactor to use TEMPLATE.md file with variable substitution instead of inline template
-cat > "$OUTPUT_FILE" <<EOF
+# Generate documentation based on session type
+if [ "$SESSION_TYPE" = "research" ]; then
+    # Generate research session template
+    cat > "$OUTPUT_FILE" <<EOF
+# 🔬 ${AI_TOOL}: ${BRIEF_DESC}
+
+**Date:** ${SESSION_DATE}
+**Repository/Project:** ${PROJECT_NAME}
+**Ticket:** [${TICKET}](https://your-jira-or-github/browse/${TICKET})
+**Session Type:** Research & Exploration
+**Agent Used:** ${AI_TOOL}
+**Complexity:** ${COMPLEXITY}
+**Time Saved:** ~${TIME_SAVED} hours vs manual research
+
+---
+
+## 📄 TL;DR
+
+**What:** ${TLDR_WHAT}
+
+**Result:** ${TLDR_RESULT}
+
+**Time:** ${TIME_SPENT} (AI-assisted research) vs ${TIME_SAVED} hours manual research
+
+**Key Success:** Iterative query refinement led to actionable insights
+
+---
+
+## 🔍 Research Context
+
+**Initial Query:** ${INITIAL_QUERY}
+
+**Objective:** ${OBJECTIVE}
+
+**Background:** ${BACKGROUND}
+
+**Domain:** [Technical area: Architecture, API Design, Database, Testing, etc.]
+
+**Query Refinement:** ${QUERY_ITERATIONS} iterations to reach optimal clarity
+
+---
+
+## 🔄 Query Evolution & Exploration Process
+
+### Iteration 1: Initial Query
+- **Query:** ${INITIAL_QUERY}
+- **AI Response:** [Summary of initial response]
+- **Gaps Identified:** [What was missing or unclear]
+
+### Iteration 2-${QUERY_ITERATIONS}: Refinement
+- **Refined Query:** [How the query evolved]
+- **AI Response:** [Summary of improved response]
+- **Insights Gained:** [New understanding]
+
+[Continue documenting query iterations...]
+
+---
+
+## 💡 Key Insights Discovered
+
+${KEY_INSIGHTS}
+
+**Detailed Insights:**
+
+1. **[Insight 1]:** [Explanation and implications]
+
+2. **[Insight 2]:** [Explanation and implications]
+
+3. **[Insight 3]:** [Explanation and implications]
+
+---
+
+## 🎯 Approaches Evaluated
+
+${APPROACHES_EVALUATED}
+
+**Evaluation Details:**
+
+### Approach 1: [Name]
+- **Pros:** [Advantages]
+- **Cons:** [Disadvantages]
+- **Best for:** [Use cases]
+
+### Approach 2: [Name]
+- **Pros:** [Advantages]
+- **Cons:** [Disadvantages]
+- **Best for:** [Use cases]
+
+[Continue for all approaches...]
+
+---
+
+## ✅ Final Decision & Recommendation
+
+**Decision:** ${FINAL_DECISION}
+
+**Rationale:**
+- [Reason 1 for this choice]
+- [Reason 2 for this choice]
+- [Reason 3 for this choice]
+
+**Implementation Guidance:**
+- [Step 1 to implement this decision]
+- [Step 2 to implement this decision]
+- [Step 3 to implement this decision]
+
+**Risks & Mitigations:**
+- **Risk 1:** [Description] → **Mitigation:** [How to address]
+- **Risk 2:** [Description] → **Mitigation:** [How to address]
+
+---
+
+## 📊 Research Impact
+
+### Knowledge Gained
+- **Questions Answered:** ${QUERY_ITERATIONS}+ through iterative refinement
+- **Approaches Evaluated:** [Number] distinct approaches
+- **Decision Confidence:** High/Medium/Low
+- **Time Efficiency:** ${TIME_SAVED}x faster than manual research
+
+### Business Value
+- ✅ **Reduced Decision Risk:** Clear evaluation of trade-offs
+- ✅ **Accelerated Planning:** ${TIME_SAVED} hours saved in research phase
+- ✅ **Knowledge Transfer:** Documented insights for team
+
+### Future Applications
+- [Where else can these insights be applied?]
+- [What patterns emerged that are reusable?]
+
+---
+
+## 📚 Resources & References
+
+- **AI Tool Used:** ${AI_TOOL}
+- **Related Documentation:** [Links to relevant docs]
+- **Similar Patterns:** [Links to related use cases]
+- **Follow-up Actions:** [What needs to be done next]
+
+---
+
+## 🔄 Replicability Framework
+
+### This research approach is replicable for:
+
+- ✅ [Similar research question 1]
+- ✅ [Similar research question 2]
+- ✅ [Similar research question 3]
+- ❌ Not suitable for [Research types that won't work]
+
+### Best Practices for Similar Research Sessions:
+
+1. **Start Broad:** Begin with open-ended questions
+2. **Iterate Deliberately:** Refine queries based on gaps
+3. **Document Insights:** Capture learnings in real-time
+4. **Evaluate Alternatives:** Consider multiple approaches
+5. **Quantify Impact:** Track time saved and value added
+
+---
+
+**Created:** ${SESSION_DATE}
+**Last Updated:** ${SESSION_DATE}
+**Author:** [Your name]
+**Review Status:** Draft
+
+<!-- TODO: Fill in bracketed sections above -->
+EOF
+
+else
+    # Generate implementation session template
+    cat > "$OUTPUT_FILE" <<EOF
 # 🎯 ${AI_TOOL}: ${BRIEF_DESC}
 
 **Date:** ${SESSION_DATE}
@@ -490,6 +695,7 @@ ${CHANGED_FILES}
 
 <!-- TODO: Fill in bracketed sections above -->
 EOF
+fi
 
 echo -e "${GREEN}✓ Documentation created!${NC}"
 echo "  Location: $OUTPUT_FILE"

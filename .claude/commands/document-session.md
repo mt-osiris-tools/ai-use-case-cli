@@ -4,7 +4,22 @@
 
 ## Your Task
 
-Automatically document the AI-assisted coding session that just occurred by analyzing git history and the conversation you had with the user.
+Automatically document the AI-assisted session that just occurred by analyzing the conversation context and, if applicable, git history.
+
+## Session Type Detection
+
+First, determine the session type:
+
+**Implementation Session:**
+- Involves actual code changes and commits
+- Files were modified
+- Git history shows commits
+
+**Research Session:**
+- No code changes or commits
+- Exploratory conversation only
+- Back-and-forth query refinement
+- Architecture or approach discussions
 
 ## Automatic Documentation Workflow
 
@@ -18,9 +33,26 @@ ls -la docs/ai-use-cases/ 2>/dev/null || echo "Not set up"
 
 If not set up, offer to run: `bash ~/.local/share/ai-use-case-cli/setup-project.sh`
 
-### Step 2: Analyze Git History (Run in Parallel)
+### Step 2: Determine Session Type
 
-Gather comprehensive git data:
+Check for commits and file changes:
+```bash
+# Check for recent commits
+git log --since="1 hour ago" --oneline | wc -l
+
+# Check for uncommitted changes
+git status --porcelain | wc -l
+
+# Check for any file modifications
+git diff --name-only HEAD~1..HEAD 2>/dev/null || echo "No commits"
+```
+
+**If commits exist:** Implementation Session → Continue to Step 3a
+**If no commits:** Research Session → Continue to Step 3b
+
+### Step 3a: Analyze Git History (Implementation Session)
+
+Gather comprehensive git data (Run in parallel):
 ```bash
 # Recent commits with relative time
 git log --since="24 hours ago" --pretty=format:"%h - %s (%ar)" | head -20
@@ -35,9 +67,20 @@ git diff HEAD~1..HEAD
 git status --short
 ```
 
-### Step 3: Extract Session Information
+### Step 3b: Analyze Conversation (Research Session)
 
-From the data gathered, automatically determine:
+Extract research context from conversation:
+- Initial user query or question
+- How the query evolved through iterations
+- Different approaches discussed
+- Key insights discovered
+- Final recommendation or decision reached
+
+Skip git commands if no commits exist.
+
+### Step 4: Extract Session Information
+
+**For Implementation Sessions:**
 
 - **Date**: Use today's date in YYYY-MM-DD format
 - **Ticket/Issue**: Extract from commit messages (e.g., HUB-001, PROJ-1234) or infer logical next number
@@ -51,25 +94,49 @@ From the data gathered, automatically determine:
 - **Objective**: Extract from conversation - what problem was being solved
 - **Background**: Extract from conversation - why this work was needed
 
-### Step 4: Generate Complete Documentation
+**For Research Sessions (Additional Fields):**
 
-Create a comprehensive markdown file following TEMPLATE.md structure:
+- **Ticket/Issue**: Use format `RESEARCH-XXX` (auto-increment from existing research docs)
+- **Initial Query**: User's original question from conversation start
+- **Query Iterations**: Count refinement cycles in conversation
+- **Key Insights**: List important learnings discovered (extract from conversation)
+- **Approaches Evaluated**: Different solutions discussed (extract from conversation)
+- **Final Decision**: Recommended approach and rationale
+- **Complexity**: Assess from conversation depth (Low: simple Q&A, Medium: multiple approaches, High: architectural decisions)
 
-**Filename**: `docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_brief-description-slug.md`
+### Step 5: Generate Complete Documentation
 
-**Content Requirements**:
+Create a comprehensive markdown file:
+
+**Filename Format:**
+- Implementation: `docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_brief-description-slug.md`
+- Research: `docs/ai-use-cases/YYYY-MM-DD_RESEARCH-XXX_brief-description-slug.md`
+
+**Content Requirements for Implementation Sessions:**
 - ✅ All sections filled with real data (NO "TODO" or placeholders)
 - ✅ Actual git statistics (files changed, lines added/removed)
 - ✅ Code examples from conversation where relevant
 - ✅ Quantitative metrics (files, commits, tests, etc.)
 - ✅ Qualitative insights from conversation context
 - ✅ Professional formatting and completeness
+- ✅ Use 🎯 icon in title
+
+**Content Requirements for Research Sessions:**
+- ✅ All sections filled with conversation insights (NO "TODO" or placeholders)
+- ✅ Document query evolution through iterations
+- ✅ List all key insights discovered
+- ✅ Compare approaches evaluated with pros/cons
+- ✅ Provide clear recommendation with rationale
+- ✅ Include conversation excerpts showing refinement
+- ✅ Professional formatting and completeness
+- ✅ Use 🔬 icon in title (not 🎯)
 
 **Use the Write tool** to create the file with full content.
 
-### Step 5: Commit and Sync
+### Step 6: Commit and Sync
 
-Commit the documentation and sync to hub:
+**For Implementation Sessions:**
+Commit the documentation along with code changes and sync to hub:
 ```bash
 git add docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_brief-description-slug.md
 git commit -m "docs: AI session YYYY-MM-DD - TICKET-XXX - Brief description
@@ -81,7 +148,14 @@ git commit -m "docs: AI session YYYY-MM-DD - TICKET-XXX - Brief description
 Co-Authored-By: Claude <noreply@anthropic.com>"
 ```
 
-Then sync to central hub:
+**For Research Sessions:**
+Create documentation file but DO NOT commit (since there are no code changes):
+```bash
+# Just create the file using Write tool
+# User can commit manually later if desired
+```
+
+**Then sync to central hub (both session types):**
 ```bash
 bash ~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh .
 ```
@@ -118,15 +192,21 @@ Available in hub at:
 
 Only use manual/interactive mode if:
 - User explicitly runs `ai-use-case document` in shell (not through you)
-- No git history is available
 - User specifically requests to manually input details
 
 Otherwise, ALWAYS use automatic mode when `/document-session` is invoked.
 
+**Note**: Automatic mode works for BOTH implementation and research sessions. Git history is NOT required - research sessions rely purely on conversation context.
+
 ## Reference Examples
 
-See these auto-generated examples:
+**Implementation Sessions:**
 - `docs/ai-use-cases/2025-10-14_HUB-001_fix-color-encoding-in-cli-tools.md`
 - `docs/ai-use-cases/2025-10-14_HUB-002_update-github-organization-references.md`
 
-Both demonstrate complete, professional documentation generated automatically by Claude Code.
+**Research Sessions (Example Format):**
+- `docs/ai-use-cases/2025-10-20_RESEARCH-001_evaluate-database-migration-strategies.md`
+- Focus on query evolution, insights, and decision-making
+- No code changes required
+
+All demonstrate complete, professional documentation generated automatically by Claude Code.
