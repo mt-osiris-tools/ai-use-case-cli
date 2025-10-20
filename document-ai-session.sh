@@ -365,7 +365,7 @@ if [ "$SESSION_TYPE" = "research" ]; then
     # Generate research session template
     {
         generate_header "🔬" "**Session Type:** Research & Exploration\n" "manual research"
-        cat <<'EOF'
+        cat <<EOF
 
 **Key Success:** Iterative query refinement led to actionable insights
 
@@ -507,7 +507,7 @@ else
     # Generate implementation session template
     {
         generate_header "🎯" "" "manual approach"
-        cat <<'EOF'
+        cat <<EOF
 
 **Cost:** ~[tokens/cost] for complete workflow
 
