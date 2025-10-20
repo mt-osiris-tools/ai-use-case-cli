@@ -203,20 +203,45 @@ echo ""
 read -p "Date (YYYY-MM-DD) [$(date +%Y-%m-%d)]: " SESSION_DATE
 SESSION_DATE=${SESSION_DATE:-$(date +%Y-%m-%d)}
 
+# Helper function to find next available research ticket (handles race conditions)
+find_next_research_ticket() {
+    local max_attempts=100
+    local attempt=0
+
+    # Find the highest existing RESEARCH number
+    local highest_num=$(ls "$AI_USECASES_DIR"/*_RESEARCH-*.md 2>/dev/null | \
+        grep -oE 'RESEARCH-[0-9]+' | \
+        sed 's/RESEARCH-//' | sort -n | tail -1)
+
+    # Start from highest + 1, or 1 if no research docs exist
+    local research_num=${highest_num:-0}
+    research_num=$((research_num + 1))
+
+    # Try to find an unused number (handles concurrent creation)
+    while [ $attempt -lt $max_attempts ]; do
+        local candidate="RESEARCH-$(printf "%03d" $research_num)"
+
+        # Check if any file with this ticket already exists in the directory
+        if ! ls "$AI_USECASES_DIR"/*_${candidate}_*.md 2>/dev/null | grep -q .; then
+            echo "$candidate"
+            return 0
+        fi
+
+        # Collision detected, try next number
+        research_num=$((research_num + 1))
+        attempt=$((attempt + 1))
+    done
+
+    # Fallback: use timestamp-based ticket if all sequential numbers exhausted
+    echo "RESEARCH-$(date +%Y%m%d%H%M%S)"
+}
+
 # Ticket number (optional for research sessions)
 if [ "$SESSION_TYPE" = "research" ]; then
     read -p "Ticket/Issue (e.g., RESEARCH-001, or leave blank): " TICKET
     if [ -z "$TICKET" ]; then
-        # Auto-generate research ticket number
-        # Find the lowest unused RESEARCH-XXX number
-        USED_RESEARCH_NUMS=$(ls "$AI_USECASES_DIR"/*_RESEARCH-*.md 2>/dev/null | \
-            grep -oE 'RESEARCH-[0-9]+' | \
-            sed 's/RESEARCH-//' | sort -n | uniq)
-        RESEARCH_NUM=1
-        while echo "$USED_RESEARCH_NUMS" | grep -qx "$RESEARCH_NUM"; do
-            RESEARCH_NUM=$((RESEARCH_NUM + 1))
-        done
-        TICKET="RESEARCH-$(printf "%03d" $RESEARCH_NUM)"
+        # Auto-generate research ticket number with race condition protection
+        TICKET=$(find_next_research_ticket)
         echo -e "${BLUE}Auto-generated: $TICKET${NC}"
     fi
 else
@@ -306,6 +331,23 @@ fi
 # Generate filename
 FILENAME="${SESSION_DATE}_${TICKET}_${SLUG}.md"
 OUTPUT_FILE="$AI_USECASES_DIR/$FILENAME"
+
+# Final collision check (race condition protection)
+if [ -f "$OUTPUT_FILE" ]; then
+    echo -e "${RED}Error: File already exists: $OUTPUT_FILE${NC}"
+    echo -e "${YELLOW}This may be due to concurrent session documentation.${NC}"
+    if [ "$SESSION_TYPE" = "research" ]; then
+        # For auto-generated research tickets, try to find next available
+        echo -e "${BLUE}Attempting to find next available ticket number...${NC}"
+        TICKET=$(find_next_research_ticket)
+        FILENAME="${SESSION_DATE}_${TICKET}_${SLUG}.md"
+        OUTPUT_FILE="$AI_USECASES_DIR/$FILENAME"
+        echo -e "${GREEN}Using alternative ticket: $TICKET${NC}"
+    else
+        echo "Please try again with a different ticket number or description."
+        exit 1
+    fi
+fi
 
 echo ""
 echo -e "${YELLOW}Generating documentation...${NC}"
