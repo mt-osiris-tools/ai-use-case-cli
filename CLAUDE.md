@@ -695,6 +695,19 @@ Implementation is in `ai-use-case:80-115` with the `check_for_updates()` functio
 - **v2.0.0**: Introduced symlink architecture (in hub repository)
 - **v1.0.0**: Initial release with basic sync functionality
 
+## Hub-CLI Synchronization
+
+This repository is tightly coupled with the **ai-use-case-hub** repository. When making changes to this CLI repository, always review **HUB-SYNC-CHECKLIST.md** to ensure corresponding updates are made to the hub.
+
+### Key Synchronization Points
+
+- **Templates**: CLI generates docs, Hub provides reference templates
+- **Session Types**: CLI implements workflows, Hub documents them
+- **File Naming**: CLI enforces patterns, Hub organizes by them
+- **Features**: CLI adds commands, Hub provides user documentation
+
+See **HUB-SYNC-CHECKLIST.md** for the complete validation process.
+
 ## Related Repositories
 
 - **[ai-use-case-hub](https://github.com/mt-osiris-tools/ai-use-case-hub)** - Documentation hub with symlink-based organization
