@@ -341,7 +341,7 @@ ${session_type_label}**Agent Used:** ${AI_TOOL}
 
 **Result:** ${TLDR_RESULT}
 
-**Time:** ${TIME_SPENT} (AI-assisted${time_context:+ $time_context}) vs ${TIME_SAVED} hours ${time_context}
+**Time:** ${TIME_SPENT} (AI-assisted) vs ${TIME_SAVED} hours ${time_context}
 EOF
 }
 
