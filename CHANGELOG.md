@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2025-10-20
+
+### Added
+- **Research session support**: Document exploratory AI sessions without code changes
+  - New session type selection in interactive mode (Implementation vs Research)
+  - Auto-generated `RESEARCH-XXX` ticket numbering for research sessions
+  - Research-specific template with 🔬 icon (vs 🎯 for implementation)
+  - Query evolution tracking through conversation iterations
+  - Approach evaluation with pros/cons comparison
+  - Decision documentation with rationale and implementation guidance
+- Research session fields: initial query, iterations, insights, approaches evaluated, final decision
+- Automatic session type detection in Claude Code `/document-session` command
+- Research session examples in README and CLAUDE.md
+- Comprehensive research session documentation workflow
+
+### Changed
+- `document-ai-session.sh` now supports both implementation and research session types
+- File naming convention expanded to include `RESEARCH-XXX` format
+- `/document-session` slash command updated to handle research sessions automatically
+- CLAUDE.md updated with research session guidance for AI assistants
+- README.md enhanced with session types section and examples
+
+### Improved
+- Better separation of concerns between code-focused and exploration-focused sessions
+- More flexible documentation workflow accommodating different AI interaction patterns
+- Enhanced template system with dual templates for different session types
+
+## [2.1.1] - 2025-10-14
+
 ### Added
 - Version display in install script banner showing current vs. new version
 - Automatic version detection from GitHub in install script
@@ -73,7 +102,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Git integration for tracking AI sessions
 - Basic template for use case documentation
 
-[Unreleased]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v2.1.1...v2.2.0
+[2.1.1]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/mt-osiris-tools/ai-use-case-cli/releases/tag/v1.0.0

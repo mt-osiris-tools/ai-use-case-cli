@@ -184,15 +184,85 @@ echo ""
 echo -e "${CYAN}Please provide session details:${NC}"
 echo ""
 
+# Session type
+echo "Session Type:"
+echo "1) Implementation (code changes, commits, file modifications)"
+echo "2) Research (exploratory, architecture discussions, no commits)"
+read -p "Select (1-2) [1]: " SESSION_TYPE_CHOICE
+SESSION_TYPE_CHOICE=${SESSION_TYPE_CHOICE:-1}
+
+case $SESSION_TYPE_CHOICE in
+    1) SESSION_TYPE="implementation" ;;
+    2) SESSION_TYPE="research" ;;
+    *) SESSION_TYPE="implementation" ;;
+esac
+
+echo ""
+
 # Date
 read -p "Date (YYYY-MM-DD) [$(date +%Y-%m-%d)]: " SESSION_DATE
 SESSION_DATE=${SESSION_DATE:-$(date +%Y-%m-%d)}
 
-# Ticket number
-read -p "Ticket/Issue (e.g., PROJ-1234): " TICKET
-if [ -z "$TICKET" ]; then
-    echo -e "${RED}Error: Ticket number is required${NC}"
-    exit 1
+# Helper function to find next available research ticket (handles race conditions)
+find_next_research_ticket() {
+    local max_attempts=100
+    local attempt=0
+    local research_num=1
+
+    # Find the highest existing RESEARCH number (if any exist)
+    # Check if any research files exist first to avoid empty pipeline issues
+    if compgen -G "$AI_USECASES_DIR"/*_RESEARCH-*.md > /dev/null; then
+        local highest_num=$(ls "$AI_USECASES_DIR"/*_RESEARCH-*.md 2>/dev/null | \
+            grep -oE 'RESEARCH-[0-9]+' | \
+            sed 's/RESEARCH-//' | \
+            sort -n | \
+            tail -1)
+
+        # Validate that we got a numeric result
+        if [[ "$highest_num" =~ ^[0-9]+$ ]]; then
+            research_num=$((highest_num + 1))
+        else
+            # Fallback to 1 if parsing failed
+            research_num=1
+        fi
+    else
+        # No research files exist yet, start at 1
+        research_num=1
+    fi
+
+    # Try to find an unused number (handles concurrent creation)
+    while [ $attempt -lt $max_attempts ]; do
+        local candidate="RESEARCH-$(printf "%03d" $research_num)"
+
+        # Check if any file with this ticket already exists in the directory
+        if ! compgen -G "$AI_USECASES_DIR"/*_${candidate}_*.md > /dev/null; then
+            echo "$candidate"
+            return 0
+        fi
+
+        # Collision detected, try next number
+        research_num=$((research_num + 1))
+        attempt=$((attempt + 1))
+    done
+
+    # Fallback: use timestamp-based ticket if all sequential numbers exhausted
+    echo "RESEARCH-$(date +%Y%m%d%H%M%S)"
+}
+
+# Ticket number (optional for research sessions)
+if [ "$SESSION_TYPE" = "research" ]; then
+    read -p "Ticket/Issue (e.g., RESEARCH-001, or leave blank): " TICKET
+    if [ -z "$TICKET" ]; then
+        # Auto-generate research ticket number with race condition protection
+        TICKET=$(find_next_research_ticket)
+        echo -e "${BLUE}Auto-generated: $TICKET${NC}"
+    fi
+else
+    read -p "Ticket/Issue (e.g., PROJ-1234): " TICKET
+    if [ -z "$TICKET" ]; then
+        echo -e "${RED}Error: Ticket number is required for implementation sessions${NC}"
+        exit 1
+    fi
 fi
 
 # Brief description
@@ -259,9 +329,38 @@ echo -e "${CYAN}Business Context:${NC}"
 read -p "Objective (what problem were you solving?): " OBJECTIVE
 read -p "Why was this work needed?: " BACKGROUND
 
+# Research-specific questions
+if [ "$SESSION_TYPE" = "research" ]; then
+    echo ""
+    echo -e "${CYAN}Research Details:${NC}"
+    read -p "Initial question/query: " INITIAL_QUERY
+    read -p "How many iterations to refine the query?: " QUERY_ITERATIONS
+    QUERY_ITERATIONS=${QUERY_ITERATIONS:-3}
+    read -p "Key insights gained (comma-separated): " KEY_INSIGHTS
+    read -p "Approaches evaluated (comma-separated): " APPROACHES_EVALUATED
+    read -p "Final decision/recommendation: " FINAL_DECISION
+fi
+
 # Generate filename
 FILENAME="${SESSION_DATE}_${TICKET}_${SLUG}.md"
 OUTPUT_FILE="$AI_USECASES_DIR/$FILENAME"
+
+# Final collision check (race condition protection)
+if [ -f "$OUTPUT_FILE" ]; then
+    echo -e "${RED}Error: File already exists: $OUTPUT_FILE${NC}"
+    echo -e "${YELLOW}This may be due to concurrent session documentation.${NC}"
+    if [ "$SESSION_TYPE" = "research" ]; then
+        # For auto-generated research tickets, try to find next available
+        echo -e "${BLUE}Attempting to find next available ticket number...${NC}"
+        TICKET=$(find_next_research_ticket)
+        FILENAME="${SESSION_DATE}_${TICKET}_${SLUG}.md"
+        OUTPUT_FILE="$AI_USECASES_DIR/$FILENAME"
+        echo -e "${GREEN}Using alternative ticket: $TICKET${NC}"
+    else
+        echo "Please try again with a different ticket number or description."
+        exit 1
+    fi
+fi
 
 echo ""
 echo -e "${YELLOW}Generating documentation...${NC}"
@@ -273,17 +372,21 @@ else
     GIT_DIFF=$(git show --stat HEAD 2>/dev/null || echo "No diff available")
 fi
 
-# Generate documentation
-# TODO: Refactor to use TEMPLATE.md file with variable substitution instead of inline template
-cat > "$OUTPUT_FILE" <<EOF
-# 🎯 ${AI_TOOL}: ${BRIEF_DESC}
+# Helper function to generate common header
+generate_header() {
+    local icon=$1
+    local session_type_label=$2
+    local time_context=$3
+
+    cat <<EOF
+# ${icon} ${AI_TOOL}: ${BRIEF_DESC}
 
 **Date:** ${SESSION_DATE}
 **Repository/Project:** ${PROJECT_NAME}
 **Ticket:** [${TICKET}](https://your-jira-or-github/browse/${TICKET})
-**Agent Used:** ${AI_TOOL}
+${session_type_label}**Agent Used:** ${AI_TOOL}
 **Complexity:** ${COMPLEXITY}
-**Time Saved:** ~${TIME_SAVED} hours vs manual approach
+**Time Saved:** ~${TIME_SAVED} hours vs ${time_context}
 
 ---
 
@@ -293,7 +396,173 @@ cat > "$OUTPUT_FILE" <<EOF
 
 **Result:** ${TLDR_RESULT}
 
-**Time:** ${TIME_SPENT} (AI-assisted) vs ${TIME_SAVED} hours manual approach
+**Time:** ${TIME_SPENT} (AI-assisted) vs ${TIME_SAVED} hours ${time_context}
+EOF
+}
+
+# Helper function to generate common footer
+generate_footer() {
+    cat <<EOF
+
+---
+
+**Created:** ${SESSION_DATE}
+**Last Updated:** ${SESSION_DATE}
+**Author:** [Your name]
+**Review Status:** Draft
+
+<!-- TODO: Fill in bracketed sections above -->
+EOF
+}
+
+# Generate documentation based on session type
+if [ "$SESSION_TYPE" = "research" ]; then
+    # Generate research session template
+    {
+        generate_header "🔬" "**Session Type:** Research & Exploration\n" "manual research"
+        cat <<EOF
+
+**Key Success:** Iterative query refinement led to actionable insights
+
+---
+
+## 🔍 Research Context
+
+**Initial Query:** ${INITIAL_QUERY}
+
+**Objective:** ${OBJECTIVE}
+
+**Background:** ${BACKGROUND}
+
+**Domain:** [Technical area: Architecture, API Design, Database, Testing, etc.]
+
+**Query Refinement:** ${QUERY_ITERATIONS} iterations to reach optimal clarity
+
+---
+
+## 🔄 Query Evolution & Exploration Process
+
+### Iteration 1: Initial Query
+- **Query:** ${INITIAL_QUERY}
+- **AI Response:** [Summary of initial response]
+- **Gaps Identified:** [What was missing or unclear]
+
+### Iteration 2-${QUERY_ITERATIONS}: Refinement
+- **Refined Query:** [How the query evolved]
+- **AI Response:** [Summary of improved response]
+- **Insights Gained:** [New understanding]
+
+[Continue documenting query iterations...]
+
+---
+
+## 💡 Key Insights Discovered
+
+${KEY_INSIGHTS}
+
+**Detailed Insights:**
+
+1. **[Insight 1]:** [Explanation and implications]
+
+2. **[Insight 2]:** [Explanation and implications]
+
+3. **[Insight 3]:** [Explanation and implications]
+
+---
+
+## 🎯 Approaches Evaluated
+
+${APPROACHES_EVALUATED}
+
+**Evaluation Details:**
+
+### Approach 1: [Name]
+- **Pros:** [Advantages]
+- **Cons:** [Disadvantages]
+- **Best for:** [Use cases]
+
+### Approach 2: [Name]
+- **Pros:** [Advantages]
+- **Cons:** [Disadvantages]
+- **Best for:** [Use cases]
+
+[Continue for all approaches...]
+
+---
+
+## ✅ Final Decision & Recommendation
+
+**Decision:** ${FINAL_DECISION}
+
+**Rationale:**
+- [Reason 1 for this choice]
+- [Reason 2 for this choice]
+- [Reason 3 for this choice]
+
+**Implementation Guidance:**
+- [Step 1 to implement this decision]
+- [Step 2 to implement this decision]
+- [Step 3 to implement this decision]
+
+**Risks & Mitigations:**
+- **Risk 1:** [Description] → **Mitigation:** [How to address]
+- **Risk 2:** [Description] → **Mitigation:** [How to address]
+
+---
+
+## 📊 Research Impact
+
+### Knowledge Gained
+- **Questions Answered:** ${QUERY_ITERATIONS}+ through iterative refinement
+- **Approaches Evaluated:** [Number] distinct approaches
+- **Decision Confidence:** High/Medium/Low
+- **Time Efficiency:** ${TIME_SAVED}x faster than manual research
+
+### Business Value
+- ✅ **Reduced Decision Risk:** Clear evaluation of trade-offs
+- ✅ **Accelerated Planning:** ${TIME_SAVED} hours saved in research phase
+- ✅ **Knowledge Transfer:** Documented insights for team
+
+### Future Applications
+- [Where else can these insights be applied?]
+- [What patterns emerged that are reusable?]
+
+---
+
+## 📚 Resources & References
+
+- **AI Tool Used:** ${AI_TOOL}
+- **Related Documentation:** [Links to relevant docs]
+- **Similar Patterns:** [Links to related use cases]
+- **Follow-up Actions:** [What needs to be done next]
+
+---
+
+## 🔄 Replicability Framework
+
+### This research approach is replicable for:
+
+- ✅ [Similar research question 1]
+- ✅ [Similar research question 2]
+- ✅ [Similar research question 3]
+- ❌ Not suitable for [Research types that won't work]
+
+### Best Practices for Similar Research Sessions:
+
+1. **Start Broad:** Begin with open-ended questions
+2. **Iterate Deliberately:** Refine queries based on gaps
+3. **Document Insights:** Capture learnings in real-time
+4. **Evaluate Alternatives:** Consider multiple approaches
+5. **Quantify Impact:** Track time saved and value added
+EOF
+        generate_footer
+    } > "$OUTPUT_FILE"
+
+else
+    # Generate implementation session template
+    {
+        generate_header "🎯" "" "manual approach"
+        cat <<EOF
 
 **Cost:** ~[tokens/cost] for complete workflow
 
@@ -480,16 +749,10 @@ ${CHANGED_FILES}
 - **Repository:** ${PROJECT_NAME}
 - **Branch:** ${BRANCH}
 - **Documentation:** [Links to relevant docs]
-
----
-
-**Created:** ${SESSION_DATE}
-**Last Updated:** ${SESSION_DATE}
-**Author:** [Your name]
-**Review Status:** Draft
-
-<!-- TODO: Fill in bracketed sections above -->
 EOF
+        generate_footer
+    } > "$OUTPUT_FILE"
+fi
 
 echo -e "${GREEN}✓ Documentation created!${NC}"
 echo "  Location: $OUTPUT_FILE"

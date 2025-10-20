@@ -2,7 +2,7 @@
   "name": "ai-session-documentor",
   "displayName": "AI Session Documentor",
   "description": "Automatically document AI-assisted coding sessions (Claude Code, GitHub Copilot)",
-  "version": "1.0.0",
+  "version": "2.2.0",
   "publisher": "your-publisher-name",
   "engines": {
     "vscode": "^1.80.0"
