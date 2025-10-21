@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Claude Code slash commands**: Fixed setup script to only install namespaced commands
+  - Now only copies `use-case:*.md` command files instead of all `.md` files
+  - Removed old non-namespaced command files (document-session.md, etc.)
+  - Prevents duplication of commands with different naming conventions
+  - Ensures consistency with documented slash command names in CLAUDE.md
+
 ### Changed
 - **Installation banner**: Improved installation banner messaging for better professionalism
   - Removed organization-specific branding
