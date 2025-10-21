@@ -20,9 +20,7 @@ Use cases are automatically synced to a central location at:
 
 To manually sync use cases:
 ```bash
-~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh ~/Documents/Projects/ai/ai-use-case-cli
-```
-
+~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh <project-path>
 ### Automatic Sync
 
 AI use cases are automatically synced after each git commit that modifies files in this directory.
