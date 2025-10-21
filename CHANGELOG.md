@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Hub-CLI Synchronization Checklist**: Comprehensive guide for maintaining consistency between repositories
+  - HUB-SYNC-CHECKLIST.md with complete validation process
+  - When to review hub repository (templates, workflows, naming, features, tickets)
+  - 5-step validation checklist (identify, review, update, version, test)
+  - Practical example using research session support (v2.2.0)
+  - Quick reference with bash commands for common update patterns
+  - Troubleshooting section for common synchronization issues
+  - Automation opportunities for future enhancements
+  - Hub-CLI Synchronization section added to CLAUDE.md
 - **Pre-commit hook for branch protection**: Prevents direct commits to main/master branches
   - Installed automatically by `setup-project.sh` in all projects using the CLI
   - Blocks commits to protected branches with clear error message
