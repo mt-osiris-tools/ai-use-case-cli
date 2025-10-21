@@ -40,6 +40,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated PR workflow for Claude Code with approval prompts
 
 ### Changed
+- **Documentation structure**: Reorganized project documentation following GitHub best practices
+  - Moved project-specific docs to `docs/` directory
+  - Kept community standards at root (README.md, CHANGELOG.md, CONTRIBUTING.md)
+  - Updated all references and internal links
+  - Files moved: CLAUDE.md, HUB-SYNC-CHECKLIST.md, HUB-FILES.md, BRANCH-PROTECTION-SETUP.md, CONFLUENCE-DESIGN.md
 - **Slash command organization**: Reorganized commands with `use-case:` namespace prefix
   - Improved command organization with clear namespacing using colon syntax
   - Commands now use `/use-case:` prefix (e.g., `/use-case:document-session`)

@@ -23,9 +23,9 @@ When Copilot crafts changes, ensure the workflow below stays intact:
 1. **Branch Naming** – Stick to prefixes like `feature/`, `fix/`, `docs/`, `refactor/`, `test/`. If the user has already named the branch, use it.
 2. **Conventional Commits** – Messages must follow `type: summary` (e.g., `feat: add sync dry run`). Multi-line bodies should explain why.
 3. **CHANGELOG Updates** – Every user-facing change needs an entry under `## [Unreleased]` in `CHANGELOG.md` describing the behaviour shift.
-4. **Hub Impact** – If a change alters sync or hub structure, review `HUB-FILES.md` and confirm whether companion updates or migration notes are required.
+4. **Hub Impact** – If a change alters sync or hub structure, review `docs/HUB-FILES.md` and confirm whether companion updates or migration notes are required.
 5. **Testing** – For scripts, suggest realistic local tests (`./ai-use-case --help`, `./sync-ai-use-cases.sh --dry-run`, etc.). For the VS Code extension, mention running `npm test` or using `vsce package` if relevant.
-6. **Documentation** – Update `README.md`, `CLAUDE.md`, or command-specific docs whenever behaviour, flags, or workflows change.
+6. **Documentation** – Update `README.md`, `docs/CLAUDE.md`, or command-specific docs whenever behaviour, flags, or workflows change.
 7. **Pull Request Etiquette** – Before proposing a PR, verify all checklist items and ask the user for approval to open it.
 
 ## Critical Architecture Constraints
@@ -54,7 +54,7 @@ When Copilot crafts changes, ensure the workflow below stays intact:
 - **Template consistency**: Keep templates aligned with the hub's `TEMPLATE.md` structure (located in the separate hub repository)
 - **No placeholders**: Never leave placeholders such as "TODO" in generated session files—fill every section with concrete information or omit optional sections entirely
 - **Naming conventions**: Auto-generated files should follow the `YYYY-MM-DD_TICKET-description.md` format for implementation sessions and `YYYY-MM-DD_RESEARCH-description.md` for research sessions
-- **Claude Code integration**: If suggesting automated flows (e.g., Copilot Chat generating docs), ensure they mirror the expectations defined in `CLAUDE.md`
+- **Claude Code integration**: If suggesting automated flows (e.g., Copilot Chat generating docs), ensure they mirror the expectations defined in `docs/CLAUDE.md`
 - **Hub synchronization**: All documented sessions are automatically synced to the hub repository via git hooks and the sync mechanism
 - **Research session fields**: Include initial query, iterations, insights, approaches evaluated, and final decision documentation
 
