@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **GitHub Copilot instructions**: Added `.github/copilot-instructions.md` for GitHub Copilot guidance
+  - Provides repository context and architecture constraints for Copilot
+  - Documents required workflow (branch naming, conventional commits, CHANGELOG updates)
+  - Includes CLI scripts, VS Code extension, and documentation generation guidance
+  - Ensures Copilot contributions align with team standards and workflows
+  - Complements existing CLAUDE.md for AI assistant guidance
 - **Hub-CLI Synchronization Checklist**: Comprehensive guide for maintaining consistency between repositories
   - HUB-SYNC-CHECKLIST.md with complete validation process
   - When to review hub repository (templates, workflows, naming, features, tickets)
