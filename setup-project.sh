@@ -164,9 +164,9 @@ if [ -d "$CLAUDE_COMMANDS_SOURCE" ]; then
         echo -e "${GREEN}✓${NC} Created: .claude/commands/"
     fi
 
-    # Copy all command files
+    # Copy namespaced command files only (use-case:*.md)
     COMMANDS_COPIED=0
-    for cmd_file in "$CLAUDE_COMMANDS_SOURCE"/*.md; do
+    for cmd_file in "$CLAUDE_COMMANDS_SOURCE"/use-case:*.md; do
         if [ -f "$cmd_file" ]; then
             cmd_name=$(basename "$cmd_file")
             target_file="$CLAUDE_COMMANDS_DIR/$cmd_name"
