@@ -48,7 +48,8 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
 
 1. **`setup-project.sh`**: One-time setup for a project repository
    - Creates `docs/ai-use-cases/` directory in target project
-   - Installs git post-commit hook
+   - Installs git pre-commit hook for branch protection
+   - Installs git post-commit hook for auto-sync
    - Adds `.gitignore` patterns for draft files
    - Performs initial sync to hub
 
@@ -77,9 +78,15 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
    - Optionally removes the CLI directory
    - Optionally cleans shell profile entries
 
-### Git Hook Template
+### Git Hook Templates
 
-- **`git-hooks/post-commit`**: Installed in each project's `.git/hooks/`
+- **`git-hooks/pre-commit`**: Branch protection hook
+  - Prevents direct commits to main/master branches
+  - Enforces branch-based workflow (feature/, fix/, docs/, etc.)
+  - Provides clear guidance on creating feature branches
+  - Can be bypassed with `--no-verify` if needed
+
+- **`git-hooks/post-commit`**: Auto-sync hook
   - Detects when markdown files in `ai-use-cases/` directories are committed
   - Automatically triggers sync script to push docs to hub
   - Non-blocking - sync failures don't prevent commits
@@ -613,6 +620,7 @@ File appears in the hub at:
 - **document-ai-session.sh**: Interactive AI session documentor
 - **install.sh**: Installation script
 - **uninstall.sh**: Uninstallation script
+- **git-hooks/pre-commit**: Hook template for branch protection
 - **git-hooks/post-commit**: Hook template for auto-sync
 - **vscode-extension/**: VS Code extension for one-click documentation
 - **README.md**: User-facing documentation
@@ -634,10 +642,12 @@ source ~/.bashrc
 ### Hook not executing
 
 ```bash
-# Check if executable
+# Check if hooks are executable
+ls -la /path/to/project/.git/hooks/pre-commit
 ls -la /path/to/project/.git/hooks/post-commit
 
-# Make executable
+# Make executable if needed
+chmod +x /path/to/project/.git/hooks/pre-commit
 chmod +x /path/to/project/.git/hooks/post-commit
 ```
 

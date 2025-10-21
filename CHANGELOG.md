@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Pre-commit hook for branch protection**: Prevents direct commits to main/master branches
+  - Installed automatically by `setup-project.sh` in all projects using the CLI
+  - Blocks commits to protected branches with clear error message
+  - Provides guidance on creating feature branches with conventional naming
+  - Shows branch naming conventions (feature/, fix/, docs/, refactor/, test/)
+  - Can be bypassed with `--no-verify` flag in exceptional cases
+  - Enforces branch-based workflow across all projects using the CLI
 - **Branch-based development workflow**: All changes now require pull requests
   - CONTRIBUTING.md with comprehensive contribution guidelines
   - Branch naming conventions (feature/, fix/, docs/, refactor/, test/)
@@ -18,7 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated PR workflow for Claude Code with approval prompts
 
 ### Changed
-- Updated README.md Contributing section to reference new guidelines
+- `setup-project.sh` now installs both pre-commit and post-commit hooks
+- Updated README.md with branch protection documentation
+- Updated CLAUDE.md to document pre-commit hook functionality
+- Enhanced Git Hook Templates section with pre-commit hook details
+- Updated troubleshooting section to include both hooks
+- README.md Contributing section updated to reference new guidelines
 - Enhanced CLAUDE.md with mandatory branch/PR workflow for AI assistants
 - Repository now requires PR-based workflow (no direct commits to main)
 
