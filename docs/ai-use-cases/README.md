@@ -12,13 +12,15 @@ YYYY-MM-DD_TICKET-XXXXX_brief-description.md
 ## Syncing
 
 Use cases are automatically synced to a central location at:
-`/home/james/Documents/ai-use-case-hub`
+`~/Documents/ai-use-case-hub`
+
+> **Note:** Replace `~/Documents/ai-use-case-hub` with your preferred local path as needed.
 
 ### Manual Sync
 
 To manually sync use cases:
 ```bash
-/home/james/.local/share/ai-use-case-cli/sync-ai-use-cases.sh /home/james/Documents/Projects/ai/ai-use-case-cli
+~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh ~/Documents/Projects/ai/ai-use-case-cli
 ```
 
 ### Automatic Sync
