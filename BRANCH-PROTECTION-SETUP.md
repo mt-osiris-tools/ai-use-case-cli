@@ -32,12 +32,20 @@ This prevents direct commits to main and requires all changes to go through PRs.
 
 **Sub-options:**
 - **Require approvals:** Set to `1` (or `0` for solo development)
-  - For solo development: You can set this to 0 and merge your own PRs
+  - For solo development: You can set this to 0 and merge your own PRs **without additional approval**
   - For team development: Set to 1+ to require peer reviews
 
-- Dismiss stale pull request approvals when new commits are pushed (optional)
-- Require review from Code Owners (optional, if you have CODEOWNERS file)
-- Restrict who can dismiss pull request reviews (optional)
+  **Important:** Setting approvals to 0 does NOT bypass the PR requirement itself. You must still:
+  1. Create a feature branch
+  2. Push your changes to that branch
+  3. Create a pull request
+  4. Merge the PR (no approval needed if set to 0)
+
+  You cannot push directly to `main` even with 0 approvals required.
+
+- [ ] Dismiss stale pull request approvals when new commits are pushed (optional)
+- [ ] Require review from Code Owners (optional, if you have CODEOWNERS file)
+- [ ] Restrict who can dismiss pull request reviews (optional)
 
 #### ✅ Require status checks to pass before merging (Optional - for CI/CD)
 
@@ -78,6 +86,14 @@ Requires all commits to be signed with GPG:
 Applies all protection rules even to repository administrators.
 
 **Recommended:** Check this to enforce the workflow for everyone, including yourself.
+
+**What this means:**
+- Administrators must still create PRs (cannot push directly to `main`)
+- Administrators must still follow all protection rules
+- With `Require approvals: 0` + `Include administrators`: You can create and merge your own PRs without additional approval
+- With `Require approvals: 1+` + `Include administrators`: Even admins need the specified number of approvals
+
+**In practice for solo development:** This ensures you always follow the PR workflow, which maintains clean git history and enables proper code review habits. You'll still be able to merge your own PRs when approvals are set to 0.
 
 #### ✅ Restrict who can push to matching branches (Optional)
 
@@ -128,6 +144,12 @@ After saving, verify the rule is active:
 ❌ Require signed commits (optional)
 ❌ Require status checks (add later with CI/CD)
 ```
+
+**Note:** With this configuration:
+- ✅ You must create PRs for all changes (no direct pushes to `main`)
+- ✅ You can merge your own PRs without waiting for approval (approvals = 0)
+- ✅ Maintains clean git history through PR workflow
+- ✅ Enforces discipline even for solo work
 
 ### Team Development
 

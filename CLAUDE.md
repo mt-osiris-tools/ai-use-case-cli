@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.com/code) when working with code in this repository.
 
 ## Repository Purpose
 
@@ -193,7 +193,7 @@ When `/document-session` is invoked in Claude Code:
 
    [Details about what was documented...]
 
-   🤖 Generated with [Claude Code](https://claude.com/claude-code)
+   🤖 Generated with [Claude Code](https://claude.com/code)
 
    Co-Authored-By: Claude <noreply@anthropic.com>"
 
@@ -316,8 +316,16 @@ When working on features or fixes in this repository:
    - Wait for user approval before creating PR
 
 5. **Create PR with detailed description**:
+
+   **Note**: The example below shows the structure. In practice, use the Bash tool to construct the PR description properly.
+
    ```bash
-   gh pr create --title "feat: add version checking" --body "$(cat <<'EOF'
+   # Example structure (illustrative - see actual implementation in git workflow)
+   gh pr create --title "feat: add version checking" --body "[markdown description]"
+   ```
+
+   **PR Description should include**:
+   ```markdown
    ## Summary
    - Implements automatic version checking
    - Runs once per day with caching
@@ -334,10 +342,10 @@ When working on features or fixes in this repository:
    - [x] Changes tested locally
    - [x] Documentation updated
 
-   🤖 Generated with [Claude Code](https://claude.com/claude-code)
-   EOF
-   )"
+   🤖 Generated with [Claude Code](https://claude.com/code)
    ```
+
+   **Practical implementation**: Use the Bash tool with heredoc as shown in the git workflow section (line ~260)
 
 ### Example Claude Code Session
 
