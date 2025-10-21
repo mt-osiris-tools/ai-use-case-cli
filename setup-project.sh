@@ -59,7 +59,8 @@ ensure_hub_exists() {
 # CENTRAL_DIR = Documentation hub directory (for storing use cases)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CENTRAL_DIR=$(ensure_hub_exists)
-HOOK_SOURCE="$SCRIPT_DIR/git-hooks/post-commit"
+POST_COMMIT_HOOK_SOURCE="$SCRIPT_DIR/git-hooks/post-commit"
+PRE_COMMIT_HOOK_SOURCE="$SCRIPT_DIR/git-hooks/pre-commit"
 SYNC_SCRIPT="$SCRIPT_DIR/sync-ai-use-cases.sh"
 
 # Show help
@@ -186,36 +187,66 @@ else
     echo -e "${YELLOW}⚠${NC} Claude Code commands not found in CLI installation"
 fi
 
-# Install git hook
+# Install git hooks
 GIT_HOOKS_DIR="$PROJECT_PATH/.git/hooks"
 POST_COMMIT_HOOK="$GIT_HOOKS_DIR/post-commit"
+PRE_COMMIT_HOOK="$GIT_HOOKS_DIR/pre-commit"
 
-if [ ! -f "$HOOK_SOURCE" ]; then
-    echo -e "${RED}Error: Hook source not found: $HOOK_SOURCE${NC}"
+# Verify hook sources exist
+if [ ! -f "$POST_COMMIT_HOOK_SOURCE" ]; then
+    echo -e "${RED}Error: Hook source not found: $POST_COMMIT_HOOK_SOURCE${NC}"
     exit 1
 fi
 
-# Check if post-commit hook already exists
+if [ ! -f "$PRE_COMMIT_HOOK_SOURCE" ]; then
+    echo -e "${RED}Error: Hook source not found: $PRE_COMMIT_HOOK_SOURCE${NC}"
+    exit 1
+fi
+
+# Install post-commit hook
 if [ -f "$POST_COMMIT_HOOK" ]; then
     # Check if our hook is already installed
     if grep -q "AI Use Cases" "$POST_COMMIT_HOOK"; then
-        echo -e "${YELLOW}⚠${NC} Git hook already installed"
+        echo -e "${YELLOW}⚠${NC} Git post-commit hook already installed"
     else
         # Backup existing hook
         BACKUP_HOOK="$POST_COMMIT_HOOK.backup.$(date +%Y%m%d%H%M%S)"
         cp "$POST_COMMIT_HOOK" "$BACKUP_HOOK"
-        echo -e "${YELLOW}⚠${NC} Existing hook backed up to: $(basename "$BACKUP_HOOK")"
+        echo -e "${YELLOW}⚠${NC} Existing post-commit hook backed up to: $(basename "$BACKUP_HOOK")"
 
         # Append our hook to existing hook
         echo "" >> "$POST_COMMIT_HOOK"
-        cat "$HOOK_SOURCE" >> "$POST_COMMIT_HOOK"
-        echo -e "${GREEN}✓${NC} Git hook appended to existing post-commit hook"
+        cat "$POST_COMMIT_HOOK_SOURCE" >> "$POST_COMMIT_HOOK"
+        echo -e "${GREEN}✓${NC} Git post-commit hook appended to existing hook"
     fi
 else
     # Install fresh hook
-    cp "$HOOK_SOURCE" "$POST_COMMIT_HOOK"
+    cp "$POST_COMMIT_HOOK_SOURCE" "$POST_COMMIT_HOOK"
     chmod +x "$POST_COMMIT_HOOK"
     echo -e "${GREEN}✓${NC} Git post-commit hook installed"
+fi
+
+# Install pre-commit hook
+if [ -f "$PRE_COMMIT_HOOK" ]; then
+    # Check if our hook is already installed
+    if grep -q "Branch Protection" "$PRE_COMMIT_HOOK"; then
+        echo -e "${YELLOW}⚠${NC} Git pre-commit hook already installed"
+    else
+        # Backup existing hook
+        BACKUP_HOOK="$PRE_COMMIT_HOOK.backup.$(date +%Y%m%d%H%M%S)"
+        cp "$PRE_COMMIT_HOOK" "$BACKUP_HOOK"
+        echo -e "${YELLOW}⚠${NC} Existing pre-commit hook backed up to: $(basename "$BACKUP_HOOK")"
+
+        # Append our hook to existing hook
+        echo "" >> "$PRE_COMMIT_HOOK"
+        cat "$PRE_COMMIT_HOOK_SOURCE" >> "$PRE_COMMIT_HOOK"
+        echo -e "${GREEN}✓${NC} Git pre-commit hook appended to existing hook"
+    fi
+else
+    # Install fresh hook
+    cp "$PRE_COMMIT_HOOK_SOURCE" "$PRE_COMMIT_HOOK"
+    chmod +x "$PRE_COMMIT_HOOK"
+    echo -e "${GREEN}✓${NC} Git pre-commit hook installed (prevents direct commits to main)"
 fi
 
 # Add to .gitignore if not already present

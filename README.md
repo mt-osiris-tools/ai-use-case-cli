@@ -208,10 +208,34 @@ git remote add origin <your-hub-repository-url>
 When you run `ai-use-case --init` in a project, it:
 
 1. ✅ Creates `docs/ai-use-cases/` directory
-2. ✅ Installs git post-commit hook for auto-sync
-3. ✅ Adds patterns to `.gitignore` for draft files
-4. ✅ Performs initial sync to hub
-5. ✅ Creates README in the use cases directory
+2. ✅ Installs git **pre-commit hook** for branch protection
+3. ✅ Installs git **post-commit hook** for auto-sync
+4. ✅ Adds patterns to `.gitignore` for draft files
+5. ✅ Performs initial sync to hub
+6. ✅ Creates README in the use cases directory
+
+### Branch Protection
+
+The pre-commit hook **prevents direct commits to main/master branches**, enforcing a branch-based workflow:
+
+```bash
+# ❌ This will be blocked
+git checkout main
+git commit -m "direct commit to main"
+
+# ✅ This is the correct workflow
+git checkout -b feature/my-feature
+git commit -m "commit to feature branch"
+```
+
+The hook provides clear guidance on creating feature branches with conventional naming:
+- `feature/description` - New features
+- `fix/description` - Bug fixes
+- `docs/description` - Documentation changes
+- `refactor/description` - Code refactoring
+- `test/description` - Test additions/changes
+
+**Bypass (not recommended):** Use `git commit --no-verify` to bypass the hook in exceptional cases.
 
 ## Documentation Template
 
@@ -411,6 +435,7 @@ ai-use-case-cli/
 ├── document-ai-session.sh   # Interactive documentor
 ├── publish-confluence.sh    # Confluence publishing script
 ├── git-hooks/
+│   ├── pre-commit           # Branch protection hook
 │   └── post-commit          # Auto-sync hook template
 ├── vscode-extension/        # VS Code extension
 ├── .claude/
