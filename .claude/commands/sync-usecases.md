@@ -1,0 +1,48 @@
+# Sync AI Use Cases
+
+You are helping the user manually sync AI use case documentation from their current project to the central repository.
+
+## Your Task
+
+Run the sync script to copy use case documents from the current project to the central hub.
+
+## Steps
+
+1. Verify we're in a project with use cases:
+   ```bash
+   # Find all use case files
+   find docs/ai-use-cases -name "*.md" -type f 2>/dev/null | head -10
+   ```
+
+2. Show what will be synced:
+   ```bash
+   echo "Files to sync:"
+   find docs/ai-use-cases -name "*.md" -type f ! -name "README.md" 2>/dev/null
+   ```
+
+3. Run the sync:
+   ```bash
+   ai-use-case sync
+   ```
+
+4. Show the results:
+   ```bash
+   # Show synced files using CLI stats
+   ai-use-case stats
+   ```
+
+5. Optionally show recent use cases:
+   ```bash
+   ai-use-case list
+   ```
+
+## When to Use This
+
+- After creating/updating use case documents
+- To verify sync is working
+- If automatic sync didn't trigger
+- To sync multiple old use cases at once
+
+## Note
+
+Auto-sync happens automatically on git commit if the post-commit hook is installed. Manual sync is usually only needed for testing or troubleshooting.
