@@ -53,9 +53,8 @@ ${CYAN}
 ██║  ██║██║    ╚██████╔╝███████║███████╗    ╚██████╗██║  ██║███████║███████╗
 ╚═╝  ╚═╝╚═╝     ╚═════╝ ╚══════╝╚══════╝     ╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝
 ${NC}
-${YELLOW}        📊 AI-Assisted Development Session Documentator${NC}
-                          Powered by MedTrainer - Osiris${NC}
-${GREEN}        ═══════════════════════════════════════════════${NC}
+${YELLOW}           Document Your AI-Assisted Development Sessions${NC}
+${GREEN}        ═══════════════════════════════════════════════════════${NC}
 
 EOF
 
