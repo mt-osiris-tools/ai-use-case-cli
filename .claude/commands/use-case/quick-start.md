@@ -70,10 +70,11 @@ CLI Commands:
 - `ai-use-case view` - Open hub in file explorer
 
 Claude Code Slash Commands:
-- `/document-session` - Document an AI session
-- `/setup-project` - Setup another project
-- `/sync-usecases` - Manual sync
-- `/search-usecases` - Search past use cases
+- `/use-case/document-session` - Document an AI session
+- `/use-case/setup-project` - Setup another project
+- `/use-case/sync-usecases` - Manual sync
+- `/use-case/search-usecases` - Search past use cases
+- `/use-case/publish-confluence` - Publish to Confluence
 
 VS Code Extension:
 - `Ctrl+Alt+D` / `Cmd+Alt+D` - Document session
