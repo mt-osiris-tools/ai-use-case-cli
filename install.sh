@@ -53,9 +53,8 @@ ${CYAN}
 ██║  ██║██║    ╚██████╔╝███████║███████╗    ╚██████╗██║  ██║███████║███████╗
 ╚═╝  ╚═╝╚═╝     ╚═════╝ ╚══════╝╚══════╝     ╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝
 ${NC}
-${YELLOW}        📊 AI-Assisted Development Session Documentator${NC}
-                          Powered by MedTrainer - Osiris${NC}
-${GREEN}        ═══════════════════════════════════════════════${NC}
+${YELLOW}           Document Your AI-Assisted Development Sessions${NC}
+${GREEN}        ═══════════════════════════════════════════════════════${NC}
 
 EOF
 
@@ -259,12 +258,16 @@ echo -e "  3. Setup the project: ${CYAN}ai-use-case --init${NC}"
 echo -e "  4. Document AI sessions: ${CYAN}ai-use-case document${NC}"
 echo ""
 echo -e "${YELLOW}Available Commands:${NC}"
-echo -e "  ${GREEN}ai-use-case --init${NC}       Setup current project"
-echo -e "  ${GREEN}ai-use-case document${NC}     Document an AI session"
-echo -e "  ${GREEN}ai-use-case sync${NC}         Sync use cases to hub"
-echo -e "  ${GREEN}ai-use-case search <term>${NC} Search use cases"
-echo -e "  ${GREEN}ai-use-case stats${NC}        View statistics"
-echo -e "  ${GREEN}ai-use-case --help${NC}       Show all commands"
+printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case --init" "Setup current project"
+printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case document" "Document an AI session"
+printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case sync" "Sync use cases to hub"
+printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case push" "Push hub changes to remote"
+printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case publish-confluence" "Publish to Confluence"
+printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case search <term>" "Search use cases"
+printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case view" "View hub in file explorer"
+printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case list" "List all projects"
+printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case stats" "View statistics"
+printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case --help" "Show detailed help"
 echo ""
 echo -e "${YELLOW}Next Steps:${NC}"
 echo -e "  Run ${CYAN}ai-use-case --help${NC} for full usage guide"
