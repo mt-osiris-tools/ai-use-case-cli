@@ -8,12 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Organized slash commands with namespace**: Reorganized commands with `use-case:` namespace prefix
-  - Improved command organization with clear namespacing using colon syntax
-  - Commands now use `/use-case:` prefix (e.g., `/use-case:document-session`)
-  - More conventional syntax compared to slash-based paths
-  - All related commands logically grouped for better discoverability
-  - Updated documentation across CLAUDE.md, setup-project.sh, and command files
 - **GitHub Copilot instructions**: Added `.github/copilot-instructions.md` for GitHub Copilot guidance
   - Provides repository context and architecture constraints for Copilot
   - Documents required workflow (branch naming, conventional commits, CHANGELOG updates)
@@ -46,6 +40,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated PR workflow for Claude Code with approval prompts
 
 ### Changed
+- **Slash command organization**: Reorganized commands with `use-case:` namespace prefix
+  - Improved command organization with clear namespacing using colon syntax
+  - Commands now use `/use-case:` prefix (e.g., `/use-case:document-session`)
+  - More conventional syntax compared to slash-based paths
+  - All related commands logically grouped for better discoverability
+  - Updated documentation across CLAUDE.md, setup-project.sh, and command files
 - `setup-project.sh` now installs both pre-commit and post-commit hooks
 - Updated README.md with branch protection documentation
 - Updated CLAUDE.md to document pre-commit hook functionality
