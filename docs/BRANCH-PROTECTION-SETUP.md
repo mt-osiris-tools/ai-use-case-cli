@@ -220,5 +220,5 @@ git pull origin main
 ## References
 
 - [GitHub Branch Protection Documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
-- [CONTRIBUTING.md](./CONTRIBUTING.md) - Full contribution guidelines
+- [CONTRIBUTING.md](../CONTRIBUTING.md) - Full contribution guidelines
 - [CLAUDE.md](./CLAUDE.md) - Instructions for Claude Code workflow

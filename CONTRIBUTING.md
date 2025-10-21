@@ -79,9 +79,9 @@ Create a PR on GitHub with:
 Before creating a pull request, ensure you have completed:
 
 - [ ] **Update CHANGELOG.md** - Add entry under "Unreleased" section
-- [ ] **Check HUB-SYNC-CHECKLIST.md** - Review if changes affect hub repository
+- [ ] **Check docs/HUB-SYNC-CHECKLIST.md** - Review if changes affect hub repository
 - [ ] **Test changes locally** - Verify all scripts and CLI commands work
-- [ ] **Update documentation** - Update README.md or CLAUDE.md if behavior changes
+- [ ] **Update documentation** - Update README.md or docs/CLAUDE.md if behavior changes
 
 #### CHANGELOG.md Format
 
@@ -108,7 +108,7 @@ If your changes affect:
 - Template structure
 - CLI commands or workflow
 
-Then review **HUB-SYNC-CHECKLIST.md** and ensure corresponding updates are made to the hub repository.
+Then review **docs/HUB-SYNC-CHECKLIST.md** and ensure corresponding updates are made to the hub repository.
 
 #### Testing
 
@@ -135,9 +135,9 @@ npm run compile
 
 Update relevant documentation:
 - **README.md** - User-facing documentation, installation, usage
-- **CLAUDE.md** - Instructions for Claude Code when working in this repo
+- **docs/CLAUDE.md** - Instructions for Claude Code when working in this repo
 - **CHANGELOG.md** - Version history and changes
-- **HUB-SYNC-CHECKLIST.md** - If adding features that affect the hub
+- **docs/HUB-SYNC-CHECKLIST.md** - If adding features that affect the hub
 
 ## Working with Claude Code
 
@@ -158,7 +158,7 @@ Claude Code is instructed to:
 - Follow the `feature/description` naming convention
 - Make atomic commits with conventional commit messages
 - Update CHANGELOG.md with all changes
-- Check HUB-SYNC-CHECKLIST.md for hub-related changes
+- Check docs/HUB-SYNC-CHECKLIST.md for hub-related changes
 - Test changes before creating PR
 - Update documentation as needed
 - Ask before creating the pull request

@@ -442,8 +442,11 @@ ai-use-case-cli/
 │   └── commands/
 │       ├── publish-confluence.md  # Claude Code slash command
 │       └── ...              # Other slash commands
-├── CLAUDE.md                # Instructions for Claude Code
-├── CONFLUENCE-DESIGN.md     # Confluence feature design
+├── docs/
+│   ├── CLAUDE.md            # Instructions for Claude Code
+│   ├── CONFLUENCE-DESIGN.md # Confluence feature design
+│   ├── HUB-SYNC-CHECKLIST.md # Hub synchronization guide
+│   └── ...                  # Other documentation
 └── README.md                # This file
 ```
 
@@ -469,7 +472,7 @@ We welcome contributions! This project follows a branch-based workflow with pull
 
 For complete guidelines, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-For GitHub branch protection setup, see [BRANCH-PROTECTION-SETUP.md](./BRANCH-PROTECTION-SETUP.md).
+For GitHub branch protection setup, see [BRANCH-PROTECTION-SETUP.md](./docs/BRANCH-PROTECTION-SETUP.md).
 
 ## License
 

@@ -40,6 +40,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automated PR workflow for Claude Code with approval prompts
 
 ### Changed
+- **Documentation structure**: Reorganized project documentation following GitHub best practices
+  - Moved project-specific docs to `docs/` directory
+  - Kept community standards at root (README.md, CHANGELOG.md, CONTRIBUTING.md)
+  - Updated all references and internal links
+  - Files moved: CLAUDE.md, HUB-SYNC-CHECKLIST.md, HUB-FILES.md, BRANCH-PROTECTION-SETUP.md, CONFLUENCE-DESIGN.md
+- **Slash command organization**: Reorganized commands with `use-case:` namespace prefix
+  - Improved command organization with clear namespacing using colon syntax
+  - Commands now use `/use-case:` prefix (e.g., `/use-case:document-session`)
+  - More conventional syntax compared to slash-based paths
+  - All related commands logically grouped for better discoverability
+  - Updated documentation across CLAUDE.md, setup-project.sh, and command files
 - `setup-project.sh` now installs both pre-commit and post-commit hooks
 - Updated README.md with branch protection documentation
 - Updated CLAUDE.md to document pre-commit hook functionality
@@ -60,14 +71,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Approach evaluation with pros/cons comparison
   - Decision documentation with rationale and implementation guidance
 - Research session fields: initial query, iterations, insights, approaches evaluated, final decision
-- Automatic session type detection in Claude Code `/document-session` command
+- Automatic session type detection in Claude Code `/use-case:document-session` command
 - Research session examples in README and CLAUDE.md
 - Comprehensive research session documentation workflow
 
 ### Changed
 - `document-ai-session.sh` now supports both implementation and research session types
 - File naming convention expanded to include `RESEARCH-XXX` format
-- `/document-session` slash command updated to handle research sessions automatically
+- `/use-case:document-session` slash command updated to handle research sessions automatically
 - CLAUDE.md updated with research session guidance for AI assistants
 - README.md enhanced with session types section and examples
 

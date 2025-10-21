@@ -282,10 +282,11 @@ if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
     echo ""
     if [ -d "$CLAUDE_COMMANDS_DIR" ]; then
         echo "Claude Code slash commands:"
-        echo "  /document-session    # Document AI session automatically"
-        echo "  /setup-project       # Setup another project"
-        echo "  /sync-usecases       # Sync to hub"
-        echo "  /search-usecases     # Search past use cases"
+        echo "  /use-case:document-session    # Document AI session automatically"
+        echo "  /use-case:setup-project       # Setup another project"
+        echo "  /use-case:sync-usecases       # Sync to hub"
+        echo "  /use-case:search-usecases     # Search past use cases"
+        echo "  /use-case:publish-confluence  # Publish to Confluence"
         echo ""
     fi
     echo "View synced: ls $CENTRAL_DIR/by-project/$PROJECT_NAME/"
