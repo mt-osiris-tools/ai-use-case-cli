@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated tagline to be clearer and more concise
   - Removed emoji for cleaner appearance
   - Better suited for open-source project
+- **Installation command list**: Now shows all 10 available commands instead of 6
+  - Added: push, publish-confluence, view, list
+  - Users now see complete CLI capabilities immediately after installation
 
 ### Added
 - **GitHub Copilot instructions**: Added `.github/copilot-instructions.md` for GitHub Copilot guidance
