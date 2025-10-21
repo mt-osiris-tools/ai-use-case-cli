@@ -52,4 +52,4 @@ Configure the current project to automatically sync AI use case documentation to
 Suggest the user:
 1. Document their next AI-assisted session using `ai-use-case document`
 2. View the template in the hub repository (location shown during setup)
-3. Use `/use-case/document-session` slash command after their next coding session
+3. Use `/use-case:document-session` slash command after their next coding session

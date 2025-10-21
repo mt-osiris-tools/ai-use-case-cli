@@ -100,24 +100,24 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
 
 ### Claude Code Integration
 
-- **`.claude/commands/use-case/`**: Slash commands for Claude Code
-  - `/use-case/quick-start` - Get started guide
-  - `/use-case/setup-project` - Setup a project
-  - `/use-case/document-session` - Document an AI session (AUTOMATIC MODE)
-  - `/use-case/sync-usecases` - Sync to hub
-  - `/use-case/search-usecases` - Search use cases
-  - `/use-case/publish-confluence` - Publish to Confluence
+- **`.claude/commands/`**: Slash commands for Claude Code (use-case namespace)
+  - `/use-case:quick-start` - Get started guide
+  - `/use-case:setup-project` - Setup a project
+  - `/use-case:document-session` - Document an AI session (AUTOMATIC MODE)
+  - `/use-case:sync-usecases` - Sync to hub
+  - `/use-case:search-usecases` - Search use cases
+  - `/use-case:publish-confluence` - Publish to Confluence
 
 ## For Claude Code: Automatic Documentation
 
-**IMPORTANT**: When the `/use-case/document-session` slash command is invoked in Claude Code, documentation should be **automatically generated** based on git history and conversation context. Do NOT run the interactive `document-ai-session.sh` script.
+**IMPORTANT**: When the `/use-case:document-session` slash command is invoked in Claude Code, documentation should be **automatically generated** based on git history and conversation context. Do NOT run the interactive `document-ai-session.sh` script.
 
 ### Automatic vs Interactive Mode
 
 The documentation system supports two modes:
 
 **Automatic Mode (Claude Code):**
-- Triggered by `/use-case/document-session` command in Claude Code
+- Triggered by `/use-case:document-session` command in Claude Code
 - Claude analyzes git history + conversation context
 - Zero user prompts required
 - Generates complete documentation with all sections filled
@@ -159,7 +159,7 @@ The system now supports two types of AI sessions:
 
 ### Automatic Documentation Workflow
 
-When `/use-case/document-session` is invoked in Claude Code:
+When `/use-case:document-session` is invoked in Claude Code:
 
 1. **Analyze Git History** (run commands in parallel):
    ```bash
