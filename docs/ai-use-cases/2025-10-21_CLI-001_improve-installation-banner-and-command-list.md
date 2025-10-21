@@ -1,7 +1,6 @@
 # 🎯 AI Use Case: Improve Installation Banner and Command List
 
 **Date:** 2025-10-21
-**Ticket/Issue:** CLI-001
 **Brief description:** Refactored installation banner messaging and expanded command list display for better user experience
 **AI Tool Used:** Claude Code (Sonnet 4.5)
 **Complexity:** Medium
