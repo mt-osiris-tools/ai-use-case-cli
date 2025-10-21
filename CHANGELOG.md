@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Installation banner**: Improved installation banner messaging for better professionalism
+  - Removed organization-specific branding
+  - Updated tagline to be clearer and more concise
+  - Removed emoji for cleaner appearance
+  - Better suited for open-source project
+
 ### Added
 - **GitHub Copilot instructions**: Added `.github/copilot-instructions.md` for GitHub Copilot guidance
   - Provides repository context and architecture constraints for Copilot
