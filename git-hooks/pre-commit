@@ -16,9 +16,19 @@ NC='\033[0m' # No Color
 # Check if committing to protected branch
 if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ]; then
     echo ""
-    echo -e "${RED}╭────────────────────────────────────────────────────────────────────╮${NC}"
-    echo -e "${RED}│ ⚠️  COMMIT BLOCKED: Cannot commit directly to '$BRANCH' branch    │${NC}"
-    echo -e "${RED}╰────────────────────────────────────────────────────────────────────╯${NC}"
+    # Dynamically size the error message box to fit the branch name
+    BLOCKED_MSG="⚠️  COMMIT BLOCKED: Cannot commit directly to '$BRANCH' branch"
+    BOX_WIDTH=$(( ${#BLOCKED_MSG} + 4 )) # 2 spaces padding on each side
+    # Build top border
+    printf "${RED}╭"
+    for ((i=0; i<$BOX_WIDTH; i++)); do printf "─"; done
+    printf "╮${NC}\n"
+    # Print message line
+    printf "${RED}│  %s  │${NC}\n" "$BLOCKED_MSG"
+    # Build bottom border
+    printf "${RED}╰"
+    for ((i=0; i<$BOX_WIDTH; i++)); do printf "─"; done
+    printf "╯${NC}\n"
     echo ""
     echo -e "${YELLOW}This project uses branch-based workflow for better collaboration.${NC}"
     echo ""
