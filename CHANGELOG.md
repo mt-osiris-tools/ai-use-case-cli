@@ -7,14 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- **Claude Code slash commands**: Fixed setup script to only install namespaced commands
-  - Now only copies `use-case:*.md` command files instead of all `.md` files
-  - Removed old non-namespaced command files (document-session.md, etc.)
-  - Prevents duplication of commands with different naming conventions
-  - Ensures consistency with documented slash command names in CLAUDE.md
-
 ### Changed
+- **Claude Code command organization**: Improved command directory structure
+  - Commands now organized in `.claude/use-case/` subdirectory
+  - Cleaner command invocation: `/use-case/document-session` instead of `/use-case:document-session`
+  - Better separation and discoverability of related commands
+  - Updated setup-project.sh to install commands in new location
+  - Updated all documentation to reflect new command paths
 - **Installation banner**: Improved installation banner messaging for better professionalism
   - Removed organization-specific branding
   - Updated tagline to be clearer and more concise
