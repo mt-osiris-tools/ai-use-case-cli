@@ -175,6 +175,91 @@ EOF
 # Command: init (setup project)
 cmd_init() {
     echo -e "${BLUE}=== Setup AI Use Cases ===${NC}"
+
+    # Check for updates before init (this is critical for setup)
+    if [ -d "$SCRIPT_DIR/.git" ]; then
+        echo -e "${CYAN}Checking for updates...${NC}"
+
+        # Save current directory before changing
+        local original_dir="$(pwd)"
+
+        if cd "$SCRIPT_DIR" 2>/dev/null; then
+            # Fetch latest from remote (capture output to check for errors)
+            fetch_output=$(git fetch origin main 2>&1)
+            fetch_status=$?
+
+            if [ $fetch_status -eq 0 ] && ! echo "$fetch_output" | grep -qi "fatal\|error"; then
+                # Check if we're behind
+                LOCAL=$(git rev-parse HEAD 2>/dev/null)
+                REMOTE=$(git rev-parse origin/main 2>/dev/null)
+
+                if [ -n "$LOCAL" ] && [ -n "$REMOTE" ] && [ "$LOCAL" != "$REMOTE" ]; then
+                    echo -e "${YELLOW}⚠ Update available${NC}"
+                    echo ""
+
+                    # Validate user input with loop
+                    while true; do
+                        read -p "Update to latest version before setup? (Y/n): " update_choice
+                        update_choice=${update_choice:-y}
+
+                        if [[ "$update_choice" =~ ^[Yy]$ ]]; then
+                            echo -e "${CYAN}Updating...${NC}"
+                            if git pull origin main; then
+                                echo -e "${GREEN}✓${NC} Updated successfully"
+                                echo -e "${BLUE}Restarting with latest version...${NC}"
+                                echo ""
+                                # Return to original directory before exec
+                                if ! cd "$original_dir" 2>/dev/null; then
+                                    echo -e "${RED}Fatal: Could not return to original directory${NC}" >&2
+                                    echo -e "${RED}Current directory: $(pwd)${NC}" >&2
+                                    exit 1
+                                fi
+                                # Re-run with same directory argument (handled by line 250)
+                                exec "$SCRIPT_DIR/ai-use-case" --init
+                            else
+                                echo -e "${RED}✗ Update failed${NC}"
+                                echo "Continuing with current version..."
+                            fi
+                            break
+                        elif [[ "$update_choice" =~ ^[Nn]$ ]]; then
+                            echo -e "${YELLOW}Continuing with current version${NC}"
+                            break
+                        else
+                            echo -e "${RED}Invalid input. Please enter Y or n.${NC}"
+                        fi
+                    done
+                    echo ""
+                elif [ -z "$LOCAL" ] || [ -z "$REMOTE" ]; then
+                    echo -e "${YELLOW}⚠ Could not compare versions${NC}"
+                    echo "Continuing with current version..."
+                    echo ""
+                else
+                    echo -e "${GREEN}✓${NC} Already up to date"
+                    echo ""
+                fi
+            else
+                echo -e "${YELLOW}⚠ Could not fetch updates (network issue?)${NC}"
+                if [ -n "$fetch_output" ]; then
+                    echo -e "${YELLOW}Details: ${fetch_output}${NC}" >&2
+                fi
+                echo "Continuing with current version..."
+                echo ""
+            fi
+
+            # Return to original directory
+            if ! cd "$original_dir" 2>/dev/null; then
+                echo -e "${RED}Fatal: Could not return to original directory${NC}" >&2
+                echo -e "${RED}Expected: $original_dir${NC}" >&2
+                echo -e "${RED}Current: $(pwd)${NC}" >&2
+                exit 1
+            fi
+        else
+            echo -e "${YELLOW}⚠ Could not access CLI directory for update check${NC}"
+            echo "Continuing with current version..."
+            echo ""
+        fi
+    fi
+
     bash "$SCRIPT_DIR/setup-project.sh" "${1:-.}"
 }
 
