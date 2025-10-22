@@ -155,18 +155,18 @@ else
 fi
 
 # Install Claude Code slash commands
-CLAUDE_COMMANDS_SOURCE="$SCRIPT_DIR/.claude/commands"
-CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
+CLAUDE_COMMANDS_SOURCE="$SCRIPT_DIR/.claude/use-case"
+CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/use-case"
 
 if [ -d "$CLAUDE_COMMANDS_SOURCE" ]; then
     if [ ! -d "$CLAUDE_COMMANDS_DIR" ]; then
         mkdir -p "$CLAUDE_COMMANDS_DIR"
-        echo -e "${GREEN}✓${NC} Created: .claude/commands/"
+        echo -e "${GREEN}✓${NC} Created: .claude/use-case/"
     fi
 
-    # Copy namespaced command files only (use-case:*.md)
+    # Copy all command files from use-case directory
     COMMANDS_COPIED=0
-    for cmd_file in "$CLAUDE_COMMANDS_SOURCE"/use-case:*.md; do
+    for cmd_file in "$CLAUDE_COMMANDS_SOURCE"/*.md; do
         if [ -f "$cmd_file" ]; then
             cmd_name=$(basename "$cmd_file")
             target_file="$CLAUDE_COMMANDS_DIR/$cmd_name"
@@ -282,11 +282,11 @@ if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
     echo ""
     if [ -d "$CLAUDE_COMMANDS_DIR" ]; then
         echo "Claude Code slash commands:"
-        echo "  /use-case:document-session    # Document AI session automatically"
-        echo "  /use-case:setup-project       # Setup another project"
-        echo "  /use-case:sync-usecases       # Sync to hub"
-        echo "  /use-case:search-usecases     # Search past use cases"
-        echo "  /use-case:publish-confluence  # Publish to Confluence"
+        echo "  /use-case/document-session    # Document AI session automatically"
+        echo "  /use-case/setup-project       # Setup another project"
+        echo "  /use-case/sync-usecases       # Sync to hub"
+        echo "  /use-case/search-usecases     # Search past use cases"
+        echo "  /use-case/publish-confluence  # Publish to Confluence"
         echo ""
     fi
     echo "View synced: ls $CENTRAL_DIR/by-project/$PROJECT_NAME/"
