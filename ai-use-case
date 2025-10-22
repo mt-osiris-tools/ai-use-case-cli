@@ -175,6 +175,49 @@ EOF
 # Command: init (setup project)
 cmd_init() {
     echo -e "${BLUE}=== Setup AI Use Cases ===${NC}"
+
+    # Check for updates before init (this is critical for setup)
+    if [ -d "$SCRIPT_DIR/.git" ]; then
+        echo -e "${CYAN}Checking for updates...${NC}"
+        cd "$SCRIPT_DIR"
+
+        # Fetch latest from remote
+        if git fetch origin main 2>/dev/null; then
+            # Check if we're behind
+            LOCAL=$(git rev-parse HEAD)
+            REMOTE=$(git rev-parse origin/main)
+
+            if [ "$LOCAL" != "$REMOTE" ]; then
+                echo -e "${YELLOW}⚠ Update available${NC}"
+                echo ""
+                read -p "Update to latest version before setup? (Y/n): " update_choice
+                update_choice=${update_choice:-y}
+
+                if [[ "$update_choice" =~ ^[Yy]$ ]]; then
+                    echo -e "${CYAN}Updating...${NC}"
+                    if git pull origin main; then
+                        echo -e "${GREEN}✓${NC} Updated successfully"
+                        echo -e "${BLUE}Restarting with latest version...${NC}"
+                        echo ""
+                        # Re-run the command with updated version
+                        exec "$SCRIPT_DIR/ai-use-case" --init "${1:-.}"
+                    else
+                        echo -e "${RED}✗ Update failed${NC}"
+                        echo "Continuing with current version..."
+                    fi
+                else
+                    echo -e "${YELLOW}Continuing with current version${NC}"
+                fi
+                echo ""
+            else
+                echo -e "${GREEN}✓${NC} Already up to date"
+                echo ""
+            fi
+        fi
+
+        cd - > /dev/null
+    fi
+
     bash "$SCRIPT_DIR/setup-project.sh" "${1:-.}"
 }
 

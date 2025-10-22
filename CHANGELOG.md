@@ -25,6 +25,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed alignment using printf formatting for professional appearance
 
 ### Added
+- **Auto-update check for --init command**: Ensures users always run setup with the latest version
+  - Checks for updates before running `ai-use-case --init`
+  - Prompts user to update if newer version available
+  - Automatically restarts with updated version after successful update
+  - Critical for ensuring projects are set up with latest features and fixes
 - **GitHub Copilot instructions**: Added `.github/copilot-instructions.md` for GitHub Copilot guidance
   - Provides repository context and architecture constraints for Copilot
   - Documents required workflow (branch naming, conventional commits, CHANGELOG updates)
