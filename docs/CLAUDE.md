@@ -100,7 +100,7 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
 
 ### Claude Code Integration
 
-- **`.claude/use-case/`**: Slash commands for Claude Code
+- **`.claude/commands/use-case/`**: Slash commands for Claude Code
   - `/use-case/quick-start` - Get started guide
   - `/use-case/setup-project` - Setup a project
   - `/use-case/document-session` - Document an AI session (AUTOMATIC MODE)
