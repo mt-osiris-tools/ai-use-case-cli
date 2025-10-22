@@ -185,39 +185,55 @@ cmd_init() {
 
         if cd "$SCRIPT_DIR" 2>/dev/null; then
             # Fetch latest from remote
-            if git fetch origin main 2>/dev/null; then
+            if ! git fetch origin main 2>&1 | grep -q "fatal\|error"; then
                 # Check if we're behind
-                LOCAL=$(git rev-parse HEAD)
-                REMOTE=$(git rev-parse origin/main)
+                LOCAL=$(git rev-parse HEAD 2>/dev/null)
+                REMOTE=$(git rev-parse origin/main 2>/dev/null)
 
-                if [ "$LOCAL" != "$REMOTE" ]; then
+                if [ -n "$LOCAL" ] && [ -n "$REMOTE" ] && [ "$LOCAL" != "$REMOTE" ]; then
                     echo -e "${YELLOW}⚠ Update available${NC}"
                     echo ""
-                    read -p "Update to latest version before setup? (Y/n): " update_choice
-                    update_choice=${update_choice:-y}
 
-                    if [[ "$update_choice" =~ ^[Yy]$ ]]; then
-                        echo -e "${CYAN}Updating...${NC}"
-                        if git pull origin main; then
-                            echo -e "${GREEN}✓${NC} Updated successfully"
-                            echo -e "${BLUE}Restarting with latest version...${NC}"
-                            echo ""
-                            # Return to original directory before exec
-                            cd "$original_dir" 2>/dev/null
-                            # Re-run the command with updated version
-                            exec "$SCRIPT_DIR/ai-use-case" --init "${1:-.}"
+                    # Validate user input with loop
+                    while true; do
+                        read -p "Update to latest version before setup? (Y/n): " update_choice
+                        update_choice=${update_choice:-y}
+
+                        if [[ "$update_choice" =~ ^[Yy]$ ]]; then
+                            echo -e "${CYAN}Updating...${NC}"
+                            if git pull origin main; then
+                                echo -e "${GREEN}✓${NC} Updated successfully"
+                                echo -e "${BLUE}Restarting with latest version...${NC}"
+                                echo ""
+                                # Return to original directory before exec
+                                cd "$original_dir" 2>/dev/null
+                                # Re-run the original command with all arguments preserved
+                                exec "$SCRIPT_DIR/ai-use-case" --init "$@"
+                            else
+                                echo -e "${RED}✗ Update failed${NC}"
+                                echo "Continuing with current version..."
+                            fi
+                            break
+                        elif [[ "$update_choice" =~ ^[Nn]$ ]]; then
+                            echo -e "${YELLOW}Continuing with current version${NC}"
+                            break
                         else
-                            echo -e "${RED}✗ Update failed${NC}"
-                            echo "Continuing with current version..."
+                            echo -e "${RED}Invalid input. Please enter Y or n.${NC}"
                         fi
-                    else
-                        echo -e "${YELLOW}Continuing with current version${NC}"
-                    fi
+                    done
+                    echo ""
+                elif [ -z "$LOCAL" ] || [ -z "$REMOTE" ]; then
+                    echo -e "${YELLOW}⚠ Could not compare versions${NC}"
+                    echo "Continuing with current version..."
                     echo ""
                 else
                     echo -e "${GREEN}✓${NC} Already up to date"
                     echo ""
                 fi
+            else
+                echo -e "${YELLOW}⚠ Could not fetch updates (network issue?)${NC}"
+                echo "Continuing with current version..."
+                echo ""
             fi
 
             # Return to original directory
