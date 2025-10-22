@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Claude Code command organization**: Improved command directory structure
-  - Commands now organized in `.claude/use-case/` subdirectory
+  - Commands now organized in `.claude/commands/use-case/` subdirectory
   - Cleaner command invocation: `/use-case/document-session` instead of `/use-case:document-session`
   - Better separation and discoverability of related commands
   - Updated setup-project.sh to install commands in new location

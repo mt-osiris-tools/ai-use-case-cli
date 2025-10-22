@@ -155,13 +155,13 @@ else
 fi
 
 # Install Claude Code slash commands
-CLAUDE_COMMANDS_SOURCE="$SCRIPT_DIR/.claude/use-case"
-CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/use-case"
+CLAUDE_COMMANDS_SOURCE="$SCRIPT_DIR/.claude/commands/use-case"
+CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/commands/use-case"
 
 if [ -d "$CLAUDE_COMMANDS_SOURCE" ]; then
     if [ ! -d "$CLAUDE_COMMANDS_DIR" ]; then
         mkdir -p "$CLAUDE_COMMANDS_DIR"
-        echo -e "${GREEN}✓${NC} Created: .claude/use-case/"
+        echo -e "${GREEN}✓${NC} Created: .claude/commands/use-case/"
     fi
 
     # Copy all command files from use-case directory
