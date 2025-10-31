@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Version check for document command**: CLI now verifies it's up-to-date before documenting sessions
+  - Checks for updates when running `ai-use-case document` or `/use-case/document-session`
+  - Warns users if newer version available with update instructions
+  - Prompts to continue or update first (interactive mode)
+  - Ensures users document with latest features and bug fixes
+  - Prevents issues from outdated CLI versions during documentation
+  - Gracefully handles network failures (continues with current version)
+
 ### Changed
 - **Claude Code command organization**: Improved command directory structure
   - Commands now organized in `.claude/commands/use-case/` subdirectory

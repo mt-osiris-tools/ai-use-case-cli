@@ -23,7 +23,28 @@ First, determine the session type:
 
 ## Automatic Documentation Workflow
 
-### Step 1: Verify Setup
+### Step 1: Check CLI Version
+
+Before starting documentation, verify the CLI is up-to-date:
+```bash
+# Check current and remote versions
+bash ~/.local/share/ai-use-case-cli/ai-use-case --version 2>&1 | grep -oP 'Version: \K[0-9.]+'
+
+# Get latest version from GitHub
+curl -s https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case | grep '^VERSION=' | head -1 | cut -d'"' -f2
+```
+
+**If versions differ:**
+- Warn the user that an update is available
+- Recommend updating: `cd ~/.local/share/ai-use-case-cli && git pull`
+- Ask if they want to continue with current version or update first
+- If they choose to update, instruct them to re-run the command after updating
+
+**If update check fails (network issues):**
+- Continue with current version
+- Note in output that version couldn't be verified
+
+### Step 2: Verify Setup
 
 Check if we're in a git repository with AI use cases configured:
 ```bash
@@ -33,7 +54,7 @@ ls -la docs/ai-use-cases/ 2>/dev/null || echo "Not set up"
 
 If not set up, offer to run: `bash ~/.local/share/ai-use-case-cli/setup-project.sh`
 
-### Step 2: Determine Session Type
+### Step 3: Determine Session Type
 
 Check for commits and file changes:
 ```bash
@@ -47,10 +68,10 @@ git status --porcelain | wc -l
 git diff --name-only HEAD~1..HEAD 2>/dev/null || echo "No commits"
 ```
 
-**If commits exist:** Implementation Session → Continue to Step 3a
-**If no commits:** Research Session → Continue to Step 3b
+**If commits exist:** Implementation Session → Continue to Step 4a
+**If no commits:** Research Session → Continue to Step 4b
 
-### Step 3a: Analyze Git History (Implementation Session)
+### Step 4a: Analyze Git History (Implementation Session)
 
 Gather comprehensive git data (Run in parallel):
 ```bash
@@ -67,7 +88,7 @@ git diff HEAD~1..HEAD
 git status --short
 ```
 
-### Step 3b: Analyze Conversation (Research Session)
+### Step 4b: Analyze Conversation (Research Session)
 
 Extract research context from conversation:
 - Initial user query or question
@@ -78,7 +99,7 @@ Extract research context from conversation:
 
 Skip git commands if no commits exist.
 
-### Step 4: Extract Session Information
+### Step 5: Extract Session Information
 
 **For Implementation Sessions:**
 
@@ -104,7 +125,7 @@ Skip git commands if no commits exist.
 - **Final Decision**: Recommended approach and rationale
 - **Complexity**: Assess from conversation depth (Low: simple Q&A, Medium: multiple approaches, High: architectural decisions)
 
-### Step 5: Generate Complete Documentation
+### Step 6: Generate Complete Documentation
 
 Create a comprehensive markdown file:
 
@@ -133,7 +154,7 @@ Create a comprehensive markdown file:
 
 **Use the Write tool** to create the file with full content.
 
-### Step 6: Commit and Sync
+### Step 7: Commit and Sync
 
 **For Implementation Sessions:**
 Commit the documentation along with code changes and sync to hub:

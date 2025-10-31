@@ -162,7 +162,13 @@ The system now supports two types of AI sessions:
 
 When `/use-case/document-session` is invoked in Claude Code:
 
-1. **Analyze Git History** (run commands in parallel):
+1. **Check CLI Version**: Verify the CLI is up-to-date before starting
+   - Compare current version with latest from GitHub
+   - If outdated, warn user and recommend updating
+   - Ask if they want to continue or update first
+   - If network check fails, continue with current version
+
+2. **Analyze Git History** (run commands in parallel):
    ```bash
    git log --since="24 hours ago" --pretty=format:"%h - %s (%ar)" | head -20
    git show --stat HEAD
@@ -170,13 +176,13 @@ When `/use-case/document-session` is invoked in Claude Code:
    git status --short
    ```
 
-2. **Extract Session Information** from:
+3. **Extract Session Information** from:
    - Recent commit messages and descriptions
    - Conversation context with the user
    - Files changed and their purpose
    - Technical decisions and rationale discussed
 
-3. **Auto-populate Documentation Fields**:
+4. **Auto-populate Documentation Fields**:
    - **Date**: Use today's date (YYYY-MM-DD format)
    - **Ticket**: Extract from commit messages or infer next number (e.g., HUB-XXX, PROJ-XXX)
    - **Brief description**: Summarize main work from commits and conversation
@@ -188,14 +194,14 @@ When `/use-case/document-session` is invoked in Claude Code:
    - **Technical details**: Include git stats, file lists, code patterns
    - **Results**: Quantify files changed, commits made, outcomes achieved
 
-4. **Generate Complete Documentation File**:
+5. **Generate Complete Documentation File**:
    - Create file in `docs/ai-use-cases/` with proper naming convention
    - Follow TEMPLATE.md structure from hub repository
    - Include all sections with real data (NO "TODO" or placeholders)
    - Use conversation context for qualitative insights
    - Use git data for quantitative metrics
 
-5. **Commit and Sync**:
+6. **Commit and Sync**:
    ```bash
    git add docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_description.md
    git commit -m "docs: AI session YYYY-MM-DD - TICKET-XXX - Brief description

@@ -31,6 +31,72 @@ RED='\033[0;31m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
+# Get script directory early for version checking
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Get CLI version
+get_cli_version() {
+    local cli_path="$SCRIPT_DIR/ai-use-case"
+    if [ -f "$cli_path" ]; then
+        grep '^VERSION=' "$cli_path" | head -1 | cut -d'"' -f2
+    else
+        echo "unknown"
+    fi
+}
+
+# Check for CLI updates
+check_cli_version() {
+    local current_version=$(get_cli_version)
+    local remote_version=""
+
+    echo -e "${BLUE}Checking CLI version...${NC}"
+
+    # Try to fetch latest version from GitHub
+    if command -v curl &> /dev/null; then
+        remote_version=$(curl -s -m 3 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+    elif command -v wget &> /dev/null; then
+        remote_version=$(wget -qO- -T 3 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+    fi
+
+    # If we couldn't fetch remote version, continue silently
+    if [ -z "$remote_version" ]; then
+        echo -e "${YELLOW}⚠${NC} Could not check for updates (network issue)"
+        echo -e "${BLUE}Current version: ${NC}v$current_version"
+        echo ""
+        return 0
+    fi
+
+    # Compare versions
+    if [ "$current_version" != "$remote_version" ]; then
+        echo ""
+        echo -e "${YELLOW}╭────────────────────────────────────────────────────╮${NC}"
+        echo -e "${YELLOW}│${NC} ${RED}⚠${NC} CLI Update Available                               ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC}                                                    ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC} Current version: ${RED}v$current_version${NC}                            ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC} Latest version:  ${GREEN}v$remote_version${NC}                            ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC}                                                    ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC} ${CYAN}It's recommended to update before documenting${NC}      ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC} to ensure you have the latest features.           ${YELLOW}│${NC}"
+        echo -e "${YELLOW}╰────────────────────────────────────────────────────╯${NC}"
+        echo ""
+        echo -e "${YELLOW}To update:${NC}"
+        echo -e "  ${BLUE}cd ~/.local/share/ai-use-case-cli && git pull${NC}"
+        echo ""
+
+        # Ask user if they want to continue
+        read -p "Continue with current version? (y/N): " -n 1 -r
+        echo ""
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo -e "${BLUE}Please update and re-run the command.${NC}"
+            exit 0
+        fi
+        echo ""
+    else
+        echo -e "${GREEN}✓${NC} CLI is up-to-date (v$current_version)"
+        echo ""
+    fi
+}
+
 # Function to ensure hub repository exists
 ensure_hub_exists() {
     local hub_dir
@@ -71,9 +137,8 @@ ensure_hub_exists() {
 }
 
 # Configuration - Auto-detect locations
-# SCRIPT_DIR = CLI installation directory (for scripts)
+# SCRIPT_DIR = CLI installation directory (for scripts) - defined above for version checking
 # CENTRAL_DIR = Documentation hub directory (for templates and storage)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CENTRAL_DIR=$(ensure_hub_exists)
 TEMPLATE_FILE="$CENTRAL_DIR/TEMPLATE.md"
 SYNC_SCRIPT="$SCRIPT_DIR/sync-ai-use-cases.sh"
@@ -130,6 +195,9 @@ if [ ! -d "$PROJECT_PATH" ]; then
 fi
 
 cd "$PROJECT_PATH"
+
+# Check CLI version before starting
+check_cli_version
 
 # Check if it's a git repository
 if [ ! -d ".git" ]; then
