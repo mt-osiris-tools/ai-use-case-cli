@@ -49,15 +49,38 @@ check_cli_version() {
     local current_version=$(get_cli_version)
     local remote_version=""
 
-    echo -e "${BLUE}Checking CLI version...${NC}"
+    # Version check cache (matches ai-use-case main script)
+    local VERSION_CHECK_FILE="${HOME}/.cache/ai-use-case-version-check"
+    local CACHE_MAX_AGE=86400  # 24 hours in seconds
+    local now
+    now=$(date +%s)
 
-    # Try to fetch latest version from GitHub
-    if command -v curl &> /dev/null; then
-        remote_version=$(curl -s -m 3 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
-    elif command -v wget &> /dev/null; then
-        remote_version=$(wget -qO- -T 3 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+    # Ensure cache directory exists
+    mkdir -p "$(dirname "$VERSION_CHECK_FILE")"
+
+    # Try to use cached remote version if cache is fresh
+    if [ -f "$VERSION_CHECK_FILE" ]; then
+        local cache_time
+        cache_time=$(head -1 "$VERSION_CHECK_FILE" 2>/dev/null)
+        if [ -n "$cache_time" ] && [ $((now - cache_time)) -lt $CACHE_MAX_AGE ]; then
+            remote_version=$(sed -n '2p' "$VERSION_CHECK_FILE" 2>/dev/null)
+        fi
     fi
 
+    # If no fresh cache, fetch remote version and update cache
+    if [ -z "$remote_version" ]; then
+        echo -e "${BLUE}Checking CLI version...${NC}"
+        if command -v curl &> /dev/null; then
+            remote_version=$(curl -s -m 3 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+        elif command -v wget &> /dev/null; then
+            remote_version=$(wget -qO- -T 3 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+        fi
+        # Update cache (even if empty, to avoid repeated attempts)
+        {
+            echo "$now"
+            echo "$remote_version"
+        } > "$VERSION_CHECK_FILE"
+    fi
     # If we couldn't fetch remote version, continue silently
     if [ -z "$remote_version" ]; then
         echo -e "${YELLOW}⚠${NC} Could not check for updates (network issue)"
