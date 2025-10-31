@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Enhanced documentation templates in hub repository**: Templates now include comprehensive AI interaction metrics
+  - Added AI Interaction Metrics section (prompts, success rates, tool usage)
+  - Added Key User Queries section for query tracking (optional but recommended)
+  - Added Query Effectiveness Analysis for research sessions
+  - Enhanced Time Analysis with detailed breakdowns
+  - Improved Code Quality Metrics section
+  - Links to AI_SESSION_STATISTICS_GUIDE.md and CAPTURING_USER_QUERIES.md for detailed guidance
+  - Week number added to date fields for better temporal organization
+  - Supports prompt quality analysis and learning patterns
+  - Hub PR: https://github.com/mt-osiris-tools/ai-use-case-hub/pull/2
+- **Version check for document command**: CLI now verifies it's up-to-date before documenting sessions
+  - Checks for updates when running `ai-use-case document` or `/use-case/document-session`
+  - Warns users if newer version available with update instructions
+  - Prompts to continue or update first (interactive mode)
+  - **Handles non-interactive contexts** (CI/CD, piped commands, automation):
+    - Detects non-interactive terminal using `[ -t 0 ]` check
+    - Continues automatically with warning in non-interactive mode
+    - No blocking prompts that would fail automation
+  - **Automation support**: `--skip-version-check` flag to skip check entirely
+  - Ensures users document with latest features and bug fixes
+  - Prevents issues from outdated CLI versions during documentation
+  - Gracefully handles network failures (continues with current version)
+
 ### Changed
 - **Claude Code command organization**: Improved command directory structure
   - Commands now organized in `.claude/commands/use-case/` subdirectory
@@ -14,6 +38,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Better separation and discoverability of related commands
   - Updated setup-project.sh to install commands in new location
   - Updated all documentation to reflect new command paths
+- **Hub git tracking architecture**: Documentation updated to clarify version control behavior
+  - `by-project/` directories are tracked in git (canonical storage)
+  - `by-date/` and `by-topic/` symlinks excluded via .gitignore (view layer only)
+  - Updated hub repository `.gitignore` in v2.1.0+ to explicitly track `by-project/` subdirectories
+    - Previously, a broad ignore rule excluded these directories unintentionally
+    - Now, all project documentation is versioned as intended
+  - README.md and CLAUDE.md updated with git tracking clarifications
 - **Installation banner**: Improved installation banner messaging for better professionalism
   - Removed organization-specific branding
   - Updated tagline to be clearer and more concise

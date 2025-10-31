@@ -31,6 +31,137 @@ RED='\033[0;31m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
+# Get script directory early for version checking
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Get CLI version
+get_cli_version() {
+    local cli_path="$SCRIPT_DIR/ai-use-case"
+    if [ -f "$cli_path" ]; then
+        grep '^VERSION=' "$cli_path" | head -1 | cut -d'"' -f2
+    else
+        echo "unknown"
+    fi
+}
+
+# Check for CLI updates
+check_cli_version() {
+    local current_version=$(get_cli_version)
+    local remote_version=""
+
+    # Version check cache (matches ai-use-case main script)
+    local VERSION_CHECK_FILE="${HOME}/.cache/ai-use-case-version-check"
+    local CACHE_MAX_AGE=86400  # 24 hours in seconds
+    local now
+    now=$(date +%s)
+
+    # Ensure cache directory exists
+    mkdir -p "$(dirname "$VERSION_CHECK_FILE")"
+
+    # Try to use cached remote version if cache is fresh
+    if [ -f "$VERSION_CHECK_FILE" ]; then
+        local cache_time
+        cache_time=$(head -1 "$VERSION_CHECK_FILE" 2>/dev/null)
+        if [ -n "$cache_time" ] && [ $((now - cache_time)) -lt $CACHE_MAX_AGE ]; then
+            remote_version=$(sed -n '2p' "$VERSION_CHECK_FILE" 2>/dev/null)
+        fi
+    fi
+
+    # If no fresh cache, fetch remote version and update cache
+    if [ -z "$remote_version" ]; then
+        echo -e "${BLUE}Checking CLI version...${NC}"
+        if command -v curl &> /dev/null; then
+            remote_version=$(curl -s -m 3 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+        elif command -v wget &> /dev/null; then
+            remote_version=$(wget -qO- -T 3 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+        fi
+        # Update cache (even if empty, to avoid repeated attempts)
+        {
+            echo "$now"
+            echo "$remote_version"
+        } > "$VERSION_CHECK_FILE"
+    fi
+    # If we couldn't fetch remote version, continue silently
+    if [ -z "$remote_version" ]; then
+        echo -e "${YELLOW}⚠${NC} Could not check for updates (network issue)"
+        echo -e "${BLUE}Current version: ${NC}v$current_version"
+        echo ""
+        return 0
+    fi
+
+    # Compare versions
+    if [ "$current_version" != "$remote_version" ]; then
+        echo ""
+        # Dynamically determine box width based on version string lengths
+        local box_inner_width=52  # default inner width (matches original box)
+        local cv_line="Current version: v$current_version"
+        local lv_line="Latest version:  v$remote_version"
+        local max_line_len=${#cv_line}
+        if [ ${#lv_line} -gt $max_line_len ]; then
+            max_line_len=${#lv_line}
+        fi
+        # Also consider the recommendation line length
+        local rec_line="It's recommended to update before documenting"
+        if [ ${#rec_line} -gt $max_line_len ]; then
+            max_line_len=${#rec_line}
+        fi
+        # Add color codes length fudge factor (since they don't print, but are in the string)
+        # We'll ignore color codes for width, as printf will pad the visible chars
+        if [ $max_line_len -gt $box_inner_width ]; then
+            box_inner_width=$((max_line_len + 4)) # add some padding
+        fi
+        local box_width=$((box_inner_width + 2)) # account for borders
+        local h_border=$(printf '─%.0s' $(seq 1 $box_inner_width))
+        # Print top border
+        echo -e "${YELLOW}╭${h_border}╮${NC}"
+        # Print title
+        printf "${YELLOW}│${NC} ${RED}⚠${NC} CLI Update Available"
+        printf "%*s${YELLOW}│${NC}\n" $((box_inner_width - 25)) ""
+        # Empty line
+        printf "${YELLOW}│%*s│${NC}\n" "-$box_inner_width" ""
+        # Current version line
+        printf "${YELLOW}│${NC} Current version: ${RED}v$current_version${NC}"
+        printf "%*s${YELLOW}│${NC}\n" $((box_inner_width - ${#cv_line})) ""
+        # Latest version line
+        printf "${YELLOW}│${NC} Latest version:  ${GREEN}v$remote_version${NC}"
+        printf "%*s${YELLOW}│${NC}\n" $((box_inner_width - ${#lv_line})) ""
+        # Empty line
+        printf "${YELLOW}│%*s│${NC}\n" "-$box_inner_width" ""
+        # Recommendation line
+        printf "${YELLOW}│${NC} ${CYAN}It's recommended to update before documenting${NC}"
+        printf "%*s${YELLOW}│${NC}\n" $((box_inner_width - 44)) ""
+        # Next line
+        printf "${YELLOW}│${NC} to ensure you have the latest features."
+        printf "%*s${YELLOW}│${NC}\n" $((box_inner_width - 44)) ""
+        # Bottom border
+        echo -e "${YELLOW}╰${h_border}╯${NC}"
+        echo ""
+        echo -e "${YELLOW}To update:${NC}"
+        echo -e "  ${BLUE}cd ~/.local/share/ai-use-case-cli && git pull${NC}"
+        echo ""
+
+        # Check if running in interactive terminal
+        if [ -t 0 ]; then
+            # Interactive mode: Ask user if they want to continue
+            read -p "Continue with current version? (y/N): " -n 1 -r
+            echo ""
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                echo -e "${BLUE}Please update and re-run the command.${NC}"
+                exit 0
+            fi
+            echo ""
+        else
+            # Non-interactive mode: Continue automatically with warning
+            echo -e "${YELLOW}⚠${NC} Running in non-interactive mode - continuing with current version"
+            echo -e "${CYAN}Note:${NC} Update recommended before next session"
+            echo ""
+        fi
+    else
+        echo -e "${GREEN}✓${NC} CLI is up-to-date (v$current_version)"
+        echo ""
+    fi
+}
+
 # Function to ensure hub repository exists
 ensure_hub_exists() {
     local hub_dir
@@ -71,12 +202,28 @@ ensure_hub_exists() {
 }
 
 # Configuration - Auto-detect locations
-# SCRIPT_DIR = CLI installation directory (for scripts)
+# SCRIPT_DIR = CLI installation directory (for scripts) - defined above for version checking
 # CENTRAL_DIR = Documentation hub directory (for templates and storage)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CENTRAL_DIR=$(ensure_hub_exists)
 TEMPLATE_FILE="$CENTRAL_DIR/TEMPLATE.md"
 SYNC_SCRIPT="$SCRIPT_DIR/sync-ai-use-cases.sh"
+
+# Check for flags
+SKIP_VERSION_CHECK=false
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --skip-version-check)
+            SKIP_VERSION_CHECK=true
+            shift
+            ;;
+        --help|-h)
+            break
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
 
 # Show help
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
@@ -117,7 +264,8 @@ if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
     echo "  4. Optionally commits and syncs to central repository"
     echo ""
     echo "Options:"
-    echo "  -h, --help    Show this help message"
+    echo "  -h, --help              Show this help message"
+    echo "  --skip-version-check    Skip CLI version check (useful for automation)"
     exit 0
 fi
 
@@ -130,6 +278,11 @@ if [ ! -d "$PROJECT_PATH" ]; then
 fi
 
 cd "$PROJECT_PATH"
+
+# Check CLI version before starting (unless skipped)
+if [ "$SKIP_VERSION_CHECK" = false ]; then
+    check_cli_version
+fi
 
 # Check if it's a git repository
 if [ ! -d ".git" ]; then

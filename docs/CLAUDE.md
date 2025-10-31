@@ -60,6 +60,7 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
    - **Automatically commits changes to hub's git repository**
    - **Automatically pushes to remote repository** (if configured)
    - Idempotent - safe to run multiple times
+   - Note: Only `by-project/` files are tracked in git; symlink directories are excluded via .gitignore
 
 3. **`document-ai-session.sh`**: Interactive AI session documentor
    - Guides you through documenting an AI-assisted coding session
@@ -161,7 +162,13 @@ The system now supports two types of AI sessions:
 
 When `/use-case/document-session` is invoked in Claude Code:
 
-1. **Analyze Git History** (run commands in parallel):
+1. **Check CLI Version**: Verify the CLI is up-to-date before starting
+   - Compare current version with latest from GitHub
+   - If outdated, warn user and recommend updating
+   - Ask if they want to continue or update first
+   - If network check fails, continue with current version
+
+2. **Analyze Git History** (run commands in parallel):
    ```bash
    git log --since="24 hours ago" --pretty=format:"%h - %s (%ar)" | head -20
    git show --stat HEAD
@@ -169,13 +176,13 @@ When `/use-case/document-session` is invoked in Claude Code:
    git status --short
    ```
 
-2. **Extract Session Information** from:
+3. **Extract Session Information** from:
    - Recent commit messages and descriptions
    - Conversation context with the user
    - Files changed and their purpose
    - Technical decisions and rationale discussed
 
-3. **Auto-populate Documentation Fields**:
+4. **Auto-populate Documentation Fields**:
    - **Date**: Use today's date (YYYY-MM-DD format)
    - **Ticket**: Extract from commit messages or infer next number (e.g., HUB-XXX, PROJ-XXX)
    - **Brief description**: Summarize main work from commits and conversation
@@ -187,14 +194,14 @@ When `/use-case/document-session` is invoked in Claude Code:
    - **Technical details**: Include git stats, file lists, code patterns
    - **Results**: Quantify files changed, commits made, outcomes achieved
 
-4. **Generate Complete Documentation File**:
+5. **Generate Complete Documentation File**:
    - Create file in `docs/ai-use-cases/` with proper naming convention
    - Follow TEMPLATE.md structure from hub repository
    - Include all sections with real data (NO "TODO" or placeholders)
    - Use conversation context for qualitative insights
    - Use git data for quantitative metrics
 
-5. **Commit and Sync**:
+6. **Commit and Sync**:
    ```bash
    git add docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_description.md
    git commit -m "docs: AI session YYYY-MM-DD - TICKET-XXX - Brief description
@@ -400,9 +407,9 @@ For complete details, see **CONTRIBUTING.md** in this repository.
 
 The CLI tools sync documentation to a **separate hub repository** that provides:
 
-- **`by-project/`**: Canonical storage - all actual markdown files
-- **`by-date/`**: View layer - symlinks organized by YYYY/MM/
-- **`by-topic/`**: View layer - symlinks organized by topic slug
+- **`by-project/`**: Canonical storage - all actual markdown files (tracked in git)
+- **`by-date/`**: View layer - symlinks organized by YYYY/MM/ (not tracked in git)
+- **`by-topic/`**: View layer - symlinks organized by topic slug (not tracked in git)
 - **`TEMPLATE.md`**: Comprehensive use case template
 - **`QUICK-REFERENCE.md`**: Command reference guide
 - **`CHANGELOG.md`**: Version history

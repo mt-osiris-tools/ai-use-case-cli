@@ -83,6 +83,7 @@ The AI Use Case CLI works with a separate documentation hub repository:
   - Default location: `~/Documents/ai-use-case-hub`
   - Configured via `AI_USECASES_DIR` environment variable
   - Repository: [ai-use-case-hub](https://github.com/mt-osiris-tools/ai-use-case-hub)
+  - Git tracking: `by-project/` files are versioned; `by-date/` and `by-topic/` symlinks are not
 
 ### Workflow
 
@@ -95,12 +96,12 @@ The AI Use Case CLI works with a separate documentation hub repository:
 ### Git Integration
 
 The sync process now automatically:
-- ✅ Copies files to the hub's `by-project/` directory
-- ✅ Creates symlinks in `by-date/` and `by-topic/`
+- ✅ Copies files to the hub's `by-project/` directory (tracked in git)
+- ✅ Creates symlinks in `by-date/` and `by-topic/` (not tracked - excluded via .gitignore)
 - ✅ **Commits changes to the hub's git repository**
 - ✅ **Pushes to the remote repository** (if configured)
 
-This ensures all documented use cases are automatically backed up and shared across your team.
+This ensures all documented use cases are automatically backed up and shared across your team. The hub's architecture keeps actual files in `by-project/` under version control, while symlink directories remain local-only for efficient organization.
 
 ### File Naming Convention
 

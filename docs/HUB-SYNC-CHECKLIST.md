@@ -167,6 +167,20 @@ $AI_USECASES_DIR
    git push origin v2.Y.Y
    ```
 
+## Recent Hub Improvements
+
+### v2.1.0+ Hub Updates
+
+**Git Tracking Fix (October 2025)**:
+- Hub `.gitignore` updated to properly track `by-project/` subdirectories
+- `by-date/` and `by-topic/` remain excluded (symlinks only)
+- Ensures all project documentation is version controlled
+- CLI documentation updated to reflect this architecture
+
+**Claude Code URL Standardization**:
+- All references updated to `claude.com/code` (consistent across hub and CLI)
+- Improved professional appearance and URL consistency
+
 ## Automation Opportunities
 
 ### Future Enhancements
@@ -210,6 +224,6 @@ This checklist should be reviewed and updated:
 
 ---
 
-**Last Updated**: 2025-10-20
+**Last Updated**: 2025-10-31
 **CLI Version**: v2.2.0
 **Hub Version**: v2.1.0
