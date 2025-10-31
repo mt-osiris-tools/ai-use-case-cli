@@ -27,8 +27,8 @@ First, determine the session type:
 
 Before starting documentation, verify the CLI is up-to-date:
 ```bash
-# Check current and remote versions
-bash ~/.local/share/ai-use-case-cli/ai-use-case --version 2>&1 | grep -oP 'Version: \K[0-9.]+'
+# Check current and remote versions (portable, works on macOS and Linux)
+bash ~/.local/share/ai-use-case-cli/ai-use-case --version 2>&1 | grep -o 'Version: [0-9.]*' | cut -d' ' -f2
 
 # Get latest version from GitHub
 curl -s https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case | grep '^VERSION=' | head -1 | cut -d'"' -f2

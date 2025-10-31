@@ -957,7 +957,7 @@ grep -A 5 "##" ~/session-log.md
   "Log Claude Query": {
     "prefix": "logquery",
     "body": [
-      "### Query #$1 [$CURRENT_HOUR:$CURRENT_MINUTE]",
+      "### Query #$1 [CURRENT_HOUR:CURRENT_MINUTE]",
       "**User:** $2",
       "**AI Response:** $3",
       "**Tools:** $4",
