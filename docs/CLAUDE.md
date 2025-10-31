@@ -60,6 +60,7 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
    - **Automatically commits changes to hub's git repository**
    - **Automatically pushes to remote repository** (if configured)
    - Idempotent - safe to run multiple times
+   - Note: Only `by-project/` files are tracked in git; symlink directories are excluded via .gitignore
 
 3. **`document-ai-session.sh`**: Interactive AI session documentor
    - Guides you through documenting an AI-assisted coding session
@@ -400,9 +401,9 @@ For complete details, see **CONTRIBUTING.md** in this repository.
 
 The CLI tools sync documentation to a **separate hub repository** that provides:
 
-- **`by-project/`**: Canonical storage - all actual markdown files
-- **`by-date/`**: View layer - symlinks organized by YYYY/MM/
-- **`by-topic/`**: View layer - symlinks organized by topic slug
+- **`by-project/`**: Canonical storage - all actual markdown files (tracked in git)
+- **`by-date/`**: View layer - symlinks organized by YYYY/MM/ (not tracked in git)
+- **`by-topic/`**: View layer - symlinks organized by topic slug (not tracked in git)
 - **`TEMPLATE.md`**: Comprehensive use case template
 - **`QUICK-REFERENCE.md`**: Command reference guide
 - **`CHANGELOG.md`**: Version history

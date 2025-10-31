@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Better separation and discoverability of related commands
   - Updated setup-project.sh to install commands in new location
   - Updated all documentation to reflect new command paths
+- **Hub git tracking architecture**: Documentation updated to clarify version control behavior
+  - `by-project/` directories are tracked in git (canonical storage)
+  - `by-date/` and `by-topic/` symlinks excluded via .gitignore (view layer only)
+  - Reflects hub repository .gitignore fix (v2.1.0+) allowing proper project subdirectory tracking
+  - README.md and CLAUDE.md updated with git tracking clarifications
 - **Installation banner**: Improved installation banner messaging for better professionalism
   - Removed organization-specific branding
   - Updated tagline to be clearer and more concise
