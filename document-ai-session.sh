@@ -92,15 +92,49 @@ check_cli_version() {
     # Compare versions
     if [ "$current_version" != "$remote_version" ]; then
         echo ""
-        echo -e "${YELLOW}╭────────────────────────────────────────────────────╮${NC}"
-        echo -e "${YELLOW}│${NC} ${RED}⚠${NC} CLI Update Available                               ${YELLOW}│${NC}"
-        echo -e "${YELLOW}│${NC}                                                    ${YELLOW}│${NC}"
-        echo -e "${YELLOW}│${NC} Current version: ${RED}v$current_version${NC}                            ${YELLOW}│${NC}"
-        echo -e "${YELLOW}│${NC} Latest version:  ${GREEN}v$remote_version${NC}                            ${YELLOW}│${NC}"
-        echo -e "${YELLOW}│${NC}                                                    ${YELLOW}│${NC}"
-        echo -e "${YELLOW}│${NC} ${CYAN}It's recommended to update before documenting${NC}      ${YELLOW}│${NC}"
-        echo -e "${YELLOW}│${NC} to ensure you have the latest features.           ${YELLOW}│${NC}"
-        echo -e "${YELLOW}╰────────────────────────────────────────────────────╯${NC}"
+        # Dynamically determine box width based on version string lengths
+        local box_inner_width=52  # default inner width (matches original box)
+        local cv_line="Current version: v$current_version"
+        local lv_line="Latest version:  v$remote_version"
+        local max_line_len=${#cv_line}
+        if [ ${#lv_line} -gt $max_line_len ]; then
+            max_line_len=${#lv_line}
+        fi
+        # Also consider the recommendation line length
+        local rec_line="It's recommended to update before documenting"
+        if [ ${#rec_line} -gt $max_line_len ]; then
+            max_line_len=${#rec_line}
+        fi
+        # Add color codes length fudge factor (since they don't print, but are in the string)
+        # We'll ignore color codes for width, as printf will pad the visible chars
+        if [ $max_line_len -gt $box_inner_width ]; then
+            box_inner_width=$((max_line_len + 4)) # add some padding
+        fi
+        local box_width=$((box_inner_width + 2)) # account for borders
+        local h_border=$(printf '─%.0s' $(seq 1 $box_inner_width))
+        # Print top border
+        echo -e "${YELLOW}╭${h_border}╮${NC}"
+        # Print title
+        printf "${YELLOW}│${NC} ${RED}⚠${NC} CLI Update Available"
+        printf "%*s${YELLOW}│${NC}\n" $((box_inner_width - 25)) ""
+        # Empty line
+        printf "${YELLOW}│%*s│${NC}\n" "-$box_inner_width" ""
+        # Current version line
+        printf "${YELLOW}│${NC} Current version: ${RED}v$current_version${NC}"
+        printf "%*s${YELLOW}│${NC}\n" $((box_inner_width - ${#cv_line})) ""
+        # Latest version line
+        printf "${YELLOW}│${NC} Latest version:  ${GREEN}v$remote_version${NC}"
+        printf "%*s${YELLOW}│${NC}\n" $((box_inner_width - ${#lv_line})) ""
+        # Empty line
+        printf "${YELLOW}│%*s│${NC}\n" "-$box_inner_width" ""
+        # Recommendation line
+        printf "${YELLOW}│${NC} ${CYAN}It's recommended to update before documenting${NC}"
+        printf "%*s${YELLOW}│${NC}\n" $((box_inner_width - 44)) ""
+        # Next line
+        printf "${YELLOW}│${NC} to ensure you have the latest features."
+        printf "%*s${YELLOW}│${NC}\n" $((box_inner_width - 44)) ""
+        # Bottom border
+        echo -e "${YELLOW}╰${h_border}╯${NC}"
         echo ""
         echo -e "${YELLOW}To update:${NC}"
         echo -e "  ${BLUE}cd ~/.local/share/ai-use-case-cli && git pull${NC}"
