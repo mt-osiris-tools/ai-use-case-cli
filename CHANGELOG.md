@@ -22,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Checks for updates when running `ai-use-case document` or `/use-case/document-session`
   - Warns users if newer version available with update instructions
   - Prompts to continue or update first (interactive mode)
+  - **Handles non-interactive contexts** (CI/CD, piped commands, automation):
+    - Detects non-interactive terminal using `[ -t 0 ]` check
+    - Continues automatically with warning in non-interactive mode
+    - No blocking prompts that would fail automation
+  - **Automation support**: `--skip-version-check` flag to skip check entirely
   - Ensures users document with latest features and bug fixes
   - Prevents issues from outdated CLI versions during documentation
   - Gracefully handles network failures (continues with current version)

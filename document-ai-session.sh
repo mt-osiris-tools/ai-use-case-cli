@@ -140,14 +140,22 @@ check_cli_version() {
         echo -e "  ${BLUE}cd ~/.local/share/ai-use-case-cli && git pull${NC}"
         echo ""
 
-        # Ask user if they want to continue
-        read -p "Continue with current version? (y/N): " -n 1 -r
-        echo ""
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            echo -e "${BLUE}Please update and re-run the command.${NC}"
-            exit 0
+        # Check if running in interactive terminal
+        if [ -t 0 ]; then
+            # Interactive mode: Ask user if they want to continue
+            read -p "Continue with current version? (y/N): " -n 1 -r
+            echo ""
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                echo -e "${BLUE}Please update and re-run the command.${NC}"
+                exit 0
+            fi
+            echo ""
+        else
+            # Non-interactive mode: Continue automatically with warning
+            echo -e "${YELLOW}⚠${NC} Running in non-interactive mode - continuing with current version"
+            echo -e "${CYAN}Note:${NC} Update recommended before next session"
+            echo ""
         fi
-        echo ""
     else
         echo -e "${GREEN}✓${NC} CLI is up-to-date (v$current_version)"
         echo ""
@@ -200,6 +208,23 @@ CENTRAL_DIR=$(ensure_hub_exists)
 TEMPLATE_FILE="$CENTRAL_DIR/TEMPLATE.md"
 SYNC_SCRIPT="$SCRIPT_DIR/sync-ai-use-cases.sh"
 
+# Check for flags
+SKIP_VERSION_CHECK=false
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --skip-version-check)
+            SKIP_VERSION_CHECK=true
+            shift
+            ;;
+        --help|-h)
+            break
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
 # Show help
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
     echo "AI Session Documentor - INTERACTIVE MODE"
@@ -239,7 +264,8 @@ if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
     echo "  4. Optionally commits and syncs to central repository"
     echo ""
     echo "Options:"
-    echo "  -h, --help    Show this help message"
+    echo "  -h, --help              Show this help message"
+    echo "  --skip-version-check    Skip CLI version check (useful for automation)"
     exit 0
 fi
 
@@ -253,8 +279,10 @@ fi
 
 cd "$PROJECT_PATH"
 
-# Check CLI version before starting
-check_cli_version
+# Check CLI version before starting (unless skipped)
+if [ "$SKIP_VERSION_CHECK" = false ]; then
+    check_cli_version
+fi
 
 # Check if it's a git repository
 if [ ! -d ".git" ]; then
