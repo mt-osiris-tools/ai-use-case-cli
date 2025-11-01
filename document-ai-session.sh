@@ -352,9 +352,18 @@ esac
 
 echo ""
 
-# Date
-read -p "Date (YYYY-MM-DD) [$(date +%Y-%m-%d)]: " SESSION_DATE
-SESSION_DATE=${SESSION_DATE:-$(date +%Y-%m-%d)}
+# Date (with week number in ISO 8601 format: YYYY-Www-MM-DD)
+read -p "Date (YYYY-MM-DD) [$(date +%Y-%m-%d)]: " USER_DATE
+USER_DATE=${USER_DATE:-$(date +%Y-%m-%d)}
+
+# Calculate week number for the given date
+WEEK_NUM=$(date -d "$USER_DATE" +%V 2>/dev/null || date -j -f "%Y-%m-%d" "$USER_DATE" +%V 2>/dev/null)
+
+# Format as YYYY-Www-MM-DD
+YEAR=$(echo "$USER_DATE" | cut -d'-' -f1)
+MONTH=$(echo "$USER_DATE" | cut -d'-' -f2)
+DAY=$(echo "$USER_DATE" | cut -d'-' -f3)
+SESSION_DATE="${YEAR}-W${WEEK_NUM}-${MONTH}-${DAY}"
 
 # Helper function to find next available research ticket (handles race conditions)
 find_next_research_ticket() {

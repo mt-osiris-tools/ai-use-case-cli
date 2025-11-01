@@ -126,7 +126,7 @@ This directory contains documentation of AI-assisted development workflows used 
 
 Each use case is documented in a markdown file with the following naming convention:
 \`\`\`
-YYYY-MM-DD_TICKET-XXXXX_brief-description.md
+YYYY-Www-MM-DD_TICKET-XXXXX_brief-description.md
 \`\`\`
 
 ## Syncing
@@ -272,7 +272,7 @@ if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
     echo ""
     echo "What's next?"
     echo "1. Create AI use case docs in: $AI_USECASES_DIR"
-    echo "2. Use format: YYYY-MM-DD_TICKET-XXXXX_description.md"
+    echo "2. Use format: YYYY-Www-MM-DD_TICKET-XXXXX_description.md"
     echo "3. Commit changes - use cases will auto-sync!"
     echo ""
     echo "Available commands:"

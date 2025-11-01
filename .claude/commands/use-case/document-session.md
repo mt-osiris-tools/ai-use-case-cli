@@ -222,11 +222,11 @@ Otherwise, ALWAYS use automatic mode when `/document-session` is invoked.
 ## Reference Examples
 
 **Implementation Sessions:**
-- `docs/ai-use-cases/2025-10-14_HUB-001_fix-color-encoding-in-cli-tools.md`
+- `docs/ai-use-cases/2025-W42-10-14_HUB-001_fix-color-encoding-in-cli-tools.md`
 - `docs/ai-use-cases/2025-10-14_HUB-002_update-github-organization-references.md`
 
 **Research Sessions (Example Format):**
-- `docs/ai-use-cases/2025-10-20_RESEARCH-001_evaluate-database-migration-strategies.md`
+- `docs/ai-use-cases/2025-W43-10-20_RESEARCH-001_evaluate-database-migration-strategies.md`
 - Focus on query evolution, insights, and decision-making
 - No code changes required
 

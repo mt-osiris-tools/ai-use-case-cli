@@ -144,15 +144,15 @@ while IFS= read -r USE_CASE_DIR; do
 
         # Validate filename convention (warn but don't fail)
         # Pattern breakdown:
-        #   ^[0-9]{4}-[0-9]{2}-[0-9]{2}  = Date: YYYY-MM-DD
-        #   _                             = Separator
-        #   [A-Z]+-[0-9]+                 = Ticket: UPPERCASE-DIGITS (exactly one dash)
-        #   _                             = Separator
-        #   .+\.md$                       = Description and .md extension
-        if ! [[ "$FILENAME" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}_[A-Z]+-[0-9]+_.+\.md$ ]]; then
+        #   ^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{2}  = Date: YYYY-Www-MM-DD
+        #   _                                       = Separator
+        #   [A-Z]+-[0-9]+                           = Ticket: UPPERCASE-DIGITS (exactly one dash)
+        #   _                                       = Separator
+        #   .+\.md$                                 = Description and .md extension
+        if ! [[ "$FILENAME" =~ ^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{2}_[A-Z]+-[0-9]+_.+\.md$ ]]; then
             echo -e "${YELLOW}⚠ Warning${NC}: $FILENAME doesn't follow naming convention"
-            echo "  Expected: YYYY-MM-DD_TICKET-XXXXX_description.md"
-            echo "  Example: 2025-10-20_PROJ-1234_add-user-authentication.md"
+            echo "  Expected: YYYY-Www-MM-DD_TICKET-XXXXX_description.md"
+            echo "  Example: 2025-W44-10-31_PROJ-1234_add-user-authentication.md"
         fi
 
         TARGET_FILE="$BY_PROJECT_DIR/$PROJECT_NAME/$FILENAME"
@@ -176,11 +176,12 @@ while IFS= read -r USE_CASE_DIR; do
             fi
         fi
 
-        # Extract date from filename (format: YYYY-MM-DD)
-        if [[ "$FILENAME" =~ ^([0-9]{4})-([0-9]{2})-([0-9]{2}) ]]; then
+        # Extract date from filename (format: YYYY-Www-MM-DD)
+        if [[ "$FILENAME" =~ ^([0-9]{4})-W([0-9]{2})-([0-9]{2})-([0-9]{2}) ]]; then
             YEAR="${BASH_REMATCH[1]}"
-            MONTH="${BASH_REMATCH[2]}"
-            DAY="${BASH_REMATCH[3]}"
+            WEEK="${BASH_REMATCH[2]}"
+            MONTH="${BASH_REMATCH[3]}"
+            DAY="${BASH_REMATCH[4]}"
 
             # Create by-date directory structure
             DATE_DIR="$BY_DATE_DIR/$YEAR/$MONTH"
@@ -198,7 +199,7 @@ while IFS= read -r USE_CASE_DIR; do
         fi
 
         # Extract topics from filename (after date and ticket)
-        # Format: YYYY-MM-DD_TICKET-XXXXX_topic-words.md
+        # Format: YYYY-Www-MM-DD_TICKET-XXXXX_topic-words.md
         if [[ "$FILENAME" =~ _([A-Z]+-[0-9]+)_(.+)\.md$ ]]; then
             TICKET="${BASH_REMATCH[1]}"
             TOPIC_SLUG="${BASH_REMATCH[2]}"

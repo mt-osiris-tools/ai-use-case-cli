@@ -149,12 +149,20 @@ gh pr create --title "..." --body "..."
 
 All documentation must follow:
 ```
-YYYY-MM-DD_TICKET-XXX_brief-description.md
+YYYY-Www-MM-DD_TICKET-XXX_brief-description.md
 ```
 
+Where:
+- `YYYY` = Year (e.g., 2025)
+- `Www` = ISO 8601 week number (W01-W53)
+- `MM` = Month (01-12)
+- `DD` = Day (01-31)
+- `TICKET-XXX` = Ticket identifier
+- `brief-description` = Lowercase with hyphens
+
 Examples:
-- `2025-10-31_HUB-123_add-version-command.md`
-- `2025-10-31_RESEARCH-001_evaluate-auth-approaches.md`
+- `2025-W44-10-31_HUB-123_add-version-command.md`
+- `2025-W44-10-31_RESEARCH-001_evaluate-auth-approaches.md`
 
 ## Environment Variables
 

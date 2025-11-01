@@ -162,8 +162,8 @@ validate_file() {
 extract_title() {
     local filename=$(basename "$MARKDOWN_FILE" .md)
 
-    # Pattern: YYYY-MM-DD_TICKET-XXX_description-slug
-    if [[ $filename =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}_([A-Z]+-[0-9]+)_(.+)$ ]]; then
+    # Pattern: YYYY-Www-MM-DD_TICKET-XXX_description-slug
+    if [[ $filename =~ ^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{2}_([A-Z]+-[0-9]+)_(.+)$ ]]; then
         local ticket="${BASH_REMATCH[1]}"
         local slug="${BASH_REMATCH[2]}"
 

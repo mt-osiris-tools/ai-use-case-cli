@@ -42,8 +42,8 @@ Use regex to extract:
 
 Read the markdown file and determine the page title:
 
-**Title extraction from filename** (e.g., `2025-10-16_PROJ-123_implement-auth.md`):
-1. Remove date prefix: `2025-10-16_`
+**Title extraction from filename** (e.g., `2025-W42-10-16_PROJ-123_implement-auth.md`):
+1. Remove date prefix: `2025-W42-10-16_`
 2. Extract ticket: `PROJ-123`
 3. Convert slug to title: `implement-auth` → `Implement Auth`
 4. Format: `PROJ-123: Implement Auth`
@@ -182,13 +182,13 @@ Options:
 ### From CLI
 ```bash
 ai-use-case publish-confluence \
-  docs/ai-use-cases/2025-10-16_PROJ-123_implement-auth.md \
+  docs/ai-use-cases/2025-W42-10-16_PROJ-123_implement-auth.md \
   https://mycompany.atlassian.net/wiki/spaces/DOCS/pages/123456789/AI+Use+Cases
 ```
 
 ### From Claude Code
 ```
-/publish-confluence docs/ai-use-cases/2025-10-16_PROJ-123_implement-auth.md https://mycompany.atlassian.net/wiki/spaces/DOCS/pages/123456789/AI+Use+Cases
+/publish-confluence docs/ai-use-cases/2025-W42-10-16_PROJ-123_implement-auth.md https://mycompany.atlassian.net/wiki/spaces/DOCS/pages/123456789/AI+Use+Cases
 ```
 
 ## Error Scenarios
@@ -232,7 +232,7 @@ When `--dry-run` is specified, show what would be published without actually doi
 ```
 🔍 Dry Run - Publishing Preview
 
-Source File: docs/ai-use-cases/2025-10-16_PROJ-123_implement-auth.md
+Source File: docs/ai-use-cases/2025-W42-10-16_PROJ-123_implement-auth.md
 File Size: 15.3 KB
 Page Title: PROJ-123: Implement Auth
 
@@ -247,7 +247,7 @@ Content Preview:
 # PROJ-123: Implement Auth
 
 ## Metadata
-- Date: 2025-10-16
+- Date: 2025-W42-10-16
 - Ticket: PROJ-123
 - AI Tool: Claude Code (Sonnet 4.5)
 ...
