@@ -44,30 +44,21 @@ get_installed_version() {
 REMOTE_VERSION=$(get_remote_version)
 INSTALLED_VERSION=$(get_installed_version)
 
-cat <<EOF
-${CYAN}
- █████╗ ██╗    ██╗   ██╗███████╗███████╗     ██████╗ █████╗ ███████╗███████╗
-██╔══██╗██║    ██║   ██║██╔════╝██╔════╝    ██╔════╝██╔══██╗██╔════╝██╔════╝
-███████║██║    ██║   ██║███████╗█████╗█████╗██║     ███████║███████╗█████╗
-██╔══██║██║    ██║   ██║╚════██║██╔══╝╚════╝██║     ██╔══██║╚════██║██╔══╝
-██║  ██║██║    ╚██████╔╝███████║███████╗    ╚██████╗██║  ██║███████║███████╗
-╚═╝  ╚═╝╚═╝     ╚═════╝ ╚══════╝╚══════╝     ╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝
-${NC}
-${YELLOW}           Document Your AI-Assisted Development Sessions${NC}
-${GREEN}        ═══════════════════════════════════════════════════════${NC}
-
-EOF
-
-# Display version info
+# Display compact banner
+echo ""
+echo -e "${CYAN}╭────────────────────────────────────────────────────────────╮${NC}"
 if [ -n "$REMOTE_VERSION" ]; then
     if [ -n "$INSTALLED_VERSION" ]; then
-        echo -e "${YELLOW}        Installing version: ${GREEN}v$REMOTE_VERSION${NC} ${YELLOW}(current: ${CYAN}v$INSTALLED_VERSION${YELLOW})${NC}"
+        echo -e "${CYAN}│${NC} ${BLUE}AI Use Case CLI${NC} ${GREEN}v$REMOTE_VERSION${NC} ${YELLOW}(current: v$INSTALLED_VERSION)${NC}"
     else
-        echo -e "${YELLOW}        Installing version: ${GREEN}v$REMOTE_VERSION${NC}"
+        echo -e "${CYAN}│${NC} ${BLUE}AI Use Case CLI${NC} ${GREEN}v$REMOTE_VERSION${NC}"
     fi
-    echo ""
+else
+    echo -e "${CYAN}│${NC} ${BLUE}AI Use Case CLI${NC} - Installation"
 fi
-echo -e "${NC}"
+echo -e "${CYAN}│${NC} Document AI-assisted development sessions"
+echo -e "${CYAN}╰────────────────────────────────────────────────────────────╯${NC}"
+echo ""
 
 # Determine install directory
 if [ -f "ai-use-case" ] && [ -d ".git" ]; then
