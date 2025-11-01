@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2025-10-31
+
+### Added
+- **Detailed version command**: New `ai-use-case version` command for comprehensive version verification
+  - Shows current version, installation directory, and git information
+  - Displays last update check time
+  - Actively checks for updates from GitHub repository
+  - Provides update instructions if newer version is available
+  - Complements existing `--version`/`-v` flag for quick version check
+  - Useful for troubleshooting and verifying installation status
+
+## [Unreleased - Previous Changes]
+
 ### Added
 - **Enhanced documentation templates in hub repository**: Templates now include comprehensive AI interaction metrics
   - Added AI Interaction Metrics section (prompts, success rates, tool usage)
@@ -208,7 +221,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Git integration for tracking AI sessions
 - Basic template for use case documentation
 
-[Unreleased]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/v2.0.0...v2.1.0

@@ -70,7 +70,7 @@ SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" && pwd)"
 HUB_DIR=$(ensure_hub_exists)
 
 # Show version
-VERSION="2.2.0"
+VERSION="2.3.0"
 
 # Version check cache
 VERSION_CHECK_FILE="$HOME/.cache/ai-use-case-version-check"
@@ -134,8 +134,9 @@ ${YELLOW}Commands:${NC}
   ${GREEN}view${NC}                      View use cases in hub (opens file explorer)
   ${GREEN}list${NC}                      List all projects with use cases
   ${GREEN}stats${NC}                     Show statistics about documented use cases
+  ${GREEN}version${NC}                   Show detailed version info and check for updates
   ${GREEN}--help, -h${NC}                Show this help message
-  ${GREEN}--version, -v${NC}             Show version information
+  ${GREEN}--version, -v${NC}             Show version number (quick)
 
 ${YELLOW}Examples:${NC}
   # First time setup
@@ -467,6 +468,76 @@ cmd_publish_confluence() {
     bash "$SCRIPT_DIR/publish-confluence.sh" "$@"
 }
 
+# Command: version (detailed)
+cmd_version_detailed() {
+    echo -e "${BLUE}=== AI Use Case CLI Version ===${NC}"
+    echo ""
+    echo -e "${GREEN}Version:${NC} $VERSION"
+    echo -e "${GREEN}Install Directory:${NC} $SCRIPT_DIR"
+    echo ""
+
+    # Show git information if available
+    if [ -d "$SCRIPT_DIR/.git" ]; then
+        echo -e "${YELLOW}Git Information:${NC}"
+
+        # Get current commit
+        local commit_hash=$(cd "$SCRIPT_DIR" && git rev-parse --short HEAD 2>/dev/null)
+        local commit_date=$(cd "$SCRIPT_DIR" && git log -1 --format=%cd --date=short 2>/dev/null)
+
+        if [ -n "$commit_hash" ]; then
+            echo "  Commit: $commit_hash ($commit_date)"
+        fi
+
+        # Get branch
+        local branch=$(cd "$SCRIPT_DIR" && git rev-parse --abbrev-ref HEAD 2>/dev/null)
+        if [ -n "$branch" ]; then
+            echo "  Branch: $branch"
+        fi
+
+        echo ""
+    fi
+
+    # Show last update check
+    if [ -f "$VERSION_CHECK_FILE" ]; then
+        local last_check=$(cat "$VERSION_CHECK_FILE" 2>/dev/null)
+        if [ -n "$last_check" ]; then
+            local now=$(date +%s)
+            local elapsed=$((now - last_check))
+            local hours=$((elapsed / 3600))
+            echo -e "${YELLOW}Last Update Check:${NC} ${hours}h ago"
+            echo ""
+        fi
+    fi
+
+    # Check for updates
+    echo -e "${BLUE}Checking for updates...${NC}"
+
+    local remote_version=""
+    if command -v curl &> /dev/null; then
+        remote_version=$(curl -s -m 5 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+    elif command -v wget &> /dev/null; then
+        remote_version=$(wget -qO- -T 5 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+    fi
+
+    # Update check timestamp
+    mkdir -p "$(dirname "$VERSION_CHECK_FILE")"
+    date +%s > "$VERSION_CHECK_FILE" 2>/dev/null || true
+
+    if [ -z "$remote_version" ]; then
+        echo -e "${YELLOW}⚠ Could not check for updates (network issue?)${NC}"
+    elif [ "$remote_version" != "$VERSION" ]; then
+        echo -e "${YELLOW}⚠ Update available:${NC} ${GREEN}v$remote_version${NC} (current: v$VERSION)"
+        echo ""
+        echo -e "${BLUE}To update:${NC}"
+        echo "  cd $SCRIPT_DIR && git pull"
+    else
+        echo -e "${GREEN}✓ You are running the latest version${NC}"
+    fi
+
+    echo ""
+    echo -e "${YELLOW}Repository:${NC} https://github.com/mt-osiris-tools/ai-use-case-cli"
+}
+
 # Main command dispatcher
 main() {
     # Check for updates in background (non-blocking)
@@ -517,6 +588,9 @@ main() {
             ;;
         --version|-v)
             echo "ai-use-case version $VERSION"
+            ;;
+        version)
+            cmd_version_detailed
             ;;
         *)
             echo -e "${RED}Error: Unknown command '$1'${NC}"
