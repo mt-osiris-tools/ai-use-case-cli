@@ -27,7 +27,7 @@ When making changes that require a version bump, follow these steps:
 
 ### 1. Update Version Number
 
-Edit `ai-use-case` script (line 73):
+Edit the `VERSION` variable in the `ai-use-case` script (near the top of the file):
 
 ```bash
 VERSION="X.Y.Z"

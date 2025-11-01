@@ -76,6 +76,55 @@ VERSION="2.3.0"
 VERSION_CHECK_FILE="$HOME/.cache/ai-use-case-version-check"
 VERSION_CHECK_INTERVAL=86400  # 24 hours in seconds
 
+# Helper function: Fetch remote version from GitHub
+# Usage: fetch_remote_version <timeout_seconds>
+# Returns: Version string via stdout, or empty if failed
+fetch_remote_version() {
+    local timeout="${1:-2}"
+    local remote_version=""
+
+    if command -v curl &> /dev/null; then
+        remote_version=$(curl -s -m "$timeout" https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+    elif command -v wget &> /dev/null; then
+        remote_version=$(wget -qO- -T "$timeout" https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+    fi
+
+    echo "$remote_version"
+}
+
+# Helper function: Compare semantic versions
+# Usage: compare_versions v1 v2
+# Returns: 0 if v1 < v2 (update available), 1 if v1 >= v2 (no update needed)
+compare_versions() {
+    local v1="$1"
+    local v2="$2"
+
+    # If versions are equal, no update needed
+    if [ "$v1" = "$v2" ]; then
+        return 1
+    fi
+
+    # Split versions into components
+    local IFS='.'
+    local v1_parts=($v1)
+    local v2_parts=($v2)
+
+    # Compare major, minor, patch
+    for i in 0 1 2; do
+        local v1_part="${v1_parts[$i]:-0}"
+        local v2_part="${v2_parts[$i]:-0}"
+
+        if [ "$v1_part" -lt "$v2_part" ]; then
+            return 0  # v1 < v2, update available
+        elif [ "$v1_part" -gt "$v2_part" ]; then
+            return 1  # v1 > v2, no update needed
+        fi
+    done
+
+    # Versions are equal
+    return 1
+}
+
 # Function to check for updates
 check_for_updates() {
     # Skip if we checked recently
@@ -89,23 +138,15 @@ check_for_updates() {
         fi
     fi
 
-    # Try to fetch latest version from GitHub
-    local remote_version
-    if command -v curl &> /dev/null; then
-        remote_version=$(curl -s -m 2 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
-    elif command -v wget &> /dev/null; then
-        remote_version=$(wget -qO- -T 2 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
-    else
-        # No way to check, skip silently
-        return 0
-    fi
+    # Try to fetch latest version from GitHub (2 second timeout for background check)
+    local remote_version=$(fetch_remote_version 2)
 
     # Update check timestamp
     mkdir -p "$(dirname "$VERSION_CHECK_FILE")"
     date +%s > "$VERSION_CHECK_FILE" 2>/dev/null || true
 
     # Compare versions if we got a remote version
-    if [ -n "$remote_version" ] && [ "$remote_version" != "$VERSION" ]; then
+    if [ -n "$remote_version" ] && compare_versions "$VERSION" "$remote_version"; then
         echo -e "${YELLOW}╭────────────────────────────────────────────────────╮${NC}" >&2
         echo -e "${YELLOW}│${NC} Update available: ${GREEN}v$remote_version${NC} (current: v$VERSION)" >&2
         echo -e "${YELLOW}│${NC} Run: ${BLUE}cd ~/.local/share/ai-use-case-cli && git pull${NC}" >&2
@@ -512,12 +553,8 @@ cmd_version_detailed() {
     # Check for updates
     echo -e "${BLUE}Checking for updates...${NC}"
 
-    local remote_version=""
-    if command -v curl &> /dev/null; then
-        remote_version=$(curl -s -m 5 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
-    elif command -v wget &> /dev/null; then
-        remote_version=$(wget -qO- -T 5 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
-    fi
+    # Fetch remote version (5 second timeout for interactive command)
+    local remote_version=$(fetch_remote_version 5)
 
     # Update check timestamp
     mkdir -p "$(dirname "$VERSION_CHECK_FILE")"
@@ -525,7 +562,7 @@ cmd_version_detailed() {
 
     if [ -z "$remote_version" ]; then
         echo -e "${YELLOW}⚠ Could not check for updates (network issue?)${NC}"
-    elif [ "$remote_version" != "$VERSION" ]; then
+    elif compare_versions "$VERSION" "$remote_version"; then
         echo -e "${YELLOW}⚠ Update available:${NC} ${GREEN}v$remote_version${NC} (current: v$VERSION)"
         echo ""
         echo -e "${BLUE}To update:${NC}"

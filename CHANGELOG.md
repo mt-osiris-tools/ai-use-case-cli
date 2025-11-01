@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.3.0] - 2025-10-31
+## [2.3.0] - 2025-11-01
 
 ### Added
 - **Detailed version command**: New `ai-use-case version` command for comprehensive version verification
@@ -17,8 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Provides update instructions if newer version is available
   - Complements existing `--version`/`-v` flag for quick version check
   - Useful for troubleshooting and verifying installation status
+- **Improved CLAUDE.md**: Restructured root CLAUDE.md as concise quick reference guide
+  - Critical requirements upfront (branch workflow, version management)
+  - Pre-PR checklist and common patterns
+  - Clear guardrails and references to detailed documentation
 
-## [Unreleased - Previous Changes]
+---
+
+**Note**: The following section contains previously documented unreleased changes that remain pending future releases.
 
 ### Added
 - **Enhanced documentation templates in hub repository**: Templates now include comprehensive AI interaction metrics
