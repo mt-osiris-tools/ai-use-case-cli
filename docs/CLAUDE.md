@@ -425,16 +425,24 @@ git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git ai-use-case-hub
 
 All use case documents created by these tools MUST follow this pattern:
 ```
-YYYY-MM-DD_TICKET-XXXXX_brief-description.md
+YYYY-Www-MM-DD_TICKET-XXXXX_brief-description.md
 ```
 
+Where:
+- `YYYY` = Year (e.g., 2025)
+- `Www` = ISO 8601 week number (W01-W53)
+- `MM` = Month (01-12)
+- `DD` = Day (01-31)
+- `TICKET-XXXXX` = Ticket identifier
+- `brief-description` = Lowercase with hyphens
+
 **Examples (Implementation Sessions):**
-- `2025-10-13_LSFB-63055_add-environment-parameter-message-flow.md`
-- `2025-10-14_PROJ-1234_implement-user-authentication.md`
+- `2025-W42-10-13_LSFB-63055_add-environment-parameter-message-flow.md`
+- `2025-W42-10-14_PROJ-1234_implement-user-authentication.md`
 
 **Examples (Research Sessions):**
-- `2025-10-20_RESEARCH-001_evaluate-database-migration-strategies.md`
-- `2025-10-20_RESEARCH-002_compare-authentication-approaches.md`
+- `2025-W43-10-20_RESEARCH-001_evaluate-database-migration-strategies.md`
+- `2025-W43-10-20_RESEARCH-002_compare-authentication-approaches.md`
 
 **Ticket Format Guidelines:**
 - Implementation sessions: Use project ticket (e.g., `PROJ-1234`, `HUB-001`)
@@ -448,9 +456,9 @@ YYYY-MM-DD_TICKET-XXXXX_brief-description.md
   - Invalid examples: `proj-123` (lowercase), `PROJ--123` (multiple dashes), `PROJ_123` (underscore)
 
 **Parsing logic:**
-- Date extraction: `^([0-9]{4})-([0-9]{2})-([0-9]{2})`
+- Date extraction: `^([0-9]{4})-W([0-9]{2})-([0-9]{2})-([0-9]{2})`
 - Ticket and topic: `_([A-Z]+-[0-9]+)_(.+)\.md$`
-- Full filename validation: `^[0-9]{4}-[0-9]{2}-[0-9]{2}_[A-Z]+-[0-9]+_.+\.md$`
+- Full filename validation: `^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{2}_[A-Z]+-[0-9]+_.+\.md$`
 
 The sync script uses regex to parse filenames and organize symlinks in the hub.
 

@@ -106,19 +106,21 @@ This ensures all documented use cases are automatically backed up and shared acr
 ### File Naming Convention
 
 ```
-YYYY-MM-DD_TICKET-XXXXX_brief-description.md
+YYYY-Www-MM-DD_TICKET-XXXXX_brief-description.md
 ```
+
+Where `Www` is the ISO 8601 week number (W01-W53).
 
 **Implementation Session Examples:**
 ```
-2025-10-14_PROJ-1234_implement-user-authentication.md
-2025-10-14_HUB-001_fix-color-encoding-in-cli-tools.md
+2025-W42-10-14_PROJ-1234_implement-user-authentication.md
+2025-W42-10-14_HUB-001_fix-color-encoding-in-cli-tools.md
 ```
 
 **Research Session Examples:**
 ```
-2025-10-20_RESEARCH-001_evaluate-database-migration-strategies.md
-2025-10-20_RESEARCH-002_compare-authentication-approaches.md
+2025-W43-10-20_RESEARCH-001_evaluate-database-migration-strategies.md
+2025-W43-10-20_RESEARCH-002_compare-authentication-approaches.md
 ```
 
 The `RESEARCH-XXX` format is auto-generated for research sessions, or you can specify your own ticket format.
@@ -332,18 +334,18 @@ Publish AI use case documentation to Confluence as a child page:
 
 ```bash
 ai-use-case publish-confluence \
-  docs/ai-use-cases/2025-10-16_PROJ-123_auth.md \
+  docs/ai-use-cases/2025-W42-10-16_PROJ-123_auth.md \
   https://company.atlassian.net/wiki/spaces/DOCS/pages/123456/Parent
 
 # With custom title
 ai-use-case publish-confluence \
   --title "PROJ-123: Complete Authentication Implementation" \
-  docs/ai-use-cases/2025-10-16_PROJ-123_auth.md \
+  docs/ai-use-cases/2025-W42-10-16_PROJ-123_auth.md \
   https://company.atlassian.net/wiki/spaces/DOCS/pages/123456/Parent
 
 # Dry run (preview without publishing)
 ai-use-case publish-confluence --dry-run \
-  docs/ai-use-cases/2025-10-16_PROJ-123_auth.md \
+  docs/ai-use-cases/2025-W42-10-16_PROJ-123_auth.md \
   https://company.atlassian.net/wiki/spaces/DOCS/pages/123456/Parent
 ```
 

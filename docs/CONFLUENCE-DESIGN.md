@@ -36,7 +36,7 @@ Options:
    - Validate authentication (SSE or token)
 
 3. **Parse Markdown File**
-   - Extract title from filename (`YYYY-MM-DD_TICKET-XXX_description.md` → title)
+   - Extract title from filename (`YYYY-Www-MM-DD_TICKET-XXX_description.md` → title)
    - Read markdown content
    - Optionally convert markdown to Confluence storage format
 
@@ -63,7 +63,7 @@ Extract page ID using regex patterns.
 
 ### Title Extraction
 
-From filename `YYYY-MM-DD_TICKET-XXX_description.md`:
+From filename `YYYY-Www-MM-DD_TICKET-XXX_description.md`:
 1. Remove date prefix: `YYYY-MM-DD_`
 2. Keep ticket: `TICKET-XXX`
 3. Convert slug to title: `description` → `Description`
