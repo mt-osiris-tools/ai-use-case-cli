@@ -1,5 +1,5 @@
 #!/bin/bash
-# AI Use Cases Sync Script v2.0
+# AI Use Cases Sync Script v2.3.0
 # Syncs AI use case documentation from project directories to a central location
 # Uses symlinks to avoid duplication - files are stored once in by-project/
 #
@@ -102,7 +102,7 @@ else
     PROJECT_NAME=$(basename "$PROJECT_PATH")
 fi
 
-echo -e "${GREEN}=== AI Use Cases Sync v2.0 ===${NC}"
+echo -e "${GREEN}=== AI Use Cases Sync v2.3.0 ===${NC}"
 echo "Project: $PROJECT_NAME"
 echo "Source: $PROJECT_PATH"
 echo "Central: $CENTRAL_DIR"
