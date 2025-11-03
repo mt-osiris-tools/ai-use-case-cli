@@ -257,6 +257,8 @@ curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/mai
 
 Good news! v3.1.0 restores all v2.x standalone CLI commands while adding Claude Code integration. No migration needed—your old commands still work!
 
+For historical details on v3.0.0 breaking changes and migration steps, see [CHANGELOG.md](./CHANGELOG.md).
+
 ## Uninstall
 
 ```bash
