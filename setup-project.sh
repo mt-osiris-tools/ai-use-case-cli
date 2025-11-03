@@ -267,6 +267,18 @@ fi
 echo ""
 echo -e "${BLUE}Performing initial sync...${NC}"
 if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
+    # Register project in the registry
+    if [ -f "$SCRIPT_DIR/registry-manager.sh" ]; then
+        source "$SCRIPT_DIR/registry-manager.sh"
+        CLI_VERSION=$(get_cli_version "$SCRIPT_DIR")
+        REGISTRY_STATUS=$(register_project "$PROJECT_PATH" "$CLI_VERSION" "docs/ai-use-cases")
+        if [ "$REGISTRY_STATUS" = "registered" ]; then
+            echo -e "${GREEN}✓${NC} Project registered in CLI registry"
+        elif [ "$REGISTRY_STATUS" = "updated" ]; then
+            echo -e "${GREEN}✓${NC} Project registry updated"
+        fi
+    fi
+
     echo ""
     echo -e "${GREEN}=== Setup Complete! ===${NC}"
     echo ""

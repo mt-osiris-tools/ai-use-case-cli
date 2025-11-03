@@ -1,6 +1,6 @@
 #!/bin/bash
 # List Projects with AI Use Cases
-# Show all projects that have documented use cases
+# Show all projects that have documented use cases and registry information
 
 set -e
 
@@ -9,7 +9,11 @@ GREEN=$'\033[0;32m'
 BLUE=$'\033[0;34m'
 YELLOW=$'\033[1;33m'
 RED=$'\033[0;31m'
+CYAN=$'\033[0;36m'
 NC=$'\033[0m'
+
+# Get script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Function to ensure hub repository exists
 ensure_hub_exists() {
@@ -53,20 +57,104 @@ ensure_hub_exists() {
 # Ensure hub exists
 HUB_DIR=$(ensure_hub_exists)
 
-echo -e "${BLUE}=== Projects with AI Use Cases ===${NC}"
-echo ""
+# Source registry manager if available
+SHOW_REGISTRY=false
+if [ -f "$SCRIPT_DIR/registry-manager.sh" ]; then
+    source "$SCRIPT_DIR/registry-manager.sh"
+    SHOW_REGISTRY=true
+fi
 
-cd "$HUB_DIR"
+# Show help
+if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
+    cat <<EOF
+${BLUE}AI Use Case CLI - List Projects${NC}
 
-if [ ! -d "by-project" ]; then
-    echo -e "${YELLOW}No projects found${NC}"
+Lists all projects with AI use cases from the hub and shows registry
+information if available.
+
+${YELLOW}Usage:${NC}
+  $0 [options]
+
+${YELLOW}Options:${NC}
+  -h, --help        Show this help message
+  --registry-only   Show only registry information
+  --hub-only        Show only hub information
+
+${YELLOW}Examples:${NC}
+  $0                    # Show both hub and registry info
+  $0 --registry-only    # Show only registered projects
+  $0 --hub-only         # Show only hub projects
+
+EOF
     exit 0
 fi
 
-for dir in by-project/*/; do
-    if [ -d "$dir" ]; then
-        project=$(basename "$dir")
-        count=$(find "$dir" -name "*.md" -type f | wc -l)
-        echo -e "${GREEN}$project${NC}: $count use case(s)"
+# Handle registry-only mode
+if [[ "$1" == "--registry-only" ]] && [ "$SHOW_REGISTRY" = true ]; then
+    CLI_VERSION=$(get_cli_version "$SCRIPT_DIR")
+    print_projects "$CLI_VERSION"
+
+    # Show statistics
+    echo -e "${BLUE}=== Statistics ===${NC}"
+    stats=$(get_registry_stats "$CLI_VERSION")
+    total=$(echo "$stats" | cut -d' ' -f1)
+    outdated=$(echo "$stats" | cut -d' ' -f2)
+
+    echo "Total projects: $total"
+    if [ "$outdated" -gt 0 ]; then
+        echo -e "Outdated projects: ${YELLOW}$outdated${NC}"
+        echo ""
+        echo -e "${YELLOW}Tip:${NC} Run ${CYAN}check-updates.sh${NC} to see which projects need updates"
+    else
+        echo -e "Outdated projects: ${GREEN}0${NC}"
     fi
-done
+
+    echo ""
+    echo -e "${CYAN}Current CLI version: $CLI_VERSION${NC}"
+    exit 0
+fi
+
+# Show hub information
+if [[ "$1" != "--registry-only" ]]; then
+    echo -e "${BLUE}=== Projects with AI Use Cases (Hub) ===${NC}"
+    echo ""
+
+    cd "$HUB_DIR"
+
+    if [ ! -d "by-project" ]; then
+        echo -e "${YELLOW}No projects found in hub${NC}"
+    else
+        for dir in by-project/*/; do
+            if [ -d "$dir" ]; then
+                project=$(basename "$dir")
+                count=$(find "$dir" -name "*.md" -type f | wc -l)
+                echo -e "${GREEN}$project${NC}: $count use case(s)"
+            fi
+        done
+    fi
+    echo ""
+fi
+
+# Show registry information
+if [[ "$1" != "--hub-only" ]] && [ "$SHOW_REGISTRY" = true ]; then
+    CLI_VERSION=$(get_cli_version "$SCRIPT_DIR")
+    print_projects "$CLI_VERSION"
+
+    # Show statistics
+    echo -e "${BLUE}=== Statistics ===${NC}"
+    stats=$(get_registry_stats "$CLI_VERSION")
+    total=$(echo "$stats" | cut -d' ' -f1)
+    outdated=$(echo "$stats" | cut -d' ' -f2)
+
+    echo "Total projects: $total"
+    if [ "$outdated" -gt 0 ]; then
+        echo -e "Outdated projects: ${YELLOW}$outdated${NC}"
+        echo ""
+        echo -e "${YELLOW}Tip:${NC} Run ${CYAN}check-updates.sh${NC} to see which projects need updates"
+    else
+        echo -e "Outdated projects: ${GREEN}0${NC}"
+    fi
+
+    echo ""
+    echo -e "${CYAN}Current CLI version: $CLI_VERSION${NC}"
+fi
