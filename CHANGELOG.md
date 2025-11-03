@@ -9,7 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.1.0] - 2025-11-02
 
+### 🎉 Major Update: Hybrid CLI + Claude Code Interface
+
+**Standalone CLI commands are back!** v3.1.0 restores all standalone bash commands while maintaining Claude Code integration, giving you the flexibility to choose your preferred workflow.
+
 ### Added
+
+- **Restored Standalone CLI Commands**: All v2.x commands work again!
+  - `ai-use-case --init` - Setup current project
+  - `ai-use-case sync` - Sync use cases to hub
+  - `ai-use-case search <term>` - Search documented use cases
+  - `ai-use-case list` - List all registered projects
+  - `ai-use-case stats` - View statistics
+  - `ai-use-case view` - Open hub directory
+  - `ai-use-case push` - Push hub changes
+  - `ai-use-case publish-confluence` - Publish to Confluence
+  - `ai-use-case uninstall` - Uninstall the CLI
+  - `ai-use-case list-projects` - List projects with versions
+  - `ai-use-case check-updates` - Check for updates
+  - `ai-use-case update-project <path>` - Update project
 
 - **Project Registry System**: Track all projects using the CLI tool
   - `registry-manager.sh` - Core registry management functions
@@ -30,12 +48,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Complete rewrite of `ai-use-case` CLI**: Hybrid approach supporting both standalone and Claude Code workflows
+  - Proper symlink resolution for global `ai-use-case` command
+  - Clean, aligned UI with consistent box borders
+  - Helpful notices directing users to Claude Code for documentation features
 - `setup-project.sh` now automatically registers projects in the registry
 - `list-projects.sh` enhanced to show registry data alongside hub information
 - Project updates now tracked with timestamps for audit trail
+- Updated `install.sh` to reflect hybrid approach
+- Updated all documentation (README.md, CLAUDE.md) to show both CLI and slash commands
+
+### Fixed
+
+- Symlink resolution: Commands now work correctly from any directory
+- Border alignment in help messages and notices
+- Path resolution for scripts when called via symlink
 
 ### Benefits
 
+- ✅ **Flexibility**: Choose between fast CLI commands or AI-assisted documentation
+- ✅ **Backward compatibility**: All v2.x commands work again
+- ✅ **Best of both worlds**: Standalone utility + Claude Code integration
 - Easily identify which projects are using the CLI
 - Track CLI version across multiple projects
 - Simplify bulk updates when new CLI versions are released

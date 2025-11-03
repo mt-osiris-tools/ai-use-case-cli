@@ -1,8 +1,8 @@
 # AI Use Case CLI
 
-**v3.0.0** - Claude Code integration tools for documenting AI-assisted development workflows.
+**v3.1.0** - Hybrid CLI and Claude Code integration for documenting AI-assisted development workflows.
 
-> **🚨 BREAKING CHANGES in v3.0.0**: Standalone CLI commands have been removed. Please use Claude Code slash commands instead. See [Migration Guide](#migration-from-v2x-to-v3x) below.
+> **✨ NEW in v3.1.0**: Standalone CLI commands are back! Use either traditional bash commands or Claude Code slash commands - whatever fits your workflow best.
 
 ## Why This Tool?
 
@@ -17,11 +17,12 @@ Documentation shouldn't be a burden—it should be a valuable asset that grows y
 
 ## Features
 
-- 🚀 **Claude Code integration** - Seamless slash commands for AI-assisted workflow
-- 📝 **Automatic documentation** - Context-aware session capture through Claude Code
+- 🎯 **Hybrid interface** - Use standalone CLI commands or Claude Code slash commands
+- 🚀 **Claude Code integration** - AI-assisted documentation with automatic context capture
+- 📝 **Quick CLI commands** - Fast bash commands for sync, search, stats, and more
 - 🔬 **Research session support** - Document exploratory sessions without code changes
 - 🔄 **Automatic syncing** - Git hooks sync docs to central hub automatically
-- 🎯 **Project setup** - Configure any project repository in minutes
+- 🗂️ **Project registry** - Track and update all projects using the CLI
 - 🔍 **Search & stats** - Find and analyze documented use cases
 - 📤 **Confluence publishing** - Publish use cases to Confluence as child pages
 - 🛠️ **Direct script access** - Advanced users can call scripts directly
@@ -48,41 +49,74 @@ cd ~/.local/share/ai-use-case-cli
 
 ## Usage
 
-### Using with Claude Code (Recommended)
+### Quick Start
 
-**v3.0.0** focuses on seamless integration with Claude Code through slash commands:
+**v3.1.0** offers flexibility - use either standalone commands or Claude Code integration:
 
 1. **Setup a project**:
-   ```
-   /use-case:setup-project
+   ```bash
+   ai-use-case --init
+   # OR: /use-case:setup-project (in Claude Code)
    ```
 
-2. **Work on your code** with Claude Code
+2. **Work on your code**
 
-3. **Document your session** (automatic):
-   ```
+3. **Document your session**:
+   ```bash
+   # With Claude Code (recommended for automatic capture):
    /use-case:document-session
+
+   # Standalone interactive mode:
+   ai-use-case document  # Redirects to Claude Code for best experience
    ```
-   Claude Code automatically captures context, git history, and generates complete documentation.
 
 4. **Other operations**:
-   ```
-   /use-case:sync-usecases       # Sync to hub
-   /use-case:search-usecases     # Search documented cases
-   /use-case:publish-confluence  # Publish to Confluence
-   /use-case:quick-start         # Quick start guide
+   ```bash
+   ai-use-case sync                  # Sync to hub
+   ai-use-case search "authentication"  # Search use cases
+   ai-use-case list                  # List all projects
+   ai-use-case stats                 # View statistics
    ```
 
-### Available Slash Commands
+### Standalone CLI Commands
 
 | Command | Description |
 |---------|-------------|
-| `/use-case:setup-project` | Setup current project for AI use case tracking |
-| `/use-case:document-session` | Automatically document AI-assisted session |
+| `ai-use-case --init` | Setup current project for AI use case tracking |
+| `ai-use-case sync` | Sync use cases from project to hub |
+| `ai-use-case search <term>` | Search documented use cases by keyword |
+| `ai-use-case list` | List all registered projects |
+| `ai-use-case stats` | View use case statistics |
+| `ai-use-case view` | Open hub directory in file explorer |
+| `ai-use-case push` | Push hub changes to remote repository |
+| `ai-use-case publish-confluence` | Publish use case to Confluence |
+| `ai-use-case uninstall` | Uninstall the CLI tool |
+| `ai-use-case --version` | Show version information |
+| `ai-use-case --help` | Show help message |
+
+**Project Registry Commands (v3.1.0+):**
+
+| Command | Description |
+|---------|-------------|
+| `ai-use-case list-projects` | List registered projects with versions |
+| `ai-use-case check-updates` | Check which projects need CLI updates |
+| `ai-use-case update-project <path>` | Update project to latest CLI version |
+
+### Claude Code Slash Commands
+
+For AI-assisted documentation with automatic context capture:
+
+| Command | Description |
+|---------|-------------|
+| `/use-case:document-session` | Automatically document AI-assisted session (recommended) |
+| `/use-case:setup-project` | Setup current project (alternative to `--init`) |
 | `/use-case:sync-usecases` | Sync use cases from project to hub |
 | `/use-case:search-usecases` | Search documented use cases by keyword |
 | `/use-case:publish-confluence` | Publish use case to Confluence |
 | `/use-case:quick-start` | Show quick start guide |
+| `/use-case:list-projects` | List registered projects with versions |
+| `/use-case:check-updates` | Check which projects need CLI updates |
+| `/use-case:update-project` | Update a project to latest CLI version |
 
 ### Direct Script Access (Advanced)
 
@@ -298,22 +332,23 @@ Use cases should capture:
 
 See the [template](https://github.com/mt-osiris-tools/ai-use-case-hub/blob/main/TEMPLATE.md) for full structure.
 
-## Migration from v2.x to v3.x
+## Migration Guide
 
-### What Changed
+### v3.1.0 - Standalone Commands Restored
 
-v3.0.0 removes standalone CLI commands in favor of Claude Code slash commands for better integration and automatic documentation.
+**Good news!** v3.1.0 restores all standalone CLI commands while keeping Claude Code integration. No migration needed if you're upgrading from v2.x - your old commands still work!
 
-**Before (v2.x):**
+**Available in v3.1.0:**
 ```bash
-ai-use-case document
+# All v2.x commands work again:
+ai-use-case --init
 ai-use-case sync
 ai-use-case search authentication
 ```
 
-**After (v3.x) - In Claude Code:**
+**Plus Claude Code integration (optional):**
 ```
-/use-case:document-session
+/use-case:document-session    # Automatic documentation with AI context
 /use-case:sync-usecases
 /use-case:search-usecases
 ```
@@ -325,23 +360,29 @@ bash ~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh
 bash ~/.local/share/ai-use-case-cli/search-use-cases.sh authentication
 ```
 
-### Why This Change?
+### v3.0.0 Note
 
-- **Better Context Awareness**: Claude Code has full conversation history
-- **Automatic Documentation**: No manual data entry required
-- **Seamless Integration**: Natural part of your AI-assisted workflow
-- **Smarter Capture**: Automatically extracts git stats, code changes, and insights
+v3.0.0 briefly removed standalone commands. If you're on v3.0.0, upgrade to v3.1.0 to get them back!
+
+### Why v3.1.0 is Best of Both Worlds
+
+- ✅ **Standalone commands**: Fast, scriptable, works anywhere
+- ✅ **Claude Code integration**: Automatic context capture for documentation
+- ✅ **Flexibility**: Choose the interface that fits your workflow
+- ✅ **Project registry**: Track all projects using the CLI
 
 ### Checking Your Version
 
 ```bash
 ai-use-case --version
-# Output: ai-use-case version 3.0.0
+# Output: ai-use-case version 3.1.0
 ```
 
-If you see v2.x, update using:
+To update:
 ```bash
 cd ~/.local/share/ai-use-case-cli && git pull
+# OR: Simply re-run the install script
+curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/install.sh | bash
 ```
 
 ## Uninstall

@@ -1,16 +1,9 @@
 #!/bin/bash
 # AI Use Case - CLI Tool
 #
-# IMPORTANT: This CLI is deprecated in v3.0.0+
-# Please use Claude Code slash commands instead
-#
-# Available slash commands:
-#   /use-case:setup-project      - Setup current project
-#   /use-case:document-session   - Document an AI session
-#   /use-case:sync-usecases      - Sync use cases to hub
-#   /use-case:search-usecases    - Search use cases
-#   /use-case:publish-confluence - Publish to Confluence
-#   /use-case:quick-start        - Quick start guide
+# Hybrid CLI and Claude Code integration for AI use case documentation
+# - Standalone commands for utility operations
+# - Claude Code slash commands for AI-context-aware operations
 
 set -e
 
@@ -25,70 +18,64 @@ NC=$'\033[0m'
 # Version
 VERSION="3.1.0"
 
-# Show deprecation notice
-show_deprecation() {
-    cat <<EOF
-${YELLOW}╭────────────────────────────────────────────────────────────╮${NC}
-${YELLOW}│${NC}  ${RED}⚠ DEPRECATION NOTICE${NC}                                   ${YELLOW}│${NC}
-${YELLOW}│${NC}                                                            ${YELLOW}│${NC}
-${YELLOW}│${NC}  Standalone CLI commands have been removed in v3.0.0      ${YELLOW}│${NC}
-${YELLOW}│${NC}                                                            ${YELLOW}│${NC}
-${YELLOW}│${NC}  ${BLUE}Please use Claude Code slash commands instead:${NC}        ${YELLOW}│${NC}
-${YELLOW}│${NC}                                                            ${YELLOW}│${NC}
-${YELLOW}│${NC}  ${GREEN}/use-case:setup-project${NC}      - Setup project           ${YELLOW}│${NC}
-${YELLOW}│${NC}  ${GREEN}/use-case:document-session${NC}   - Document AI session    ${YELLOW}│${NC}
-${YELLOW}│${NC}  ${GREEN}/use-case:sync-usecases${NC}      - Sync to hub            ${YELLOW}│${NC}
-${YELLOW}│${NC}  ${GREEN}/use-case:search-usecases${NC}    - Search use cases       ${YELLOW}│${NC}
-${YELLOW}│${NC}  ${GREEN}/use-case:publish-confluence${NC} - Publish to Confluence  ${YELLOW}│${NC}
-${YELLOW}│${NC}  ${GREEN}/use-case:quick-start${NC}        - Quick start guide      ${YELLOW}│${NC}
-${YELLOW}│${NC}                                                            ${YELLOW}│${NC}
-${YELLOW}│${NC}  ${CYAN}More info:${NC} https://github.com/mt-osiris-tools/         ${YELLOW}│${NC}
-${YELLOW}│${NC}             ai-use-case-cli                                ${YELLOW}│${NC}
-${YELLOW}╰────────────────────────────────────────────────────────────╯${NC}
+# Get script directory (resolve symlinks)
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+if [ -L "$SCRIPT_PATH" ]; then
+    SCRIPT_PATH="$(readlink -f "$SCRIPT_PATH")"
+fi
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 
-EOF
-}
-
-# Show help (updated for v3)
+# Show help
 show_help() {
-    show_deprecation
     cat <<EOF
-${BLUE}ai-use-case v${VERSION}${NC}
+${BLUE}╭────────────────────────────────────────────────────────────╮${NC}
+${BLUE}│${NC} ${GREEN}AI Use Case CLI${NC} v${VERSION}                                ${BLUE}│${NC}
+${BLUE}│${NC} Document AI workflows, build knowledge                 ${BLUE}│${NC}
+${BLUE}╰────────────────────────────────────────────────────────────╯${NC}
 
-${YELLOW}This tool is now designed to work exclusively with Claude Code.${NC}
+${YELLOW}USAGE${NC}
+  ai-use-case <command> [options]
 
-${YELLOW}Installation Status:${NC}
-  Scripts location: $(dirname "$0")
-  Version: $VERSION
+${YELLOW}COMMANDS${NC}
+  ${GREEN}--init, init${NC}              Setup current project for use case tracking
+  ${GREEN}sync${NC}                      Sync use cases from project to hub
+  ${GREEN}search <term>${NC}             Search documented use cases
+  ${GREEN}list${NC}                      List all registered projects
+  ${GREEN}stats${NC}                     View use case statistics
+  ${GREEN}view${NC}                      Open hub directory in file explorer
+  ${GREEN}push${NC}                      Push hub changes to remote repository
+  ${GREEN}publish-confluence${NC}        Publish use case to Confluence
+  ${GREEN}uninstall${NC}                 Uninstall the CLI tool
+  ${GREEN}--version, -v, version${NC}    Show version information
+  ${GREEN}--help, -h, help${NC}          Show this help message
 
-${YELLOW}Available Slash Commands in Claude Code:${NC}
-  ${GREEN}/use-case:setup-project${NC}      Setup current project
-  ${GREEN}/use-case:document-session${NC}   Document AI-assisted session
-  ${GREEN}/use-case:sync-usecases${NC}      Sync use cases to hub
-  ${GREEN}/use-case:search-usecases${NC}    Search documented use cases
-  ${GREEN}/use-case:publish-confluence${NC} Publish to Confluence
+${YELLOW}CLAUDE CODE INTEGRATION${NC}
+  For AI-assisted documentation with automatic context capture:
+  ${GREEN}/use-case:document-session${NC}   Document AI session (automatic)
+  ${GREEN}/use-case:setup-project${NC}      Setup project (alternative to --init)
+  ${GREEN}/use-case:sync-usecases${NC}      Sync to hub (alternative to sync)
+  ${GREEN}/use-case:search-usecases${NC}    Search (alternative to search)
+  ${GREEN}/use-case:publish-confluence${NC} Publish (alternative)
   ${GREEN}/use-case:quick-start${NC}        Quick start guide
 
-${YELLOW}Direct Script Access (Advanced):${NC}
-If you need to call scripts directly, they are available at:
-  $(dirname "$0")/setup-project.sh
-  $(dirname "$0")/document-ai-session.sh
-  $(dirname "$0")/sync-ai-use-cases.sh
-  $(dirname "$0")/search-use-cases.sh
-  $(dirname "$0")/stats-use-cases.sh
-  $(dirname "$0")/list-projects.sh
-  $(dirname "$0")/view-hub.sh
-  $(dirname "$0")/push-hub.sh
-  $(dirname "$0")/publish-confluence.sh
+${YELLOW}EXAMPLES${NC}
+  ai-use-case --init              # Setup current project
+  ai-use-case sync                # Sync use cases to hub
+  ai-use-case search "auth"       # Search for auth-related use cases
+  ai-use-case list                # List all projects
+  ai-use-case stats               # View statistics
 
-${YELLOW}Why This Change?${NC}
-v3.0.0 focuses on integration with Claude Code for a more seamless
-AI-assisted development workflow. The slash command interface provides
-better context awareness and automatic documentation generation.
+${YELLOW}PROJECT REGISTRY (v3.1.0+)${NC}
+  ${GREEN}list-projects${NC}             List registered projects with versions
+  ${GREEN}check-updates${NC}             Check which projects need CLI updates
+  ${GREEN}update-project <path>${NC}     Update project to latest CLI version
 
-${YELLOW}Need Help?${NC}
-  GitHub: https://github.com/mt-osiris-tools/ai-use-case-cli
-  Issues: https://github.com/mt-osiris-tools/ai-use-case-cli/issues
+${YELLOW}ENVIRONMENT${NC}
+  AI_USECASES_DIR      Hub directory (default: ~/Documents/ai-use-case-hub)
+
+${YELLOW}MORE INFO${NC}
+  GitHub: ${CYAN}https://github.com/mt-osiris-tools/ai-use-case-cli${NC}
+  Issues: ${CYAN}https://github.com/mt-osiris-tools/ai-use-case-cli/issues${NC}
 
 EOF
 }
@@ -105,21 +92,139 @@ case "${1:-}" in
         ;;
     version)
         echo "${BLUE}ai-use-case${NC} version ${GREEN}$VERSION${NC}"
-        echo ""
-        echo "${YELLOW}Note:${NC} Standalone commands removed in v3.0.0"
-        echo "Please use Claude Code slash commands instead"
-        echo ""
-        echo "Run ${CYAN}ai-use-case --help${NC} for more information"
         exit 0
         ;;
+    --init|init)
+        echo -e "${BLUE}Setting up project...${NC}"
+        if [ -f "$SCRIPT_DIR/setup-project.sh" ]; then
+            bash "$SCRIPT_DIR/setup-project.sh" .
+        else
+            echo -e "${RED}Error: setup-project.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    sync)
+        echo -e "${BLUE}Syncing use cases to hub...${NC}"
+        if [ -f "$SCRIPT_DIR/sync-ai-use-cases.sh" ]; then
+            bash "$SCRIPT_DIR/sync-ai-use-cases.sh" .
+        else
+            echo -e "${RED}Error: sync-ai-use-cases.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    search)
+        if [ -z "${2:-}" ]; then
+            echo -e "${RED}Error: Search term required${NC}"
+            echo "Usage: ai-use-case search <term>"
+            exit 1
+        fi
+        if [ -f "$SCRIPT_DIR/search-use-cases.sh" ]; then
+            bash "$SCRIPT_DIR/search-use-cases.sh" "$2"
+        else
+            echo -e "${RED}Error: search-use-cases.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    list)
+        if [ -f "$SCRIPT_DIR/list-projects.sh" ]; then
+            bash "$SCRIPT_DIR/list-projects.sh"
+        else
+            echo -e "${RED}Error: list-projects.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    stats)
+        if [ -f "$SCRIPT_DIR/stats-use-cases.sh" ]; then
+            bash "$SCRIPT_DIR/stats-use-cases.sh"
+        else
+            echo -e "${RED}Error: stats-use-cases.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    view)
+        if [ -f "$SCRIPT_DIR/view-hub.sh" ]; then
+            bash "$SCRIPT_DIR/view-hub.sh"
+        else
+            echo -e "${RED}Error: view-hub.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    push)
+        if [ -f "$SCRIPT_DIR/push-hub.sh" ]; then
+            bash "$SCRIPT_DIR/push-hub.sh"
+        else
+            echo -e "${RED}Error: push-hub.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    publish-confluence)
+        if [ -f "$SCRIPT_DIR/publish-confluence.sh" ]; then
+            bash "$SCRIPT_DIR/publish-confluence.sh" "${2:-}"
+        else
+            echo -e "${RED}Error: publish-confluence.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    list-projects)
+        if [ -f "$SCRIPT_DIR/list-projects.sh" ]; then
+            bash "$SCRIPT_DIR/list-projects.sh" "${2:-}"
+        else
+            echo -e "${RED}Error: list-projects.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    check-updates)
+        if [ -f "$SCRIPT_DIR/check-updates.sh" ]; then
+            bash "$SCRIPT_DIR/check-updates.sh" "${2:-}"
+        else
+            echo -e "${RED}Error: check-updates.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    update-project)
+        if [ -z "${2:-}" ]; then
+            echo -e "${RED}Error: Project path required${NC}"
+            echo "Usage: ai-use-case update-project <path>"
+            exit 1
+        fi
+        if [ -f "$SCRIPT_DIR/update-project.sh" ]; then
+            bash "$SCRIPT_DIR/update-project.sh" "$2"
+        else
+            echo -e "${RED}Error: update-project.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    uninstall)
+        if [ -f "$SCRIPT_DIR/uninstall.sh" ]; then
+            bash "$SCRIPT_DIR/uninstall.sh"
+        else
+            echo -e "${RED}Error: uninstall.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    document)
+        # Document command removed in v3.0.0 - now uses Claude Code
+        cat <<EOF
+${YELLOW}╭────────────────────────────────────────────────────────────╮${NC}
+${YELLOW}│${NC}  ${RED}⚠ COMMAND CHANGED${NC}                                      ${YELLOW}│${NC}
+${YELLOW}│${NC}                                                            ${YELLOW}│${NC}
+${YELLOW}│${NC}  The 'document' command now requires Claude Code for     ${YELLOW}│${NC}
+${YELLOW}│${NC}  automatic context capture and documentation generation. ${YELLOW}│${NC}
+${YELLOW}│${NC}                                                            ${YELLOW}│${NC}
+${YELLOW}│${NC}  ${BLUE}Please use:${NC}                                            ${YELLOW}│${NC}
+${YELLOW}│${NC}  ${GREEN}/use-case:document-session${NC}                            ${YELLOW}│${NC}
+${YELLOW}│${NC}                                                            ${YELLOW}│${NC}
+${YELLOW}│${NC}  This provides better AI-assisted documentation with     ${YELLOW}│${NC}
+${YELLOW}│${NC}  automatic git history analysis and context awareness.   ${YELLOW}│${NC}
+${YELLOW}╰────────────────────────────────────────────────────────────╯${NC}
+
+EOF
+        exit 1
+        ;;
     *)
-        show_deprecation
+        echo -e "${RED}Error: Unknown command '${1}'${NC}"
         echo ""
-        echo "${RED}Error: Standalone command '$1' is no longer supported${NC}"
-        echo ""
-        echo "Please use Claude Code slash commands instead."
-        echo "Run ${CYAN}ai-use-case --help${NC} for more information."
-        echo ""
+        echo "Run ${CYAN}ai-use-case --help${NC} for available commands"
         exit 1
         ;;
 esac
