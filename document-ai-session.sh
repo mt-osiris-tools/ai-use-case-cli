@@ -477,6 +477,22 @@ esac
 read -p "Time saved vs manual approach (hours): " TIME_SAVED
 TIME_SAVED=${TIME_SAVED:-2}
 
+# AI Interaction Metrics
+echo ""
+echo -e "${CYAN}AI Interaction Metrics:${NC}"
+read -p "Total interactions (back-and-forth exchanges): " TOTAL_INTERACTIONS
+TOTAL_INTERACTIONS=${TOTAL_INTERACTIONS:-10}
+read -p "User prompts/messages sent: " USER_PROMPTS
+USER_PROMPTS=${USER_PROMPTS:-${TOTAL_INTERACTIONS}}
+read -p "Total tokens used (if known, or leave blank): " TOTAL_TOKENS
+TOTAL_TOKENS=${TOTAL_TOKENS:-""}
+read -p "Input tokens (if known, or leave blank): " INPUT_TOKENS
+INPUT_TOKENS=${INPUT_TOKENS:-""}
+read -p "Output tokens (if known, or leave blank): " OUTPUT_TOKENS
+OUTPUT_TOKENS=${OUTPUT_TOKENS:-""}
+read -p "Estimated cost in USD (e.g., 0.25 or leave blank): " ESTIMATED_COST
+ESTIMATED_COST=${ESTIMATED_COST:-""}
+
 # TL;DR
 echo ""
 echo -e "${CYAN}TL;DR Section:${NC}"
@@ -562,6 +578,61 @@ ${session_type_label}**Agent Used:** ${AI_TOOL}
 EOF
 }
 
+# Helper function to generate token metrics section
+generate_token_metrics() {
+    local context_type=$1  # "research" or "implementation"
+
+    cat <<EOF
+### Token Usage Summary
+EOF
+    if [ -n "$TOTAL_TOKENS" ]; then
+        cat <<EOF
+- **Total Tokens Used:** ${TOTAL_TOKENS} tokens
+EOF
+    else
+        cat <<EOF
+- **Total Tokens Used:** [Track in your AI tool] tokens
+EOF
+    fi
+    if [ -n "$INPUT_TOKENS" ] && [ -n "$OUTPUT_TOKENS" ]; then
+        if [ "$context_type" = "research" ]; then
+            cat <<EOF
+  - **Input Tokens:** ${INPUT_TOKENS} (questions, context, follow-ups)
+  - **Output Tokens:** ${OUTPUT_TOKENS} (AI explanations, comparisons, recommendations)
+EOF
+        else
+            cat <<EOF
+  - **Input Tokens:** ${INPUT_TOKENS} (prompt, context, code read)
+  - **Output Tokens:** ${OUTPUT_TOKENS} (AI responses, code generated)
+EOF
+        fi
+    else
+        if [ "$context_type" = "research" ]; then
+            cat <<EOF
+  - **Input Tokens:** [Track in your AI tool] (questions, context, follow-ups)
+  - **Output Tokens:** [Track in your AI tool] (AI explanations, comparisons, recommendations)
+EOF
+        else
+            cat <<EOF
+  - **Input Tokens:** [Track in your AI tool] (prompt, context, code read)
+  - **Output Tokens:** [Track in your AI tool] (AI responses, code generated)
+EOF
+        fi
+    fi
+    if [ -n "$ESTIMATED_COST" ]; then
+        cat <<EOF
+- **Estimated Cost:** ~\$${ESTIMATED_COST} (based on model pricing)
+EOF
+    else
+        cat <<EOF
+- **Estimated Cost:** ~\$[Calculate based on tokens] (based on model pricing)
+EOF
+    fi
+    cat <<EOF
+- **Model Used:** ${AI_TOOL}
+EOF
+}
+
 # Helper function to generate common footer
 generate_footer() {
     cat <<EOF
@@ -585,6 +656,23 @@ if [ "$SESSION_TYPE" = "research" ]; then
         cat <<EOF
 
 **Key Success:** Iterative query refinement led to actionable insights
+
+---
+
+## 🤖 AI Interaction Metrics
+
+### Research Engagement
+- **Total Interactions:** ${TOTAL_INTERACTIONS} back-and-forth exchanges between user and AI
+- **User Prompts:** ${USER_PROMPTS} total queries/questions from user
+- **AI Responses:** ~${USER_PROMPTS} total responses from AI
+
+EOF
+        generate_token_metrics "research"
+        cat <<EOF
+
+### Research Efficiency
+- **Questions Resolved:** ${QUERY_ITERATIONS}+ through iterative refinement
+- **Decision Confidence:** High/Medium/Low
 
 ---
 
@@ -729,6 +817,19 @@ else
 **Cost:** ~[tokens/cost] for complete workflow
 
 **Key Success:** [What made this particularly successful?]
+
+---
+
+## 🤖 AI Interaction Metrics
+
+### Engagement Level
+- **Total Interactions:** ${TOTAL_INTERACTIONS} back-and-forth exchanges between user and AI
+- **User Prompts:** ${USER_PROMPTS} total prompts/messages from user
+- **AI Responses:** ~${USER_PROMPTS} total responses from AI
+
+EOF
+        generate_token_metrics "implementation"
+        cat <<EOF
 
 ---
 
