@@ -36,14 +36,14 @@ gh pr create --title "..." --body "..."
 
 When adding features or fixing bugs:
 
-1. **Update version** in `ai-use-case` (line 73):
+1. **Update version** in `ai-use-case` (line 26):
    - MAJOR: Breaking changes (X.0.0)
    - MINOR: New features (0.X.0)
    - PATCH: Bug fixes (0.0.X)
 
 2. **Update CHANGELOG.md**: Add entry under appropriate version section
 
-3. **Test**: Run `./ai-use-case --version` and `./ai-use-case version`
+3. **Test**: Run `./ai-use-case --version`
 
 See [docs/VERSION-MANAGEMENT.md](docs/VERSION-MANAGEMENT.md) for complete guide.
 
@@ -61,23 +61,39 @@ Before creating any PR:
 
 ## Key Commands
 
+**v3.0.0+: Use Claude Code slash commands instead of standalone CLI**
+
+```
+/use-case:setup-project      # Setup project
+/use-case:document-session   # Document AI session (automatic)
+/use-case:sync-usecases      # Sync to hub
+/use-case:search-usecases    # Search use cases
+/use-case:publish-confluence # Publish to Confluence
+/use-case:quick-start        # Quick start guide
+```
+
+**Direct script access (advanced):**
 ```bash
-ai-use-case --init          # Setup project
-ai-use-case document        # Document AI session (interactive)
-ai-use-case sync            # Sync to hub (auto-commits/pushes)
-ai-use-case update          # Update CLI to latest version
-ai-use-case version         # Detailed version info with update check
-ai-use-case --version       # Quick version number
-ai-use-case search <term>   # Search use cases
-ai-use-case stats           # Show statistics
+bash ~/.local/share/ai-use-case-cli/setup-project.sh .
+bash ~/.local/share/ai-use-case-cli/document-ai-session.sh .
+bash ~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh .
+bash ~/.local/share/ai-use-case-cli/search-use-cases.sh <term>
+bash ~/.local/share/ai-use-case-cli/stats-use-cases.sh
 ```
 
 ## File Structure
 
-- `ai-use-case` - Main CLI entry point (version on line 73)
+- `ai-use-case` - Shows deprecation notice (version on line 26)
 - `setup-project.sh` - Project setup script
 - `sync-ai-use-cases.sh` - Hub synchronization
 - `document-ai-session.sh` - Interactive documentation
+- `search-use-cases.sh` - Search functionality
+- `stats-use-cases.sh` - Statistics display
+- `list-projects.sh` - Project listing
+- `view-hub.sh` - Hub viewer
+- `push-hub.sh` - Hub push automation
+- `publish-confluence.sh` - Confluence publishing
+- `.claude/commands/use-case/` - Slash commands for Claude Code
 - `git-hooks/` - Hook templates (pre-commit, post-commit)
 - `docs/` - Detailed documentation
   - `CLAUDE.md` - Comprehensive guide
@@ -86,7 +102,7 @@ ai-use-case stats           # Show statistics
 
 ## Automatic Documentation (Claude Code)
 
-When `/use-case/document-session` is invoked:
+When `/use-case:document-session` is invoked:
 
 1. **Analyze git history** (parallel):
    ```bash
@@ -110,10 +126,10 @@ When `/use-case/document-session` is invoked:
    # Create file: docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_description.md
    git add docs/ai-use-cases/...
    git commit -m "docs: AI session documentation"
-   ai-use-case sync
+   bash ~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh .
    ```
 
-See [docs/CLAUDE.md:112-299](docs/CLAUDE.md) for complete automatic documentation workflow.
+See [docs/CLAUDE.md](docs/CLAUDE.md) and [.claude/commands/use-case/document-session.md](.claude/commands/use-case/document-session.md) for complete automatic documentation workflow.
 
 ## Common Patterns
 
@@ -127,8 +143,8 @@ git checkout -b feature/new-command
 # - Edit ai-use-case script
 # - Test locally
 
-# 3. Update version (e.g., 2.3.0 -> 2.4.0)
-# - Edit ai-use-case line 73
+# 3. Update version (e.g., 3.0.0 -> 3.1.0)
+# - Edit ai-use-case line 26
 # - Update CHANGELOG.md
 
 # 4. Commit and PR

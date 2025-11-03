@@ -6,10 +6,21 @@ You are helping the user search through their documented AI use cases to find re
 
 Help the user search, filter, and analyze their AI use case documentation across all projects.
 
+## Quick Search
+
+Use the search script for simple keyword searches:
+```bash
+bash ~/.local/share/ai-use-case-cli/search-use-cases.sh <search-term>
+```
+
 ## Available Search Methods
 
 ### 1. Search by Topic/Keyword
 ```bash
+# Use the search script (recommended)
+bash ~/.local/share/ai-use-case-cli/search-use-cases.sh authentication
+
+# Or search manually:
 # Search filenames
 find ~/Documents/ai-use-case-hub/by-project -name "*keyword*" -type f
 

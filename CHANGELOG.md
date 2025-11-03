@@ -7,6 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2025-11-02
+
+### 🚨 BREAKING CHANGES
+
+- **Removed standalone CLI commands**: The tool now exclusively uses Claude Code slash commands
+  - Removed: `ai-use-case document`, `ai-use-case sync`, `ai-use-case init`, etc.
+  - Use instead: `/use-case:document-session`, `/use-case:sync-usecases`, `/use-case:setup-project`, etc.
+  - The `ai-use-case` command now shows a deprecation notice and available slash commands
+  - Direct script access still available for advanced users (see `ai-use-case --help`)
+
+### Added
+
+- **New shell scripts** for direct access to functionality:
+  - `search-use-cases.sh` - Search use cases by keyword
+  - `stats-use-cases.sh` - Show statistics about use cases
+  - `list-projects.sh` - List all projects with use cases
+  - `view-hub.sh` - Open hub directory in file explorer
+  - `push-hub.sh` - Commit and push hub changes
+- **Updated slash commands** to call scripts directly instead of CLI commands
+- **Comprehensive deprecation notice** explaining the migration to slash commands
+
+### Changed
+
+- Simplified `ai-use-case` to only show help, version, and deprecation notices
+- Updated all slash command documentation to reference scripts directly
+- Improved integration with Claude Code workflow
+
+### Migration Guide
+
+**Before (v2.x):**
+```bash
+ai-use-case document
+ai-use-case sync
+ai-use-case search authentication
+```
+
+**After (v3.x) - Use in Claude Code:**
+```
+/use-case:document-session
+/use-case:sync-usecases
+/use-case:search-usecases
+```
+
+For advanced users who need direct script access:
+```bash
+bash ~/.local/share/ai-use-case-cli/document-ai-session.sh
+bash ~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh
+bash ~/.local/share/ai-use-case-cli/search-use-cases.sh authentication
+```
+
 ## [2.5.0] - 2025-11-02
 
 ### Added
