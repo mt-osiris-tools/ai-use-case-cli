@@ -103,7 +103,7 @@ Skip git commands if no commits exist.
 
 **For Implementation Sessions:**
 
-- **Date**: Use today's date in YYYY-MM-DD format
+- **Date**: Use today's date in YYYY-Www-MM-DD format (calculate ISO 8601 week number)
 - **Ticket/Issue**: Extract from commit messages (e.g., HUB-001, PROJ-1234) or infer logical next number
 - **Brief description**: Summarize main work from commit messages and conversation
 - **AI Tool Used**: "Claude Code (Sonnet 4.5)"
@@ -130,8 +130,10 @@ Skip git commands if no commits exist.
 Create a comprehensive markdown file:
 
 **Filename Format:**
-- Implementation: `docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_brief-description-slug.md`
-- Research: `docs/ai-use-cases/YYYY-MM-DD_RESEARCH-XXX_brief-description-slug.md`
+- Implementation: `docs/ai-use-cases/YYYY-Www-MM-DD_TICKET-XXX_brief-description-slug.md`
+- Research: `docs/ai-use-cases/YYYY-Www-MM-DD_RESEARCH-XXX_brief-description-slug.md`
+
+Where `Www` is the ISO 8601 week number (calculate using: `date +%V` or `date +%G-W%V` format)
 
 **Content Requirements for Implementation Sessions:**
 - ✅ All sections filled with real data (NO "TODO" or placeholders)
@@ -159,8 +161,8 @@ Create a comprehensive markdown file:
 **For Implementation Sessions:**
 Commit the documentation along with code changes and sync to hub:
 ```bash
-git add docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_brief-description-slug.md
-git commit -m "docs: AI session YYYY-MM-DD - TICKET-XXX - Brief description
+git add docs/ai-use-cases/YYYY-Www-MM-DD_TICKET-XXX_brief-description-slug.md
+git commit -m "docs: AI session YYYY-Www-MM-DD - TICKET-XXX - Brief description
 
 [Additional details about what was documented...]
 
@@ -196,7 +198,7 @@ After completion, inform the user:
 ```
 ✅ Documentation created and synced!
 
-File: docs/ai-use-cases/2025-10-14_HUB-002_update-github-organization-references.md
+File: docs/ai-use-cases/2025-W42-10-14_HUB-002_update-github-organization-references.md
 
 Summary:
 - 5 files updated
