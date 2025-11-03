@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.0] - 2025-11-02
+
+### Added
+- **Update command**: New `ai-use-case update` command for simplified CLI updates
+  - Automatically checks for and installs the latest version from GitHub
+  - Shows current vs. latest version comparison
+  - Displays recent changes from CHANGELOG before updating
+  - Supports `--check` flag to only check for updates without installing
+  - Supports `--yes` flag to skip confirmation prompt (useful for automation)
+  - Validates git installation and checks for local modifications
+  - Clears version check cache after successful update
+  - Provides clear error messages and fallback to manual update instructions
+  - Replaces manual `cd ~/.local/share/ai-use-case-cli && git pull` process
+
 ## [2.4.0] - 2025-11-02
 
 ### Added
