@@ -123,12 +123,6 @@ Test your changes thoroughly:
 ./setup-project.sh /tmp/test-project
 ./sync-ai-use-cases.sh /tmp/test-project
 ./document-ai-session.sh /tmp/test-project
-
-# Test VS Code extension
-cd vscode-extension
-npm install
-npm run compile
-# Press F5 in VS Code to test
 ```
 
 #### Documentation Updates
