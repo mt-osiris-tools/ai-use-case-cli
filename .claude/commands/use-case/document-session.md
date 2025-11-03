@@ -125,9 +125,29 @@ Skip git commands if no commits exist.
 - **Final Decision**: Recommended approach and rationale
 - **Complexity**: Assess from conversation depth (Low: simple Q&A, Medium: multiple approaches, High: architectural decisions)
 
-### Step 6: Generate Complete Documentation
+### Step 6: Read the Template
 
-Create a comprehensive markdown file:
+**IMPORTANT**: Before generating documentation, read the appropriate template from the CLI project:
+
+**For Implementation Sessions:**
+```bash
+cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE.md
+```
+
+**For Research Sessions:**
+```bash
+cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE-RESEARCH.md
+```
+
+Use the Read tool to read the template file. This is your source of truth for:
+- All sections that must be included
+- Exact formatting and structure
+- Order of sections
+- What information goes in each section
+
+### Step 7: Generate Complete Documentation
+
+Create a comprehensive markdown file **following the template structure exactly**:
 
 **Filename Format:**
 - Implementation: `docs/ai-use-cases/YYYY-Www-MM-DD_TICKET-XXX_brief-description-slug.md`
@@ -154,9 +174,9 @@ Where `Www` is the ISO 8601 week number (calculate using: `date +%V` to get week
 - ✅ Professional formatting and completeness
 - ✅ Use 🔬 icon in title (not 🎯)
 
-**Use the Write tool** to create the file with full content.
+**Use the Write tool** to create the file with full content based on the template.
 
-### Step 7: Commit and Sync
+### Step 8: Commit and Sync
 
 **For Implementation Sessions:**
 Commit the documentation along with code changes and sync to hub:

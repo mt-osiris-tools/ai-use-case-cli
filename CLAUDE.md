@@ -149,7 +149,7 @@ When `/use-case:document-session` is invoked:
    - Extract data from commits and conversation context
    - Use git stats for metrics (files, lines, commits)
    - NO placeholders or TODOs
-   - Follow template from hub repository
+   - Follow template from CLI docs/ directory (TEMPLATE.md or TEMPLATE-RESEARCH.md)
 
 3. **Detect session type**:
    - Implementation: Has code changes/commits
@@ -303,7 +303,7 @@ export AI_USECASES_DIR="$HOME/Documents/ai-use-case-hub"
 - **[docs/VERSION-MANAGEMENT.md](docs/VERSION-MANAGEMENT.md)** - Version bump process
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
 - **[README.md](README.md)** - User-facing documentation
-- **[Hub Repository](https://github.com/mt-osiris-tools/ai-use-case-hub)** - Documentation templates
+- **[Hub Repository](https://github.com/mt-osiris-tools/ai-use-case-hub)** - Centralized documentation storage
 
 ## Quick Reference
 
