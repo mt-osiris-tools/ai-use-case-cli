@@ -65,6 +65,7 @@ Before creating any PR:
 ai-use-case --init          # Setup project
 ai-use-case document        # Document AI session (interactive)
 ai-use-case sync            # Sync to hub (auto-commits/pushes)
+ai-use-case update          # Update CLI to latest version
 ai-use-case version         # Detailed version info with update check
 ai-use-case --version       # Quick version number
 ai-use-case search <term>   # Search use cases

@@ -80,6 +80,8 @@ ai-use-case search <term>       # Search documented use cases
 ai-use-case view                # Open hub in file explorer
 ai-use-case list                # List all projects with use cases
 ai-use-case stats               # Show statistics
+ai-use-case update              # Update CLI to latest version
+ai-use-case version             # Show detailed version info with update check
 ai-use-case --help              # Show all commands
 ```
 
@@ -381,12 +383,25 @@ The CLI automatically checks for updates once every 24 hours. If a new version i
 
 ```
 ╭────────────────────────────────────────────────────╮
-│ Update available: v2.2.0 (current: v2.1.0)        │
-│ Run: cd ~/.local/share/ai-use-case-cli && git pull│
+│ Update available: v2.5.0 (current: v2.4.0)        │
+│ Run: ai-use-case update                           │
 ╰────────────────────────────────────────────────────╯
 ```
 
-To update manually:
+To update to the latest version:
+
+```bash
+ai-use-case update
+```
+
+The `update` command will:
+- Check for the latest version from GitHub
+- Show you recent changes from the CHANGELOG
+- Automatically install the update with confirmation
+- Support `--check` flag to only check without installing
+- Support `--yes` flag to skip confirmation (useful for automation)
+
+You can also update manually if needed:
 
 ```bash
 cd ~/.local/share/ai-use-case-cli
@@ -506,5 +521,5 @@ MIT License - see LICENSE file for details
 
 ---
 
-**Version**: 2.1.0
-**Last Updated**: 2025-10-14
+**Version**: 2.5.0
+**Last Updated**: 2025-11-02

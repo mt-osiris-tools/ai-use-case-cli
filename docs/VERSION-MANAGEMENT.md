@@ -162,10 +162,30 @@ The CLI automatically checks for updates once every 24 hours when commands are r
 - Provides update instructions
 - Caches check results to avoid excessive network requests
 
-Users can also manually check with:
+### Checking and Updating
+
+Users can check for updates with:
 
 ```bash
-ai-use-case version
+ai-use-case version        # Detailed version info with update check
 ```
 
-This command always performs a fresh check regardless of cache.
+To update to the latest version:
+
+```bash
+ai-use-case update         # Update CLI to latest version
+```
+
+The `update` command:
+- Checks for the latest version from GitHub
+- Shows recent changes from CHANGELOG
+- Automatically installs the update with confirmation
+- Supports `--check` flag to only check without installing
+- Supports `--yes` flag to skip confirmation (useful for automation)
+
+Manual update method (if needed):
+
+```bash
+cd ~/.local/share/ai-use-case-cli
+git pull
+```
