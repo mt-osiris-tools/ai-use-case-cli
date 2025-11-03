@@ -4,13 +4,19 @@ This file provides guidance to Claude Code (claude.com/code) when working with c
 
 ## Repository Purpose
 
-This repository contains the **CLI tools** for documenting AI-assisted development workflows across multiple software projects. These are the command-line utilities that work together with a separate documentation hub repository.
+This repository contains the **CLI tools** for documenting AI-assisted development workflows across multiple software projects, designed to help developers on a daily basis.
+
+**Main Goals:**
+- **Reduce cognitive overload**: Minimize the mental burden of documentation through guided, pre-built templates
+- **Build knowledge base**: Create a comprehensive, searchable repository of AI tool usage patterns and successful solutions
+- **Enable learning**: Help teams learn from past AI-assisted sessions and improve their AI interaction techniques
+- **Streamline workflow**: Quick, template-based documentation that integrates seamlessly with daily development
 
 **Architecture:**
 - **This repo (ai-use-case-cli)**: CLI tools, scripts, VS Code extension
 - **Hub repo (ai-use-case-hub)**: Central documentation storage with symlink-based organization
 
-The CLI tools in this repository provide commands for setting up projects, documenting AI sessions, syncing documentation, and searching use cases.
+The CLI tools in this repository provide commands for setting up projects, documenting AI sessions, syncing documentation, and searching use cases. By reducing the friction of documentation, we make it easy for teams to build valuable knowledge bases of their AI work.
 
 ## Installation for End Users
 
