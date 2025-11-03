@@ -19,22 +19,22 @@ CYAN=$'\033[0;36m'
 YELLOW=$'\033[1;33m'
 NC=$'\033[0m' # No Color
 
-# Function to get remote version
+# Function to get remote version from version.sh (single source of truth)
 get_remote_version() {
     local remote_version=""
     if command -v curl &> /dev/null; then
-        remote_version=$(curl -s -m 2 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+        remote_version=$(curl -s -m 2 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/version.sh 2>/dev/null | grep '^export CLI_VERSION=' | head -1 | cut -d'"' -f2)
     elif command -v wget &> /dev/null; then
-        remote_version=$(wget -qO- -T 2 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/ai-use-case 2>/dev/null | grep '^VERSION=' | head -1 | cut -d'"' -f2)
+        remote_version=$(wget -qO- -T 2 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/version.sh 2>/dev/null | grep '^export CLI_VERSION=' | head -1 | cut -d'"' -f2)
     fi
     echo "$remote_version"
 }
 
-# Function to get installed version
+# Function to get installed version from version.sh (single source of truth)
 get_installed_version() {
     local install_dir="$HOME/.local/share/ai-use-case-cli"
-    if [ -f "$install_dir/ai-use-case" ]; then
-        grep '^VERSION=' "$install_dir/ai-use-case" 2>/dev/null | head -1 | cut -d'"' -f2
+    if [ -f "$install_dir/version.sh" ]; then
+        (source "$install_dir/version.sh" && echo "$CLI_VERSION")
     else
         echo ""
     fi

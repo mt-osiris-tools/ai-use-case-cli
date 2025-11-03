@@ -15,15 +15,22 @@ RED=$'\033[0;31m'
 CYAN=$'\033[0;36m'
 NC=$'\033[0m'
 
-# Version
-VERSION="3.1.1"
-
 # Get script directory (resolve symlinks)
 SCRIPT_PATH="${BASH_SOURCE[0]}"
 if [ -L "$SCRIPT_PATH" ]; then
     SCRIPT_PATH="$(readlink -f "$SCRIPT_PATH")"
 fi
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+
+# Source version configuration (single source of truth)
+if [ -f "$SCRIPT_DIR/version.sh" ]; then
+    source "$SCRIPT_DIR/version.sh"
+    VERSION="$CLI_VERSION"
+else
+    # Fallback if version.sh is missing
+    echo "Warning: version.sh not found, using fallback version" >&2
+    VERSION="unknown"
+fi
 
 # Show help
 show_help() {
