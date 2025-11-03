@@ -66,8 +66,8 @@ cd ~/.local/share/ai-use-case-cli
    # With Claude Code (recommended for automatic capture):
    /use-case:document-session
 
-   # Standalone interactive mode:
-   ai-use-case document  # Redirects to Claude Code for best experience
+   # Via CLI (redirects to Claude Code):
+   ai-use-case document  # Shows helpful notice to use /use-case:document-session
    ```
 
 4. **Other operations**:
