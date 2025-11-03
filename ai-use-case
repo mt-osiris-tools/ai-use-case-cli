@@ -70,7 +70,7 @@ SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" && pwd)"
 HUB_DIR=$(ensure_hub_exists)
 
 # Show version
-VERSION="2.4.0"
+VERSION="2.5.0"
 
 # Version check cache
 VERSION_CHECK_FILE="$HOME/.cache/ai-use-case-version-check"
@@ -176,6 +176,7 @@ ${YELLOW}Commands:${NC}
   ${GREEN}list${NC}                      List all projects with use cases
   ${GREEN}stats${NC}                     Show statistics about documented use cases
   ${GREEN}version${NC}                   Show detailed version info and check for updates
+  ${GREEN}update${NC}                    Update CLI to the latest version
   ${GREEN}--help, -h${NC}                Show this help message
   ${GREEN}--version, -v${NC}             Show version number (quick)
 
@@ -196,6 +197,9 @@ ${YELLOW}Examples:${NC}
 
   # View statistics
   ai-use-case stats
+
+  # Update CLI to latest version
+  ai-use-case update
 
 ${YELLOW}Quick Start:${NC}
   1. Run 'ai-use-case --init' in your project
@@ -575,6 +579,184 @@ cmd_version_detailed() {
     echo -e "${YELLOW}Repository:${NC} https://github.com/mt-osiris-tools/ai-use-case-cli"
 }
 
+# Command: update
+cmd_update() {
+    local auto_yes=false
+    local check_only=false
+
+    # Parse flags
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --help|-h)
+                echo "Usage: ai-use-case update [OPTIONS]"
+                echo ""
+                echo "Update CLI to the latest version from GitHub"
+                echo ""
+                echo "Options:"
+                echo "  --check        Only check for updates, don't install"
+                echo "  --yes, -y      Skip confirmation prompt"
+                echo "  --help, -h     Show this help message"
+                echo ""
+                echo "Examples:"
+                echo "  ai-use-case update              # Interactive update"
+                echo "  ai-use-case update --check      # Check only"
+                echo "  ai-use-case update --yes        # Auto-confirm"
+                exit 0
+                ;;
+            --yes|-y)
+                auto_yes=true
+                shift
+                ;;
+            --check)
+                check_only=true
+                shift
+                ;;
+            *)
+                echo -e "${RED}Error: Unknown option '$1'${NC}"
+                echo "Usage: ai-use-case update [--check] [--yes]"
+                echo "Run 'ai-use-case update --help' for more information"
+                exit 1
+                ;;
+        esac
+    done
+
+    echo -e "${BLUE}=== AI Use Case CLI Update ===${NC}"
+    echo ""
+
+    # Check if we're in a git repository
+    if [ ! -d "$SCRIPT_DIR/.git" ]; then
+        echo -e "${RED}Error: CLI not installed via git${NC}"
+        echo "Cannot auto-update a non-git installation."
+        echo ""
+        echo "Please reinstall using:"
+        echo -e "  ${CYAN}curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/install.sh | bash${NC}"
+        exit 1
+    fi
+
+    # Check current version
+    echo -e "${CYAN}Current version:${NC} v$VERSION"
+    echo -e "${CYAN}Checking for updates...${NC}"
+    echo ""
+
+    # Fetch remote version (5 second timeout)
+    local remote_version=$(fetch_remote_version 5)
+
+    if [ -z "$remote_version" ]; then
+        echo -e "${RED}✗ Could not check for updates${NC}"
+        echo "Please check your internet connection and try again."
+        exit 1
+    fi
+
+    echo -e "${CYAN}Latest version:${NC} v$remote_version"
+    echo ""
+
+    # Compare versions
+    if ! compare_versions "$VERSION" "$remote_version"; then
+        echo -e "${GREEN}✓ You are already running the latest version${NC}"
+        exit 0
+    fi
+
+    echo -e "${YELLOW}⚠ Update available: v$VERSION → v$remote_version${NC}"
+    echo ""
+
+    # If check-only mode, exit here
+    if [ "$check_only" = true ]; then
+        echo "To update, run: ${CYAN}ai-use-case update${NC}"
+        exit 0
+    fi
+
+    # Show recent changes from CHANGELOG
+    if [ -f "$SCRIPT_DIR/CHANGELOG.md" ]; then
+        echo -e "${YELLOW}Recent Changes:${NC}"
+        echo ""
+
+        # Try to extract the latest version section from CHANGELOG
+        # This will show changes from the most recent release
+        awk '/^## \[.*\].*[0-9]{4}-[0-9]{2}-[0-9]{2}/ { if (count++ < 1) print; next } count == 1 && /^## / { exit } count == 1' "$SCRIPT_DIR/CHANGELOG.md" | head -20
+        echo ""
+    fi
+
+    # Prompt for confirmation unless --yes flag
+    if [ "$auto_yes" = false ]; then
+        read -p "Update now? (Y/n): " update_choice
+        update_choice=${update_choice:-y}
+
+        if [[ ! "$update_choice" =~ ^[Yy]$ ]]; then
+            echo -e "${YELLOW}Update cancelled${NC}"
+            exit 0
+        fi
+    fi
+
+    echo ""
+    echo -e "${CYAN}Updating CLI...${NC}"
+
+    # Save current directory
+    local original_dir="$(pwd)"
+
+    # Navigate to CLI directory
+    if ! cd "$SCRIPT_DIR" 2>/dev/null; then
+        echo -e "${RED}✗ Could not access CLI directory${NC}"
+        exit 1
+    fi
+
+    # Fetch latest changes
+    echo -e "${CYAN}Fetching latest changes...${NC}"
+    if ! git fetch origin main 2>&1; then
+        echo -e "${RED}✗ Failed to fetch updates${NC}"
+        echo "Please check your internet connection."
+        cd "$original_dir" 2>/dev/null || true
+        exit 1
+    fi
+
+    # Check for local modifications
+    if ! git diff --quiet || ! git diff --cached --quiet; then
+        echo -e "${YELLOW}⚠ Warning: Local modifications detected${NC}"
+        echo ""
+        git status --short
+        echo ""
+        echo "Please commit or stash your changes before updating."
+        cd "$original_dir" 2>/dev/null || true
+        exit 1
+    fi
+
+    # Perform update
+    echo -e "${CYAN}Pulling latest version...${NC}"
+    if git pull origin main; then
+        echo ""
+        echo -e "${GREEN}✓ Update completed successfully${NC}"
+
+        # Get new version
+        local new_version=$(grep '^VERSION=' "$SCRIPT_DIR/ai-use-case" 2>/dev/null | head -1 | cut -d'"' -f2)
+        if [ -n "$new_version" ]; then
+            echo -e "${GREEN}✓ Updated to version v$new_version${NC}"
+        fi
+
+        # Clear version check cache
+        rm -f "$VERSION_CHECK_FILE" 2>/dev/null || true
+
+        echo ""
+        echo -e "${BLUE}Verifying installation...${NC}"
+
+        # Make sure scripts are executable
+        chmod +x "$SCRIPT_DIR/ai-use-case" 2>/dev/null || true
+        chmod +x "$SCRIPT_DIR"/*.sh 2>/dev/null || true
+
+        echo -e "${GREEN}✓ Installation verified${NC}"
+        echo ""
+        echo -e "${YELLOW}Update complete!${NC} You can now use the latest features."
+    else
+        echo ""
+        echo -e "${RED}✗ Update failed${NC}"
+        echo "Please try manually:"
+        echo -e "  ${CYAN}cd $SCRIPT_DIR && git pull${NC}"
+        cd "$original_dir" 2>/dev/null || true
+        exit 1
+    fi
+
+    # Return to original directory
+    cd "$original_dir" 2>/dev/null || true
+}
+
 # Main command dispatcher
 main() {
     # Check for updates in background (non-blocking)
@@ -628,6 +810,10 @@ main() {
             ;;
         version)
             cmd_version_detailed
+            ;;
+        update)
+            shift
+            cmd_update "$@"
             ;;
         *)
             echo -e "${RED}Error: Unknown command '$1'${NC}"
