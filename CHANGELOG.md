@@ -10,23 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.4.0] - 2025-11-02
 
 ### Added
-- **Enhanced token and interaction metrics**: Significantly improved tracking capabilities in documentation templates
-  - Added comprehensive Token Usage Summary with input/output tokens and cache hits
-  - Added interaction tracking (total exchanges, user prompts, AI responses)
-  - Added average tokens per interaction calculation
+- **Enhanced documentation templates** (in hub repository):
+  - Added comprehensive Token Usage Summary section with input/output tokens and cache hits
   - Added detailed token breakdown tables by phase (analysis, implementation, testing, documentation)
   - Added interaction breakdown by phase with average tokens
   - Added ROI calculations for cost efficiency analysis
-  - Enhanced both TEMPLATE.md and TEMPLATE-RESEARCH.md in hub repository
-- **Interactive metrics collection**: document-ai-session.sh now prompts for:
-  - Total interactions count
-  - User prompts sent
-  - Token usage (input, output, total)
-  - Estimated costs
-  - Automatically integrates into generated documentation
+  - Enhanced both TEMPLATE.md and TEMPLATE-RESEARCH.md
+- **Interactive metrics collection** (in document-ai-session.sh):
+  - Added prompts for total interactions count
+  - Added prompts for user prompts/messages sent
+  - Added prompts for token usage (input, output, total) - optional fields
+  - Added prompts for estimated costs - optional field
+  - Automatically integrates collected metrics into generated documentation
 
 ### Changed
-- **Improved cost tracking**: Token usage tables now separate input/output/cache for better visibility
 - **Better metrics organization**: Moved token metrics earlier in templates for prominence
 
 ## [2.3.0] - 2025-11-01

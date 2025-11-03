@@ -578,6 +578,61 @@ ${session_type_label}**Agent Used:** ${AI_TOOL}
 EOF
 }
 
+# Helper function to generate token metrics section
+generate_token_metrics() {
+    local context_type=$1  # "research" or "implementation"
+
+    cat <<EOF
+### Token Usage Summary
+EOF
+    if [ -n "$TOTAL_TOKENS" ]; then
+        cat <<EOF
+- **Total Tokens Used:** ${TOTAL_TOKENS} tokens
+EOF
+    else
+        cat <<EOF
+- **Total Tokens Used:** [Track in your AI tool] tokens
+EOF
+    fi
+    if [ -n "$INPUT_TOKENS" ] && [ -n "$OUTPUT_TOKENS" ]; then
+        if [ "$context_type" = "research" ]; then
+            cat <<EOF
+  - **Input Tokens:** ${INPUT_TOKENS} (questions, context, follow-ups)
+  - **Output Tokens:** ${OUTPUT_TOKENS} (AI explanations, comparisons, recommendations)
+EOF
+        else
+            cat <<EOF
+  - **Input Tokens:** ${INPUT_TOKENS} (prompt, context, code read)
+  - **Output Tokens:** ${OUTPUT_TOKENS} (AI responses, code generated)
+EOF
+        fi
+    else
+        if [ "$context_type" = "research" ]; then
+            cat <<EOF
+  - **Input Tokens:** [Track in your AI tool] (questions, context, follow-ups)
+  - **Output Tokens:** [Track in your AI tool] (AI explanations, comparisons, recommendations)
+EOF
+        else
+            cat <<EOF
+  - **Input Tokens:** [Track in your AI tool] (prompt, context, code read)
+  - **Output Tokens:** [Track in your AI tool] (AI responses, code generated)
+EOF
+        fi
+    fi
+    if [ -n "$ESTIMATED_COST" ]; then
+        cat <<EOF
+- **Estimated Cost:** ~\$${ESTIMATED_COST} (based on model pricing)
+EOF
+    else
+        cat <<EOF
+- **Estimated Cost:** ~\$[Calculate based on tokens] (based on model pricing)
+EOF
+    fi
+    cat <<EOF
+- **Model Used:** ${AI_TOOL}
+EOF
+}
+
 # Helper function to generate common footer
 generate_footer() {
     cat <<EOF
@@ -611,39 +666,9 @@ if [ "$SESSION_TYPE" = "research" ]; then
 - **User Prompts:** ${USER_PROMPTS} total queries/questions from user
 - **AI Responses:** ~${USER_PROMPTS} total responses from AI
 
-### Token Usage Summary
 EOF
-        if [ -n "$TOTAL_TOKENS" ]; then
-            cat <<EOF
-- **Total Tokens Used:** ${TOTAL_TOKENS} tokens
-EOF
-        else
-            cat <<EOF
-- **Total Tokens Used:** [Track in your AI tool] tokens
-EOF
-        fi
-        if [ -n "$INPUT_TOKENS" ] && [ -n "$OUTPUT_TOKENS" ]; then
-            cat <<EOF
-  - **Input Tokens:** ${INPUT_TOKENS} (questions, context, follow-ups)
-  - **Output Tokens:** ${OUTPUT_TOKENS} (AI explanations, comparisons, recommendations)
-EOF
-        else
-            cat <<EOF
-  - **Input Tokens:** [Track in your AI tool] (questions, context, follow-ups)
-  - **Output Tokens:** [Track in your AI tool] (AI explanations, comparisons, recommendations)
-EOF
-        fi
-        if [ -n "$ESTIMATED_COST" ]; then
-            cat <<EOF
-- **Estimated Cost:** ~\$${ESTIMATED_COST} (based on model pricing)
-EOF
-        else
-            cat <<EOF
-- **Estimated Cost:** ~\$[Calculate based on tokens] (based on model pricing)
-EOF
-        fi
+        generate_token_metrics "research"
         cat <<EOF
-- **Model Used:** ${AI_TOOL}
 
 ### Research Efficiency
 - **Questions Resolved:** ${QUERY_ITERATIONS}+ through iterative refinement
@@ -802,39 +827,9 @@ else
 - **User Prompts:** ${USER_PROMPTS} total prompts/messages from user
 - **AI Responses:** ~${USER_PROMPTS} total responses from AI
 
-### Token Usage Summary
 EOF
-        if [ -n "$TOTAL_TOKENS" ]; then
-            cat <<EOF
-- **Total Tokens Used:** ${TOTAL_TOKENS} tokens
-EOF
-        else
-            cat <<EOF
-- **Total Tokens Used:** [Track in your AI tool] tokens
-EOF
-        fi
-        if [ -n "$INPUT_TOKENS" ] && [ -n "$OUTPUT_TOKENS" ]; then
-            cat <<EOF
-  - **Input Tokens:** ${INPUT_TOKENS} (prompt, context, code read)
-  - **Output Tokens:** ${OUTPUT_TOKENS} (AI responses, code generated)
-EOF
-        else
-            cat <<EOF
-  - **Input Tokens:** [Track in your AI tool] (prompt, context, code read)
-  - **Output Tokens:** [Track in your AI tool] (AI responses, code generated)
-EOF
-        fi
-        if [ -n "$ESTIMATED_COST" ]; then
-            cat <<EOF
-- **Estimated Cost:** ~\$${ESTIMATED_COST} (based on model pricing)
-EOF
-        else
-            cat <<EOF
-- **Estimated Cost:** ~\$[Calculate based on tokens] (based on model pricing)
-EOF
-        fi
+        generate_token_metrics "implementation"
         cat <<EOF
-- **Model Used:** ${AI_TOOL}
 
 ---
 
