@@ -313,3 +313,4 @@ export AI_USECASES_DIR="$HOME/Documents/ai-use-case-hub"
 **Main Branch**: `main` (protected, requires PRs)
 **Commit Style**: Conventional commits (feat:, fix:, docs:, etc.)
 **Documentation Updates**: Always verify if we need to update the documentation, README, CHANGELOG and all related documentation
+**Branching Policy**: Always create a new branch for any changes. Direct commits to the main branch are not allowed.
