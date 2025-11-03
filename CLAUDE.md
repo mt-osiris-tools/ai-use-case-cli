@@ -36,7 +36,7 @@ gh pr create --title "..." --body "..."
 
 When adding features or fixing bugs:
 
-1. **Update version** in `ai-use-case` (line 26):
+1. **Update version** in `ai-use-case` (line 19):
    - MAJOR: Breaking changes (X.0.0)
    - MINOR: New features (0.X.0)
    - PATCH: Bug fixes (0.0.X)
@@ -61,14 +61,36 @@ Before creating any PR:
 
 ## Key Commands
 
-**v3.0.0+: Use Claude Code slash commands instead of standalone CLI**
+**v3.1.0+: Hybrid approach - Standalone CLI + Claude Code integration**
 
+### Standalone CLI Commands
+```bash
+ai-use-case --init              # Setup current project
+ai-use-case sync                # Sync use cases to hub
+ai-use-case search <term>       # Search documented use cases
+ai-use-case list                # List all registered projects
+ai-use-case stats               # View statistics
+ai-use-case view                # Open hub in file explorer
+ai-use-case push                # Push hub changes to remote
+ai-use-case publish-confluence  # Publish to Confluence
+ai-use-case uninstall           # Uninstall the CLI
+ai-use-case --version           # Show version
+ai-use-case --help              # Show help
+
+# v3.1.0+ Project Registry Commands
+ai-use-case list-projects       # List registered projects with versions
+ai-use-case check-updates       # Check which projects need CLI updates
+ai-use-case update-project <path> # Update a project to latest CLI version
 ```
-/use-case:setup-project      # Setup project
-/use-case:document-session   # Document AI session (automatic)
-/use-case:sync-usecases      # Sync to hub
-/use-case:search-usecases    # Search use cases
-/use-case:publish-confluence # Publish to Confluence
+
+### Claude Code Slash Commands
+For AI-assisted documentation with automatic context capture:
+```
+/use-case:document-session   # Document AI session (automatic, AI-context aware)
+/use-case:setup-project      # Setup project (alternative to --init)
+/use-case:sync-usecases      # Sync to hub (alternative to sync)
+/use-case:search-usecases    # Search use cases (alternative to search)
+/use-case:publish-confluence # Publish to Confluence (alternative)
 /use-case:quick-start        # Quick start guide
 
 # v3.1.0+ Project Registry Commands
@@ -91,7 +113,7 @@ bash ~/.local/share/ai-use-case-cli/update-project.sh <path>
 
 ## File Structure
 
-- `ai-use-case` - Shows deprecation notice (version on line 26)
+- `ai-use-case` - Main CLI entry point with hybrid commands (version on line 19)
 - `setup-project.sh` - Project setup script (now includes registry)
 - `sync-ai-use-cases.sh` - Hub synchronization
 - `document-ai-session.sh` - Interactive documentation
@@ -214,7 +236,7 @@ git checkout -b feature/new-command
 # - Test locally
 
 # 3. Update version (e.g., 3.0.0 -> 3.1.0)
-# - Edit ai-use-case line 26
+# - Edit ai-use-case line 19
 # - Update CHANGELOG.md
 
 # 4. Commit and PR
@@ -285,8 +307,9 @@ export AI_USECASES_DIR="$HOME/Documents/ai-use-case-hub"
 
 ## Quick Reference
 
-**Current Version**: Check `ai-use-case` line 73
+**Current Version**: Check `ai-use-case` line 19
 **Latest Changes**: See `CHANGELOG.md`
 **Project Type**: Bash CLI tool with hub integration
 **Main Branch**: `main` (protected, requires PRs)
 **Commit Style**: Conventional commits (feat:, fix:, docs:, etc.)
+**Documentation Updates**: Always verify if we need to update the documentation, README, CHANGELOG and all related documentation
