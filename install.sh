@@ -49,14 +49,27 @@ echo ""
 echo -e "${CYAN}╭────────────────────────────────────────────────────────────╮${NC}"
 if [ -n "$REMOTE_VERSION" ]; then
     if [ -n "$INSTALLED_VERSION" ]; then
-        echo -e "${CYAN}│${NC} ${BLUE}AI Use Case CLI${NC} ${GREEN}v$REMOTE_VERSION${NC} ${YELLOW}(current: v$INSTALLED_VERSION)${NC}"
+        # Calculate padding for version line
+        VERSION_LINE="AI Use Case CLI v$REMOTE_VERSION (current: v$INSTALLED_VERSION)"
+        PADDING_NEEDED=$((58 - ${#VERSION_LINE}))
+        PADDING=$(printf '%*s' "$PADDING_NEEDED" '')
+        echo -e "${CYAN}│${NC} ${BLUE}AI Use Case CLI${NC} ${GREEN}v$REMOTE_VERSION${NC} ${YELLOW}(current: v$INSTALLED_VERSION)${NC}${PADDING} ${CYAN}│${NC}"
     else
-        echo -e "${CYAN}│${NC} ${BLUE}AI Use Case CLI${NC} ${GREEN}v$REMOTE_VERSION${NC}"
+        VERSION_LINE="AI Use Case CLI v$REMOTE_VERSION"
+        PADDING_NEEDED=$((58 - ${#VERSION_LINE}))
+        PADDING=$(printf '%*s' "$PADDING_NEEDED" '')
+        echo -e "${CYAN}│${NC} ${BLUE}AI Use Case CLI${NC} ${GREEN}v$REMOTE_VERSION${NC}${PADDING} ${CYAN}│${NC}"
     fi
 else
-    echo -e "${CYAN}│${NC} ${BLUE}AI Use Case CLI${NC} - Installation"
+    VERSION_LINE="AI Use Case CLI - Installation"
+    PADDING_NEEDED=$((58 - ${#VERSION_LINE}))
+    PADDING=$(printf '%*s' "$PADDING_NEEDED" '')
+    echo -e "${CYAN}│${NC} ${BLUE}AI Use Case CLI${NC} - Installation${PADDING} ${CYAN}│${NC}"
 fi
-echo -e "${CYAN}│${NC} Document AI-assisted development sessions"
+DESCR_LINE="Document AI-assisted development sessions"
+DESCR_PADDING=$((58 - ${#DESCR_LINE}))
+DESCR_PAD=$(printf '%*s' "$DESCR_PADDING" '')
+echo -e "${CYAN}│${NC} ${DESCR_LINE}${DESCR_PAD} ${CYAN}│${NC}"
 echo -e "${CYAN}╰────────────────────────────────────────────────────────────╯${NC}"
 echo ""
 
