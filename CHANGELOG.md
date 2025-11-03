@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- **VS Code Extension**: Removed `vscode-extension/` directory to simplify project scope
+  - Extension was at v2.2.0 and not actively maintained
+  - Claude Code slash commands (`/use-case:*`) provide better AI-context-aware documentation
+  - Simplifies version management and reduces maintenance burden
+  - Users should migrate to Claude Code slash commands for best experience
+
 ## [3.2.0] - 2025-11-03
 
 ### Added
