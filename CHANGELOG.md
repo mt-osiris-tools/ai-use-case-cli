@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Sync script version display**: Updated sync-ai-use-cases.sh version banner from v2.0 to v2.3.0 to match main CLI version
+
 ## [2.3.0] - 2025-11-01
 
 ### Added
