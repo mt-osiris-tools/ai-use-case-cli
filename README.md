@@ -67,7 +67,7 @@ Use **either** standalone CLI or Claude Code slash commands—whatever fits your
 | Task | CLI Command | Claude Code |
 |------|-------------|-------------|
 | Setup project | `ai-use-case --init` | `/use-case:setup-project` |
-| Document session | Use `/use-case:document-session` | `/use-case:document-session` |
+| Document session | N/A – use Claude Code | `/use-case:document-session` |
 | Sync to hub | `ai-use-case sync` | `/use-case:sync-usecases` |
 | Search use cases | `ai-use-case search <term>` | `/use-case:search-usecases` |
 | View statistics | `ai-use-case stats` | |
