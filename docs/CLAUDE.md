@@ -45,10 +45,13 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
   - `ai-use-case document` - Document an AI session
   - `ai-use-case sync` - Sync to hub (auto-commits and pushes)
   - `ai-use-case push` - Manually commit and push hub changes
+  - `ai-use-case publish-confluence` - Publish to Confluence
   - `ai-use-case search` - Search use cases
   - `ai-use-case stats` - Show statistics
   - `ai-use-case list` - List projects
   - `ai-use-case view` - Open hub in file explorer
+  - `ai-use-case update` - Update CLI to latest version
+  - `ai-use-case version` - Show detailed version info
 
 ### Shell Scripts
 
