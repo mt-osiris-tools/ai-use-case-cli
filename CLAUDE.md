@@ -310,6 +310,6 @@ export AI_USECASES_DIR="$HOME/Documents/ai-use-case-hub"
 **Current Version**: Check `ai-use-case` line 19
 **Latest Changes**: See `CHANGELOG.md`
 **Project Type**: Bash CLI tool with hub integration
-**Main Branch**: `main` (protected, requires PRs)
+**Main Branch**: `main` (protected, requires PRs – no direct commits allowed)
 **Commit Style**: Conventional commits (feat:, fix:, docs:, etc.)
 **Documentation Updates**: Always verify if we need to update the documentation, README, CHANGELOG and all related documentation
