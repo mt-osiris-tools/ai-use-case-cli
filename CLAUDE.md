@@ -4,7 +4,15 @@ Quick reference for AI assistants working with this repository. For comprehensiv
 
 ## Repository Purpose
 
-CLI tools for documenting AI-assisted development workflows. Works with a separate [hub repository](https://github.com/mt-osiris-tools/ai-use-case-hub) for centralized documentation storage.
+CLI tools for documenting AI-assisted development workflows, designed to help developers on a daily basis.
+
+**Main Goals:**
+- **Reduce cognitive overload**: Minimize the mental burden of documentation through guided templates
+- **Build knowledge base**: Create a comprehensive repository of AI tool usage patterns and solutions
+- **Enable learning**: Help teams learn from past AI-assisted sessions and improve over time
+- **Streamline workflow**: Quick, template-based documentation that integrates seamlessly with development
+
+Works with a separate [hub repository](https://github.com/mt-osiris-tools/ai-use-case-hub) for centralized documentation storage.
 
 ## Critical Requirements
 
