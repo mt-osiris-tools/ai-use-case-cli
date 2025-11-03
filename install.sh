@@ -66,7 +66,7 @@ else
     PADDING=$(printf '%*s' "$PADDING_NEEDED" '')
     echo -e "${CYAN}│${NC} ${BLUE}AI Use Case CLI${NC} - Installation${PADDING} ${CYAN}│${NC}"
 fi
-DESCR_LINE="Document AI-assisted development sessions"
+DESCR_LINE="Reduce documentation overhead, build knowledge"
 DESCR_PADDING=$((58 - ${#DESCR_LINE}))
 DESCR_PAD=$(printf '%*s' "$DESCR_PADDING" '')
 echo -e "${CYAN}│${NC} ${DESCR_LINE}${DESCR_PAD} ${CYAN}│${NC}"

@@ -2,6 +2,17 @@
 
 Command-line tools for documenting AI-assisted development workflows across multiple projects.
 
+## Why This Tool?
+
+**Help developers on a daily basis** by making AI session documentation effortless:
+
+- **Reduce cognitive overload**: Pre-built templates eliminate the "what should I document?" paralysis
+- **Build a knowledge base**: Create a searchable repository of successful AI interactions and solutions
+- **Learn and improve**: Reference past sessions to understand what works and replicate success patterns
+- **Stay organized**: Automatic syncing and categorization keeps your AI work documented and accessible
+
+Documentation shouldn't be a burden—it should be a valuable asset that grows your team's AI expertise.
+
 ## Features
 
 - 🚀 **One-command installation** - Get started in seconds
