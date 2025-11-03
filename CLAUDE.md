@@ -70,6 +70,11 @@ Before creating any PR:
 /use-case:search-usecases    # Search use cases
 /use-case:publish-confluence # Publish to Confluence
 /use-case:quick-start        # Quick start guide
+
+# v3.1.0+ Project Registry Commands
+/use-case:list-projects      # List all registered projects with versions
+/use-case:check-updates      # Check which projects need CLI updates
+/use-case:update-project     # Update a project to latest CLI version
 ```
 
 **Direct script access (advanced):**
@@ -79,26 +84,33 @@ bash ~/.local/share/ai-use-case-cli/document-ai-session.sh .
 bash ~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh .
 bash ~/.local/share/ai-use-case-cli/search-use-cases.sh <term>
 bash ~/.local/share/ai-use-case-cli/stats-use-cases.sh
+bash ~/.local/share/ai-use-case-cli/list-projects.sh
+bash ~/.local/share/ai-use-case-cli/check-updates.sh
+bash ~/.local/share/ai-use-case-cli/update-project.sh <path>
 ```
 
 ## File Structure
 
 - `ai-use-case` - Shows deprecation notice (version on line 26)
-- `setup-project.sh` - Project setup script
+- `setup-project.sh` - Project setup script (now includes registry)
 - `sync-ai-use-cases.sh` - Hub synchronization
 - `document-ai-session.sh` - Interactive documentation
 - `search-use-cases.sh` - Search functionality
 - `stats-use-cases.sh` - Statistics display
-- `list-projects.sh` - Project listing
+- `list-projects.sh` - Project listing (enhanced with registry in v3.1.0)
 - `view-hub.sh` - Hub viewer
 - `push-hub.sh` - Hub push automation
 - `publish-confluence.sh` - Confluence publishing
+- **v3.1.0+:** `registry-manager.sh` - Project registry management
+- **v3.1.0+:** `check-updates.sh` - Check for outdated projects
+- **v3.1.0+:** `update-project.sh` - Update project CLI version
 - `.claude/commands/use-case/` - Slash commands for Claude Code
 - `git-hooks/` - Hook templates (pre-commit, post-commit)
 - `docs/` - Detailed documentation
   - `CLAUDE.md` - Comprehensive guide
   - `VERSION-MANAGEMENT.md` - Version bump guide
   - `HUB-SYNC-CHECKLIST.md` - Hub sync validation
+- **v3.1.0+:** `~/.local/share/ai-use-case-cli/projects-registry.json` - Project registry database
 
 ## Automatic Documentation (Claude Code)
 
@@ -130,6 +142,64 @@ When `/use-case:document-session` is invoked:
    ```
 
 See [docs/CLAUDE.md](docs/CLAUDE.md) and [.claude/commands/use-case/document-session.md](.claude/commands/use-case/document-session.md) for complete automatic documentation workflow.
+
+## Project Registry (v3.1.0+)
+
+The CLI now maintains a registry of all projects using the tool, enabling better version management and updates.
+
+### How It Works
+
+1. **Automatic Registration**: When you run `setup-project.sh`, the project is automatically registered
+2. **Version Tracking**: Each project's CLI version is tracked in the registry
+3. **Update Management**: Easily identify and update projects with outdated CLI versions
+
+### Registry Location
+
+```bash
+~/.local/share/ai-use-case-cli/projects-registry.json
+```
+
+### Common Workflows
+
+**Check all registered projects:**
+```bash
+bash ~/.local/share/ai-use-case-cli/list-projects.sh --registry-only
+```
+
+**Find projects needing updates:**
+```bash
+bash ~/.local/share/ai-use-case-cli/check-updates.sh
+```
+
+**Update a specific project:**
+```bash
+bash ~/.local/share/ai-use-case-cli/update-project.sh /path/to/project
+```
+
+**Update all outdated projects:**
+```bash
+for p in $(bash ~/.local/share/ai-use-case-cli/check-updates.sh --paths-only); do
+  bash ~/.local/share/ai-use-case-cli/update-project.sh "$p"
+done
+```
+
+### Registry Data Structure
+
+```json
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-11-02T10:30:00Z",
+  "projects": {
+    "/full/path/to/project": {
+      "name": "project-name",
+      "version": "3.1.0",
+      "installedAt": "2025-11-02T10:30:00Z",
+      "lastUpdated": "2025-11-02T10:30:00Z",
+      "hubPath": "docs/ai-use-cases"
+    }
+  }
+}
+```
 
 ## Common Patterns
 

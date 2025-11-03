@@ -23,7 +23,7 @@ CYAN=$'\033[0;36m'
 NC=$'\033[0m'
 
 # Version
-VERSION="3.0.0"
+VERSION="3.1.0"
 
 # Show deprecation notice
 show_deprecation() {

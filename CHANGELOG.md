@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] - 2025-11-02
+
+### Added
+
+- **Project Registry System**: Track all projects using the CLI tool
+  - `registry-manager.sh` - Core registry management functions
+  - `~/.local/share/ai-use-case-cli/projects-registry.json` - Registry database
+  - Automatic project registration during setup
+  - Track CLI version per project
+  - Track installation and update timestamps
+
+- **New Commands for Registry Management**:
+  - `list-projects.sh` - Enhanced to show both hub and registry information with version status
+  - `check-updates.sh` - Identify projects with outdated CLI versions
+  - `update-project.sh` - Update a specific project to the latest CLI version
+
+- **New Claude Code Slash Commands**:
+  - `/use-case:list-projects` - View all registered projects with version information
+  - `/use-case:check-updates` - Check which projects need CLI updates
+  - `/use-case:update-project` - Update a project to latest CLI version
+
+### Changed
+
+- `setup-project.sh` now automatically registers projects in the registry
+- `list-projects.sh` enhanced to show registry data alongside hub information
+- Project updates now tracked with timestamps for audit trail
+
+### Benefits
+
+- Easily identify which projects are using the CLI
+- Track CLI version across multiple projects
+- Simplify bulk updates when new CLI versions are released
+- Maintain audit trail of project setup and updates
+- Enable better project lifecycle management
+
 ## [3.0.0] - 2025-11-02
 
 ### 🚨 BREAKING CHANGES
