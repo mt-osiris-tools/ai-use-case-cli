@@ -21,6 +21,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Critical requirements upfront (branch workflow, version management)
   - Pre-PR checklist and common patterns
   - Clear guardrails and references to detailed documentation
+- **ISO 8601 week numbers**: Added week numbers to file naming convention
+  - New format: YYYY-Www-MM-DD_TICKET-XXX_description.md
+  - Better temporal organization with ISO 8601 week format (W01-W53)
+  - Maintains chronological sort order
+  - Updated all scripts and documentation
+
+### Changed
+- **Compact installation banner**: Reduced banner from 13 lines to 5 lines
+  - Removed large ASCII art for cleaner display
+  - Shows only essential info: name, version, description
+  - More professional and space-efficient
 
 ---
 
