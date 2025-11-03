@@ -1,7 +1,9 @@
 #!/bin/bash
-# AI Use Cases Sync Script v3.1.1
+# AI Use Cases Sync Script
 # Syncs AI use case documentation from project directories to a central location
 # Uses symlinks to avoid duplication - files are stored once in by-project/
+#
+# Version is sourced from version.sh (single source of truth)
 #
 # Usage:
 #   ./sync-ai-use-cases.sh [project_path]
@@ -57,6 +59,16 @@ ensure_hub_exists() {
 
 # Configuration - Auto-detect hub location
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Source version configuration (single source of truth)
+if [ -f "$SCRIPT_DIR/version.sh" ]; then
+    source "$SCRIPT_DIR/version.sh"
+else
+    # Fallback if version.sh is missing
+    echo "Warning: version.sh not found, using fallback version" >&2
+    CLI_VERSION="unknown"
+fi
+
 CENTRAL_DIR=$(ensure_hub_exists)
 BY_PROJECT_DIR="$CENTRAL_DIR/by-project"
 BY_DATE_DIR="$CENTRAL_DIR/by-date"
@@ -64,7 +76,7 @@ BY_TOPIC_DIR="$CENTRAL_DIR/by-topic"
 
 # Show help
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-    echo "AI Use Cases Sync Script v3.1.1"
+    echo "AI Use Cases Sync Script v${CLI_VERSION}"
     echo ""
     echo "Usage:"
     echo "  $0 [project_path]"
@@ -102,7 +114,7 @@ else
     PROJECT_NAME=$(basename "$PROJECT_PATH")
 fi
 
-echo -e "${GREEN}=== AI Use Cases Sync v3.1.1 ===${NC}"
+echo -e "${GREEN}=== AI Use Cases Sync v${CLI_VERSION} ===${NC}"
 echo "Project: $PROJECT_NAME"
 echo "Source: $PROJECT_PATH"
 echo "Central: $CENTRAL_DIR"

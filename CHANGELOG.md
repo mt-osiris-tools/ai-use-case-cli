@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.0] - 2025-11-03
+
+### Added
+
+- **Centralized Version Management**: Introduced `version.sh` as single source of truth for CLI version
+  - All scripts now source version from `version.sh` instead of hardcoding
+  - Eliminates version drift across scripts
+  - Simplifies version bumps - update one file instead of multiple
+  - Includes version history and bump instructions in comments
+
+### Changed
+
+- **Updated version retrieval in all scripts**:
+  - `ai-use-case`: Sources `version.sh` for VERSION variable
+  - `sync-ai-use-cases.sh`: Sources `version.sh` for display banner
+  - `registry-manager.sh`: `get_cli_version()` now reads from `version.sh`
+  - `document-ai-session.sh`: Updated local and remote version checks to use `version.sh`
+  - `install.sh`: Updated remote and installed version checks to use `version.sh`
+- Remote version checks now fetch `version.sh` instead of grepping `ai-use-case`
+- All version display messages now use `$CLI_VERSION` variable
+
+### Fixed
+
+- Prevents future version inconsistencies like the v2.3.0 issue in sync script
+- Makes version management more maintainable and less error-prone
+
 ## [3.1.1] - 2025-11-03
 
 ### Fixed

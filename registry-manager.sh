@@ -39,13 +39,14 @@ EOF
     fi
 }
 
-# Get CLI version from the ai-use-case script
+# Get CLI version from version.sh (single source of truth)
 get_cli_version() {
     local script_dir="$1"
-    local ai_use_case_script="$script_dir/ai-use-case"
+    local version_file="$script_dir/version.sh"
 
-    if [ -f "$ai_use_case_script" ]; then
-        grep '^VERSION=' "$ai_use_case_script" | cut -d'"' -f2
+    if [ -f "$version_file" ]; then
+        # Source version.sh and return CLI_VERSION
+        (source "$version_file" && echo "$CLI_VERSION")
     else
         echo "unknown"
     fi
