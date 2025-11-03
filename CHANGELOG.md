@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Streamlined README.md**: Major improvements for better usability and clarity
+  - Consolidated command documentation into single comparison table (CLI vs Claude Code)
+  - Removed redundant sections (file structure, verbose migration guide, direct script access)
+  - Simplified session types and configuration sections
+  - Fixed version inconsistency (footer now matches v3.1.0)
+  - Reduced from 588 to 307 lines while maintaining all essential information
+  - More scannable and user-focused structure
+  - Moved developer-specific content to appropriate documentation files
+
 ### Removed
 
 - **VS Code Extension**: Removed `vscode-extension/` directory to simplify project scope
