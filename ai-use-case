@@ -16,7 +16,7 @@ CYAN=$'\033[0;36m'
 NC=$'\033[0m'
 
 # Version
-VERSION="3.1.0"
+VERSION="3.1.1"
 
 # Get script directory (resolve symlinks)
 SCRIPT_PATH="${BASH_SOURCE[0]}"

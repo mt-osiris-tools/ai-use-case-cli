@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.1] - 2025-11-03
+
+### Fixed
+
+- Updated version display in `sync-ai-use-cases.sh` from v2.3.0/v2.0 to v3.1.1 for consistency with main CLI version
+
 ## [3.1.0] - 2025-11-02
 
 ### 🎉 Major Update: Hybrid CLI + Claude Code Interface
