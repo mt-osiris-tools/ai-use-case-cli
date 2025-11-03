@@ -70,7 +70,7 @@ SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" && pwd)"
 HUB_DIR=$(ensure_hub_exists)
 
 # Show version
-VERSION="2.3.0"
+VERSION="2.4.0"
 
 # Version check cache
 VERSION_CHECK_FILE="$HOME/.cache/ai-use-case-version-check"

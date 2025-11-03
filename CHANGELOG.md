@@ -7,8 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- **Sync script version display**: Updated sync-ai-use-cases.sh version banner from v2.0 to v2.3.0 to match main CLI version
+## [2.4.0] - 2025-11-02
+
+### Added
+- **Enhanced token and interaction metrics**: Significantly improved tracking capabilities in documentation templates
+  - Added comprehensive Token Usage Summary with input/output tokens and cache hits
+  - Added interaction tracking (total exchanges, user prompts, AI responses)
+  - Added average tokens per interaction calculation
+  - Added detailed token breakdown tables by phase (analysis, implementation, testing, documentation)
+  - Added interaction breakdown by phase with average tokens
+  - Added ROI calculations for cost efficiency analysis
+  - Enhanced both TEMPLATE.md and TEMPLATE-RESEARCH.md in hub repository
+- **Interactive metrics collection**: document-ai-session.sh now prompts for:
+  - Total interactions count
+  - User prompts sent
+  - Token usage (input, output, total)
+  - Estimated costs
+  - Automatically integrates into generated documentation
+
+### Changed
+- **Improved cost tracking**: Token usage tables now separate input/output/cache for better visibility
+- **Better metrics organization**: Moved token metrics earlier in templates for prominence
 
 ## [2.3.0] - 2025-11-01
 
