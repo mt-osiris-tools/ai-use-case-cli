@@ -7,7 +7,7 @@ This document describes how to properly version the AI Use Case CLI following se
 The project follows [Semantic Versioning 2.0.0](https://semver.org/):
 
 ```
-MAJOR.MINOR.PATCH (e.g., 2.3.0)
+MAJOR.MINOR.PATCH (e.g., 3.2.0)
 ```
 
 ### Version Increment Rules
@@ -21,61 +21,158 @@ MAJOR.MINOR.PATCH (e.g., 2.3.0)
 - **PATCH** (0.0.X): Backward compatible bug fixes
   - Examples: Fixing bugs, improving error messages, documentation updates
 
-## Version Change Checklist
+## Automated Version Bump (Recommended)
 
-When making changes that require a version bump, follow these steps:
+**Since v3.2.0**, the CLI includes an automated version bump system that handles everything for you.
 
-### 1. Update Version Number
-
-Edit the `VERSION` variable in the `ai-use-case` script (near the top of the file):
+### Quick Start
 
 ```bash
-VERSION="X.Y.Z"
+# Bump patch version (3.2.0 -> 3.2.1)
+ai-use-case bump-version patch
+
+# Bump minor version (3.2.0 -> 3.3.0)
+ai-use-case bump-version minor
+
+# Bump major version (3.2.0 -> 4.0.0)
+ai-use-case bump-version major
+
+# Set specific version
+ai-use-case bump-version 3.5.0
+
+# Preview changes without applying
+ai-use-case bump-version patch --dry-run
+```
+
+### What It Does Automatically
+
+The `bump-version` command handles the entire release process:
+
+1. ✅ **Parses current version** from `version.sh`
+2. ✅ **Calculates new version** based on bump type
+3. ✅ **Updates version.sh** with new version
+4. ✅ **Updates CHANGELOG.md** (moves Unreleased to versioned section with date)
+5. ✅ **Creates git commit** with conventional commit message
+6. ✅ **Creates git tag** (vX.Y.Z)
+7. ✅ **Pushes to remote** with tags
+
+### Command Options
+
+```bash
+ai-use-case bump-version <type> [options]
+
+Types:
+  major           Bump major version (X.0.0)
+  minor           Bump minor version (0.X.0)
+  patch           Bump patch version (0.0.X)
+  X.Y.Z           Set specific version
+
+Options:
+  --dry-run       Preview changes without applying
+  --no-commit     Update files but don't commit
+  --no-tag        Don't create git tag
+  --no-push       Don't push to remote
+  --yes, -y       Skip confirmations (for CI/CD)
+  --help, -h      Show detailed help
+```
+
+### Examples
+
+#### Standard Release (Patch)
+```bash
+# Bump from 3.2.0 to 3.2.1
+ai-use-case bump-version patch
+# Automatically commits, tags, and pushes
+```
+
+#### Preview Changes First
+```bash
+# See what will change without applying
+ai-use-case bump-version minor --dry-run
+
+# Apply after reviewing
+ai-use-case bump-version minor
+```
+
+#### Manual Control
+```bash
+# Update files only, commit manually later
+ai-use-case bump-version patch --no-commit
+
+# Bump and commit, but don't push yet
+ai-use-case bump-version minor --no-push
+```
+
+#### CI/CD Automation
+```bash
+# Skip confirmation prompts
+ai-use-case bump-version patch --yes
+```
+
+### Verification
+
+After bumping, verify the changes:
+
+```bash
+# Check version display
+ai-use-case --version
+# Should show: ai-use-case version 3.3.0
+
+# View commit
+git log -1
+
+# Check tag was created
+git tag -l v3.3.0
+
+# Verify all scripts use new version
+./sync-ai-use-cases.sh --help | head -1
+# Should show: AI Use Cases Sync Script v3.3.0
+```
+
+## Manual Version Bump (Legacy)
+
+If you need to bump the version manually without using the automated tool:
+
+### 1. Update Version in version.sh
+
+Edit `version.sh` (line 21):
+
+```bash
+export CLI_VERSION="3.3.0"
 ```
 
 ### 2. Update CHANGELOG.md
 
-Add a new version section following the Keep a Changelog format:
+Move Unreleased section to new version:
 
 ```markdown
-## [X.Y.Z] - YYYY-MM-DD
+## [Unreleased]
+
+## [3.3.0] - 2025-11-03
 
 ### Added
-- New feature description with details
+- New feature description
 
 ### Changed
-- Modified functionality description
+- Modified functionality
 
 ### Fixed
 - Bug fix description
 ```
 
-### 3. Update Version Links
-
-At the bottom of CHANGELOG.md, update the version comparison links:
-
-```markdown
-[Unreleased]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/vX.Y.Z...HEAD
-[X.Y.Z]: https://github.com/mt-osiris-tools/ai-use-case-cli/compare/vA.B.C...vX.Y.Z
-```
-
-### 4. Test the Version
-
-Verify the version is correct:
+### 3. Test the Version
 
 ```bash
-./ai-use-case --version        # Quick version check
-./ai-use-case version          # Detailed version info
+./ai-use-case --version
+./sync-ai-use-cases.sh --help | head -1
 ```
 
-### 5. Commit and Tag
-
-Commit the version changes:
+### 4. Commit and Tag
 
 ```bash
-git add ai-use-case CHANGELOG.md
-git commit -m "chore: Bump version to X.Y.Z"
-git tag -a vX.Y.Z -m "Release version X.Y.Z"
+git add version.sh CHANGELOG.md
+git commit -m "chore: bump version to 3.3.0"
+git tag -a v3.3.0 -m "Release version 3.3.0"
 git push origin main --tags
 ```
 

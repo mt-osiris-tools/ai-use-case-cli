@@ -52,6 +52,7 @@ ${YELLOW}COMMANDS${NC}
   ${GREEN}view${NC}                      Open hub directory in file explorer
   ${GREEN}push${NC}                      Push hub changes to remote repository
   ${GREEN}publish-confluence${NC}        Publish use case to Confluence
+  ${GREEN}bump-version <type>${NC}       Bump version (major|minor|patch)
   ${GREEN}uninstall${NC}                 Uninstall the CLI tool
   ${GREEN}--version, -v, version${NC}    Show version information
   ${GREEN}--help, -h, help${NC}          Show this help message
@@ -198,6 +199,22 @@ case "${1:-}" in
             bash "$SCRIPT_DIR/update-project.sh" "$2"
         else
             echo -e "${RED}Error: update-project.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    bump-version|bump)
+        if [ -z "${2:-}" ]; then
+            echo -e "${RED}Error: Bump type required${NC}"
+            echo "Usage: ai-use-case bump-version [major|minor|patch|X.Y.Z] [options]"
+            echo "Run: ai-use-case bump-version --help for more information"
+            exit 1
+        fi
+        if [ -f "$SCRIPT_DIR/bump-version.sh" ]; then
+            # Pass all arguments after the command to the script
+            shift
+            bash "$SCRIPT_DIR/bump-version.sh" "$@"
+        else
+            echo -e "${RED}Error: bump-version.sh not found${NC}"
             exit 1
         fi
         ;;
