@@ -133,7 +133,7 @@ Create a comprehensive markdown file:
 - Implementation: `docs/ai-use-cases/YYYY-Www-MM-DD_TICKET-XXX_brief-description-slug.md`
 - Research: `docs/ai-use-cases/YYYY-Www-MM-DD_RESEARCH-XXX_brief-description-slug.md`
 
-Where `Www` is the ISO 8601 week number (calculate using: `date +%V` or `date +%G-W%V` format)
+Where `Www` is the ISO 8601 week number (calculate using: `date +%V` to get week number (e.g., 42), then format as W42)
 
 **Content Requirements for Implementation Sessions:**
 - ✅ All sections filled with real data (NO "TODO" or placeholders)
