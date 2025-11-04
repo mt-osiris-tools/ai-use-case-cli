@@ -88,7 +88,7 @@ ${CYAN}Workflow:${NC}
   • Requires Unreleased section in CHANGELOG.md
   • Creates atomic commit with both version.sh and CHANGELOG.md
   • Tags commit for GitHub releases
-  • Automatically pushes to origin/main (unless --no-push)
+  • Automatically pushes to remote on current branch (unless --no-push)
 
 EOF
     exit 0
@@ -153,6 +153,9 @@ if ! git rev-parse --git-dir > /dev/null 2>&1; then
     echo -e "${RED}Error: Not in a git repository${NC}"
     exit 1
 fi
+
+# Get current branch early for use in messages throughout the script
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 # Check for uncommitted changes
 if [ "$DRY_RUN" = false ] && [ -n "$(git status --porcelain)" ]; then
@@ -234,7 +237,7 @@ if [ "$NO_COMMIT" = false ]; then
         echo -e "  ${CYAN}4.${NC} Create git tag: v${NEW_VERSION}"
     fi
     if [ "$NO_PUSH" = false ]; then
-        echo -e "  ${CYAN}5.${NC} Push to remote: origin/main with tags"
+        echo -e "  ${CYAN}5.${NC} Push to remote: origin/${CURRENT_BRANCH} with tags"
     fi
 fi
 echo ""
@@ -309,9 +312,6 @@ Updates:
     if [ "$NO_PUSH" = false ]; then
         echo -e "${CYAN}[5/5]${NC} Pushing to remote..."
 
-        # Get current branch
-        CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-
         # Push commit
         git push origin "$CURRENT_BRANCH"
 
@@ -342,14 +342,14 @@ echo ""
 # Next steps
 if [ "$NO_PUSH" = true ]; then
     echo -e "${YELLOW}Next steps:${NC}"
-    echo -e "  Run: ${CYAN}git push origin main --tags${NC}"
+    echo -e "  Run: ${CYAN}git push origin ${CURRENT_BRANCH} --tags${NC}"
     echo ""
 elif [ "$NO_COMMIT" = true ]; then
     echo -e "${YELLOW}Next steps:${NC}"
     echo -e "  1. Review changes: ${CYAN}git diff${NC}"
     echo -e "  2. Commit changes: ${CYAN}git add version.sh CHANGELOG.md && git commit${NC}"
     echo -e "  3. Tag release: ${CYAN}git tag -a v${NEW_VERSION} -m 'Release version ${NEW_VERSION}'${NC}"
-    echo -e "  4. Push: ${CYAN}git push origin main --tags${NC}"
+    echo -e "  4. Push: ${CYAN}git push origin ${CURRENT_BRANCH} --tags${NC}"
     echo ""
 fi
 
