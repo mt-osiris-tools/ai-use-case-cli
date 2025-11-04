@@ -202,10 +202,10 @@ ensure_hub_exists() {
 }
 
 # Configuration - Auto-detect locations
-# SCRIPT_DIR = CLI installation directory (for scripts) - defined above for version checking
-# CENTRAL_DIR = Documentation hub directory (for templates and storage)
+# SCRIPT_DIR = CLI installation directory (for scripts and templates) - defined above for version checking
+# CENTRAL_DIR = Documentation hub directory (for storage only, no longer stores templates)
 CENTRAL_DIR=$(ensure_hub_exists)
-TEMPLATE_FILE="$CENTRAL_DIR/TEMPLATE.md"
+TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE.md"
 SYNC_SCRIPT="$SCRIPT_DIR/sync-ai-use-cases.sh"
 
 # Check for flags

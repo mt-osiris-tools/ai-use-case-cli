@@ -127,7 +127,9 @@ Skip git commands if no commits exist.
 
 ### Step 6: Read the Template
 
-**IMPORTANT**: Before generating documentation, read the appropriate template from the CLI project:
+**IMPORTANT**: Before generating documentation, read the appropriate template from the CLI installation directory.
+
+The CLI is installed at `~/.local/share/ai-use-case-cli/` (the entire repository is cloned there), so templates are accessible at:
 
 **For Implementation Sessions:**
 ```bash
@@ -139,7 +141,7 @@ cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE.md
 cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE-RESEARCH.md
 ```
 
-Use the Read tool to read the template file. This is your source of truth for:
+Use the Read tool to read the template file from this path. This is your source of truth for:
 - All sections that must be included
 - Exact formatting and structure
 - Order of sections
