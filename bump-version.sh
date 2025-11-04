@@ -260,7 +260,10 @@ echo ""
 
 # Step 1: Update version.sh
 echo -e "${CYAN}[1/5]${NC} Updating version.sh..."
-sed -i "s/^export CLI_VERSION=\".*\"/export CLI_VERSION=\"${NEW_VERSION}\"/" "$VERSION_FILE"
+# Use portable sed approach (works on both macOS and Linux)
+TEMP_VERSION_FILE=$(mktemp)
+sed "s/^export CLI_VERSION=\".*\"/export CLI_VERSION=\"${NEW_VERSION}\"/" "$VERSION_FILE" > "$TEMP_VERSION_FILE"
+mv "$TEMP_VERSION_FILE" "$VERSION_FILE"
 echo -e "${GREEN}✓${NC} version.sh updated"
 
 # Step 2: Update CHANGELOG.md
@@ -292,11 +295,7 @@ if [ "$NO_COMMIT" = false ]; then
 
 Updates:
 - version.sh: CLI_VERSION updated
-- CHANGELOG.md: Unreleased section moved to ${NEW_VERSION}
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>"
+- CHANGELOG.md: Unreleased section moved to ${NEW_VERSION}"
     echo -e "${GREEN}✓${NC} Commit created"
 
     # Step 4: Create tag
