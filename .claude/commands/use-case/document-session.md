@@ -129,7 +129,11 @@ Skip git commands if no commits exist.
 
 **IMPORTANT**: Before generating documentation, read the appropriate template from the CLI installation directory.
 
-The CLI is typically installed at `~/.local/share/ai-use-case-cli/` (the entire repository is cloned there). This path may vary depending on the installation method, but the default installation uses this location.
+The CLI installation includes the complete repository structure, including the docs/ directory with templates. During installation, the repository is cloned to a user-scoped directory (by default `~/.local/share/ai-use-case-cli/`).
+
+**Path Reference Pattern:**
+- **Slash commands** (this file): Use absolute path `~/.local/share/ai-use-case-cli/docs/TEMPLATE.md` since Claude Code runs in the user's project directory
+- **Bash scripts**: Use `$SCRIPT_DIR/docs/TEMPLATE.md` variable for flexibility across installation methods
 
 **For Implementation Sessions:**
 ```bash
@@ -141,7 +145,7 @@ cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE.md
 cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE-RESEARCH.md
 ```
 
-**Note**: Always use the default installation path shown above. The Read tool should successfully access these files as long as the CLI was installed using the standard `install.sh` script.
+**Note**: Use the Read tool with the full path shown above. The hardcoded path is necessary because this slash command runs in the user's project directory, not the CLI installation directory. The `$SCRIPT_DIR` variable pattern is only available in bash scripts.
 
 Use the Read tool to read the template file from this path. This is your source of truth for:
 - All sections that must be included

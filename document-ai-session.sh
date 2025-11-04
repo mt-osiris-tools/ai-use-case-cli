@@ -204,8 +204,8 @@ ensure_hub_exists() {
 # Configuration - Auto-detect locations
 # SCRIPT_DIR = CLI installation directory (for scripts and templates) - defined above for version checking
 # CENTRAL_DIR = Documentation hub directory (for storage only, no longer stores templates)
+# TEMPLATE_FILE = Will be set dynamically based on session type selection
 CENTRAL_DIR=$(ensure_hub_exists)
-TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE.md"
 SYNC_SCRIPT="$SCRIPT_DIR/sync-ai-use-cases.sh"
 
 # Check for flags
@@ -304,6 +304,27 @@ if [ ! -d "$AI_USECASES_DIR" ]; then
     echo -e "Run: ${CYAN}$CENTRAL_DIR/setup-project.sh${NC}"
     exit 1
 fi
+
+# Prompt for session type (implementation or research)
+echo -e "${CYAN}Select session type:${NC}"
+echo "  1) Implementation (code changes, commits)"
+echo "  2) Research (exploration, no code changes)"
+echo ""
+read -p "Enter choice [1-2] (default: 1): " SESSION_TYPE_CHOICE
+
+case "$SESSION_TYPE_CHOICE" in
+    2)
+        SESSION_TYPE="research"
+        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE-RESEARCH.md"
+        echo -e "${GREEN}✓${NC} Using research session template"
+        ;;
+    *)
+        SESSION_TYPE="implementation"
+        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE.md"
+        echo -e "${GREEN}✓${NC} Using implementation session template"
+        ;;
+esac
+echo ""
 
 # Collect session data
 echo -e "${CYAN}Collecting session data...${NC}"
