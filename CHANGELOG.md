@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Automated Version Bump System**: Fully automated version management with single command
+  - `ai-use-case bump-version [major|minor|patch]` - automated version bumping
+  - Automatically updates version.sh and CHANGELOG.md
+  - Creates git commit with conventional commit message
+  - Creates git tag (vX.Y.Z) for GitHub releases
+  - Pushes to remote automatically
+  - Supports dry-run, no-commit, no-tag, no-push options
+  - Interactive confirmation prompts (can be skipped with --yes for CI/CD)
+  - Detailed help with `ai-use-case bump-version --help`
+  - Updated VERSION-MANAGEMENT.md with automated workflow documentation
+
 - **Consolidated Templates into CLI**: Moved TEMPLATE.md and TEMPLATE-RESEARCH.md from hub repository to CLI docs/ directory
   - Establishes CLI as single source of truth for documentation structure
   - Templates now version-controlled with the tool that uses them
