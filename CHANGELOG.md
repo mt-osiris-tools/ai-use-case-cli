@@ -14,8 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Templates now version-controlled with the tool that uses them
   - Slash command explicitly reads templates before generating documentation
   - Added header comments identifying templates as authoritative source
-  - Fixed filename format to include ISO 8601 week number (Www)
-  - Updated 6 documentation references to point to CLI templates
+  - Updated documentation references across codebase to point to CLI templates
+  - Interactive script now dynamically selects template based on session type (implementation vs research)
 
 ### Changed
 

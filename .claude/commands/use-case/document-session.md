@@ -129,7 +129,7 @@ Skip git commands if no commits exist.
 
 **IMPORTANT**: Before generating documentation, read the appropriate template from the CLI installation directory.
 
-The CLI is installed at `~/.local/share/ai-use-case-cli/` (the entire repository is cloned there), so templates are accessible at:
+The CLI is typically installed at `~/.local/share/ai-use-case-cli/` (the entire repository is cloned there). This path may vary depending on the installation method, but the default installation uses this location.
 
 **For Implementation Sessions:**
 ```bash
@@ -140,6 +140,8 @@ cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE.md
 ```bash
 cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE-RESEARCH.md
 ```
+
+**Note**: Always use the default installation path shown above. The Read tool should successfully access these files as long as the CLI was installed using the standard `install.sh` script.
 
 Use the Read tool to read the template file from this path. This is your source of truth for:
 - All sections that must be included

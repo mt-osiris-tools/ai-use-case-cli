@@ -345,9 +345,18 @@ read -p "Select (1-2) [1]: " SESSION_TYPE_CHOICE
 SESSION_TYPE_CHOICE=${SESSION_TYPE_CHOICE:-1}
 
 case $SESSION_TYPE_CHOICE in
-    1) SESSION_TYPE="implementation" ;;
-    2) SESSION_TYPE="research" ;;
-    *) SESSION_TYPE="implementation" ;;
+    1)
+        SESSION_TYPE="implementation"
+        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE.md"
+        ;;
+    2)
+        SESSION_TYPE="research"
+        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE-RESEARCH.md"
+        ;;
+    *)
+        SESSION_TYPE="implementation"
+        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE.md"
+        ;;
 esac
 
 echo ""
