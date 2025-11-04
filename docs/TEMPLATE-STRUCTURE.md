@@ -409,10 +409,11 @@ YYYY-Www-MM-DD_TICKET-XXX_brief-description.md
 
 ## Location
 
-Templates are stored in the hub repository:
-- **Hub Repository**: https://github.com/mt-osiris-tools/ai-use-case-hub
-- **Implementation Template**: `TEMPLATE.md`
-- **Research Template**: `TEMPLATE-RESEARCH.md`
+Templates are stored in this CLI repository (single source of truth):
+- **CLI Repository**: https://github.com/mt-osiris-tools/ai-use-case-cli
+- **Implementation Template**: `docs/TEMPLATE.md`
+- **Research Template**: `docs/TEMPLATE-RESEARCH.md`
+- **Local Path**: `~/.local/share/ai-use-case-cli/docs/TEMPLATE*.md`
 
 ---
 

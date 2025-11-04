@@ -205,7 +205,7 @@ When `/use-case/document-session` is invoked in Claude Code:
 
 5. **Generate Complete Documentation File**:
    - Create file in `docs/ai-use-cases/` with proper naming convention
-   - Follow TEMPLATE.md structure from hub repository
+   - Follow TEMPLATE.md or TEMPLATE-RESEARCH.md structure from CLI docs/ directory
    - Include all sections with real data (NO "TODO" or placeholders)
    - Use conversation context for qualitative insights
    - Use git data for quantitative metrics
@@ -419,9 +419,10 @@ The CLI tools sync documentation to a **separate hub repository** that provides:
 - **`by-project/`**: Canonical storage - all actual markdown files (tracked in git)
 - **`by-date/`**: View layer - symlinks organized by YYYY/MM/ (not tracked in git)
 - **`by-topic/`**: View layer - symlinks organized by topic slug (not tracked in git)
-- **`TEMPLATE.md`**: Comprehensive use case template
 - **`QUICK-REFERENCE.md`**: Command reference guide
 - **`CHANGELOG.md`**: Version history
+
+**Note**: Templates (TEMPLATE.md and TEMPLATE-RESEARCH.md) are now in the CLI repository (docs/ directory), not in the hub.
 
 The hub repository should be cloned separately:
 
@@ -512,7 +513,7 @@ ai-use-case document
 This runs `document-ai-session.sh` which:
 - Collects git changes and session statistics
 - Guides you through interactive prompts
-- Generates documentation using the hub's TEMPLATE.md
+- Generates documentation using the CLI's TEMPLATE.md or TEMPLATE-RESEARCH.md
 - Saves to `docs/ai-use-cases/` with proper naming
 - Optionally commits and syncs automatically
 
@@ -726,7 +727,7 @@ This repository is tightly coupled with the **ai-use-case-hub** repository. When
 
 ### Key Synchronization Points
 
-- **Templates**: CLI generates docs, Hub provides reference templates
+- **Templates**: CLI provides templates (docs/TEMPLATE*.md) and generates documentation
 - **Session Types**: CLI implements workflows, Hub documents them
 - **File Naming**: CLI enforces patterns, Hub organizes by them
 - **Features**: CLI adds commands, Hub provides user documentation

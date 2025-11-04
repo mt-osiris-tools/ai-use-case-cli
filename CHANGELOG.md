@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Consolidated Templates into CLI**: Moved TEMPLATE.md and TEMPLATE-RESEARCH.md from hub repository to CLI docs/ directory
+  - Establishes CLI as single source of truth for documentation structure
+  - Templates now version-controlled with the tool that uses them
+  - Slash command explicitly reads templates before generating documentation
+  - Added header comments identifying templates as authoritative source
+  - Updated documentation references across codebase to point to CLI templates
+  - Interactive script now dynamically selects template based on session type (implementation vs research)
+
 ### Changed
 
 - **Streamlined README.md**: Major improvements for better usability and clarity
@@ -17,6 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Reduced from 588 to 307 lines while maintaining all essential information
   - More scannable and user-focused structure
   - Moved developer-specific content to appropriate documentation files
+
+### Fixed
+
+- **Template Path Resolution**: Updated `document-ai-session.sh` to reference templates from CLI docs/ directory
+  - Changed from `$CENTRAL_DIR/TEMPLATE.md` (hub) to `$SCRIPT_DIR/docs/TEMPLATE.md` (CLI)
+  - Ensures interactive documentation mode uses same template source as automatic mode
+  - Addresses PR feedback about template location inconsistency
 
 ### Removed
 

@@ -125,9 +125,37 @@ Skip git commands if no commits exist.
 - **Final Decision**: Recommended approach and rationale
 - **Complexity**: Assess from conversation depth (Low: simple Q&A, Medium: multiple approaches, High: architectural decisions)
 
-### Step 6: Generate Complete Documentation
+### Step 6: Read the Template
 
-Create a comprehensive markdown file:
+**IMPORTANT**: Before generating documentation, read the appropriate template from the CLI installation directory.
+
+The CLI installation includes the complete repository structure, including the docs/ directory with templates. During installation, the repository is cloned to a user-scoped directory (by default `~/.local/share/ai-use-case-cli/`).
+
+**Path Reference Pattern:**
+- **Slash commands** (this file): Use absolute path `~/.local/share/ai-use-case-cli/docs/TEMPLATE.md` since Claude Code runs in the user's project directory
+- **Bash scripts**: Use `$SCRIPT_DIR/docs/TEMPLATE.md` variable for flexibility across installation methods
+
+**For Implementation Sessions:**
+```bash
+cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE.md
+```
+
+**For Research Sessions:**
+```bash
+cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE-RESEARCH.md
+```
+
+**Note**: Use the Read tool with the full path shown above. The hardcoded path is necessary because this slash command runs in the user's project directory, not the CLI installation directory. The `$SCRIPT_DIR` variable pattern is only available in bash scripts.
+
+Use the Read tool to read the template file from this path. This is your source of truth for:
+- All sections that must be included
+- Exact formatting and structure
+- Order of sections
+- What information goes in each section
+
+### Step 7: Generate Complete Documentation
+
+Create a comprehensive markdown file **following the template structure exactly**:
 
 **Filename Format:**
 - Implementation: `docs/ai-use-cases/YYYY-Www-MM-DD_TICKET-XXX_brief-description-slug.md`
@@ -154,9 +182,9 @@ Where `Www` is the ISO 8601 week number (calculate using: `date +%V` to get week
 - ✅ Professional formatting and completeness
 - ✅ Use 🔬 icon in title (not 🎯)
 
-**Use the Write tool** to create the file with full content.
+**Use the Write tool** to create the file with full content based on the template.
 
-### Step 7: Commit and Sync
+### Step 8: Commit and Sync
 
 **For Implementation Sessions:**
 Commit the documentation along with code changes and sync to hub:
