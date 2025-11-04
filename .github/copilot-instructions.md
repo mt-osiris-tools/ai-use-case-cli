@@ -53,7 +53,7 @@ When Copilot crafts changes, ensure the workflow below stays intact:
 - **Session types**: The CLI supports **implementation** and **research** sessions with different templates and workflows
 - **Template consistency**: Keep templates aligned with the hub's `TEMPLATE.md` structure (located in the separate hub repository)
 - **No placeholders**: Never leave placeholders such as "TODO" in generated session files—fill every section with concrete information or omit optional sections entirely
-- **Naming conventions**: Auto-generated files should follow the `YYYY-MM-DD_TICKET-description.md` format for implementation sessions and `YYYY-MM-DD_RESEARCH-description.md` for research sessions
+- **Naming conventions**: Auto-generated files should follow the `YYYY-Www-MM-DD_TICKET-description.md` format for implementation sessions and `YYYY-Www-MM-DD_RESEARCH-description.md` for research sessions
 - **Claude Code integration**: If suggesting automated flows (e.g., Copilot Chat generating docs), ensure they mirror the expectations defined in `docs/CLAUDE.md`
 - **Hub synchronization**: All documented sessions are automatically synced to the hub repository via git hooks and the sync mechanism
 - **Research session fields**: Include initial query, iterations, insights, approaches evaluated, and final decision documentation

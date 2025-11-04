@@ -64,7 +64,7 @@ Extract page ID using regex patterns.
 ### Title Extraction
 
 From filename `YYYY-Www-MM-DD_TICKET-XXX_description.md`:
-1. Remove date prefix: `YYYY-MM-DD_`
+1. Remove date prefix: `YYYY-Www-MM-DD_`
 2. Keep ticket: `TICKET-XXX`
 3. Convert slug to title: `description` → `Description`
 4. Final title: `TICKET-XXX: Description`

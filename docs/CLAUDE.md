@@ -212,8 +212,8 @@ When `/use-case/document-session` is invoked in Claude Code:
 
 6. **Commit and Sync**:
    ```bash
-   git add docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_description.md
-   git commit -m "docs: AI session YYYY-MM-DD - TICKET-XXX - Brief description
+   git add docs/ai-use-cases/YYYY-Www-MM-DD_TICKET-XXX_description.md
+   git commit -m "docs: AI session YYYY-Www-MM-DD - TICKET-XXX - Brief description
 
    [Details about what was documented...]
 
@@ -242,9 +242,9 @@ When the session involves NO code changes (research/exploration only):
    - No files modified
    - Focus on questions, decisions, or architecture discussion
 
-2. **Generate Research Ticket**: Use format `YYYY-MM-DD_RESEARCH-XXX_description.md`
+2. **Generate Research Ticket**: Use format `YYYY-Www-MM-DD_RESEARCH-XXX_description.md`
    - Auto-increment RESEARCH number based on existing research docs
-   - Example: `2025-10-20_RESEARCH-001_evaluate-database-migration-strategies.md`
+   - Example: `2025-W42-10-20_RESEARCH-001_evaluate-database-migration-strategies.md`
 
 3. **Extract Research Context** from conversation:
    - **Initial Query**: User's original question or problem

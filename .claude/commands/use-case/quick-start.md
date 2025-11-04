@@ -103,7 +103,7 @@ Run: `ai-use-case document`
    - Organized by project, date, and topic automatically
 
 3. **Documentation Format:**
-   - Filename: `YYYY-MM-DD_TICKET-XXXXX_description.md`
+   - Filename: `YYYY-Www-MM-DD_TICKET-XXXXX_description.md`
    - Template-based content
    - Captures time saved, tools used, results
 

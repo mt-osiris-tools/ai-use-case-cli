@@ -157,7 +157,7 @@ When `/use-case:document-session` is invoked:
 
 4. **Save and sync**:
    ```bash
-   # Create file: docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_description.md
+   # Create file: docs/ai-use-cases/YYYY-Www-MM-DD_TICKET-XXX_description.md
    git add docs/ai-use-cases/...
    git commit -m "docs: AI session documentation"
    bash ~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh .
