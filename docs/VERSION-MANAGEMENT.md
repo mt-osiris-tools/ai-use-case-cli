@@ -51,10 +51,11 @@ The `bump-version` command handles the entire release process:
 1. ✅ **Parses current version** from `version.sh`
 2. ✅ **Calculates new version** based on bump type
 3. ✅ **Updates version.sh** with new version
-4. ✅ **Updates CHANGELOG.md** (moves Unreleased to versioned section with date)
-5. ✅ **Creates git commit** with conventional commit message
-6. ✅ **Creates git tag** (vX.Y.Z)
-7. ✅ **Pushes to remote** with tags
+4. ✅ **Updates README.md** with new version badge
+5. ✅ **Updates CHANGELOG.md** (moves Unreleased to versioned section with date)
+6. ✅ **Creates git commit** with conventional commit message
+7. ✅ **Creates git tag** (vX.Y.Z)
+8. ✅ **Pushes to remote** with tags
 
 ### Command Options
 
@@ -141,7 +142,15 @@ Edit `version.sh` (line 21):
 export CLI_VERSION="3.3.0"
 ```
 
-### 2. Update CHANGELOG.md
+### 2. Update README.md
+
+Edit `README.md` (line 4) to update the version badge:
+
+```markdown
+<h3><em>**v3.3.0** - Document AI-assisted development workflows with ease.</em></h3>
+```
+
+### 3. Update CHANGELOG.md
 
 Move Unreleased section to new version:
 
@@ -160,17 +169,17 @@ Move Unreleased section to new version:
 - Bug fix description
 ```
 
-### 3. Test the Version
+### 4. Test the Version
 
 ```bash
 ./ai-use-case --version
 ./sync-ai-use-cases.sh --help | head -1
 ```
 
-### 4. Commit and Tag
+### 5. Commit and Tag
 
 ```bash
-git add version.sh CHANGELOG.md
+git add version.sh README.md CHANGELOG.md
 git commit -m "chore: bump version to 3.3.0"
 git tag -a v3.3.0 -m "Release version 3.3.0"
 git push origin main --tags
