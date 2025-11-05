@@ -1,6 +1,33 @@
-# AI Use Case CLI
+<div align="center">
+    <img src="./media/ai_use_case_cli_documentator.webp" alt="AI Use Case CLI - The Documenter"/>
+    <h1>AI Use Case CLI</h1>
+    <h3><em><strong>v3.1.0</strong> - Document AI-assisted development workflows with ease.</em></h3>
+</div>
 
-**v3.1.0** - Document AI-assisted development workflows with ease.
+---
+
+## Table of Contents
+
+- 🎯 [Why This Tool?](#why-this-tool)
+- ✨ [Features](#features)
+- 📦 [Quick Install](#quick-install)
+- 🚀 [Quick Start](#quick-start)
+- 📖 [Usage](#usage)
+- ⚙️ [How It Works](#how-it-works)
+- 🔧 [Configuration](#configuration)
+- 🗂️ [Project Registry (v3.1.0+)](#project-registry-v310)
+- 💡 [Examples](#examples)
+- 🔍 [Troubleshooting](#troubleshooting)
+- 🔄 [Updates](#updates)
+- 🚚 [Migration from v2.x](#migration-from-v2x)
+- 🗑️ [Uninstall](#uninstall)
+- 🤝 [Contributing](#contributing)
+- 📋 [Requirements](#requirements)
+- 💬 [Support](#support)
+- 🔗 [Related Projects](#related-projects)
+- 📄 [License](#license)
+
+---
 
 ## Why This Tool?
 
