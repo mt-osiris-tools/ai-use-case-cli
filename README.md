@@ -1,7 +1,7 @@
 <div align="center">
     <img src="./media/ai_use_case_cli_documentator.webp" alt="AI Use Case CLI - The Documenter"/>
     <h1>AI Use Case CLI</h1>
-    <h3><em>**v3.2.0** - Document AI-assisted development workflows with ease.</em></h3>
+    <h3><em><strong>v3.1.0</strong> - Document AI-assisted development workflows with ease.</em></h3>
 </div>
 
 ---
