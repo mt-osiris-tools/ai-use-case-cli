@@ -140,8 +140,8 @@ The CLI provides flexible documentation storage options:
 
 - **CLI Tools** (this repo): Scripts for documenting and managing use cases
 - **Documentation Hub**: Your choice of storage location
-  - **Local only** (default): `~/.local/share/ai-use-case-cli/hub/` - No git, no remote sync
-  - **Private git**: Your own repository - Full version control
+  - **Local Only** (default): `~/.local/share/ai-use-case-cli/hub/` - No git, no remote sync
+  - **Private Git**: Your own repository - Full version control
   - Organized by project, date, and topic using symlinks
 
 ### Workflow
