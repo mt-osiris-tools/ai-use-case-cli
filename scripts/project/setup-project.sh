@@ -22,9 +22,20 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_MANAGER="$SCRIPT_DIR/../utils/config-manager.sh"
 if [ -f "$CONFIG_MANAGER" ]; then
     source "$CONFIG_MANAGER"
+    # Verify that essential functions were loaded
+    if ! command -v get_hub_mode &> /dev/null || ! command -v get_hub_path &> /dev/null; then
+        echo -e "${RED}Error: Failed to load configuration manager functions${NC}" >&2
+        exit 1
+    fi
+else
+    echo -e "${RED}Error: Configuration manager not found: $CONFIG_MANAGER${NC}" >&2
+    echo "This script requires the configuration manager to function properly" >&2
+    exit 1
 fi
 
-# Function to ensure hub repository exists
+# Function to setup and initialize hub repository
+# NOTE: This function is specifically for setup and includes interactive prompts.
+# It differs from ensure_hub_exists() in hub-utils.sh which is for validation only.
 ensure_hub_exists() {
     local hub_dir
     local hub_mode
@@ -60,7 +71,7 @@ ensure_hub_exists() {
                 mkdir -p "$hub_dir"
                 echo -e "${GREEN}✓${NC} Local hub directory created" >&2
                 ;;
-            private-git|shared-git)
+            private-git)
                 echo -e "${BLUE}Cloning git repository...${NC}" >&2
                 echo -e "${CYAN}URL: $git_url${NC}" >&2
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Configuration Manager for AI Use Case CLI
-# Handles hub configuration: local-only, private git, or shared git
+# Handles hub configuration: local-only or private git
 
 # Configuration file location
 CONFIG_DIR="$HOME/.config/ai-use-case-cli"
@@ -19,6 +19,55 @@ ensure_config_dir() {
     if [ ! -d "$CONFIG_DIR" ]; then
         mkdir -p "$CONFIG_DIR"
     fi
+}
+
+# Validate directory path
+validate_path() {
+    local path="$1"
+
+    # Check for empty path
+    if [ -z "$path" ]; then
+        return 1
+    fi
+
+    # Check for problematic characters
+    if [[ "$path" =~ [\'\"\`\$\;] ]]; then
+        echo -e "${RED}Error: Path contains invalid characters (quotes, backticks, dollar signs, semicolons)${NC}" >&2
+        return 1
+    fi
+
+    # Expand tilde to home directory
+    path="${path/#\~/$HOME}"
+
+    # Check if parent directory exists or can be created
+    local parent_dir=$(dirname "$path")
+    if [ ! -d "$parent_dir" ]; then
+        echo -e "${YELLOW}Warning: Parent directory $parent_dir does not exist${NC}" >&2
+        read -p "Create parent directory? (y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            return 1
+        fi
+        if ! mkdir -p "$parent_dir" 2>/dev/null; then
+            echo -e "${RED}Error: Cannot create parent directory $parent_dir${NC}" >&2
+            return 1
+        fi
+    fi
+
+    # Check if directory is writable (if exists) or parent is writable (if not)
+    if [ -d "$path" ]; then
+        if [ ! -w "$path" ]; then
+            echo -e "${RED}Error: Directory $path is not writable${NC}" >&2
+            return 1
+        fi
+    else
+        if [ ! -w "$parent_dir" ]; then
+            echo -e "${RED}Error: Parent directory $parent_dir is not writable${NC}" >&2
+            return 1
+        fi
+    fi
+
+    return 0
 }
 
 # Initialize default configuration
@@ -51,6 +100,9 @@ EOF
 }
 
 # Read configuration value
+# Note: Uses simple sed/grep parsing suitable for our flat JSON structure.
+# This avoids requiring jq as a dependency. If the JSON structure becomes
+# more complex (nested objects, arrays), consider using jq instead.
 get_config() {
     local key="$1"
 
@@ -58,7 +110,8 @@ get_config() {
         return 1
     fi
 
-    # Simple JSON parsing (works for simple structure)
+    # Simple JSON parsing (works for flat key-value structure)
+    # Pattern matches: "key": "value" and extracts value
     grep "\"$key\"" "$CONFIG_FILE" | sed 's/.*: "\(.*\)".*/\1/' | tr -d ','
 }
 
@@ -68,21 +121,35 @@ set_config() {
     local value="$2"
 
     if [ ! -f "$CONFIG_FILE" ]; then
-        init_config
+        echo -e "${RED}Error: Configuration file not found${NC}" >&2
+        echo "Please run 'ai-use-case --init' to initialize configuration" >&2
+        return 1
     fi
 
-    # Create temporary file with updated value
-    local temp_file=$(mktemp)
+    # Create temporary file in config dir for atomic update
+    local temp_file
+    temp_file="$(mktemp "$CONFIG_DIR/config.json.tmp.XXXXXX")"
+
+    # Ensure temp file is cleaned up on exit or interruption
+    cleanup_temp_file() {
+        [ -f "$temp_file" ] && rm -f "$temp_file"
+    }
+    trap cleanup_temp_file EXIT INT TERM
 
     # Simple JSON update (works for simple structure)
     sed "s|\"$key\": \"[^\"]*\"|\"$key\": \"$value\"|" "$CONFIG_FILE" > "$temp_file"
 
+    # Atomically move temp file to config file
     mv "$temp_file" "$CONFIG_FILE"
+
+    # Remove trap and cleanup function
+    trap - EXIT INT TERM
+    unset -f cleanup_temp_file
 
     echo -e "${GREEN}✓${NC} Configuration updated: $key = $value"
 }
 
-# Get hub mode (local, private-git, shared-git)
+# Get hub mode (local, private-git)
 get_hub_mode() {
     local mode=$(get_config "hubMode")
 
@@ -120,20 +187,31 @@ get_hub_path() {
 
 # Get git URL (for git modes)
 get_git_url() {
+    local mode=$(get_hub_mode)
     local url=$(get_config "gitUrl")
 
-    # Default to shared hub if not set
-    if [ -z "$url" ]; then
-        echo "https://github.com/mt-osiris-tools/ai-use-case-hub.git"
-    else
-        echo "$url"
-    fi
+    case "$mode" in
+        local)
+            # In local mode, git URL is not applicable
+            echo ""
+            ;;
+        private-git)
+            if [ -z "$url" ]; then
+                echo -e "${YELLOW}Warning: Private git mode configured but no git URL set${NC}" >&2
+                echo -e "Please reconfigure: ai-use-case config reconfigure${NC}" >&2
+            fi
+            echo "$url"
+            ;;
+        *)
+            echo "$url"
+            ;;
+    esac
 }
 
 # Check if hub mode uses git
 is_git_mode() {
     local mode=$(get_hub_mode)
-    [ "$mode" = "private-git" ] || [ "$mode" = "shared-git" ]
+    [ "$mode" = "private-git" ]
 }
 
 # Interactive hub mode selection
@@ -162,6 +240,12 @@ prompt_hub_mode() {
                 read -p "Hub directory path [$HOME/.local/share/ai-use-case-cli/hub]: " hub_path
                 hub_path=${hub_path:-$HOME/.local/share/ai-use-case-cli/hub}
 
+                # Validate path
+                if ! validate_path "$hub_path"; then
+                    echo -e "${RED}Invalid path. Please try again.${NC}"
+                    continue
+                fi
+
                 init_config "local" "$hub_path" ""
                 echo "$hub_path"
                 return 0
@@ -176,8 +260,25 @@ prompt_hub_mode() {
                     continue
                 fi
 
+                # Basic git URL validation
+                if ! [[ "$git_url" =~ ^(https?://|git@|ssh://|file://) ]]; then
+                    echo -e "${YELLOW}Warning: URL doesn't appear to be a valid git repository URL${NC}"
+                    echo "Valid formats: https://, http://, git@, ssh://, file://"
+                    read -p "Continue anyway? (y/n) " -n 1 -r
+                    echo
+                    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                        continue
+                    fi
+                fi
+
                 read -p "Local hub directory path [$HOME/Documents/ai-use-case-hub]: " hub_path
                 hub_path=${hub_path:-$HOME/Documents/ai-use-case-hub}
+
+                # Validate path
+                if ! validate_path "$hub_path"; then
+                    echo -e "${RED}Invalid path. Please try again.${NC}"
+                    continue
+                fi
 
                 init_config "private-git" "$hub_path" "$git_url"
                 echo "$hub_path"

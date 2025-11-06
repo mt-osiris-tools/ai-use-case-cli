@@ -254,7 +254,7 @@ echo -e "${BLUE}💾 Disk usage:${NC} Files stored once, alternate views use sym
 # Git commit and push to hub repository (only for git modes)
 if [ $NEW_COUNT -gt 0 ] || [ $UPDATED_COUNT -gt 0 ]; then
     # Get hub mode
-    local hub_mode=$(get_hub_mode 2>/dev/null || echo "local")
+    hub_mode=$(get_hub_mode 2>/dev/null || echo "local")
 
     # Skip git operations for local mode
     if [ "$hub_mode" = "local" ]; then
