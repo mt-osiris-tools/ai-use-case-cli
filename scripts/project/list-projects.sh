@@ -15,6 +15,9 @@ NC=$'\033[0m'
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Get CLI root directory (parent of parent of script directory)
+CLI_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
 # Function to ensure hub repository exists
 ensure_hub_exists() {
     local hub_dir
@@ -91,7 +94,7 @@ fi
 
 # Handle registry-only mode
 if [[ "$1" == "--registry-only" ]] && [ "$SHOW_REGISTRY" = true ]; then
-    CLI_VERSION=$(get_cli_version "$SCRIPT_DIR")
+    CLI_VERSION=$(get_cli_version "$CLI_ROOT")
     print_projects "$CLI_VERSION"
 
     # Show statistics
@@ -137,7 +140,7 @@ fi
 
 # Show registry information
 if [[ "$1" != "--hub-only" ]] && [ "$SHOW_REGISTRY" = true ]; then
-    CLI_VERSION=$(get_cli_version "$SCRIPT_DIR")
+    CLI_VERSION=$(get_cli_version "$CLI_ROOT")
     print_projects "$CLI_VERSION"
 
     # Show statistics

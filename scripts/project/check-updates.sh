@@ -15,6 +15,9 @@ NC='\033[0m' # No Color
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Get CLI root directory (parent of parent of script directory)
+CLI_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
 # Source registry manager
 if [ ! -f "$SCRIPT_DIR/registry-manager.sh" ]; then
     echo -e "${RED}Error: registry-manager.sh not found${NC}"
@@ -55,7 +58,7 @@ EOF
 fi
 
 # Get current CLI version
-CLI_VERSION=$(get_cli_version "$SCRIPT_DIR")
+CLI_VERSION=$(get_cli_version "$CLI_ROOT")
 
 # Initialize registry
 init_registry
