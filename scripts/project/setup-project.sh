@@ -15,50 +15,95 @@ BLUE='\033[0;34m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-# Function to ensure hub repository exists
+# Get script directory first (needed for config manager)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Source configuration manager
+CONFIG_MANAGER="$SCRIPT_DIR/../utils/config-manager.sh"
+if [ -f "$CONFIG_MANAGER" ]; then
+    source "$CONFIG_MANAGER"
+    # Verify that essential functions were loaded
+    if ! command -v get_hub_mode &> /dev/null || ! command -v get_hub_path &> /dev/null; then
+        echo -e "${RED}Error: Failed to load configuration manager functions${NC}" >&2
+        exit 1
+    fi
+else
+    echo -e "${RED}Error: Configuration manager not found: $CONFIG_MANAGER${NC}" >&2
+    echo "This script requires the configuration manager to function properly" >&2
+    exit 1
+fi
+
+# Function to setup and initialize hub repository
+# NOTE: This function is specifically for setup and includes interactive prompts.
+# It differs from ensure_hub_exists() in hub-utils.sh which is for validation only.
 ensure_hub_exists() {
     local hub_dir
-    local default_hub="$HOME/Documents/ai-use-case-hub"
+    local hub_mode
+    local git_url
+    local config_exists=false
 
-    # Check if AI_USECASES_DIR is set
-    if [ -n "$AI_USECASES_DIR" ]; then
-        hub_dir="$AI_USECASES_DIR"
+    # Check if configuration exists
+    if [ -f "$HOME/.config/ai-use-case-cli/config.json" ]; then
+        config_exists=true
+        hub_mode=$(get_hub_mode)
+        hub_dir=$(get_hub_path)
+        git_url=$(get_git_url)
     else
-        hub_dir="$default_hub"
+        # No config exists - prompt user for hub mode
+        echo -e "${BLUE}=== First Time Setup ===${NC}" >&2
+        echo "" >&2
+        hub_dir=$(prompt_hub_mode)
+        hub_mode=$(get_hub_mode)
+        git_url=$(get_git_url)
     fi
 
-    # Check if hub exists
+    # Check if hub directory exists
     if [ ! -d "$hub_dir" ]; then
-        echo -e "${YELLOW}Hub repository not found at: $hub_dir${NC}" >&2
-        echo -e "${BLUE}Cloning ai-use-case-hub repository...${NC}" >&2
+        echo -e "${YELLOW}Hub directory not found at: $hub_dir${NC}" >&2
 
         # Create parent directory if needed
         mkdir -p "$(dirname "$hub_dir")"
 
-        # Clone the repository
-        if git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git "$hub_dir" 2>/dev/null; then
-            echo -e "${GREEN}✓${NC} Hub repository cloned successfully" >&2
-        else
-            echo -e "${RED}Error: Failed to clone hub repository${NC}" >&2
-            echo "Please clone manually:" >&2
-            echo "  git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git $hub_dir" >&2
-            exit 1
-        fi
+        # Handle based on hub mode
+        case "$hub_mode" in
+            local)
+                echo -e "${BLUE}Creating local hub directory...${NC}" >&2
+                mkdir -p "$hub_dir"
+                echo -e "${GREEN}✓${NC} Local hub directory created" >&2
+                ;;
+            private-git)
+                echo -e "${BLUE}Cloning git repository...${NC}" >&2
+                echo -e "${CYAN}URL: $git_url${NC}" >&2
+
+                if git clone "$git_url" "$hub_dir" 2>/dev/null; then
+                    echo -e "${GREEN}✓${NC} Hub repository cloned successfully" >&2
+                else
+                    echo -e "${RED}Error: Failed to clone hub repository${NC}" >&2
+                    echo "Please clone manually:" >&2
+                    echo "  git clone $git_url $hub_dir" >&2
+                    echo "" >&2
+                    echo "Or reconfigure:" >&2
+                    echo "  rm ~/.config/ai-use-case-cli/config.json" >&2
+                    echo "  ai-use-case --init" >&2
+                    exit 1
+                fi
+                ;;
+        esac
     fi
 
-    # Verify hub structure
+    # Verify and create hub structure
     if [ ! -d "$hub_dir/by-project" ]; then
         mkdir -p "$hub_dir/by-project" "$hub_dir/by-date" "$hub_dir/by-topic"
+        echo -e "${GREEN}✓${NC} Hub directory structure created" >&2
     fi
 
     echo "$hub_dir"
 }
 
 # Configuration - Auto-detect locations
-# SCRIPT_DIR = Script's parent directory (scripts/project)
+# SCRIPT_DIR = Script's parent directory (scripts/project) - already set above
 # CLI_ROOT = CLI installation root directory (for scripts and hooks)
 # CENTRAL_DIR = Documentation hub directory (for storing use cases)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLI_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 CENTRAL_DIR=$(ensure_hub_exists)
 POST_COMMIT_HOOK_SOURCE="$CLI_ROOT/git-hooks/post-commit"

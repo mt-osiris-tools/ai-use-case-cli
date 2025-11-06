@@ -18,35 +18,37 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Configuration - Auto-detect hub location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Source configuration manager
+CONFIG_MANAGER="$SCRIPT_DIR/../utils/config-manager.sh"
+if [ -f "$CONFIG_MANAGER" ]; then
+    source "$CONFIG_MANAGER"
+fi
+
 # Function to ensure hub repository exists
 ensure_hub_exists() {
     local hub_dir
-    local default_hub="$HOME/Documents/ai-use-case-hub"
+    local hub_mode
 
-    # Check if AI_USECASES_DIR is set
-    if [ -n "$AI_USECASES_DIR" ]; then
-        hub_dir="$AI_USECASES_DIR"
+    # Check if configuration exists
+    if [ -f "$HOME/.config/ai-use-case-cli/config.json" ]; then
+        hub_mode=$(get_hub_mode)
+        hub_dir=$(get_hub_path)
     else
-        hub_dir="$default_hub"
+        # Fallback to local mode if no config
+        echo -e "${YELLOW}Warning: No configuration found. Using local mode.${NC}" >&2
+        echo -e "${BLUE}Run 'ai-use-case --init' to configure hub mode.${NC}" >&2
+        hub_dir="${AI_USECASES_DIR:-$HOME/.local/share/ai-use-case-cli/hub}"
+        hub_mode="local"
     fi
 
     # Check if hub exists
     if [ ! -d "$hub_dir" ]; then
-        echo -e "${YELLOW}Hub repository not found at: $hub_dir${NC}" >&2
-        echo -e "${BLUE}Cloning ai-use-case-hub repository...${NC}" >&2
-
-        # Create parent directory if needed
-        mkdir -p "$(dirname "$hub_dir")"
-
-        # Clone the repository
-        if git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git "$hub_dir" 2>/dev/null; then
-            echo -e "${GREEN}✓${NC} Hub repository cloned successfully" >&2
-        else
-            echo -e "${RED}Error: Failed to clone hub repository${NC}" >&2
-            echo "Please clone manually:" >&2
-            echo "  git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git $hub_dir" >&2
-            exit 1
-        fi
+        echo -e "${RED}Error: Hub directory not found at: $hub_dir${NC}" >&2
+        echo "Please run 'ai-use-case --init' to setup the hub" >&2
+        exit 1
     fi
 
     # Verify hub structure
@@ -56,9 +58,6 @@ ensure_hub_exists() {
 
     echo "$hub_dir"
 }
-
-# Configuration - Auto-detect hub location
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Source version configuration (single source of truth)
 if [ -f "$SCRIPT_DIR/../utils/version.sh" ]; then
@@ -252,61 +251,72 @@ echo "  By topic: $BY_TOPIC_DIR/ (symlinks)"
 echo ""
 echo -e "${BLUE}💾 Disk usage:${NC} Files stored once, alternate views use symlinks"
 
-# Git commit and push to hub repository
+# Git commit and push to hub repository (only for git modes)
 if [ $NEW_COUNT -gt 0 ] || [ $UPDATED_COUNT -gt 0 ]; then
-    echo ""
-    echo -e "${BLUE}=== Committing changes to hub repository ===${NC}"
+    # Get hub mode
+    hub_mode=$(get_hub_mode 2>/dev/null || echo "local")
 
-    cd "$CENTRAL_DIR"
+    # Skip git operations for local mode
+    if [ "$hub_mode" = "local" ]; then
+        echo ""
+        echo -e "${GREEN}✓ Sync complete!${NC} (Local mode - no git operations)"
+        echo -e "${BLUE}Note:${NC} Running in local-only mode. Files are stored locally without version control."
+        echo "  To enable git sync, reconfigure: rm ~/.config/ai-use-case-cli/config.json && ai-use-case --init"
+    else
+        echo ""
+        echo -e "${BLUE}=== Committing changes to hub repository ===${NC}"
 
-    # Check if hub is a git repository
-    if [ -d ".git" ]; then
-        # Stage all changes
-        git add by-project/ by-date/ by-topic/ 2>/dev/null || true
+        cd "$CENTRAL_DIR"
 
-        # Check if there are changes to commit
-        if ! git diff --cached --quiet 2>/dev/null; then
-            # Create commit message
-            COMMIT_MSG="sync: Update from $PROJECT_NAME
+        # Check if hub is a git repository
+        if [ -d ".git" ]; then
+            # Stage all changes
+            git add by-project/ by-date/ by-topic/ 2>/dev/null || true
+
+            # Check if there are changes to commit
+            if ! git diff --cached --quiet 2>/dev/null; then
+                # Create commit message
+                COMMIT_MSG="sync: Update from $PROJECT_NAME
 
 - New files: $NEW_COUNT
 - Updated files: $UPDATED_COUNT
 
 Synced at: $(date '+%Y-%m-%d %H:%M:%S')"
 
-            if git commit -m "$COMMIT_MSG" 2>/dev/null; then
-                echo -e "${GREEN}✓${NC} Changes committed to hub repository"
+                if git commit -m "$COMMIT_MSG" 2>/dev/null; then
+                    echo -e "${GREEN}✓${NC} Changes committed to hub repository"
 
-                # Push to remote if configured
-                if git remote get-url origin &>/dev/null; then
-                    echo ""
-                    read -p "Push changes to remote hub repository? (y/n) " -n 1 -r
-                    echo
+                    # Push to remote if configured
+                    if git remote get-url origin &>/dev/null; then
+                        echo ""
+                        read -p "Push changes to remote hub repository? (y/n) " -n 1 -r
+                        echo
 
-                    if [[ $REPLY =~ ^[Yy]$ ]]; then
-                        echo -e "${BLUE}Pushing to remote repository...${NC}"
+                        if [[ $REPLY =~ ^[Yy]$ ]]; then
+                            echo -e "${BLUE}Pushing to remote repository...${NC}"
 
-                        if git push origin HEAD 2>&1 | grep -q "Everything up-to-date\|Total"; then
-                            echo -e "${GREEN}✓${NC} Changes pushed to remote repository"
+                            if git push origin HEAD 2>&1 | grep -q "Everything up-to-date\|Total"; then
+                                echo -e "${GREEN}✓${NC} Changes pushed to remote repository"
+                            else
+                                echo -e "${YELLOW}⚠ Warning${NC}: Failed to push changes to remote"
+                                echo "  You can push manually later: cd $CENTRAL_DIR && git push"
+                            fi
                         else
-                            echo -e "${YELLOW}⚠ Warning${NC}: Failed to push changes to remote"
-                            echo "  You can push manually later: cd $CENTRAL_DIR && git push"
+                            echo -e "${YELLOW}⚠ Note${NC}: Changes committed locally only"
+                            echo "  To push later, run: ai-use-case push"
                         fi
                     else
-                        echo -e "${YELLOW}⚠ Note${NC}: Changes committed locally only"
-                        echo "  To push later, run: ai-use-case push"
+                        echo -e "${YELLOW}⚠ Note${NC}: No remote configured - changes committed locally only"
                     fi
                 else
-                    echo -e "${YELLOW}⚠ Note${NC}: No remote configured - changes committed locally only"
+                    echo -e "${RED}✗ Failed to commit changes${NC}"
                 fi
             else
-                echo -e "${RED}✗ Failed to commit changes${NC}"
+                echo -e "${YELLOW}✓ No git changes to commit${NC} (files already in sync)"
             fi
         else
-            echo -e "${YELLOW}✓ No git changes to commit${NC} (files already in sync)"
+            echo -e "${YELLOW}⚠ Note${NC}: Hub directory is not a git repository"
+            echo "  To enable git sync, run: cd $CENTRAL_DIR && git init"
         fi
-    else
-        echo -e "${YELLOW}⚠ Note${NC}: Hub directory is not a git repository"
-        echo "  To enable git sync, run: cd $CENTRAL_DIR && git init"
     fi
 fi

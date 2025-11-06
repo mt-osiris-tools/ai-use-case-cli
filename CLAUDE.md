@@ -12,7 +12,7 @@ CLI tools for documenting AI-assisted development workflows, designed to help de
 - **Enable learning**: Help teams learn from past AI-assisted sessions and improve over time
 - **Streamline workflow**: Quick, template-based documentation that integrates seamlessly with development
 
-Works with a separate [hub repository](https://github.com/mt-osiris-tools/ai-use-case-hub) for centralized documentation storage.
+Supports flexible documentation storage: local-only (no git), private repository, or shared hub.
 
 ## Critical Requirements
 
@@ -66,6 +66,8 @@ Before creating any PR:
 ### Standalone CLI Commands
 ```bash
 ai-use-case --init              # Setup current project
+ai-use-case config show         # Show hub configuration
+ai-use-case config reconfigure  # Change hub mode (local/private)
 ai-use-case sync                # Sync use cases to hub
 ai-use-case search <term>       # Search documented use cases
 ai-use-case list                # List all registered projects
@@ -137,7 +139,9 @@ bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh <path>
 │   │   └── uninstall.sh           # Uninstallation script
 │   └── utils/                     # Utilities
 │       ├── bump-version.sh        # Version management
-│       └── version.sh              # Version configuration
+│       ├── version.sh             # Version configuration
+│       ├── config-manager.sh      # Hub configuration (v3.2.0+)
+│       └── hub-utils.sh           # Hub utilities (v3.2.0+)
 ├── .claude/commands/use-case/     # Slash commands for Claude Code
 ├── git-hooks/                     # Hook templates (pre-commit, post-commit)
 └── docs/                          # Detailed documentation
@@ -145,6 +149,53 @@ bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh <path>
   - `VERSION-MANAGEMENT.md` - Version bump guide
   - `HUB-SYNC-CHECKLIST.md` - Hub sync validation
 - **v3.1.0+:** `~/.local/share/ai-use-case-cli/projects-registry.json` - Project registry database
+- **v3.2.0+:** `~/.config/ai-use-case-cli/config.json` - Hub configuration
+
+## Hub Configuration (v3.2.0+)
+
+The CLI supports two hub modes for documentation storage:
+
+### Hub Modes
+
+1. **Local Only** (Default - No git repository)
+   - Files stored in: `~/.local/share/ai-use-case-cli/hub/`
+   - No version control, no remote sync
+   - Best for: Personal use, quick local documentation
+   - Git operations (push, remote sync) are disabled
+
+2. **Private Git** (Your own repository)
+   - Connect to your own private git repository
+   - Full version control with your chosen remote
+   - Best for: Private team documentation, company-internal use, version-controlled workflow
+   - Requires: Git repository URL during setup
+
+### Configuration
+
+During first setup (`ai-use-case --init`), you'll be prompted to select a mode.
+
+**Show current configuration:**
+```bash
+ai-use-case config show
+```
+
+**Reconfigure hub mode (change between local/private):**
+```bash
+ai-use-case config reconfigure
+```
+
+**Override hub location** (works with all modes):
+```bash
+export AI_USECASES_DIR="/custom/path/to/hub"
+```
+
+**Advanced (direct script access):**
+```bash
+# Show config
+bash ~/.local/share/ai-use-case-cli/scripts/utils/config-manager.sh show
+
+# Check mode
+bash ~/.local/share/ai-use-case-cli/scripts/utils/config-manager.sh mode
+```
 
 ## Automatic Documentation (Claude Code)
 

@@ -9,6 +9,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Hub Configuration Command**: New `ai-use-case config` command for managing hub settings
+  - `ai-use-case config show` - Display current hub configuration
+  - `ai-use-case config reconfigure` - Interactively change hub mode (local/private)
+  - Provides confirmation prompt before replacing existing configuration
+  - Cleaner alternative to manually deleting config file
+
+### Changed
+
+- **Removed shared hub option**: Hub configuration now offers only two modes for better privacy control
+  - Local only mode (default) - No git, files stored locally
+  - Private git mode - Connect to your own repository
+  - Removes dependency on external shared repository
+  - Users maintain full control over their documentation storage
+
+## [3.2.0] - 2025-11-06
+
+### Added
+
+- **Optional Hub Repository Configuration**: Two flexible hub modes for documentation storage
+  - **Local Only Mode**: Store files locally without git (no version control)
+    - Files stored in `~/.local/share/ai-use-case-cli/hub/`
+    - No git operations, no remote sync
+    - Best for personal use and quick local documentation
+    - Default mode for better privacy
+  - **Private Git Mode**: Connect to your own private repository
+    - Configure custom git repository URL during setup
+    - Full version control with your chosen remote
+    - Best for private team documentation and company-internal use
+  - Configuration stored in `~/.config/ai-use-case-cli/config.json`
+  - Interactive mode selection during first setup (`ai-use-case --init`)
+  - New utility scripts: `config-manager.sh` and `hub-utils.sh`
+  - Environment variable override still supported (`AI_USECASES_DIR`)
+  - Users maintain full control over their documentation storage
+
 - **Automated Version Bump System**: Fully automated version management with single command
   - `ai-use-case bump-version [major|minor|patch]` - automated version bumping
   - Automatically updates version.sh and CHANGELOG.md
@@ -28,7 +62,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated documentation references across codebase to point to CLI templates
   - Interactive script now dynamically selects template based on session type (implementation vs research)
 
+- **Centralized Version Management**: Introduced `version.sh` as single source of truth for CLI version
+  - All scripts now source version from `version.sh` instead of hardcoding
+  - Eliminates version drift across scripts
+  - Simplifies version bumps - update one file instead of multiple
+  - Includes version history and bump instructions in comments
+
 ### Changed
+
+- **Hub setup and sync operations** now support all three hub modes
+  - `setup-project.sh`: Prompts for hub mode selection on first run
+  - `sync-ai-use-cases.sh`: Skips git operations in local-only mode
+  - `push-hub.sh`: Warns users when in local-only mode
+  - All hub-dependent scripts now use `hub-utils.sh` for consistency
+  - Removed duplicate `ensure_hub_exists()` functions across scripts
 
 - **Restructured bash scripts into organized directories**: Improved project organization and maintainability
   - Created logical directory structure under `scripts/`:
@@ -37,7 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `search/` - Search and analytics (search, stats)
     - `hub/` - Hub operations (view, push)
     - `install/` - Installation scripts
-    - `utils/` - Utility scripts (version, bump-version)
+    - `utils/` - Utility scripts (version, bump-version, config-manager, hub-utils)
   - Updated all script paths in main CLI, install script, and cross-references
   - Updated documentation (README.md, CLAUDE.md) to reflect new structure
   - Benefits: Better organization, easier navigation, cleaner structure, better scalability
@@ -51,33 +98,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - More scannable and user-focused structure
   - Moved developer-specific content to appropriate documentation files
 
-### Fixed
-
-- **Template Path Resolution**: Updated `document-ai-session.sh` to reference templates from CLI docs/ directory
-  - Changed from `$CENTRAL_DIR/TEMPLATE.md` (hub) to `$SCRIPT_DIR/docs/TEMPLATE.md` (CLI)
-  - Ensures interactive documentation mode uses same template source as automatic mode
-  - Addresses PR feedback about template location inconsistency
-
-### Removed
-
-- **VS Code Extension**: Removed `vscode-extension/` directory to simplify project scope
-  - Extension was at v2.2.0 and not actively maintained
-  - Claude Code slash commands (`/use-case:*`) provide better AI-context-aware documentation
-  - Simplifies version management and reduces maintenance burden
-  - Users should migrate to Claude Code slash commands for best experience
-
-## [3.2.0] - 2025-11-03
-
-### Added
-
-- **Centralized Version Management**: Introduced `version.sh` as single source of truth for CLI version
-  - All scripts now source version from `version.sh` instead of hardcoding
-  - Eliminates version drift across scripts
-  - Simplifies version bumps - update one file instead of multiple
-  - Includes version history and bump instructions in comments
-
-### Changed
-
 - **Updated version retrieval in all scripts**:
   - `ai-use-case`: Sources `version.sh` for VERSION variable
   - `sync-ai-use-cases.sh`: Sources `version.sh` for display banner
@@ -89,8 +109,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Template Path Resolution**: Updated `document-ai-session.sh` to reference templates from CLI docs/ directory
+  - Changed from `$CENTRAL_DIR/TEMPLATE.md` (hub) to `$SCRIPT_DIR/docs/TEMPLATE.md` (CLI)
+  - Ensures interactive documentation mode uses same template source as automatic mode
+  - Addresses PR feedback about template location inconsistency
+
 - Prevents future version inconsistencies like the v2.3.0 issue in sync script
 - Makes version management more maintainable and less error-prone
+
+### Removed
+
+- **VS Code Extension**: Removed `vscode-extension/` directory to simplify project scope
+  - Extension was at v2.2.0 and not actively maintained
+  - Claude Code slash commands (`/use-case:*`) provide better AI-context-aware documentation
+  - Simplifies version management and reduces maintenance burden
+  - Users should migrate to Claude Code slash commands for best experience
 
 ## [3.1.1] - 2025-11-03
 

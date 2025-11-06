@@ -45,6 +45,7 @@ ${YELLOW}USAGE${NC}
 
 ${YELLOW}COMMANDS${NC}
   ${GREEN}--init, init${NC}              Setup current project for use case tracking
+  ${GREEN}config [show|reconfigure]${NC} Show or reconfigure hub settings
   ${GREEN}sync${NC}                      Sync use cases from project to hub
   ${GREEN}search <term>${NC}             Search documented use cases
   ${GREEN}list${NC}                      List all registered projects
@@ -68,6 +69,8 @@ ${YELLOW}CLAUDE CODE INTEGRATION${NC}
 
 ${YELLOW}EXAMPLES${NC}
   ai-use-case --init              # Setup current project
+  ai-use-case config show         # Show current hub configuration
+  ai-use-case config reconfigure  # Change hub mode (local/private)
   ai-use-case sync                # Sync use cases to hub
   ai-use-case search "auth"       # Search for auth-related use cases
   ai-use-case list                # List all projects
@@ -108,6 +111,42 @@ case "${1:-}" in
             bash "$SCRIPT_DIR/scripts/project/setup-project.sh" .
         else
             echo -e "${RED}Error: setup-project.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    config)
+        if [ -f "$SCRIPT_DIR/scripts/utils/config-manager.sh" ]; then
+            case "${2:-show}" in
+                show)
+                    bash "$SCRIPT_DIR/scripts/utils/config-manager.sh" show
+                    ;;
+                reconfigure)
+                    CONFIG_FILE="$HOME/.config/ai-use-case-cli/config.json"
+                    if [ -f "$CONFIG_FILE" ]; then
+                        echo -e "${YELLOW}Current configuration will be replaced.${NC}"
+                        echo ""
+                        bash "$SCRIPT_DIR/scripts/utils/config-manager.sh" show
+                        echo ""
+                        read -p "Continue with reconfiguration? (y/n) " -n 1 -r
+                        echo
+                        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                            echo -e "${BLUE}Reconfiguration cancelled${NC}"
+                            exit 0
+                        fi
+                        rm "$CONFIG_FILE"
+                        echo -e "${GREEN}✓${NC} Previous configuration removed"
+                        echo ""
+                    fi
+                    bash "$SCRIPT_DIR/scripts/utils/config-manager.sh" init
+                    ;;
+                *)
+                    echo -e "${RED}Error: Unknown config command '${2}'${NC}"
+                    echo "Usage: ai-use-case config [show|reconfigure]"
+                    exit 1
+                    ;;
+            esac
+        else
+            echo -e "${RED}Error: config-manager.sh not found${NC}"
             exit 1
         fi
         ;;
