@@ -1,7 +1,7 @@
 <div align="center">
-    <img src="./media/ai_use_case_cli_documentator.webp" alt="AI Use Case CLI - The Documenter" width="800"/>
+    <img src="./media/ai_use_case_cli_banner.webp" alt="AI Use Case CLI - The Documenter" width="800"/>
     <h1>AI Use Case CLI</h1>
-    <h3><em><strong>v3.1.0</strong> - Document AI-assisted development workflows with ease.</em></h3>
+    <h3><em><strong>v3.2.0</strong> - Document AI-assisted development workflows with ease.</em></h3>
 </div>
 
 ---
@@ -45,7 +45,8 @@ Documentation shouldn't be a burden—it should be a valuable asset that grows y
 - 🎯 **Hybrid interface** - Use standalone CLI commands or Claude Code slash commands
 - 🚀 **AI-assisted documentation** - Automatic context capture with Claude Code integration
 - 🔬 **Research & implementation sessions** - Document both code changes and exploratory work
-- 🔄 **Automatic syncing** - Git hooks sync docs to central hub automatically
+- 🔄 **Automatic syncing** - Git hooks sync docs to your chosen hub automatically
+- 🔧 **Flexible storage** - Choose between local-only or private git repository (v3.2.0+)
 - 🗂️ **Project registry** - Track and update all projects using the CLI (v3.1.0+)
 - 🔍 **Search & stats** - Find and analyze documented use cases
 - 📤 **Confluence publishing** - Publish use cases to Confluence as child pages
@@ -94,6 +95,8 @@ Use **either** standalone CLI or Claude Code slash commands—whatever fits your
 | Task | CLI Command | Claude Code |
 |------|-------------|-------------|
 | Setup project | `ai-use-case --init` | `/use-case:setup-project` |
+| Show hub config | `ai-use-case config show` | |
+| Reconfigure hub | `ai-use-case config reconfigure` | |
 | Document session | N/A – use Claude Code | `/use-case:document-session` |
 | Sync to hub | `ai-use-case sync` | `/use-case:sync-usecases` |
 | Search use cases | `ai-use-case search <term>` | `/use-case:search-usecases` |
@@ -133,19 +136,19 @@ Examples: Evaluating architectures, comparing solutions, understanding codebases
 
 ### Architecture
 
-The CLI works with a separate documentation hub repository:
+The CLI provides flexible documentation storage options:
 
 - **CLI Tools** (this repo): Scripts for documenting and managing use cases
-- **Documentation Hub**: Central storage for all use case documents
-  - Default: `~/Documents/ai-use-case-hub`
-  - Repository: [ai-use-case-hub](https://github.com/mt-osiris-tools/ai-use-case-hub)
+- **Documentation Hub**: Your choice of storage location
+  - **Local only** (default): `~/.local/share/ai-use-case-cli/hub/` - No git, no remote sync
+  - **Private git**: Your own repository - Full version control
   - Organized by project, date, and topic using symlinks
 
 ### Workflow
 
 1. **Setup**: Creates `docs/ai-use-cases/` in your project + installs git hooks
 2. **Document**: `/use-case:document-session` automatically captures session details
-3. **Sync**: Git hooks automatically sync to hub, commit, and push changes
+3. **Sync**: Git hooks automatically sync to hub (with git operations if configured)
 4. **Organize**: Hub organizes docs by project, date, and topic
 
 ### File Naming Convention
@@ -164,10 +167,36 @@ Examples:
 
 ## Configuration
 
+### Hub Configuration (v3.2.0+)
+
+When you run `ai-use-case --init` for the first time, you'll choose a hub mode:
+
+**1. Local Only (Default)**
+- Files stored in `~/.local/share/ai-use-case-cli/hub/`
+- No git, no version control, no remote sync
+- Best for: Personal use, quick local documentation
+- Complete privacy - everything stays on your machine
+
+**2. Private Git**
+- Connect to your own private git repository
+- Full version control with your chosen remote
+- Best for: Private team documentation, version-controlled workflow
+- You control the repository and access
+
+### Managing Configuration
+
+```bash
+# View current configuration
+ai-use-case config show
+
+# Change hub mode (switch between local/private)
+ai-use-case config reconfigure
+```
+
 ### Environment Variables
 
 ```bash
-# Set custom hub location (optional, defaults to ~/Documents/ai-use-case-hub)
+# Override hub location (works with all modes)
 export AI_USECASES_DIR="$HOME/Documents/my-custom-hub"
 
 # Ensure CLI is in PATH (usually handled by install script)
@@ -175,19 +204,6 @@ export PATH="$HOME/.local/bin:$PATH"
 ```
 
 Add to `~/.bashrc` or `~/.zshrc` for persistence.
-
-### Hub Setup
-
-Clone the documentation hub:
-
-```bash
-cd ~/Documents
-git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git
-cd ai-use-case-hub
-git remote add origin <your-hub-repository-url>
-```
-
-Configure git remote to enable automatic pushing. Without a remote, changes are committed locally only.
 
 ## Project Registry (v3.1.0+)
 
@@ -322,8 +338,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for complete guidelines.
 
 ## Related Projects
 
-- [ai-use-case-hub](https://github.com/mt-osiris-tools/ai-use-case-hub) - Documentation hub repository
-- [Claude Code](https://claude.com/code) - AI coding assistant
+- [Claude Code](https://claude.com/code) - AI coding assistant that powers the automatic documentation feature
 
 ## License
 
@@ -331,5 +346,5 @@ MIT License - see [LICENSE](./LICENSE) file for details
 
 ---
 
-**Version**: 3.1.0
+**Version**: 3.2.0
 **Last Updated**: 2025-11-03
