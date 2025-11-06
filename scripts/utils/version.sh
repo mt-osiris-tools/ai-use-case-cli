@@ -21,7 +21,7 @@
 export CLI_VERSION="3.2.0"
 
 # Version history (for reference)
-# 3.2.0 - 2025-11-03 - Centralized version constant (single source of truth)
+# 3.2.0 - 2025-11-06 - Optional hub repository (local, private-git, shared-git modes)
 # 3.1.1 - 2025-11-03 - Fixed version display in sync script
 # 3.1.0 - 2025-11-02 - Hybrid CLI + Project Registry
 # 3.0.0 - 2025-11-02 - Claude Code integration

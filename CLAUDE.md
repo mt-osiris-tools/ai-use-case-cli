@@ -12,7 +12,7 @@ CLI tools for documenting AI-assisted development workflows, designed to help de
 - **Enable learning**: Help teams learn from past AI-assisted sessions and improve over time
 - **Streamline workflow**: Quick, template-based documentation that integrates seamlessly with development
 
-Works with a separate [hub repository](https://github.com/mt-osiris-tools/ai-use-case-hub) for centralized documentation storage.
+Supports flexible documentation storage: local-only (no git), private repository, or shared hub.
 
 ## Critical Requirements
 
@@ -137,7 +137,9 @@ bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh <path>
 │   │   └── uninstall.sh           # Uninstallation script
 │   └── utils/                     # Utilities
 │       ├── bump-version.sh        # Version management
-│       └── version.sh              # Version configuration
+│       ├── version.sh             # Version configuration
+│       ├── config-manager.sh      # Hub configuration (v3.2.0+)
+│       └── hub-utils.sh           # Hub utilities (v3.2.0+)
 ├── .claude/commands/use-case/     # Slash commands for Claude Code
 ├── git-hooks/                     # Hook templates (pre-commit, post-commit)
 └── docs/                          # Detailed documentation
@@ -145,6 +147,50 @@ bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh <path>
   - `VERSION-MANAGEMENT.md` - Version bump guide
   - `HUB-SYNC-CHECKLIST.md` - Hub sync validation
 - **v3.1.0+:** `~/.local/share/ai-use-case-cli/projects-registry.json` - Project registry database
+- **v3.2.0+:** `~/.config/ai-use-case-cli/config.json` - Hub configuration
+
+## Hub Configuration (v3.2.0+)
+
+The CLI supports three hub modes for documentation storage:
+
+### Hub Modes
+
+1. **Local Only** (No git repository)
+   - Files stored in: `~/.local/share/ai-use-case-cli/hub/`
+   - No version control, no remote sync
+   - Best for: Personal use, quick local documentation
+   - Git operations (push, remote sync) are disabled
+
+2. **Private Git** (Your own repository)
+   - Connect to your own private git repository
+   - Full version control with your chosen remote
+   - Best for: Private team documentation, company-internal use
+   - Requires: Git repository URL during setup
+
+3. **Shared Git** (Default, community hub)
+   - Uses shared hub: `https://github.com/mt-osiris-tools/ai-use-case-hub`
+   - Stored in: `~/Documents/ai-use-case-hub/`
+   - Best for: Open collaboration, community contributions
+
+### Configuration
+
+During first setup (`ai-use-case --init`), you'll be prompted to select a mode.
+
+**Reconfigure hub mode:**
+```bash
+rm ~/.config/ai-use-case-cli/config.json
+ai-use-case --init
+```
+
+**Check current configuration:**
+```bash
+bash ~/.local/share/ai-use-case-cli/scripts/utils/config-manager.sh show
+```
+
+**Override hub location** (works with all modes):
+```bash
+export AI_USECASES_DIR="/custom/path/to/hub"
+```
 
 ## Automatic Documentation (Claude Code)
 
