@@ -66,6 +66,8 @@ Before creating any PR:
 ### Standalone CLI Commands
 ```bash
 ai-use-case --init              # Setup current project
+ai-use-case config show         # Show hub configuration
+ai-use-case config reconfigure  # Change hub mode (local/private/shared)
 ai-use-case sync                # Sync use cases to hub
 ai-use-case search <term>       # Search documented use cases
 ai-use-case list                # List all registered projects
@@ -176,20 +178,28 @@ The CLI supports three hub modes for documentation storage:
 
 During first setup (`ai-use-case --init`), you'll be prompted to select a mode.
 
-**Reconfigure hub mode:**
+**Show current configuration:**
 ```bash
-rm ~/.config/ai-use-case-cli/config.json
-ai-use-case --init
+ai-use-case config show
 ```
 
-**Check current configuration:**
+**Reconfigure hub mode (change between local/private/shared):**
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/utils/config-manager.sh show
+ai-use-case config reconfigure
 ```
 
 **Override hub location** (works with all modes):
 ```bash
 export AI_USECASES_DIR="/custom/path/to/hub"
+```
+
+**Advanced (direct script access):**
+```bash
+# Show config
+bash ~/.local/share/ai-use-case-cli/scripts/utils/config-manager.sh show
+
+# Check mode
+bash ~/.local/share/ai-use-case-cli/scripts/utils/config-manager.sh mode
 ```
 
 ## Automatic Documentation (Claude Code)

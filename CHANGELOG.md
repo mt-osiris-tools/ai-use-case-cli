@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Hub Configuration Command**: New `ai-use-case config` command for managing hub settings
+  - `ai-use-case config show` - Display current hub configuration
+  - `ai-use-case config reconfigure` - Interactively change hub mode (local/private/shared)
+  - Provides confirmation prompt before replacing existing configuration
+  - Cleaner alternative to manually deleting config file
+
 ## [3.2.0] - 2025-11-06
 
 ### Added
