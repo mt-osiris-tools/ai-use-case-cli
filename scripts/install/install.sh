@@ -44,34 +44,32 @@ get_installed_version() {
 REMOTE_VERSION=$(get_remote_version)
 INSTALLED_VERSION=$(get_installed_version)
 
-# Display compact banner
-echo ""
-echo -e "${CYAN}╭────────────────────────────────────────────────────────────╮${NC}"
+cat <<EOF
+${CYAN}
+ █████╗ ██╗    ██╗   ██╗███████╗███████╗     ██████╗ █████╗ ███████╗███████╗
+██╔══██╗██║    ██║   ██║██╔════╝██╔════╝    ██╔════╝██╔══██╗██╔════╝██╔════╝
+███████║██║    ██║   ██║███████╗█████╗█████╗██║     ███████║███████╗█████╗
+██╔══██║██║    ██║   ██║╚════██║██╔══╝╚════╝██║     ██╔══██║╚════██║██╔══╝
+██║  ██║██║    ╚██████╔╝███████║███████╗    ╚██████╗██║  ██║███████║███████╗
+╚═╝  ╚═╝╚═╝     ╚═════╝ ╚══════╝╚══════╝     ╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝
+${NC}
+${YELLOW}           Reduce documentation overhead, build knowledge${NC}
+${GREEN}        ═══════════════════════════════════════════════════════${NC}
+
+EOF
+
+# Display version info
 if [ -n "$REMOTE_VERSION" ]; then
     if [ -n "$INSTALLED_VERSION" ]; then
-        # Calculate padding for version line
-        VERSION_LINE="AI Use Case CLI v$REMOTE_VERSION (current: v$INSTALLED_VERSION)"
-        PADDING_NEEDED=$((58 - ${#VERSION_LINE}))
-        PADDING=$(printf '%*s' "$PADDING_NEEDED" '')
-        echo -e "${CYAN}│${NC} ${BLUE}AI Use Case CLI${NC} ${GREEN}v$REMOTE_VERSION${NC} ${YELLOW}(current: v$INSTALLED_VERSION)${NC}${PADDING} ${CYAN}│${NC}"
+        echo -e "${YELLOW}        Installing version: ${GREEN}v$REMOTE_VERSION${NC} ${YELLOW}(current: ${CYAN}v$INSTALLED_VERSION${YELLOW})${NC}"
     else
-        VERSION_LINE="AI Use Case CLI v$REMOTE_VERSION"
-        PADDING_NEEDED=$((58 - ${#VERSION_LINE}))
-        PADDING=$(printf '%*s' "$PADDING_NEEDED" '')
-        echo -e "${CYAN}│${NC} ${BLUE}AI Use Case CLI${NC} ${GREEN}v$REMOTE_VERSION${NC}${PADDING} ${CYAN}│${NC}"
+        echo -e "${YELLOW}        Installing version: ${GREEN}v$REMOTE_VERSION${NC}"
     fi
+    echo ""
 else
-    VERSION_LINE="AI Use Case CLI - Installation"
-    PADDING_NEEDED=$((58 - ${#VERSION_LINE}))
-    PADDING=$(printf '%*s' "$PADDING_NEEDED" '')
-    echo -e "${CYAN}│${NC} ${BLUE}AI Use Case CLI${NC} - Installation${PADDING} ${CYAN}│${NC}"
+    echo -e "${YELLOW}        AI Use Case CLI - Installation proceeding (version unavailable)${NC}"
+    echo ""
 fi
-DESCR_LINE="Reduce documentation overhead, build knowledge"
-DESCR_PADDING=$((58 - ${#DESCR_LINE}))
-DESCR_PAD=$(printf '%*s' "$DESCR_PADDING" '')
-echo -e "${CYAN}│${NC} ${DESCR_LINE}${DESCR_PAD} ${CYAN}│${NC}"
-echo -e "${CYAN}╰────────────────────────────────────────────────────────────╯${NC}"
-echo ""
 
 # Determine install directory
 if [ -f "ai-use-case" ] && [ -d ".git" ]; then

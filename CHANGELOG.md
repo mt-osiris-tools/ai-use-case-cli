@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Restored ASCII Art Banner**: Brought back the classic installation banner
+  - Replaced compact box design with original ASCII art project logo (displays "AI USE-CASE" for visual emphasis; official name remains `ai-use-case-cli`)
+  - More visually distinctive and memorable
+  - Maintains professional appearance with clear version information
+  - Tagline: "Reduce documentation overhead, build knowledge"
+
 - **Removed shared hub option**: Hub configuration now offers only two modes for better privacy control
   - Local only mode (default) - No git, files stored locally
   - Private git mode - Connect to your own repository
