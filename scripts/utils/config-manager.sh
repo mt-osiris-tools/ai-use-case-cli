@@ -246,7 +246,7 @@ prompt_hub_mode() {
                     continue
                 fi
 
-                init_config "local" "$hub_path" "" >&2
+                init_config "local" "$hub_path" ""
                 echo "$hub_path"
                 return 0
                 ;;
@@ -280,7 +280,7 @@ prompt_hub_mode() {
                     continue
                 fi
 
-                init_config "private-git" "$hub_path" "$git_url" >&2
+                init_config "private-git" "$hub_path" "$git_url"
                 echo "$hub_path"
                 return 0
                 ;;
