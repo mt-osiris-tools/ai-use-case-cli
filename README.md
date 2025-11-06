@@ -53,7 +53,7 @@ Documentation shouldn't be a burden—it should be a valuable asset that grows y
 ## Quick Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/install/install.sh | bash
 ```
 
 Or clone and install manually:
@@ -61,7 +61,7 @@ Or clone and install manually:
 ```bash
 git clone https://github.com/mt-osiris-tools/ai-use-case-cli.git ~/.local/share/ai-use-case-cli
 cd ~/.local/share/ai-use-case-cli
-./install.sh
+./scripts/install/install.sh
 ```
 
 ## Quick Start
@@ -277,7 +277,7 @@ Update to latest:
 ```bash
 cd ~/.local/share/ai-use-case-cli && git pull
 # OR: Re-run install script
-curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/install/install.sh | bash
 ```
 
 ## Migration from v2.x

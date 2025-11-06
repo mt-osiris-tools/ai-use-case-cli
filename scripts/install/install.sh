@@ -23,9 +23,9 @@ NC=$'\033[0m' # No Color
 get_remote_version() {
     local remote_version=""
     if command -v curl &> /dev/null; then
-        remote_version=$(curl -s -m 2 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/version.sh 2>/dev/null | grep '^export CLI_VERSION=' | head -1 | cut -d'"' -f2)
+        remote_version=$(curl -s -m 2 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/utils/version.sh 2>/dev/null | grep '^export CLI_VERSION=' | head -1 | cut -d'"' -f2)
     elif command -v wget &> /dev/null; then
-        remote_version=$(wget -qO- -T 2 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/version.sh 2>/dev/null | grep '^export CLI_VERSION=' | head -1 | cut -d'"' -f2)
+        remote_version=$(wget -qO- -T 2 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/utils/version.sh 2>/dev/null | grep '^export CLI_VERSION=' | head -1 | cut -d'"' -f2)
     fi
     echo "$remote_version"
 }
@@ -33,8 +33,8 @@ get_remote_version() {
 # Function to get installed version from version.sh (single source of truth)
 get_installed_version() {
     local install_dir="$HOME/.local/share/ai-use-case-cli"
-    if [ -f "$install_dir/version.sh" ]; then
-        (source "$install_dir/version.sh" && echo "$CLI_VERSION")
+    if [ -f "$install_dir/scripts/utils/version.sh" ]; then
+        (source "$install_dir/scripts/utils/version.sh" && echo "$CLI_VERSION")
     else
         echo ""
     fi
@@ -159,9 +159,8 @@ echo ""
 # Make scripts executable
 echo -e "${CYAN}Making scripts executable...${NC}"
 chmod +x ai-use-case
-chmod +x setup-project.sh
-chmod +x sync-ai-use-cases.sh
-chmod +x document-ai-session.sh
+# Make all scripts in subdirectories executable
+find scripts -name "*.sh" -type f -exec chmod +x {} \;
 echo -e "${GREEN}✓${NC} Scripts are executable"
 
 # Create symlink in user's bin directory

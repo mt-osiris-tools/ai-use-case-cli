@@ -23,8 +23,8 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 
 # Source version configuration (single source of truth)
-if [ -f "$SCRIPT_DIR/version.sh" ]; then
-    source "$SCRIPT_DIR/version.sh"
+if [ -f "$SCRIPT_DIR/scripts/utils/version.sh" ]; then
+    source "$SCRIPT_DIR/scripts/utils/version.sh"
     VERSION="$CLI_VERSION"
 else
     # Fallback if version.sh is missing
@@ -104,8 +104,8 @@ case "${1:-}" in
         ;;
     --init|init)
         echo -e "${BLUE}Setting up project...${NC}"
-        if [ -f "$SCRIPT_DIR/setup-project.sh" ]; then
-            bash "$SCRIPT_DIR/setup-project.sh" .
+        if [ -f "$SCRIPT_DIR/scripts/project/setup-project.sh" ]; then
+            bash "$SCRIPT_DIR/scripts/project/setup-project.sh" .
         else
             echo -e "${RED}Error: setup-project.sh not found${NC}"
             exit 1
@@ -113,8 +113,8 @@ case "${1:-}" in
         ;;
     sync)
         echo -e "${BLUE}Syncing use cases to hub...${NC}"
-        if [ -f "$SCRIPT_DIR/sync-ai-use-cases.sh" ]; then
-            bash "$SCRIPT_DIR/sync-ai-use-cases.sh" .
+        if [ -f "$SCRIPT_DIR/scripts/core/sync-ai-use-cases.sh" ]; then
+            bash "$SCRIPT_DIR/scripts/core/sync-ai-use-cases.sh" .
         else
             echo -e "${RED}Error: sync-ai-use-cases.sh not found${NC}"
             exit 1
@@ -126,64 +126,64 @@ case "${1:-}" in
             echo "Usage: ai-use-case search <term>"
             exit 1
         fi
-        if [ -f "$SCRIPT_DIR/search-use-cases.sh" ]; then
-            bash "$SCRIPT_DIR/search-use-cases.sh" "$2"
+        if [ -f "$SCRIPT_DIR/scripts/search/search-use-cases.sh" ]; then
+            bash "$SCRIPT_DIR/scripts/search/search-use-cases.sh" "$2"
         else
             echo -e "${RED}Error: search-use-cases.sh not found${NC}"
             exit 1
         fi
         ;;
     list)
-        if [ -f "$SCRIPT_DIR/list-projects.sh" ]; then
-            bash "$SCRIPT_DIR/list-projects.sh"
+        if [ -f "$SCRIPT_DIR/scripts/project/list-projects.sh" ]; then
+            bash "$SCRIPT_DIR/scripts/project/list-projects.sh"
         else
             echo -e "${RED}Error: list-projects.sh not found${NC}"
             exit 1
         fi
         ;;
     stats)
-        if [ -f "$SCRIPT_DIR/stats-use-cases.sh" ]; then
-            bash "$SCRIPT_DIR/stats-use-cases.sh"
+        if [ -f "$SCRIPT_DIR/scripts/search/stats-use-cases.sh" ]; then
+            bash "$SCRIPT_DIR/scripts/search/stats-use-cases.sh"
         else
             echo -e "${RED}Error: stats-use-cases.sh not found${NC}"
             exit 1
         fi
         ;;
     view)
-        if [ -f "$SCRIPT_DIR/view-hub.sh" ]; then
-            bash "$SCRIPT_DIR/view-hub.sh"
+        if [ -f "$SCRIPT_DIR/scripts/hub/view-hub.sh" ]; then
+            bash "$SCRIPT_DIR/scripts/hub/view-hub.sh"
         else
             echo -e "${RED}Error: view-hub.sh not found${NC}"
             exit 1
         fi
         ;;
     push)
-        if [ -f "$SCRIPT_DIR/push-hub.sh" ]; then
-            bash "$SCRIPT_DIR/push-hub.sh"
+        if [ -f "$SCRIPT_DIR/scripts/hub/push-hub.sh" ]; then
+            bash "$SCRIPT_DIR/scripts/hub/push-hub.sh"
         else
             echo -e "${RED}Error: push-hub.sh not found${NC}"
             exit 1
         fi
         ;;
     publish-confluence)
-        if [ -f "$SCRIPT_DIR/publish-confluence.sh" ]; then
-            bash "$SCRIPT_DIR/publish-confluence.sh" "${2:-}"
+        if [ -f "$SCRIPT_DIR/scripts/core/publish-confluence.sh" ]; then
+            bash "$SCRIPT_DIR/scripts/core/publish-confluence.sh" "${2:-}"
         else
             echo -e "${RED}Error: publish-confluence.sh not found${NC}"
             exit 1
         fi
         ;;
     list-projects)
-        if [ -f "$SCRIPT_DIR/list-projects.sh" ]; then
-            bash "$SCRIPT_DIR/list-projects.sh" "${2:-}"
+        if [ -f "$SCRIPT_DIR/scripts/project/list-projects.sh" ]; then
+            bash "$SCRIPT_DIR/scripts/project/list-projects.sh" "${2:-}"
         else
             echo -e "${RED}Error: list-projects.sh not found${NC}"
             exit 1
         fi
         ;;
     check-updates)
-        if [ -f "$SCRIPT_DIR/check-updates.sh" ]; then
-            bash "$SCRIPT_DIR/check-updates.sh" "${2:-}"
+        if [ -f "$SCRIPT_DIR/scripts/project/check-updates.sh" ]; then
+            bash "$SCRIPT_DIR/scripts/project/check-updates.sh" "${2:-}"
         else
             echo -e "${RED}Error: check-updates.sh not found${NC}"
             exit 1
@@ -195,8 +195,8 @@ case "${1:-}" in
             echo "Usage: ai-use-case update-project <path>"
             exit 1
         fi
-        if [ -f "$SCRIPT_DIR/update-project.sh" ]; then
-            bash "$SCRIPT_DIR/update-project.sh" "$2"
+        if [ -f "$SCRIPT_DIR/scripts/project/update-project.sh" ]; then
+            bash "$SCRIPT_DIR/scripts/project/update-project.sh" "$2"
         else
             echo -e "${RED}Error: update-project.sh not found${NC}"
             exit 1
@@ -209,18 +209,18 @@ case "${1:-}" in
             echo "Run: ai-use-case bump-version --help for more information"
             exit 1
         fi
-        if [ -f "$SCRIPT_DIR/bump-version.sh" ]; then
+        if [ -f "$SCRIPT_DIR/scripts/utils/bump-version.sh" ]; then
             # Pass all arguments after the command to the script
             shift
-            bash "$SCRIPT_DIR/bump-version.sh" "$@"
+            bash "$SCRIPT_DIR/scripts/utils/bump-version.sh" "$@"
         else
             echo -e "${RED}Error: bump-version.sh not found${NC}"
             exit 1
         fi
         ;;
     uninstall)
-        if [ -f "$SCRIPT_DIR/uninstall.sh" ]; then
-            bash "$SCRIPT_DIR/uninstall.sh"
+        if [ -f "$SCRIPT_DIR/scripts/install/uninstall.sh" ]; then
+            bash "$SCRIPT_DIR/scripts/install/uninstall.sh"
         else
             echo -e "${RED}Error: uninstall.sh not found${NC}"
             exit 1

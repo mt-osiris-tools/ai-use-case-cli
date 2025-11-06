@@ -36,7 +36,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Get CLI version from version.sh (single source of truth)
 get_cli_version() {
-    local version_file="$SCRIPT_DIR/version.sh"
+    local version_file="$SCRIPT_DIR/../utils/version.sh"
     if [ -f "$version_file" ]; then
         (source "$version_file" && echo "$CLI_VERSION")
     else
@@ -71,9 +71,9 @@ check_cli_version() {
     if [ -z "$remote_version" ]; then
         echo -e "${BLUE}Checking CLI version...${NC}"
         if command -v curl &> /dev/null; then
-            remote_version=$(curl -s -m 3 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/version.sh 2>/dev/null | grep '^export CLI_VERSION=' | head -1 | cut -d'"' -f2)
+            remote_version=$(curl -s -m 3 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/utils/version.sh 2>/dev/null | grep '^export CLI_VERSION=' | head -1 | cut -d'"' -f2)
         elif command -v wget &> /dev/null; then
-            remote_version=$(wget -qO- -T 3 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/version.sh 2>/dev/null | grep '^export CLI_VERSION=' | head -1 | cut -d'"' -f2)
+            remote_version=$(wget -qO- -T 3 https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/utils/version.sh 2>/dev/null | grep '^export CLI_VERSION=' | head -1 | cut -d'"' -f2)
         fi
         # Update cache (even if empty, to avoid repeated attempts)
         {
