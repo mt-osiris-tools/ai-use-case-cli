@@ -101,14 +101,14 @@ For AI-assisted documentation with automatic context capture:
 
 **Direct script access (advanced):**
 ```bash
-bash ~/.local/share/ai-use-case-cli/setup-project.sh .
-bash ~/.local/share/ai-use-case-cli/document-ai-session.sh .
-bash ~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh .
-bash ~/.local/share/ai-use-case-cli/search-use-cases.sh <term>
-bash ~/.local/share/ai-use-case-cli/stats-use-cases.sh
-bash ~/.local/share/ai-use-case-cli/list-projects.sh
-bash ~/.local/share/ai-use-case-cli/check-updates.sh
-bash ~/.local/share/ai-use-case-cli/update-project.sh <path>
+bash ~/.local/share/ai-use-case-cli/scripts/project/setup-project.sh .
+bash ~/.local/share/ai-use-case-cli/scripts/core/document-ai-session.sh .
+bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
+bash ~/.local/share/ai-use-case-cli/scripts/search/search-use-cases.sh <term>
+bash ~/.local/share/ai-use-case-cli/scripts/search/stats-use-cases.sh
+bash ~/.local/share/ai-use-case-cli/scripts/project/list-projects.sh
+bash ~/.local/share/ai-use-case-cli/scripts/project/check-updates.sh
+bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh <path>
 ```
 
 ## File Structure
@@ -172,7 +172,7 @@ When `/use-case:document-session` is invoked:
    # Create file: docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_description.md
    git add docs/ai-use-cases/...
    git commit -m "docs: AI session documentation"
-   bash ~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh .
+   bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
    ```
 
 See [docs/CLAUDE.md](docs/CLAUDE.md) and [.claude/commands/use-case/document-session.md](.claude/commands/use-case/document-session.md) for complete automatic documentation workflow.
@@ -197,23 +197,23 @@ The CLI now maintains a registry of all projects using the tool, enabling better
 
 **Check all registered projects:**
 ```bash
-bash ~/.local/share/ai-use-case-cli/list-projects.sh --registry-only
+bash ~/.local/share/ai-use-case-cli/scripts/project/list-projects.sh --registry-only
 ```
 
 **Find projects needing updates:**
 ```bash
-bash ~/.local/share/ai-use-case-cli/check-updates.sh
+bash ~/.local/share/ai-use-case-cli/scripts/project/check-updates.sh
 ```
 
 **Update a specific project:**
 ```bash
-bash ~/.local/share/ai-use-case-cli/update-project.sh /path/to/project
+bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh /path/to/project
 ```
 
 **Update all outdated projects:**
 ```bash
-for p in $(bash ~/.local/share/ai-use-case-cli/check-updates.sh --paths-only); do
-  bash ~/.local/share/ai-use-case-cli/update-project.sh "$p"
+for p in $(bash ~/.local/share/ai-use-case-cli/scripts/project/check-updates.sh --paths-only); do
+  bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh "$p"
 done
 ```
 

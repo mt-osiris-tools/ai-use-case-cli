@@ -30,6 +30,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Restructured bash scripts into organized directories**: Improved project organization and maintainability
+  - Created logical directory structure under `scripts/`:
+    - `core/` - Core functionality (document, sync, publish)
+    - `project/` - Project management (setup, registry, updates)
+    - `search/` - Search and analytics (search, stats)
+    - `hub/` - Hub operations (view, push)
+    - `install/` - Installation scripts
+    - `utils/` - Utility scripts (version, bump-version)
+  - Updated all script paths in main CLI, install script, and cross-references
+  - Updated documentation (README.md, CLAUDE.md) to reflect new structure
+  - Benefits: Better organization, easier navigation, cleaner structure, better scalability
+
 - **Streamlined README.md**: Major improvements for better usability and clarity
   - Consolidated command documentation into single comparison table (CLI vs Claude Code)
   - Removed redundant sections (file structure, verbose migration guide, direct script access)
