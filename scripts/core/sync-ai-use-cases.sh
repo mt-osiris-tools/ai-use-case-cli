@@ -61,8 +61,8 @@ ensure_hub_exists() {
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Source version configuration (single source of truth)
-if [ -f "$SCRIPT_DIR/version.sh" ]; then
-    source "$SCRIPT_DIR/version.sh"
+if [ -f "$SCRIPT_DIR/../utils/version.sh" ]; then
+    source "$SCRIPT_DIR/../utils/version.sh"
 else
     # Fallback if version.sh is missing
     echo "Warning: version.sh not found, using fallback version" >&2

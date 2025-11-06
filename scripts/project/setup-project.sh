@@ -55,13 +55,15 @@ ensure_hub_exists() {
 }
 
 # Configuration - Auto-detect locations
-# SCRIPT_DIR = CLI installation directory (for scripts and hooks)
+# SCRIPT_DIR = Script's parent directory (scripts/project)
+# CLI_ROOT = CLI installation root directory (for scripts and hooks)
 # CENTRAL_DIR = Documentation hub directory (for storing use cases)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CLI_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 CENTRAL_DIR=$(ensure_hub_exists)
-POST_COMMIT_HOOK_SOURCE="$SCRIPT_DIR/git-hooks/post-commit"
-PRE_COMMIT_HOOK_SOURCE="$SCRIPT_DIR/git-hooks/pre-commit"
-SYNC_SCRIPT="$SCRIPT_DIR/sync-ai-use-cases.sh"
+POST_COMMIT_HOOK_SOURCE="$CLI_ROOT/git-hooks/post-commit"
+PRE_COMMIT_HOOK_SOURCE="$CLI_ROOT/git-hooks/pre-commit"
+SYNC_SCRIPT="$CLI_ROOT/scripts/core/sync-ai-use-cases.sh"
 
 # Show help
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
@@ -270,7 +272,7 @@ if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
     # Register project in the registry
     if [ -f "$SCRIPT_DIR/registry-manager.sh" ]; then
         source "$SCRIPT_DIR/registry-manager.sh"
-        CLI_VERSION=$(get_cli_version "$SCRIPT_DIR")
+        CLI_VERSION=$(get_cli_version "$CLI_ROOT")
         REGISTRY_STATUS=$(register_project "$PROJECT_PATH" "$CLI_VERSION" "docs/ai-use-cases")
         if [ "$REGISTRY_STATUS" = "registered" ]; then
             echo -e "${GREEN}✓${NC} Project registered in CLI registry"

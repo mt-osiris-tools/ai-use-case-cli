@@ -113,22 +113,34 @@ bash ~/.local/share/ai-use-case-cli/update-project.sh <path>
 
 ## File Structure
 
-- `ai-use-case` - Main CLI entry point with hybrid commands (version on line 19)
-- `setup-project.sh` - Project setup script (now includes registry)
-- `sync-ai-use-cases.sh` - Hub synchronization
-- `document-ai-session.sh` - Interactive documentation
-- `search-use-cases.sh` - Search functionality
-- `stats-use-cases.sh` - Statistics display
-- `list-projects.sh` - Project listing (enhanced with registry in v3.1.0)
-- `view-hub.sh` - Hub viewer
-- `push-hub.sh` - Hub push automation
-- `publish-confluence.sh` - Confluence publishing
-- **v3.1.0+:** `registry-manager.sh` - Project registry management
-- **v3.1.0+:** `check-updates.sh` - Check for outdated projects
-- **v3.1.0+:** `update-project.sh` - Update project CLI version
-- `.claude/commands/use-case/` - Slash commands for Claude Code
-- `git-hooks/` - Hook templates (pre-commit, post-commit)
-- `docs/` - Detailed documentation
+```
+├── ai-use-case                    # Main CLI entry point with hybrid commands
+├── scripts/
+│   ├── core/                      # Core functionality
+│   │   ├── document-ai-session.sh # Interactive documentation
+│   │   ├── publish-confluence.sh  # Confluence publishing
+│   │   └── sync-ai-use-cases.sh   # Hub synchronization
+│   ├── project/                   # Project management
+│   │   ├── setup-project.sh       # Project setup (includes registry)
+│   │   ├── registry-manager.sh    # Project registry management (v3.1.0+)
+│   │   ├── list-projects.sh       # Project listing
+│   │   ├── check-updates.sh       # Check for outdated projects (v3.1.0+)
+│   │   └── update-project.sh      # Update project CLI version (v3.1.0+)
+│   ├── search/                    # Search and analytics
+│   │   ├── search-use-cases.sh    # Search functionality
+│   │   └── stats-use-cases.sh     # Statistics display
+│   ├── hub/                       # Hub operations
+│   │   ├── view-hub.sh            # Hub viewer
+│   │   └── push-hub.sh            # Hub push automation
+│   ├── install/                   # Installation
+│   │   ├── install.sh             # Installation script
+│   │   └── uninstall.sh           # Uninstallation script
+│   └── utils/                     # Utilities
+│       ├── bump-version.sh        # Version management
+│       └── version.sh              # Version configuration
+├── .claude/commands/use-case/     # Slash commands for Claude Code
+├── git-hooks/                     # Hook templates (pre-commit, post-commit)
+└── docs/                          # Detailed documentation
   - `CLAUDE.md` - Comprehensive guide
   - `VERSION-MANAGEMENT.md` - Version bump guide
   - `HUB-SYNC-CHECKLIST.md` - Hub sync validation

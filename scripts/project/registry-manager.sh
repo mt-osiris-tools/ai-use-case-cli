@@ -42,7 +42,7 @@ EOF
 # Get CLI version from version.sh (single source of truth)
 get_cli_version() {
     local script_dir="$1"
-    local version_file="$script_dir/version.sh"
+    local version_file="$script_dir/scripts/utils/version.sh"
 
     if [ -f "$version_file" ]; then
         # Source version.sh and return CLI_VERSION

@@ -34,8 +34,9 @@ NC='\033[0m'
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CLI_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 VERSION_FILE="$SCRIPT_DIR/version.sh"
-CHANGELOG_FILE="$SCRIPT_DIR/CHANGELOG.md"
+CHANGELOG_FILE="$CLI_ROOT/CHANGELOG.md"
 
 # Parse options
 DRY_RUN=false
