@@ -44,9 +44,15 @@ ensure_hub_exists() {
         exit 1
     fi
 
-    # Verify hub structure
-    if [ ! -d "$hub_dir/by-project" ]; then
-        mkdir -p "$hub_dir/by-project" "$hub_dir/by-date" "$hub_dir/by-topic"
+    # Verify and create hub structure if needed
+    # Note: We auto-create subdirectories since they're just organizational structure
+    # and might be missing due to manual deletion or corruption
+    if [ ! -d "$hub_dir/by-project" ] || [ ! -d "$hub_dir/by-date" ] || [ ! -d "$hub_dir/by-topic" ]; then
+        mkdir -p "$hub_dir/by-project" "$hub_dir/by-date" "$hub_dir/by-topic" 2>/dev/null || {
+            echo -e "${RED}Error: Cannot create hub directory structure${NC}" >&2
+            echo "Please check permissions for: $hub_dir" >&2
+            exit 1
+        }
     fi
 
     echo "$hub_dir"
