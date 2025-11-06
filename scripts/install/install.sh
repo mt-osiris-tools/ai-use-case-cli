@@ -53,7 +53,7 @@ ${CYAN}
 ██║  ██║██║    ╚██████╔╝███████║███████╗    ╚██████╗██║  ██║███████║███████╗
 ╚═╝  ╚═╝╚═╝     ╚═════╝ ╚══════╝╚══════╝     ╚═════╝╚═╝  ╚═╝╚══════╝╚══════╝
 ${NC}
-${YELLOW}           Document Your AI-Assisted Development Sessions${NC}
+${YELLOW}           Reduce documentation overhead, build knowledge${NC}
 ${GREEN}        ═══════════════════════════════════════════════════════${NC}
 
 EOF
