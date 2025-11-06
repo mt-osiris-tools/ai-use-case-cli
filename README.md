@@ -197,7 +197,9 @@ ai-use-case config reconfigure
 
 ```bash
 # Override hub location (works with both modes)
-export AI_USECASES_DIR="$HOME/Documents/my-custom-hub"
+export AI_USECASES_DIR="$HOME/.local/share/ai-use-case-cli/hub"  # Default for local mode
+# Or use a custom path:
+# export AI_USECASES_DIR="$HOME/Documents/my-custom-hub"
 
 # Ensure CLI is in PATH (usually handled by install script)
 export PATH="$HOME/.local/bin:$PATH"
