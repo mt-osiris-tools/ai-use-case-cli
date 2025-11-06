@@ -15,6 +15,9 @@ NC='\033[0m' # No Color
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Get CLI root directory (parent of parent of script directory)
+CLI_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
 # Source registry manager
 if [ ! -f "$SCRIPT_DIR/registry-manager.sh" ]; then
     echo -e "${RED}Error: registry-manager.sh not found${NC}"
@@ -23,8 +26,58 @@ fi
 
 source "$SCRIPT_DIR/registry-manager.sh"
 
-# Show help
-if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]] || [ -z "$1" ]; then
+# Parse flags
+AUTO_CONFIRM=false
+PROJECT_PATH=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -y|--yes)
+            AUTO_CONFIRM=true
+            shift
+            ;;
+        -h|--help)
+            cat <<EOF
+${BLUE}AI Use Case CLI - Update Project${NC}
+
+Updates a registered project to the latest CLI version by re-running
+the setup script.
+
+${YELLOW}Usage:${NC}
+  $0 [options] <project_path>
+
+${YELLOW}Arguments:${NC}
+  project_path    Path to the project to update
+
+${YELLOW}Options:${NC}
+  -y, --yes       Skip confirmation prompt and proceed automatically
+  -h, --help      Show this help message
+
+${YELLOW}Examples:${NC}
+  $0 /path/to/project          # Update specific project (with prompt)
+  $0 -y .                      # Update current directory (no prompt)
+  $0 --yes ~/Projects/my-app   # Update project by path (no prompt)
+EOF
+            exit 0
+            ;;
+        *)
+            if [ -z "$PROJECT_PATH" ]; then
+                PROJECT_PATH="$1"
+                shift
+            else
+                echo -e "${RED}Error: Unexpected argument '$1'${NC}"
+                echo "Only one project path is allowed."
+                echo ""
+                echo "Usage: $0 [options] <project_path>"
+                echo "Run '$0 --help' for more information."
+                exit 1
+            fi
+            ;;
+    esac
+done
+
+# Show help if no project path provided
+if [ -z "$PROJECT_PATH" ]; then
     cat <<EOF
 ${BLUE}AI Use Case CLI - Update Project${NC}
 
@@ -32,18 +85,19 @@ Updates a registered project to the latest CLI version by re-running
 the setup script.
 
 ${YELLOW}Usage:${NC}
-  $0 <project_path>
+  $0 [options] <project_path>
 
 ${YELLOW}Arguments:${NC}
   project_path    Path to the project to update
 
 ${YELLOW}Options:${NC}
+  -y, --yes       Skip confirmation prompt and proceed automatically
   -h, --help      Show this help message
 
 ${YELLOW}Examples:${NC}
-  $0 /path/to/project          # Update specific project
-  $0 .                         # Update current directory
-  $0 ~/Projects/my-app         # Update project by path
+  $0 /path/to/project          # Update specific project (with prompt)
+  $0 -y .                      # Update current directory (no prompt)
+  $0 --yes ~/Projects/my-app   # Update project by path (no prompt)
 
 ${YELLOW}Description:${NC}
   This command updates a project's CLI installation by:
@@ -59,15 +113,12 @@ ${YELLOW}Update All Projects:${NC}
   To update all outdated projects at once:
 
   for p in \$(./check-updates.sh --paths-only); do
-    ./update-project.sh "\$p"
+    ./update-project.sh -y "\$p"
   done
 
 EOF
     exit 0
 fi
-
-# Get project path
-PROJECT_PATH="$1"
 
 # Verify project exists
 if [ ! -d "$PROJECT_PATH" ]; then
@@ -94,7 +145,7 @@ PROJECT_NAME=$(echo "$PROJECT_INFO" | jq -r '.name')
 PROJECT_VERSION=$(echo "$PROJECT_INFO" | jq -r '.version')
 
 # Get current CLI version
-CLI_VERSION=$(get_cli_version "$SCRIPT_DIR")
+CLI_VERSION=$(get_cli_version "$CLI_ROOT")
 
 echo -e "${BLUE}=== Update Project ===${NC}"
 echo "Project: $PROJECT_NAME"
@@ -112,13 +163,18 @@ fi
 echo -e "${YELLOW}⚠ Update needed: $PROJECT_VERSION → $CLI_VERSION${NC}"
 echo ""
 
-# Confirm update
-read -p "Update project? [Y/n] " -n 1 -r
-echo ""
+# Confirm update (unless -y flag is used)
+if [ "$AUTO_CONFIRM" = false ]; then
+    read -p "Update project? [Y/n] " -n 1 -r
+    echo ""
 
-if [[ ! $REPLY =~ ^[Yy]$ ]] && [[ ! -z $REPLY ]]; then
-    echo "Update cancelled"
-    exit 0
+    if [[ ! $REPLY =~ ^[Yy]$ ]] && [[ ! -z $REPLY ]]; then
+        echo "Update cancelled"
+        exit 0
+    fi
+else
+    echo "Auto-confirming update (--yes flag used)"
+    echo ""
 fi
 
 echo ""

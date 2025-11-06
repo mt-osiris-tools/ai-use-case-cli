@@ -23,6 +23,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removes dependency on external shared repository
   - Users maintain full control over their documentation storage
 
+## [3.2.1] - 2025-11-06
+
+### Fixed
+
+- **CLI Version Detection**: Fixed bug where project management scripts couldn't detect CLI version
+  - `update-project.sh`, `list-projects.sh`, and `check-updates.sh` now correctly resolve CLI_ROOT
+  - Previously showed "unknown" for CLI version, now displays actual version (e.g., 3.2.1)
+  - Fixed by defining CLI_ROOT as parent directory of scripts directory
+  - Affects: `scripts/project/update-project.sh:19,100`, `scripts/project/list-projects.sh:19`, `scripts/project/check-updates.sh:19,61`
+
+### Added
+
+- **Auto-confirm flag for update-project**: New `-y/--yes` flag to skip confirmation prompt
+  - Enables non-interactive updates for automation and batch operations
+  - Usage: `bash update-project.sh -y /path/to/project`
+  - Useful for updating multiple projects in a loop
+  - Example: `for p in $(check-updates.sh --paths-only); do update-project.sh -y "$p"; done`
+
 ## [3.2.0] - 2025-11-06
 
 ### Added
