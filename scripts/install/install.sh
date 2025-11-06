@@ -66,8 +66,10 @@ if [ -n "$REMOTE_VERSION" ]; then
         echo -e "${YELLOW}        Installing version: ${GREEN}v$REMOTE_VERSION${NC}"
     fi
     echo ""
+else
+    echo -e "${YELLOW}        AI Use Case CLI - Installation proceeding (version unavailable)${NC}"
+    echo ""
 fi
-echo -e "${NC}"
 
 # Determine install directory
 if [ -f "ai-use-case" ] && [ -d ".git" ]; then
