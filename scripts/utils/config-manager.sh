@@ -144,17 +144,16 @@ prompt_hub_mode() {
     echo ""
     echo -e "  ${GREEN}1${NC}. Local only (no git repository)"
     echo "     Files stored locally, no version control or remote sync"
+    echo "     Best for: Personal use, quick local documentation"
     echo ""
     echo -e "  ${GREEN}2${NC}. Private git repository"
     echo "     Connect to your own private repository for version control"
-    echo ""
-    echo -e "  ${GREEN}3${NC}. Shared hub repository (default)"
-    echo "     Use the shared mt-osiris-tools hub for collaboration"
+    echo "     Best for: Private team documentation, version-controlled workflow"
     echo ""
 
     while true; do
-        read -p "Select option (1-3) [3]: " choice
-        choice=${choice:-3}
+        read -p "Select option (1-2) [1]: " choice
+        choice=${choice:-1}
 
         case $choice in
             1)
@@ -184,18 +183,8 @@ prompt_hub_mode() {
                 echo "$hub_path"
                 return 0
                 ;;
-            3)
-                echo ""
-                echo -e "${BLUE}Shared hub mode selected${NC}"
-                read -p "Local hub directory path [$HOME/Documents/ai-use-case-hub]: " hub_path
-                hub_path=${hub_path:-$HOME/Documents/ai-use-case-hub}
-
-                init_config "shared-git" "$hub_path" "https://github.com/mt-osiris-tools/ai-use-case-hub.git"
-                echo "$hub_path"
-                return 0
-                ;;
             *)
-                echo -e "${RED}Invalid option. Please select 1, 2, or 3.${NC}"
+                echo -e "${RED}Invalid option. Please select 1 or 2.${NC}"
                 ;;
         esac
     done

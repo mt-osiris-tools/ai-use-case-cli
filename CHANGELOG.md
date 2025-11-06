@@ -11,30 +11,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Hub Configuration Command**: New `ai-use-case config` command for managing hub settings
   - `ai-use-case config show` - Display current hub configuration
-  - `ai-use-case config reconfigure` - Interactively change hub mode (local/private/shared)
+  - `ai-use-case config reconfigure` - Interactively change hub mode (local/private)
   - Provides confirmation prompt before replacing existing configuration
   - Cleaner alternative to manually deleting config file
+
+### Changed
+
+- **Removed shared hub option**: Hub configuration now offers only two modes for better privacy control
+  - Local only mode (default) - No git, files stored locally
+  - Private git mode - Connect to your own repository
+  - Removes dependency on external shared repository
+  - Users maintain full control over their documentation storage
 
 ## [3.2.0] - 2025-11-06
 
 ### Added
 
-- **Optional Hub Repository Configuration**: Three flexible hub modes for documentation storage
+- **Optional Hub Repository Configuration**: Two flexible hub modes for documentation storage
   - **Local Only Mode**: Store files locally without git (no version control)
     - Files stored in `~/.local/share/ai-use-case-cli/hub/`
     - No git operations, no remote sync
     - Best for personal use and quick local documentation
+    - Default mode for better privacy
   - **Private Git Mode**: Connect to your own private repository
     - Configure custom git repository URL during setup
     - Full version control with your chosen remote
     - Best for private team documentation and company-internal use
-  - **Shared Git Mode**: Use community hub (default)
-    - Uses `https://github.com/mt-osiris-tools/ai-use-case-hub`
-    - Best for open collaboration and community contributions
   - Configuration stored in `~/.config/ai-use-case-cli/config.json`
   - Interactive mode selection during first setup (`ai-use-case --init`)
   - New utility scripts: `config-manager.sh` and `hub-utils.sh`
   - Environment variable override still supported (`AI_USECASES_DIR`)
+  - Users maintain full control over their documentation storage
 
 - **Automated Version Bump System**: Fully automated version management with single command
   - `ai-use-case bump-version [major|minor|patch]` - automated version bumping

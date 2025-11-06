@@ -70,7 +70,7 @@ ${YELLOW}CLAUDE CODE INTEGRATION${NC}
 ${YELLOW}EXAMPLES${NC}
   ai-use-case --init              # Setup current project
   ai-use-case config show         # Show current hub configuration
-  ai-use-case config reconfigure  # Change hub mode (local/private/shared)
+  ai-use-case config reconfigure  # Change hub mode (local/private)
   ai-use-case sync                # Sync use cases to hub
   ai-use-case search "auth"       # Search for auth-related use cases
   ai-use-case list                # List all projects

@@ -67,7 +67,7 @@ Before creating any PR:
 ```bash
 ai-use-case --init              # Setup current project
 ai-use-case config show         # Show hub configuration
-ai-use-case config reconfigure  # Change hub mode (local/private/shared)
+ai-use-case config reconfigure  # Change hub mode (local/private)
 ai-use-case sync                # Sync use cases to hub
 ai-use-case search <term>       # Search documented use cases
 ai-use-case list                # List all registered projects
@@ -153,11 +153,11 @@ bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh <path>
 
 ## Hub Configuration (v3.2.0+)
 
-The CLI supports three hub modes for documentation storage:
+The CLI supports two hub modes for documentation storage:
 
 ### Hub Modes
 
-1. **Local Only** (No git repository)
+1. **Local Only** (Default - No git repository)
    - Files stored in: `~/.local/share/ai-use-case-cli/hub/`
    - No version control, no remote sync
    - Best for: Personal use, quick local documentation
@@ -166,13 +166,8 @@ The CLI supports three hub modes for documentation storage:
 2. **Private Git** (Your own repository)
    - Connect to your own private git repository
    - Full version control with your chosen remote
-   - Best for: Private team documentation, company-internal use
+   - Best for: Private team documentation, company-internal use, version-controlled workflow
    - Requires: Git repository URL during setup
-
-3. **Shared Git** (Default, community hub)
-   - Uses shared hub: `https://github.com/mt-osiris-tools/ai-use-case-hub`
-   - Stored in: `~/Documents/ai-use-case-hub/`
-   - Best for: Open collaboration, community contributions
 
 ### Configuration
 
@@ -183,7 +178,7 @@ During first setup (`ai-use-case --init`), you'll be prompted to select a mode.
 ai-use-case config show
 ```
 
-**Reconfigure hub mode (change between local/private/shared):**
+**Reconfigure hub mode (change between local/private):**
 ```bash
 ai-use-case config reconfigure
 ```
