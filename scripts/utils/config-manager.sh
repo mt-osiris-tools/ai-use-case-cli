@@ -96,7 +96,7 @@ init_config() {
 }
 EOF
 
-    echo -e "${GREEN}✓${NC} Configuration initialized: $CONFIG_FILE"
+    echo -e "${GREEN}✓${NC} Configuration initialized: $CONFIG_FILE" >&2
 }
 
 # Read configuration value
@@ -216,18 +216,18 @@ is_git_mode() {
 
 # Interactive hub mode selection
 prompt_hub_mode() {
-    echo -e "${BLUE}=== Hub Configuration ===${NC}"
-    echo ""
-    echo "How would you like to store AI use case documentation?"
-    echo ""
-    echo -e "  ${GREEN}1${NC}. Local only (no git repository)"
-    echo "     Files stored locally, no version control or remote sync"
-    echo "     Best for: Personal use, quick local documentation"
-    echo ""
-    echo -e "  ${GREEN}2${NC}. Private git repository"
-    echo "     Connect to your own private repository for version control"
-    echo "     Best for: Private team documentation, version-controlled workflow"
-    echo ""
+    echo -e "${BLUE}=== Hub Configuration ===${NC}" >&2
+    echo "" >&2
+    echo "How would you like to store AI use case documentation?" >&2
+    echo "" >&2
+    echo -e "  ${GREEN}1${NC}. Local only (no git repository)" >&2
+    echo "     Files stored locally, no version control or remote sync" >&2
+    echo "     Best for: Personal use, quick local documentation" >&2
+    echo "" >&2
+    echo -e "  ${GREEN}2${NC}. Private git repository" >&2
+    echo "     Connect to your own private repository for version control" >&2
+    echo "     Best for: Private team documentation, version-controlled workflow" >&2
+    echo "" >&2
 
     while true; do
         read -p "Select option (1-2) [1]: " choice
@@ -235,14 +235,14 @@ prompt_hub_mode() {
 
         case $choice in
             1)
-                echo ""
-                echo -e "${BLUE}Local mode selected${NC}"
+                echo "" >&2
+                echo -e "${BLUE}Local mode selected${NC}" >&2
                 read -p "Hub directory path [$HOME/.local/share/ai-use-case-cli/hub]: " hub_path
                 hub_path=${hub_path:-$HOME/.local/share/ai-use-case-cli/hub}
 
                 # Validate path
                 if ! validate_path "$hub_path"; then
-                    echo -e "${RED}Invalid path. Please try again.${NC}"
+                    echo -e "${RED}Invalid path. Please try again.${NC}" >&2
                     continue
                 fi
 
@@ -251,19 +251,19 @@ prompt_hub_mode() {
                 return 0
                 ;;
             2)
-                echo ""
-                echo -e "${BLUE}Private git mode selected${NC}"
+                echo "" >&2
+                echo -e "${BLUE}Private git mode selected${NC}" >&2
                 read -p "Git repository URL: " git_url
 
                 if [ -z "$git_url" ]; then
-                    echo -e "${RED}Error: Git URL is required for private git mode${NC}"
+                    echo -e "${RED}Error: Git URL is required for private git mode${NC}" >&2
                     continue
                 fi
 
                 # Basic git URL validation
                 if ! [[ "$git_url" =~ ^(https?://|git@|ssh://|file://) ]]; then
-                    echo -e "${YELLOW}Warning: URL doesn't appear to be a valid git repository URL${NC}"
-                    echo "Valid formats: https://, http://, git@, ssh://, file://"
+                    echo -e "${YELLOW}Warning: URL doesn't appear to be a valid git repository URL${NC}" >&2
+                    echo "Valid formats: https://, http://, git@, ssh://, file://" >&2
                     read -p "Continue anyway? (y/n) " -n 1 -r
                     echo
                     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -276,7 +276,7 @@ prompt_hub_mode() {
 
                 # Validate path
                 if ! validate_path "$hub_path"; then
-                    echo -e "${RED}Invalid path. Please try again.${NC}"
+                    echo -e "${RED}Invalid path. Please try again.${NC}" >&2
                     continue
                 fi
 
@@ -285,7 +285,7 @@ prompt_hub_mode() {
                 return 0
                 ;;
             *)
-                echo -e "${RED}Invalid option. Please select 1 or 2.${NC}"
+                echo -e "${RED}Invalid option. Please select 1 or 2.${NC}" >&2
                 ;;
         esac
     done
