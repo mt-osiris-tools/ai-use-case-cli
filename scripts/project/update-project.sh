@@ -63,8 +63,15 @@ EOF
         *)
             if [ -z "$PROJECT_PATH" ]; then
                 PROJECT_PATH="$1"
+                shift
+            else
+                echo -e "${RED}Error: Unexpected argument '$1'${NC}"
+                echo "Only one project path is allowed."
+                echo ""
+                echo "Usage: $0 [options] <project_path>"
+                echo "Run '$0 --help' for more information."
+                exit 1
             fi
-            shift
             ;;
     esac
 done
