@@ -49,7 +49,7 @@ curl -s https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/a
 Check if we're in a git repository with AI use cases configured:
 ```bash
 git rev-parse --show-toplevel
-ls -la docs/ai-use-cases/ 2>/dev/null || echo "Not set up"
+ls -la .usecase/cases/ 2>/dev/null || echo "Not set up"
 ```
 
 If not set up, offer to run: `bash ~/.local/share/ai-use-case-cli/setup-project.sh`
@@ -158,8 +158,8 @@ Use the Read tool to read the template file from this path. This is your source 
 Create a comprehensive markdown file **following the template structure exactly**:
 
 **Filename Format:**
-- Implementation: `docs/ai-use-cases/YYYY-Www-MM-DD_TICKET-XXX_brief-description-slug.md`
-- Research: `docs/ai-use-cases/YYYY-Www-MM-DD_RESEARCH-XXX_brief-description-slug.md`
+- Implementation: `.usecase/cases/YYYY-Www-MM-DD_TICKET-XXX_brief-description-slug.md`
+- Research: `.usecase/cases/YYYY-Www-MM-DD_RESEARCH-XXX_brief-description-slug.md`
 
 Where `Www` is the ISO 8601 week number (calculate using: `date +%V` to get week number (e.g., 42), then format as W42)
 
@@ -189,7 +189,7 @@ Where `Www` is the ISO 8601 week number (calculate using: `date +%V` to get week
 **For Implementation Sessions:**
 Commit the documentation along with code changes and sync to hub:
 ```bash
-git add docs/ai-use-cases/YYYY-Www-MM-DD_TICKET-XXX_brief-description-slug.md
+git add .usecase/cases/YYYY-Www-MM-DD_TICKET-XXX_brief-description-slug.md
 git commit -m "docs: AI session YYYY-Www-MM-DD - TICKET-XXX - Brief description
 
 [Additional details about what was documented...]
@@ -226,7 +226,7 @@ After completion, inform the user:
 ```
 ✅ Documentation created and synced!
 
-File: docs/ai-use-cases/2025-W42-10-14_HUB-002_update-github-organization-references.md
+File: .usecase/cases/2025-W42-10-14_HUB-002_update-github-organization-references.md
 
 Summary:
 - 5 files updated
@@ -252,11 +252,11 @@ Otherwise, ALWAYS use automatic mode when `/document-session` is invoked.
 ## Reference Examples
 
 **Implementation Sessions:**
-- `docs/ai-use-cases/2025-W42-10-14_HUB-001_fix-color-encoding-in-cli-tools.md`
-- `docs/ai-use-cases/2025-10-14_HUB-002_update-github-organization-references.md`
+- `.usecase/cases/2025-W42-10-14_HUB-001_fix-color-encoding-in-cli-tools.md`
+- `.usecase/cases/2025-10-14_HUB-002_update-github-organization-references.md`
 
 **Research Sessions (Example Format):**
-- `docs/ai-use-cases/2025-W43-10-20_RESEARCH-001_evaluate-database-migration-strategies.md`
+- `.usecase/cases/2025-W43-10-20_RESEARCH-001_evaluate-database-migration-strategies.md`
 - Focus on query evolution, insights, and decision-making
 - No code changes required
 

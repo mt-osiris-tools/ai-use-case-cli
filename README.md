@@ -146,7 +146,7 @@ The CLI provides flexible documentation storage options:
 
 ### Workflow
 
-1. **Setup**: Creates `docs/ai-use-cases/` in your project + installs git hooks
+1. **Setup**: Creates `.usecase/cases/` in your project + installs git hooks
 2. **Document**: `/use-case:document-session` automatically captures session details
 3. **Sync**: Git hooks automatically sync to hub (with git operations if configured)
 4. **Organize**: Hub organizes docs by project, date, and topic

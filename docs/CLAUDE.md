@@ -56,14 +56,14 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
 ### Shell Scripts
 
 1. **`setup-project.sh`**: One-time setup for a project repository
-   - Creates `docs/ai-use-cases/` directory in target project
+   - Creates `.usecase/cases/` directory in target project
    - Installs git pre-commit hook for branch protection
    - Installs git post-commit hook for auto-sync
    - Adds `.gitignore` patterns for draft files
    - Performs initial sync to hub
 
 2. **`sync-ai-use-cases.sh`**: Syncs documents from project to hub
-   - Copies files from project's `docs/ai-use-cases/` to hub's `by-project/[project-name]/`
+   - Copies files from project's `.usecase/cases/` to hub's `by-project/[project-name]/`
    - Creates symlinks in hub's `by-date/` based on YYYY-MM-DD prefix
    - Creates symlinks in hub's `by-topic/` based on topic slug
    - **Automatically commits changes to hub's git repository**
@@ -204,7 +204,7 @@ When `/use-case/document-session` is invoked in Claude Code:
    - **Results**: Quantify files changed, commits made, outcomes achieved
 
 5. **Generate Complete Documentation File**:
-   - Create file in `docs/ai-use-cases/` with proper naming convention
+   - Create file in `.usecase/cases/` with proper naming convention
    - Follow TEMPLATE.md or TEMPLATE-RESEARCH.md structure from CLI docs/ directory
    - Include all sections with real data (NO "TODO" or placeholders)
    - Use conversation context for qualitative insights
@@ -212,7 +212,7 @@ When `/use-case/document-session` is invoked in Claude Code:
 
 6. **Commit and Sync**:
    ```bash
-   git add docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_description.md
+   git add .usecase/cases/YYYY-MM-DD_TICKET-XXX_description.md
    git commit -m "docs: AI session YYYY-MM-DD - TICKET-XXX - Brief description
 
    [Details about what was documented...]
@@ -498,7 +498,7 @@ ai-use-case --init
 ```
 
 This runs `setup-project.sh` which:
-- Creates `docs/ai-use-cases/` in the project
+- Creates `.usecase/cases/` in the project
 - Installs post-commit hook
 - Adds `.gitignore` patterns
 - Runs initial sync to hub
@@ -514,7 +514,7 @@ This runs `document-ai-session.sh` which:
 - Collects git changes and session statistics
 - Guides you through interactive prompts
 - Generates documentation using the CLI's TEMPLATE.md or TEMPLATE-RESEARCH.md
-- Saves to `docs/ai-use-cases/` with proper naming
+- Saves to `.usecase/cases/` with proper naming
 - Optionally commits and syncs automatically
 
 ### Manual Sync
@@ -627,7 +627,7 @@ npm run compile
 
 **Option 2: Manual**
 1. Navigate to your project
-2. Create markdown file in `docs/ai-use-cases/` with proper naming
+2. Create markdown file in `.usecase/cases/` with proper naming
 3. Document your AI-assisted work using the template
 4. Commit the file with git
 5. Post-commit hook automatically syncs to hub

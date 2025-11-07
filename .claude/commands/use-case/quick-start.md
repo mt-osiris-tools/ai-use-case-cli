@@ -54,7 +54,7 @@ ai-use-case --init
 ### 6. Explain What Was Set Up
 
 Tell the user:
-- ✅ `docs/ai-use-cases/` directory created in their project
+- ✅ `.usecase/cases/` directory created in their project
 - ✅ Git post-commit hook installed for auto-syncing
 - ✅ `.gitignore` patterns added for draft files
 - ✅ CLI tools ready for use

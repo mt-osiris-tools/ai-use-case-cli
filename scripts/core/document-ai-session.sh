@@ -291,17 +291,23 @@ if [ ! -d ".git" ]; then
 fi
 
 PROJECT_NAME=$(basename "$(git rev-parse --show-toplevel)")
-AI_USECASES_DIR="$PROJECT_PATH/docs/ai-use-cases"
+AI_USECASES_DIR="$PROJECT_PATH/.usecase/cases"
 
 echo -e "${BLUE}=== AI Session Documentor ===${NC}"
 echo "Project: $PROJECT_NAME"
 echo "Path: $PROJECT_PATH"
 echo ""
 
-# Check if project is set up
-if [ ! -d "$AI_USECASES_DIR" ]; then
-    echo -e "${YELLOW}⚠ This project is not set up for AI use cases${NC}"
-    echo -e "Run: ${CYAN}$CENTRAL_DIR/setup-project.sh${NC}"
+# Check if project is set up (also check old location for migration)
+OLD_USECASES_DIR="$PROJECT_PATH/docs/ai-use-cases"
+if [ ! -d "$AI_USECASES_DIR" ] && [ ! -d "$OLD_USECASES_DIR" ]; then
+    echo -e "${YELLOW}⚠ This project is not set up for use case documentation${NC}"
+    echo -e "Run: ${CYAN}ai-use-case --init${NC}"
+    exit 1
+elif [ ! -d "$AI_USECASES_DIR" ] && [ -d "$OLD_USECASES_DIR" ]; then
+    echo -e "${YELLOW}⚠ Old structure detected. Please re-run setup:${NC}"
+    echo -e "Run: ${CYAN}ai-use-case --init${NC}"
+    echo -e "This will automatically migrate your use cases to the new structure."
     exit 1
 fi
 

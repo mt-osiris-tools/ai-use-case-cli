@@ -16,7 +16,7 @@ Configure the current project to automatically sync AI use case documentation to
 2. Check current status:
    ```bash
    # Check if already set up
-   ls -la docs/ai-use-cases/ 2>/dev/null && echo "Already set up" || echo "Not set up"
+   ls -la .usecase/cases/ 2>/dev/null && echo "Already set up" || echo "Not set up"
    ls -la .git/hooks/post-commit 2>/dev/null && grep -q "AI Use Cases" .git/hooks/post-commit && echo "Hook installed" || echo "Hook not installed"
    ```
 
@@ -28,7 +28,7 @@ Configure the current project to automatically sync AI use case documentation to
 4. Verify the setup:
    ```bash
    # Check what was created
-   ls -la docs/ai-use-cases/
+   ls -la .usecase/cases/
    ls -la .git/hooks/post-commit
 
    # Show the user where files will be synced
@@ -42,7 +42,7 @@ Configure the current project to automatically sync AI use case documentation to
 
 ## What Gets Set Up
 
-- `docs/ai-use-cases/` directory in the project
+- `.usecase/cases/` directory in the project
 - Git post-commit hook for auto-syncing
 - `.gitignore` patterns for draft files
 - README in the ai-use-cases directory

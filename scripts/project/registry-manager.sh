@@ -57,7 +57,7 @@ get_cli_version() {
 register_project() {
     local project_path="$1"
     local cli_version="$2"
-    local hub_path="${3:-docs/ai-use-cases}"
+    local hub_path="${3:-.usecase/cases}"
 
     init_registry
 

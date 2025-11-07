@@ -18,9 +18,10 @@
 # 4. Commit with message: "chore: bump version to X.Y.Z"
 
 # Current CLI version
-export CLI_VERSION="3.2.1"
+export CLI_VERSION="3.3.0"
 
 # Version history (for reference)
+# 3.3.0 - 2025-11-07 - Refactor folder structure (.usecase/cases)
 # 3.2.1 - 2025-11-06 - Fix CLI version detection bug, add auto-confirm flag
 # 3.2.0 - 2025-11-06 - Optional hub repository (local, private-git modes)
 # 3.1.1 - 2025-11-03 - Fixed version display in sync script

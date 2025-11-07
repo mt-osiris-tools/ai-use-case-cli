@@ -18,14 +18,10 @@ Thumbs.db
 *.draft.md
 *.local.md
 
-# AI Use Cases - ignore entire directory and all content (for local testing)
-docs/ai-use-cases/
-docs/ai-use-cases/*
-docs/ai-use-cases/**/*
+# Use Case Documentation - ignore entire directory and all content (for local testing)
+.usecase/
+.usecase/*
+.usecase/**/*
 
 # Note: by-project/, by-date/, and by-topic/ directories
 # belong in the ai-use-case-hub repository, not this CLI tools repo
-
-# AI Use Cases - ignore local notes
-docs/ai-use-cases/*.draft.md
-docs/ai-use-cases/*.local.md

@@ -73,7 +73,7 @@ curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/mai
 When documenting a session with `ai-use-case document`, the script automatically:
 1. Looks for TEMPLATE.md in the hub directory
 2. Uses it to structure your documentation
-3. Saves the completed document to your project's `docs/ai-use-cases/` directory
+3. Saves the completed document to your project's `.usecase/cases/` directory
 4. Syncs it to the hub via git post-commit hook
 
 You don't need to manually copy or reference these files - the CLI tools handle it automatically.

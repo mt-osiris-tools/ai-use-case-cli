@@ -157,7 +157,7 @@ sudo apt install flameshot  # or use built-in screenshot tool
 
 **Organize screenshots:**
 ```
-docs/ai-use-cases/2025-10-31_LSFB-12345/
+.usecase/cases/2025-10-31_LSFB-12345/
 ├── 01-initial-prompt.png
 ├── 02-service-created.png
 ├── 03-test-results.png
