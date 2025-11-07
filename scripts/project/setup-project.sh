@@ -323,10 +323,18 @@ GITIGNORE="$PROJECT_PATH/.gitignore"
 if [ -f "$GITIGNORE" ]; then
     # Check for old patterns and remove them
     if grep -q "^# AI Use Cases - ignore local notes" "$GITIGNORE"; then
-        # Remove old patterns
-        sed -i '/^# AI Use Cases - ignore local notes/d' "$GITIGNORE"
-        sed -i '/^docs\/ai-use-cases\/\*\.draft\.md/d' "$GITIGNORE"
-        sed -i '/^docs\/ai-use-cases\/\*\.local\.md/d' "$GITIGNORE"
+        # Remove old patterns (platform-compatible)
+        if [[ "$(uname)" == "Darwin" ]]; then
+            # macOS (BSD sed)
+            sed -i '' '/^# AI Use Cases - ignore local notes/d' "$GITIGNORE" || true
+            sed -i '' '/^docs\/ai-use-cases\/\*\.draft\.md/d' "$GITIGNORE" || true
+            sed -i '' '/^docs\/ai-use-cases\/\*\.local\.md/d' "$GITIGNORE" || true
+        else
+            # Linux (GNU sed)
+            sed -i '/^# AI Use Cases - ignore local notes/d' "$GITIGNORE" || true
+            sed -i '/^docs\/ai-use-cases\/\*\.draft\.md/d' "$GITIGNORE" || true
+            sed -i '/^docs\/ai-use-cases\/\*\.local\.md/d' "$GITIGNORE" || true
+        fi
         echo -e "${BLUE}Removed old gitignore patterns${NC}"
     fi
 
