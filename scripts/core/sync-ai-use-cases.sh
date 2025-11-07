@@ -119,11 +119,23 @@ echo "Source: $PROJECT_PATH"
 echo "Central: $CENTRAL_DIR"
 echo ""
 
-# Find all AI use case files
-USE_CASE_DIRS=$(find "$PROJECT_PATH" -type d -name "ai-use-cases" 2>/dev/null || true)
+# Find all use case files (support both new and old structure)
+# New structure: .usecase/cases
+# Old structure: docs/ai-use-cases (for backward compatibility)
+NEW_STRUCTURE_DIR="$PROJECT_PATH/.usecase/cases"
+OLD_STRUCTURE_DIR="$PROJECT_PATH/docs/ai-use-cases"
+
+USE_CASE_DIRS=""
+if [ -d "$NEW_STRUCTURE_DIR" ]; then
+    USE_CASE_DIRS="$NEW_STRUCTURE_DIR"
+elif [ -d "$OLD_STRUCTURE_DIR" ]; then
+    USE_CASE_DIRS="$OLD_STRUCTURE_DIR"
+    echo -e "${YELLOW}⚠ Using old structure. Consider running 'ai-use-case --init' to migrate.${NC}"
+fi
 
 if [ -z "$USE_CASE_DIRS" ]; then
-    echo -e "${YELLOW}No ai-use-cases directories found in $PROJECT_PATH${NC}"
+    echo -e "${YELLOW}No use case directories found in $PROJECT_PATH${NC}"
+    echo -e "${BLUE}Run 'ai-use-case --init' to set up use case documentation.${NC}"
     exit 0
 fi
 

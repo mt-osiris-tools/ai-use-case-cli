@@ -7,7 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.0] - 2025-11-07
+
+### Changed
+
+- **Folder Structure Refactoring**: Consolidated use case documentation into dedicated `.usecase/` directory
+  - Use cases now stored in `.usecase/cases/` instead of `docs/ai-use-cases/`
+  - Cleaner separation of use case documentation from project documentation
+  - Simplified path structure (reduced nesting)
+  - Claude commands remain in `.claude/commands/use-case/` for consistency
+  - All documentation, scripts, and slash commands updated to use new paths
+  - Project registry default path updated to `.usecase/cases`
+
 ### Added
+
+- **Automatic Migration**: Setup script automatically migrates existing `docs/ai-use-cases/` to new structure
+  - Detects old structure and prompts for migration during `ai-use-case --init`
+  - Preserves all existing use case files
+  - Updates `.gitignore` to exclude `.usecase/cases/` instead of old path
+  - Backward compatibility in sync script warns users to migrate
 
 - **Hub Configuration Command**: New `ai-use-case config` command for managing hub settings
   - `ai-use-case config show` - Display current hub configuration
@@ -15,15 +33,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Provides confirmation prompt before replacing existing configuration
   - Cleaner alternative to manually deleting config file
 
-### Changed
-
 - **Restored ASCII Art Banner**: Brought back the classic installation banner
   - Replaced compact box design with original ASCII art project logo (displays "AI USE-CASE" for visual emphasis; official name remains `ai-use-case-cli`)
   - More visually distinctive and memorable
   - Maintains professional appearance with clear version information
   - Tagline: "Reduce documentation overhead, build knowledge"
 
-- **Removed shared hub option**: Hub configuration now offers only two modes for better privacy control
+### Removed
+
+- **Shared hub option**: Hub configuration now offers only two modes for better privacy control
   - Local only mode (default) - No git, files stored locally
   - Private git mode - Connect to your own repository
   - Removes dependency on external shared repository

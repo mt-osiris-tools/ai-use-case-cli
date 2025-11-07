@@ -182,13 +182,13 @@ Options:
 ### From CLI
 ```bash
 ai-use-case publish-confluence \
-  docs/ai-use-cases/2025-W42-10-16_PROJ-123_implement-auth.md \
+  .usecase/cases/2025-W42-10-16_PROJ-123_implement-auth.md \
   https://mycompany.atlassian.net/wiki/spaces/DOCS/pages/123456789/AI+Use+Cases
 ```
 
 ### From Claude Code
 ```
-/publish-confluence docs/ai-use-cases/2025-W42-10-16_PROJ-123_implement-auth.md https://mycompany.atlassian.net/wiki/spaces/DOCS/pages/123456789/AI+Use+Cases
+/publish-confluence .usecase/cases/2025-W42-10-16_PROJ-123_implement-auth.md https://mycompany.atlassian.net/wiki/spaces/DOCS/pages/123456789/AI+Use+Cases
 ```
 
 ## Error Scenarios
@@ -232,7 +232,7 @@ When `--dry-run` is specified, show what would be published without actually doi
 ```
 🔍 Dry Run - Publishing Preview
 
-Source File: docs/ai-use-cases/2025-W42-10-16_PROJ-123_implement-auth.md
+Source File: .usecase/cases/2025-W42-10-16_PROJ-123_implement-auth.md
 File Size: 15.3 KB
 Page Title: PROJ-123: Implement Auth
 

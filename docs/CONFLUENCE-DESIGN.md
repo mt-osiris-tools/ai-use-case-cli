@@ -136,7 +136,7 @@ ai-use-case-cli/
 ```bash
 cd ~/my-project
 ai-use-case publish-confluence \
-  docs/ai-use-cases/2025-10-16_PROJ-123_implement-auth.md \
+  .usecase/cases/2025-10-16_PROJ-123_implement-auth.md \
   https://mycompany.atlassian.net/wiki/spaces/DOCS/pages/123456789/AI+Use+Cases
 ```
 
@@ -144,14 +144,14 @@ ai-use-case publish-confluence \
 ```bash
 ai-use-case publish-confluence \
   --title "PROJ-123: Complete Authentication Implementation" \
-  docs/ai-use-cases/2025-10-16_PROJ-123_implement-auth.md \
+  .usecase/cases/2025-10-16_PROJ-123_implement-auth.md \
   https://mycompany.atlassian.net/wiki/spaces/DOCS/pages/123456789/AI+Use+Cases
 ```
 
 ### Dry Run
 ```bash
 ai-use-case publish-confluence --dry-run \
-  docs/ai-use-cases/2025-10-16_PROJ-123_implement-auth.md \
+  .usecase/cases/2025-10-16_PROJ-123_implement-auth.md \
   https://mycompany.atlassian.net/wiki/spaces/DOCS/pages/123456789/AI+Use+Cases
 ```
 

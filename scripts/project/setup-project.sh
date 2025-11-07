@@ -119,7 +119,7 @@ if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
     echo ""
     echo "Description:"
     echo "  Sets up AI use case documentation automation for a project."
-    echo "  Creates docs/ai-use-cases/ directory, installs git hook,"
+    echo "  Creates .usecase/cases/ directory, installs git hook,"
     echo "  and performs initial sync to central repository."
     echo ""
     echo "Arguments:"
@@ -157,11 +157,33 @@ echo "Project: $PROJECT_NAME"
 echo "Path: $PROJECT_PATH"
 echo ""
 
-# Create ai-use-cases directory if it doesn't exist
-AI_USECASES_DIR="$PROJECT_PATH/docs/ai-use-cases"
+# Check for old structure and migrate if needed
+OLD_USECASES_DIR="$PROJECT_PATH/docs/ai-use-cases"
+AI_USECASES_DIR="$PROJECT_PATH/.usecase/cases"
+
+if [ -d "$OLD_USECASES_DIR" ] && [ ! -d "$AI_USECASES_DIR" ]; then
+    echo -e "${YELLOW}⚠ Detected old structure: docs/ai-use-cases/${NC}"
+    echo -e "${BLUE}Migrating to new structure: .usecase/cases/${NC}"
+
+    # Create new directory structure
+    mkdir -p "$AI_USECASES_DIR"
+
+    # Move all files (excluding README.md which we'll regenerate)
+    if [ "$(ls -A "$OLD_USECASES_DIR")" ]; then
+        find "$OLD_USECASES_DIR" -type f -name "*.md" ! -name "README.md" -exec mv {} "$AI_USECASES_DIR/" \;
+        FILE_COUNT=$(find "$AI_USECASES_DIR" -type f -name "*.md" | wc -l)
+        echo -e "${GREEN}✓${NC} Migrated $FILE_COUNT use case file(s)"
+    fi
+
+    # Remove old directory
+    rm -rf "$OLD_USECASES_DIR"
+    echo -e "${GREEN}✓${NC} Removed old docs/ai-use-cases/ directory"
+fi
+
+# Create use cases directory if it doesn't exist
 if [ ! -d "$AI_USECASES_DIR" ]; then
     mkdir -p "$AI_USECASES_DIR"
-    echo -e "${GREEN}✓${NC} Created: docs/ai-use-cases/"
+    echo -e "${GREEN}✓${NC} Created: .usecase/cases/"
 
     # Create a README
     cat > "$AI_USECASES_DIR/README.md" <<EOF
@@ -196,13 +218,13 @@ AI use cases are automatically synced after each git commit that modifies files 
 
 See the central repository for use case templates and examples.
 EOF
-    echo -e "${GREEN}✓${NC} Created: docs/ai-use-cases/README.md"
+    echo -e "${GREEN}✓${NC} Created: .usecase/cases/README.md"
 else
-    echo -e "${YELLOW}⚠${NC} docs/ai-use-cases/ already exists"
+    echo -e "${YELLOW}⚠${NC} .usecase/cases/ already exists"
 fi
 
 # Install Claude Code slash commands
-CLAUDE_COMMANDS_SOURCE="$SCRIPT_DIR/.claude/commands/use-case"
+CLAUDE_COMMANDS_SOURCE="$CLI_ROOT/.claude/commands/use-case"
 CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/commands/use-case"
 
 if [ -d "$CLAUDE_COMMANDS_SOURCE" ]; then
@@ -299,12 +321,29 @@ fi
 # Add to .gitignore if not already present
 GITIGNORE="$PROJECT_PATH/.gitignore"
 if [ -f "$GITIGNORE" ]; then
-    if ! grep -q "^# AI Use Cases - ignore local notes" "$GITIGNORE"; then
+    # Check for old patterns and remove them
+    if grep -q "^# AI Use Cases - ignore local notes" "$GITIGNORE"; then
+        # Remove old patterns (platform-compatible)
+        if [[ "$(uname)" == "Darwin" ]]; then
+            # macOS (BSD sed)
+            sed -i '' '/^# AI Use Cases - ignore local notes/d' "$GITIGNORE" || true
+            sed -i '' '/^docs\/ai-use-cases\/\*\.draft\.md/d' "$GITIGNORE" || true
+            sed -i '' '/^docs\/ai-use-cases\/\*\.local\.md/d' "$GITIGNORE" || true
+        else
+            # Linux (GNU sed)
+            sed -i '/^# AI Use Cases - ignore local notes/d' "$GITIGNORE" || true
+            sed -i '/^docs\/ai-use-cases\/\*\.draft\.md/d' "$GITIGNORE" || true
+            sed -i '/^docs\/ai-use-cases\/\*\.local\.md/d' "$GITIGNORE" || true
+        fi
+        echo -e "${BLUE}Removed old gitignore patterns${NC}"
+    fi
+
+    # Add new pattern if not present
+    if ! grep -q "^# Use Case Documentation" "$GITIGNORE"; then
         echo "" >> "$GITIGNORE"
-        echo "# AI Use Cases - ignore local notes" >> "$GITIGNORE"
-        echo "docs/ai-use-cases/*.draft.md" >> "$GITIGNORE"
-        echo "docs/ai-use-cases/*.local.md" >> "$GITIGNORE"
-        echo -e "${GREEN}✓${NC} Added AI use cases patterns to .gitignore"
+        echo "# Use Case Documentation" >> "$GITIGNORE"
+        echo ".usecase/cases/" >> "$GITIGNORE"
+        echo -e "${GREEN}✓${NC} Added .usecase/cases/ to .gitignore"
     else
         echo -e "${YELLOW}⚠${NC} .gitignore already configured"
     fi
@@ -318,7 +357,7 @@ if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
     if [ -f "$SCRIPT_DIR/registry-manager.sh" ]; then
         source "$SCRIPT_DIR/registry-manager.sh"
         CLI_VERSION=$(get_cli_version "$CLI_ROOT")
-        REGISTRY_STATUS=$(register_project "$PROJECT_PATH" "$CLI_VERSION" "docs/ai-use-cases")
+        REGISTRY_STATUS=$(register_project "$PROJECT_PATH" "$CLI_VERSION" ".usecase/cases")
         if [ "$REGISTRY_STATUS" = "registered" ]; then
             echo -e "${GREEN}✓${NC} Project registered in CLI registry"
         elif [ "$REGISTRY_STATUS" = "updated" ]; then
@@ -330,7 +369,7 @@ if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
     echo -e "${GREEN}=== Setup Complete! ===${NC}"
     echo ""
     echo "What's next?"
-    echo "1. Create AI use case docs in: $AI_USECASES_DIR"
+    echo "1. Create use case docs in: $AI_USECASES_DIR"
     echo "2. Use format: YYYY-Www-MM-DD_TICKET-XXXXX_description.md"
     echo "3. Commit changes - use cases will auto-sync!"
     echo ""
@@ -341,11 +380,11 @@ if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
     echo ""
     if [ -d "$CLAUDE_COMMANDS_DIR" ]; then
         echo "Claude Code slash commands:"
-        echo "  /use-case/document-session    # Document AI session automatically"
-        echo "  /use-case/setup-project       # Setup another project"
-        echo "  /use-case/sync-usecases       # Sync to hub"
-        echo "  /use-case/search-usecases     # Search past use cases"
-        echo "  /use-case/publish-confluence  # Publish to Confluence"
+        echo "  /use-case:document-session    # Document AI session automatically"
+        echo "  /use-case:setup-project       # Setup another project"
+        echo "  /use-case:sync-usecases       # Sync to hub"
+        echo "  /use-case:search-usecases     # Search past use cases"
+        echo "  /use-case:publish-confluence  # Publish to Confluence"
         echo ""
     fi
     echo "View synced: ls $CENTRAL_DIR/by-project/$PROJECT_NAME/"

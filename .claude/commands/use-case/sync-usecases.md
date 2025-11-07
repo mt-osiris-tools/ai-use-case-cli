@@ -11,13 +11,13 @@ Run the sync script to copy use case documents from the current project to the c
 1. Verify we're in a project with use cases:
    ```bash
    # Find all use case files
-   find docs/ai-use-cases -name "*.md" -type f 2>/dev/null | head -10
+   find .usecase/cases -name "*.md" -type f 2>/dev/null | head -10
    ```
 
 2. Show what will be synced:
    ```bash
    echo "Files to sync:"
-   find docs/ai-use-cases -name "*.md" -type f ! -name "README.md" 2>/dev/null
+   find .usecase/cases -name "*.md" -type f ! -name "README.md" 2>/dev/null
    ```
 
 3. Run the sync:

@@ -220,8 +220,8 @@ When `/use-case:document-session` is invoked:
 
 4. **Save and sync**:
    ```bash
-   # Create file: docs/ai-use-cases/YYYY-MM-DD_TICKET-XXX_description.md
-   git add docs/ai-use-cases/...
+   # Create file: .usecase/cases/YYYY-MM-DD_TICKET-XXX_description.md
+   git add .usecase/cases/...
    git commit -m "docs: AI session documentation"
    bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
    ```
@@ -280,7 +280,7 @@ done
       "version": "3.1.0",
       "installedAt": "2025-11-02T10:30:00Z",
       "lastUpdated": "2025-11-02T10:30:00Z",
-      "hubPath": "docs/ai-use-cases"
+      "hubPath": ".usecase/cases"
     }
   }
 }
