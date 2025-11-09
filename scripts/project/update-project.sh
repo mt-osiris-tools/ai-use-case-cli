@@ -178,6 +178,44 @@ else
 fi
 
 echo ""
+echo -e "${BLUE}Preparing for update...${NC}"
+echo ""
+
+# Force refresh slash commands by removing old ones and copying from running CLI
+# This ensures outdated slash commands (with wrong paths) get replaced
+CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/commands/use-case"
+CLI_COMMANDS_SOURCE="$CLI_ROOT/.claude/commands/use-case"
+
+if [ -d "$CLAUDE_COMMANDS_DIR" ]; then
+    BACKUP_DIR="$CLAUDE_COMMANDS_DIR.backup.$(date +%Y%m%d%H%M%S)"
+    echo -e "${CYAN}Backing up old slash commands...${NC}"
+    mv "$CLAUDE_COMMANDS_DIR" "$BACKUP_DIR"
+    echo -e "${GREEN}✓${NC} Old commands backed up to: $(basename "$BACKUP_DIR")"
+
+    # Copy fresh commands from the running CLI installation
+    if [ -d "$CLI_COMMANDS_SOURCE" ]; then
+        mkdir -p "$CLAUDE_COMMANDS_DIR"
+        cp "$CLI_COMMANDS_SOURCE"/*.md "$CLAUDE_COMMANDS_DIR/" 2>/dev/null
+        COMMAND_COUNT=$(ls -1 "$CLAUDE_COMMANDS_DIR"/*.md 2>/dev/null | wc -l)
+        echo -e "${GREEN}✓${NC} Installed $COMMAND_COUNT fresh slash command(s) from CLI v$CLI_VERSION"
+    else
+        echo -e "${YELLOW}⚠${NC} Could not find CLI commands at $CLI_COMMANDS_SOURCE"
+        echo -e "${YELLOW}⚠${NC} Setup script will attempt installation"
+    fi
+else
+    echo -e "${CYAN}No existing slash commands found, setup will install them${NC}"
+fi
+
+# Check for and migrate old structure (docs/ai-use-cases → .usecase/cases)
+OLD_USECASES_DIR="$PROJECT_PATH/docs/ai-use-cases"
+NEW_USECASES_DIR="$PROJECT_PATH/.usecase/cases"
+if [ -d "$OLD_USECASES_DIR" ] && [ ! -d "$NEW_USECASES_DIR" ]; then
+    echo -e "${YELLOW}⚠ Detected old structure: docs/ai-use-cases/${NC}"
+    echo -e "${CYAN}Will be migrated to: .usecase/cases/${NC}"
+    # Setup script will handle the actual migration
+fi
+
+echo ""
 echo -e "${BLUE}Running setup script...${NC}"
 echo ""
 
@@ -195,6 +233,14 @@ if "$SCRIPT_DIR/setup-project.sh" "$PROJECT_PATH"; then
         echo -e "${GREEN}✓${NC} Registry updated successfully"
     else
         echo -e "${YELLOW}⚠${NC} Warning: Registry may not have updated correctly"
+    fi
+
+    # Note about backup cleanup
+    if [ -d "$PROJECT_PATH/.claude/commands/use-case.backup."* ] 2>/dev/null; then
+        echo ""
+        echo -e "${CYAN}Note:${NC} Old slash commands backed up to .claude/commands/use-case.backup.*"
+        echo "You can safely remove the backup once you've tested the update:"
+        echo "  rm -rf \"$PROJECT_PATH\"/.claude/commands/use-case.backup.*"
     fi
 else
     echo ""

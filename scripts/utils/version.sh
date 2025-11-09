@@ -18,9 +18,10 @@
 # 4. Commit with message: "chore: bump version to X.Y.Z"
 
 # Current CLI version
-export CLI_VERSION="3.4.2"
+export CLI_VERSION="3.4.3"
 
 # Version history (for reference)
+# 3.4.3 - 2025-11-09 - Force refresh slash commands during project updates
 # 3.4.2 - 2025-11-08 - Optimize CLAUDE.md token usage (split into WORKFLOW.md, COMMANDS.md)
 # 3.4.1 - 2025-11-08 - Fix version references + add version update checklist
 # 3.4.0 - 2025-11-08 - Interactive session selection for documentation
