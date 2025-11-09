@@ -12,7 +12,7 @@ CLI tools for documenting AI-assisted development workflows, designed to help de
 - **Enable learning**: Help teams learn from past AI-assisted sessions and improve over time
 - **Streamline workflow**: Quick, template-based documentation that integrates seamlessly with development
 
-Supports flexible documentation storage: local-only (no git), private repository, or shared hub.
+Supports flexible documentation storage: local-only (no git) or private git repository.
 
 ## Critical Requirements
 
@@ -36,7 +36,7 @@ gh pr create --title "..." --body "..."
 
 When adding features or fixing bugs:
 
-1. **Update version** in `ai-use-case` (line 19):
+1. **Update version** in `scripts/utils/version.sh` (line 21):
    - MAJOR: Breaking changes (X.0.0)
    - MINOR: New features (0.X.0)
    - PATCH: Bug fixes (0.0.X)
@@ -347,8 +347,10 @@ Examples:
 ## Environment Variables
 
 ```bash
-# Hub location (defaults to ~/Documents/ai-use-case-hub)
-export AI_USECASES_DIR="$HOME/Documents/ai-use-case-hub"
+# Hub location override (optional)
+# Default for local-only mode: ~/.local/share/ai-use-case-cli/hub/
+# Default for private git mode: Set during configuration
+export AI_USECASES_DIR="/custom/path/to/hub"
 ```
 
 ## Never Do
@@ -366,11 +368,10 @@ export AI_USECASES_DIR="$HOME/Documents/ai-use-case-hub"
 - **[docs/VERSION-MANAGEMENT.md](docs/VERSION-MANAGEMENT.md)** - Version bump process
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
 - **[README.md](README.md)** - User-facing documentation
-- **[Hub Repository](https://github.com/mt-osiris-tools/ai-use-case-hub)** - Centralized documentation storage
 
 ## Quick Reference
 
-**Current Version**: Check `ai-use-case` line 19
+**Current Version**: Check `scripts/utils/version.sh` line 21
 **Latest Changes**: See `CHANGELOG.md`
 **Project Type**: Bash CLI tool with hub integration
 **Main Branch**: `main` (protected, requires PRs – no direct commits allowed)

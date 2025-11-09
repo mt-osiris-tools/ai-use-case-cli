@@ -22,7 +22,7 @@ fi
 CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD)
 
 # Check if any AI use case files were modified
-if echo "$CHANGED_FILES" | grep -q "ai-use-cases/.*\.md"; then
+if echo "$CHANGED_FILES" | grep -q ".usecase/cases/.*\.md"; then
     echo ""
     echo "🤖 AI Use Cases detected in commit, syncing to central location..."
 

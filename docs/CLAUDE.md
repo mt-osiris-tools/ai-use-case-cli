@@ -97,7 +97,7 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
   - Can be bypassed with `--no-verify` if needed
 
 - **`git-hooks/post-commit`**: Auto-sync hook
-  - Detects when markdown files in `ai-use-cases/` directories are committed
+  - Detects when markdown files in `.usecase/cases/` directories are committed
   - Automatically triggers sync script to push docs to hub
   - Non-blocking - sync failures don't prevent commits
 
@@ -111,16 +111,16 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
 ### Claude Code Integration
 
 - **`.claude/commands/use-case/`**: Slash commands for Claude Code
-  - `/use-case/quick-start` - Get started guide
-  - `/use-case/setup-project` - Setup a project
-  - `/use-case/document-session` - Document an AI session (AUTOMATIC MODE)
-  - `/use-case/sync-usecases` - Sync to hub
-  - `/use-case/search-usecases` - Search use cases
-  - `/use-case/publish-confluence` - Publish to Confluence
+  - `/use-case:quick-start` - Get started guide
+  - `/use-case:setup-project` - Setup a project
+  - `/use-case:document-session` - Document an AI session (AUTOMATIC MODE)
+  - `/use-case:sync-usecases` - Sync to hub
+  - `/use-case:search-usecases` - Search use cases
+  - `/use-case:publish-confluence` - Publish to Confluence
 
 ## For Claude Code: Automatic Documentation
 
-**IMPORTANT**: When the `/use-case/document-session` slash command is invoked in Claude Code, documentation should be **automatically generated** based on git history and conversation context. Do NOT run the interactive `document-ai-session.sh` script.
+**IMPORTANT**: When the `/use-case:document-session` slash command is invoked in Claude Code, documentation should be **automatically generated** based on git history and conversation context. Do NOT run the interactive `document-ai-session.sh` script.
 
 ### Automatic vs Interactive Mode
 
@@ -169,7 +169,7 @@ The system now supports two types of AI sessions:
 
 ### Automatic Documentation Workflow
 
-When `/use-case/document-session` is invoked in Claude Code:
+When `/use-case:document-session` is invoked in Claude Code:
 
 1. **Check CLI Version**: Verify the CLI is up-to-date before starting
    - Compare current version with latest from GitHub
@@ -717,6 +717,10 @@ Implementation is in `ai-use-case:80-115` with the `check_for_updates()` functio
 
 ## Version History
 
+- **v3.3.0**: Refactored folder structure to `.usecase/cases/`, added hub configuration commands, restored ASCII art banner
+- **v3.2.0**: Optional hub repository (local-only or private git), automated version bump system, centralized version management
+- **v3.1.0**: Hybrid CLI + Claude Code interface, project registry system for version tracking
+- **v3.0.0**: Claude Code integration with slash commands (breaking changes from v2.x)
 - **v2.1.0**: Separated CLI tools from documentation hub, unified CLI interface, added automatic git push, version checking
 - **v2.0.0**: Introduced symlink architecture (in hub repository)
 - **v1.0.0**: Initial release with basic sync functionality
