@@ -66,6 +66,9 @@ ${YELLOW}CLAUDE CODE INTEGRATION${NC}
   ${GREEN}/use-case:sync-usecases${NC}      Sync to hub (alternative to sync)
   ${GREEN}/use-case:search-usecases${NC}    Search (alternative to search)
   ${GREEN}/use-case:extract-session${NC}    Extract session data (alternative to extract)
+  ${GREEN}/use-case:list-projects${NC}      List projects (alternative to list)
+  ${GREEN}/use-case:check-updates${NC}      Check updates (alternative to check-updates)
+  ${GREEN}/use-case:update-project${NC}     Update project (alternative to update-project)
   ${GREEN}/use-case:publish-confluence${NC} Publish (alternative)
   ${GREEN}/use-case:quick-start${NC}        Quick start guide
 
