@@ -98,6 +98,99 @@ When Copilot crafts changes, ensure the workflow below stays intact:
 - **Error handling**: Provides clear feedback for authentication and API failures
 - **Configuration**: Stores Confluence settings in user's environment or config files
 
+## Security and Safety Guidelines
+
+- **Sensitive data handling**: Never expose API tokens, passwords, or personal data in code examples or documentation
+- **Input sanitization**: Always validate and sanitize user inputs in shell scripts to prevent injection attacks
+- **File permissions**: Maintain proper file permissions (644 for files, 755 for directories and executables)
+- **Git hooks security**: Ensure git hooks cannot be used to execute malicious code or bypass security measures
+- **Environment isolation**: Use user-scoped installations (`~/.local/`) to avoid system-wide security implications
+- **Confluence credentials**: Store API tokens securely using environment variables or secure credential stores
+- **Log sanitization**: Ensure logs don't contain sensitive information like tokens or personal data
+
+## Performance Considerations
+
+- **Script efficiency**: Minimize external command calls in shell scripts; prefer built-in operations when possible
+- **Hub sync optimization**: Large hub repositories should use incremental sync strategies to avoid long wait times
+- **Version check caching**: Respect the 24-hour cache interval for version checks to avoid unnecessary network requests
+- **Memory usage**: Be mindful of memory consumption when processing large documentation files or git histories
+- **Terminal responsiveness**: Provide progress indicators for long-running operations (sync, search, etc.)
+- **Batch operations**: When possible, batch multiple file operations instead of individual commits
+
+## Code Quality Standards
+
+- **Shell script patterns**: Use consistent error handling patterns across all scripts
+  ```bash
+  set -euo pipefail
+  # Always check command success
+  if ! command -v git >/dev/null 2>&1; then
+      echo "Error: git is required but not installed" >&2
+      exit 1
+  fi
+  ```
+- **Function documentation**: Document complex functions with purpose, parameters, and return values
+- **Variable naming**: Use descriptive names (`hub_directory` not `hd`, `session_type` not `st`)
+- **Error messages**: Provide actionable error messages that guide users toward solutions
+- **Exit codes**: Use appropriate exit codes (0 for success, 1 for general errors, 2 for misuse)
+- **Logging levels**: Use consistent logging patterns (INFO, WARN, ERROR) across scripts
+
+## Troubleshooting and Common Issues
+
+- **Hub synchronization failures**: Common causes include network issues, git conflicts, or permission problems
+- **Git hook execution**: Issues often stem from PATH problems or missing dependencies in hook environment
+- **VS Code extension debugging**: Use VS Code's developer console and extension host logs for troubleshooting
+- **Cross-platform compatibility**: Test path handling, command availability, and shell compatibility
+- **Installation problems**: Verify user has write access to `~/.local/bin` and PATH configuration
+- **Version conflicts**: Check for conflicting installations in different locations
+
+## Examples and Anti-Patterns
+
+### Good Patterns
+```bash
+# Robust error handling
+ensure_hub_exists() {
+    local hub_dir="${AI_USECASES_DIR:-$HOME/Documents/ai-use-case-hub}"
+    if [[ ! -d "$hub_dir" ]]; then
+        echo "Error: Hub directory not found at $hub_dir" >&2
+        echo "Run 'ai-use-case setup' to initialize the hub" >&2
+        return 1
+    fi
+}
+
+# Clear user feedback
+echo "Syncing with hub... This may take a moment."
+```
+
+### Anti-Patterns to Avoid
+```bash
+# Don't: Silent failures
+cd "$some_directory" 2>/dev/null
+
+# Don't: Unclear error messages
+echo "Error: Something went wrong"
+
+# Don't: Hard-coded paths
+cp file.txt /home/user/documents/
+```
+
+## CI/CD and Automation Considerations
+
+- **Branch protection**: Respect the pre-commit hook requirements and branch naming conventions
+- **Automated testing**: Focus on integration tests that verify CLI workflows end-to-end
+- **Release automation**: Version bumps must synchronize across CLI script, VS Code extension, and CHANGELOG
+- **Hub integrity**: Automated processes must preserve the hub's symlink structure and git history
+- **Documentation sync**: Changes to templates or workflows should trigger documentation updates
+- **Backwards compatibility**: Maintain support for existing user workflows during updates
+
+## Integration Points
+
+- **Hub repository coordination**: Changes affecting both repositories require careful coordination
+- **Git hook lifecycle**: Modifications to hooks must consider installation, updates, and removal scenarios
+- **VS Code extension APIs**: Stay current with VS Code API changes and deprecation notices
+- **Confluence API**: Handle API rate limits and version compatibility in publishing workflows
+- **Shell environment**: Account for different shell configurations (bash, zsh) and environment variables
+- **Package managers**: Consider how different installation methods (manual, homebrew, etc.) affect updates
+
 ## Communication Style
 
 - **Provide context-aware guidance**: Reference specific files, functions, and patterns from the codebase when making suggestions
@@ -107,5 +200,8 @@ When Copilot crafts changes, ensure the workflow below stays intact:
 - **Respect existing patterns**: Follow established coding styles, error handling patterns, and user interaction flows
 - **Document breaking changes**: Clearly explain any changes that affect existing user workflows or require migration steps
 - **Validate before implementing**: For complex changes, outline the approach and confirm with the user before making modifications
+- **Include testing instructions**: Always provide specific commands or steps to verify changes work correctly
+- **Reference documentation**: Point to relevant documentation files (`docs/CLAUDE.md`, `docs/HUB-FILES.md`, etc.) when applicable
+- **Explain the "why"**: Don't just provide solutions; explain the reasoning behind architectural decisions
 
-Adhering to these instructions keeps Copilot contributions aligned with the team’s tooling standards and documentation-first workflow.
+Adhering to these instructions keeps Copilot contributions aligned with the team's tooling standards and documentation-first workflow.
