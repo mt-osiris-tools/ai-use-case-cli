@@ -63,7 +63,7 @@ bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . <hour
 
 After extraction, present the data in a clear, actionable format:
 
-####  Session Summary
+#### Session Summary
 ```
 📊 Session Extract - <Project Name>
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

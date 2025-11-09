@@ -3,7 +3,7 @@
 # Extracts AI interaction session data from git history and file system
 # to support automated use case documentation and reporting
 
-set -e
+set -euo pipefail
 
 # Colors
 GREEN=$'\033[0;32m'
@@ -158,6 +158,12 @@ if ! git rev-parse --git-dir > /dev/null 2>&1; then
     exit 1
 fi
 
+# Validate TIME_WINDOW is a positive number
+if ! [[ "$TIME_WINDOW" =~ ^[0-9]+$ ]] || [ "$TIME_WINDOW" -le 0 ]; then
+    echo -e "${RED}Error: TIME_WINDOW must be a positive integer (got: ${TIME_WINDOW})${NC}" >&2
+    exit 1
+fi
+
 # Extract project name
 PROJECT_NAME=$(basename "$PROJECT_DIR")
 
@@ -170,7 +176,7 @@ echo -e "${CYAN}Time window: Last ${TIME_WINDOW} hours${NC}" >&2
 echo "" >&2
 
 # Get commits since time window
-SINCE_DATE=$(date -d "${TIME_WINDOW} hours ago" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -v-${TIME_WINDOW}H '+%Y-%m-%d %H:%M:%S' 2>/dev/null || echo "24 hours ago")
+SINCE_DATE=$(date -d "${TIME_WINDOW} hours ago" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -v-${TIME_WINDOW}H '+%Y-%m-%d %H:%M:%S' 2>/dev/null || echo "${TIME_WINDOW}.hours.ago")
 
 # Count commits
 TOTAL_COMMITS=$(git log --since="${SINCE_DATE}" --oneline | wc -l)
@@ -207,7 +213,11 @@ if [ "$TOTAL_COMMITS" -gt 0 ]; then
 fi
 
 # Get list of modified files
-MODIFIED_FILES=$(git diff --name-only HEAD~${TOTAL_COMMITS}..HEAD 2>/dev/null | jq -R . | jq -s . || echo "[]")
+if [ "$TOTAL_COMMITS" -gt 0 ]; then
+    MODIFIED_FILES=$(git diff --name-only HEAD~${TOTAL_COMMITS}..HEAD 2>/dev/null | jq -R . | jq -s . || echo "[]")
+else
+    MODIFIED_FILES="[]"
+fi
 
 # Get uncommitted changes
 UNCOMMITTED_MODIFIED=$(git status --short | grep '^ M' | awk '{print $2}' | jq -R . | jq -s . || echo "[]")
@@ -219,8 +229,10 @@ if [ "$TOTAL_COMMITS" -gt 0 ]; then
     FIRST_COMMIT_TIME=$(git log --since="${SINCE_DATE}" --reverse --pretty=format:'%at' | head -1)
     LAST_COMMIT_TIME=$(git log --since="${SINCE_DATE}" --pretty=format:'%at' | head -1)
     DURATION_SECONDS=$((LAST_COMMIT_TIME - FIRST_COMMIT_TIME))
-    DURATION_HOURS=$(echo "scale=2; $DURATION_SECONDS / 3600" | bc)
-    DURATION_HUMAN="${DURATION_HOURS}h"
+    # Use shell arithmetic for hours and minutes (no external dependencies)
+    DURATION_HOURS=$((DURATION_SECONDS / 3600))
+    DURATION_MINUTES=$(((DURATION_SECONDS % 3600) / 60))
+    DURATION_HUMAN="${DURATION_HOURS}h ${DURATION_MINUTES}m"
 else
     DURATION_SECONDS=0
     DURATION_HOURS=0
@@ -228,6 +240,8 @@ else
 fi
 
 # Calculate metrics
+# Note: Using bc for decimal precision in averages (required dependency)
+# bc is a standard Unix utility available on Linux, macOS, and most Unix systems
 if [ "$TOTAL_COMMITS" -gt 0 ]; then
     AVG_FILES_PER_COMMIT=$(echo "scale=2; $TOTAL_FILES / $TOTAL_COMMITS" | bc)
     AVG_LINES_PER_COMMIT=$(echo "scale=2; ($TOTAL_INSERTIONS + $TOTAL_DELETIONS) / $TOTAL_COMMITS" | bc)
@@ -239,6 +253,10 @@ else
 fi
 
 # Estimate interactions (rough heuristic: commits + (files/3) + (major tool uses))
+# Heuristic explanation:
+#   - TOTAL_COMMITS: Each commit represents at least one interaction
+#   - TOTAL_FILES / 3: Multi-file changes divided by 3 approximates distinct multi-file interactions
+#   - +5: Fixed overhead for tool setup, session init, and non-commit interactions
 ESTIMATED_INTERACTIONS=$((TOTAL_COMMITS + (TOTAL_FILES / 3) + 5))
 
 # Get current timestamp
