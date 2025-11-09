@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Installer Update Process**: Enhanced installer to handle local modifications automatically
+  - Detects and gracefully handles permission-only changes (automatically discarded with `git reset --hard`)
+  - Stashes actual content changes before update and re-applies them after
+  - Prevents update failures when installation directory has local modifications
+  - Now checks both staged and unstaged changes using `git diff HEAD --numstat`
+  - Exits with clear error if stashing fails (prevents unsafe updates)
+  - Uses `git stash apply` instead of `pop` for better conflict detection and recovery
+  - Only checks most recent stash to avoid confusion with old stashes from failed updates
+  - Provides detailed guidance for resolving merge conflicts if they occur during restoration
+  - Provides clear user feedback about what actions are being taken
+  - Fixes issue where `curl | bash` installer would fail with "Failed to update repository" error
+
 ## [3.4.2] - 2025-11-08
 
 ### Changed

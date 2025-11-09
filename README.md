@@ -295,10 +295,14 @@ ai-use-case --version
 Update to latest:
 
 ```bash
-cd ~/.local/share/ai-use-case-cli && git pull
-# OR: Re-run install script
+# Recommended: Re-run install script (handles updates automatically)
 curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/install/install.sh | bash
+
+# OR: Manual update
+cd ~/.local/share/ai-use-case-cli && git pull
 ```
+
+The installer automatically handles local modifications (like permission changes) during updates.
 
 ## Migration from v2.x
 
