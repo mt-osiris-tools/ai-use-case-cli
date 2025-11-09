@@ -78,10 +78,31 @@ Create a PR on GitHub with:
 
 Before creating a pull request, ensure you have completed:
 
-- [ ] **Update CHANGELOG.md** - Add entry under "Unreleased" section
+- [ ] **MANDATORY: Update CHANGELOG.md** - Add entry under "Unreleased" section (non-negotiable for ALL changes)
+- [ ] **MANDATORY: Review and update README.md** - Update if any user-facing functionality changed (non-negotiable)
 - [ ] **Check docs/HUB-SYNC-CHECKLIST.md** - Review if changes affect hub repository
 - [ ] **Test changes locally** - Verify all scripts and CLI commands work
-- [ ] **Update documentation** - Update README.md or docs/CLAUDE.md if behavior changes
+- [ ] **Update all related documentation** - Update docs/*, CLAUDE.md, CONTRIBUTING.md if behavior/architecture changes
+
+**⚠️ DOCUMENTATION REVISION RULE (NON-NEGOTIABLE):**
+
+Every code change MUST trigger a documentation review:
+
+1. **CHANGELOG.md** - MUST be updated for ALL changes
+   - Describe what changed, why, and any breaking changes
+   - Add entry under `## [Unreleased]` section
+
+2. **README.md** - MUST be reviewed and updated if user-facing changes
+   - New features → add to feature list and usage section
+   - Changed commands → update command examples
+   - New options/flags → document in usage section
+
+3. **Related documentation** - MUST be updated if applicable
+   - docs/CLAUDE.md - for AI assistant guidance changes
+   - docs/VERSION-MANAGEMENT.md - for version process changes
+   - CONTRIBUTING.md - for contribution workflow changes
+
+**PRs without proper documentation updates will be rejected.**
 
 #### CHANGELOG.md Format
 
