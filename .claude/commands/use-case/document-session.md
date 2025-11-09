@@ -1,19 +1,20 @@
-# Document AI Session - Automatic Mode
+# Document AI Session - Interactive Selection with Automatic Generation
 
-**IMPORTANT**: You are Claude Code, and you should **automatically generate documentation** based on git history and conversation context. Do NOT run the interactive `document-ai-session.sh` script or ask the user to fill in details.
+**IMPORTANT**: You are Claude Code, and you should **first ask the user which session to document**, then automatically generate documentation for the selected session. Do NOT run the interactive `document-ai-session.sh` script or ask the user to fill in details after selection.
 
 ## Your Task
 
-Automatically document the AI-assisted session that just occurred by analyzing the conversation context and, if applicable, git history.
+Help the user select which work session to document, then automatically generate comprehensive documentation by analyzing git history and conversation context.
 
 ## Session Type Detection
 
-First, determine the session type:
+Session types:
 
 **Implementation Session:**
 - Involves actual code changes and commits
 - Files were modified
 - Git history shows commits
+- Usually associated with PRs or feature branches
 
 **Research Session:**
 - No code changes or commits
@@ -21,7 +22,95 @@ First, determine the session type:
 - Back-and-forth query refinement
 - Architecture or approach discussions
 
-## Automatic Documentation Workflow
+## Interactive Documentation Workflow
+
+### Step 0: Detect and Present Documentation Options
+
+**CRITICAL**: Start by identifying what work can be documented, prioritizing actual implementation work over research sessions.
+
+#### 0.1: Detect Recent Undocumented Work
+
+Check for recent PRs and commits that haven't been documented yet:
+
+```bash
+# Get recent merged PRs (last 24 hours)
+gh pr list --limit 20 --state merged --json number,title,mergedAt,headRefName,author --jq '.[] | select(.mergedAt | fromdateiso8601 > (now - 86400)) | "PR #\(.number): \(.title) (branch: \(.headRefName))"'
+
+# Get recent commits on current branch
+git log --since="24 hours ago" --pretty=format:"%h - %s (%ar)" --first-parent
+
+# Check existing documentation
+ls -1 .usecase/cases/ 2>/dev/null | grep -E '^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{2}_.*\.md$'
+```
+
+#### 0.2: Build Options List
+
+Create a prioritized list of documentation options:
+
+1. **Recent PRs/Implementation Work** (Priority 1):
+   - List each PR merged in the last 24 hours
+   - Include PR number, title, and branch name
+   - Check if already documented (match PR number or branch name in existing files)
+   - Mark undocumented PRs prominently
+
+2. **Current Conversation/Research Session** (Priority 2):
+   - What happened in the current Claude Code conversation
+   - Only if it's substantial enough to warrant documentation
+
+3. **Recent Commits Not in PRs** (Priority 3):
+   - Direct commits to main/current branch
+   - Check if already documented
+
+#### 0.3: Present Options to User
+
+Use the `AskUserQuestion` tool to present options:
+
+```markdown
+**Question**: "Which work session would you like to document?"
+
+**Options** (ordered by priority):
+
+1. **PR #XX: [PR Title]** (branch: feature/xxx)
+   - Description: "Document the implementation work from this PR"
+   - Status: ⚠️ Not yet documented / ✅ Already documented
+
+2. **PR #YY: [PR Title]** (branch: docs/yyy)
+   - Description: "Document the implementation work from this PR"
+   - Status: ⚠️ Not yet documented
+
+3. **Current Research Session**
+   - Description: "Document the current exploratory conversation"
+   - Status: Current session
+
+4. **Recent Commits** (X commits in last 24h)
+   - Description: "Document recent direct commits"
+   - Status: ⚠️ Not yet documented
+```
+
+**IMPORTANT**: Use the `AskUserQuestion` tool with:
+- `multiSelect: false` (user picks ONE session)
+- Clear labels like "PR #59: Enhance copilot instructions"
+- Descriptions that explain what will be documented
+- Visual indicators (⚠️/✅) for documentation status
+
+#### 0.4: Process User Selection
+
+Based on the user's selection:
+
+**If user selected a PR**:
+1. Get PR details: `gh pr view <pr-number> --json number,title,body,headRefName,commits,files`
+2. Checkout the PR's merge commit to analyze the full changes
+3. Extract PR metadata (title, description, files changed)
+4. Proceed to Implementation Session workflow (Step 2+)
+
+**If user selected Current Session**:
+1. Analyze the current conversation history
+2. Determine if it's research or implementation based on git activity
+3. Proceed to appropriate workflow (Step 2+)
+
+**If user selected Recent Commits**:
+1. Analyze the specified commits
+2. Proceed to Implementation Session workflow (Step 2+)
 
 ### Step 1: Check CLI Version
 
@@ -213,41 +302,66 @@ bash ~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh .
 
 ## Key Principles
 
-1. **Be Automatic**: Don't ask the user to fill anything in - you have all the context
-2. **Be Complete**: Generate comprehensive documentation with all sections filled
-3. **Be Precise**: Use exact numbers from git (files changed, lines modified, commits)
-4. **Be Contextual**: Use conversation history to add qualitative insights
-5. **Be Professional**: Follow template structure, use proper formatting
+1. **Be Interactive First**: Always present options for what to document, prioritizing undocumented PRs and implementation work
+2. **Be Automatic After Selection**: Once user selects a session, generate documentation automatically without further questions
+3. **Be Complete**: Generate comprehensive documentation with all sections filled
+4. **Be Precise**: Use exact numbers from git (files changed, lines modified, commits)
+5. **Be Contextual**: Use conversation history to add qualitative insights
+6. **Be Professional**: Follow template structure, use proper formatting
+7. **Prioritize Implementation Over Research**: Real code changes and PRs should always be documented before research sessions
 
-## Example Output
+## Example Workflow
 
-After completion, inform the user:
+### Initial Presentation
+
+```
+I found 5 undocumented work sessions from today:
+
+⚠️ PR #59: Enhance copilot instructions (docs/enhance-copilot-instructions)
+⚠️ PR #58: Add missing project registry commands (docs/complete-help-banner-commands)
+⚠️ PR #57: Establish mandatory documentation rule (docs/mandatory-documentation-rule)
+⚠️ PR #56: Add session data extraction (feature/session-data-extraction)
+⚠️ PR #55: Update version references to 3.3.0 (docs/update-version-references-to-3.3.0)
+
+Which session would you like to document?
+```
+
+### After User Selection
 
 ```
 ✅ Documentation created and synced!
 
-File: .usecase/cases/2025-W42-10-14_HUB-002_update-github-organization-references.md
+File: .usecase/cases/2025-W45-11-08_HUB-056_session-data-extraction-with-token-tracking.md
 
 Summary:
-- 5 files updated
-- 22 replacements made
-- Time saved: ~1 hour
+- PR #56: Add session data extraction feature
+- 8 files updated
+- 245 lines added, 32 deleted
+- Time saved: ~2 hours
 
 Available in hub at:
-- by-project/[project-name]/
-- by-date/2025/10/
-- by-topic/[topic-slug]/
+- by-project/ai-use-case-cli/
+- by-date/2025/11/
+- by-topic/feature-development/
 ```
 
-## When NOT to Use Automatic Mode
+## Workflow Benefits
 
-Only use manual/interactive mode if:
-- User explicitly runs `ai-use-case document` in shell (not through you)
-- User specifically requests to manually input details
+**Why Interactive Selection Matters:**
+1. **Prevents Documentation Gaps**: Ensures all PRs and implementation work get documented, not just research sessions
+2. **User Control**: Developer chooses what's most important to document right now
+3. **Batch Documentation**: Can invoke multiple times to document several sessions sequentially
+4. **Context Awareness**: AI has full context of the selected session for better documentation quality
+5. **Audit Trail**: Clear mapping between PRs and their documentation
 
-Otherwise, ALWAYS use automatic mode when `/document-session` is invoked.
+## When NOT to Use Manual Input
 
-**Note**: Automatic mode works for BOTH implementation and research sessions. Git history is NOT required - research sessions rely purely on conversation context.
+After selection, documentation generation is ALWAYS automatic. Do NOT:
+- Ask user to fill in sections manually
+- Run the interactive bash script `document-ai-session.sh`
+- Prompt for ticket numbers, descriptions, or other details
+
+**Exception**: If user explicitly runs `ai-use-case document` in shell (not through Claude Code), they want the manual bash script workflow.
 
 ## Reference Examples
 

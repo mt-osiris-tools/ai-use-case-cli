@@ -206,34 +206,54 @@ bash ~/.local/share/ai-use-case-cli/scripts/utils/config-manager.sh mode
 
 ## Automatic Documentation (Claude Code)
 
+**v3.4.0+: Interactive session selection with automatic generation**
+
 When `/use-case:document-session` is invoked:
 
-1. **Analyze git history** (parallel):
+1. **Detect undocumented work** (prioritized):
    ```bash
+   # Find recent merged PRs (last 24 hours)
+   gh pr list --limit 20 --state merged --json number,title,mergedAt,headRefName
+
+   # Check recent commits
    git log --since="24 hours ago" --pretty=format:"%h - %s (%ar)"
-   git show --stat HEAD
-   git diff HEAD~1..HEAD
+
+   # List existing documentation
+   ls -1 .usecase/cases/
    ```
 
-2. **Auto-generate complete documentation**:
-   - Extract data from commits and conversation context
+2. **Present options to user**:
+   - Priority 1: **Undocumented PRs** (implementation work) ⚠️
+   - Priority 2: **Current conversation** (research session)
+   - Priority 3: **Recent direct commits**
+   - Use `AskUserQuestion` to let user select which session to document
+
+3. **Auto-generate complete documentation** for selected session:
+   - For PRs: Analyze PR metadata, commits, file changes
+   - For current session: Extract from conversation context
    - Use git stats for metrics (files, lines, commits)
    - NO placeholders or TODOs
    - Follow template from CLI docs/ directory (TEMPLATE.md or TEMPLATE-RESEARCH.md)
 
-3. **Detect session type**:
-   - Implementation: Has code changes/commits
+4. **Detect session type**:
+   - Implementation: Has code changes/commits (usually PRs)
    - Research: No code changes, exploration only (use `RESEARCH-XXX` tickets)
 
-4. **Save and sync**:
+5. **Save and sync**:
    ```bash
-   # Create file: .usecase/cases/YYYY-MM-DD_TICKET-XXX_description.md
+   # Create file: .usecase/cases/YYYY-Www-MM-DD_TICKET-XXX_description.md
    git add .usecase/cases/...
    git commit -m "docs: AI session documentation"
    bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
    ```
 
-See [docs/CLAUDE.md](docs/CLAUDE.md) and [.claude/commands/use-case/document-session.md](.claude/commands/use-case/document-session.md) for complete automatic documentation workflow.
+**Benefits of interactive selection:**
+- Ensures all PRs get documented, not just research sessions
+- User controls documentation priority
+- Can invoke multiple times to document several sessions
+- Clear audit trail between PRs and their documentation
+
+See [docs/CLAUDE.md](docs/CLAUDE.md) and [.claude/commands/use-case/document-session.md](.claude/commands/use-case/document-session.md) for complete workflow.
 
 ## Project Registry (v3.1.0+)
 
