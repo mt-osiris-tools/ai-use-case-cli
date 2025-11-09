@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.3] - 2025-11-09
+
+### Fixed
+
+- **Project Update Mechanism**: Enhanced `update-project.sh` to force refresh slash commands from running CLI
+  - Automatically backs up and removes old slash command files before running setup
+  - Copies fresh slash commands from the running CLI installation
+  - Ensures projects with outdated slash commands (wrong paths) get updated correctly
+  - Fixes issue where `/use-case:update-project` would fail on projects with v3.3.0 or older CLI installations
+  - Provides backup directory with timestamp for safety (can be removed after verification)
+  - Also checks for and prepares migration from old structure (`docs/ai-use-cases` → `.usecase/cases`)
+
+### Changed
+
+- **Slash Command Source**: Update script now copies from `$CLI_ROOT` instead of hardcoded path
+  - More flexible and works correctly whether run from dev repo or installed location
+  - Always uses the same version as the running script
+
+## [3.4.2] - 2025-11-08
+
 ### Fixed
 
 - **Slash Command Paths**: Fixed incorrect script paths in Claude Code slash commands
