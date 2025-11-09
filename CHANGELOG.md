@@ -7,7 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0] - 2025-11-08
+
 ### Added
+
+- **Interactive Session Selection**: `/use-case:document-session` now presents options instead of auto-documenting current session
+  - **Prioritizes undocumented work**: Detects recent merged PRs (last 24 hours) and highlights those not yet documented
+  - **User choice**: Developer selects which session to document using `AskUserQuestion` tool
+  - **Multiple session support**: Can invoke command multiple times to document several PRs/sessions sequentially
+  - **Smart detection**: Cross-references existing documentation to identify gaps
+  - **Priority ordering**: 1) Undocumented PRs, 2) Current conversation, 3) Recent direct commits
+  - Prevents documentation gaps where implementation work (PRs) was being skipped in favor of research sessions
+  - Provides clear audit trail between PRs and their documentation
+
+### Changed
+
+- **Documentation workflow**: Changed from fully automatic to interactive selection + automatic generation
+  - User interaction only at the start (selecting what to document)
+  - After selection, documentation generation remains fully automatic
+  - Maintains all existing automatic generation features (template adherence, metrics, sync)
+
+### Added (Previous Unreleased)
 
 - **Enhanced Copilot Instructions**: Comprehensive updates to `.github/copilot-instructions.md`
   - **Security and Safety Guidelines**: Input sanitization, credential handling, and environment isolation
