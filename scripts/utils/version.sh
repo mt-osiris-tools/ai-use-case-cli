@@ -18,7 +18,7 @@
 # 4. Commit with message: "chore: bump version to X.Y.Z"
 
 # Current CLI version
-export CLI_VERSION="3.4.3"
+export CLI_VERSION="3.5.0"
 
 # Version history (for reference)
 # 3.4.3 - 2025-11-09 - Force refresh slash commands during project updates
