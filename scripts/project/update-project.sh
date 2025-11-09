@@ -195,9 +195,17 @@ if [ -d "$CLAUDE_COMMANDS_DIR" ]; then
     # Copy fresh commands from the running CLI installation
     if [ -d "$CLI_COMMANDS_SOURCE" ]; then
         mkdir -p "$CLAUDE_COMMANDS_DIR"
-        cp "$CLI_COMMANDS_SOURCE"/*.md "$CLAUDE_COMMANDS_DIR/" 2>/dev/null
-        COMMAND_COUNT=$(ls -1 "$CLAUDE_COMMANDS_DIR"/*.md 2>/dev/null | wc -l)
-        echo -e "${GREEN}✓${NC} Installed $COMMAND_COUNT fresh slash command(s) from CLI v$CLI_VERSION"
+
+        # Check if .md files exist before attempting copy
+        MD_FILES=("$CLI_COMMANDS_SOURCE"/*.md)
+        if [ -e "${MD_FILES[0]}" ]; then
+            cp "$CLI_COMMANDS_SOURCE"/*.md "$CLAUDE_COMMANDS_DIR/" 2>/dev/null
+            COMMAND_COUNT=$(ls -1 "$CLAUDE_COMMANDS_DIR"/*.md 2>/dev/null | wc -l)
+            echo -e "${GREEN}✓${NC} Installed $COMMAND_COUNT fresh slash command(s) from CLI v$CLI_VERSION"
+        else
+            echo -e "${YELLOW}⚠${NC} No .md slash command files found in $CLI_COMMANDS_SOURCE"
+            echo -e "${YELLOW}⚠${NC} Setup script will attempt installation"
+        fi
     else
         echo -e "${YELLOW}⚠${NC} Could not find CLI commands at $CLI_COMMANDS_SOURCE"
         echo -e "${YELLOW}⚠${NC} Setup script will attempt installation"
@@ -236,7 +244,7 @@ if "$SCRIPT_DIR/setup-project.sh" "$PROJECT_PATH"; then
     fi
 
     # Note about backup cleanup
-    if [ -d "$PROJECT_PATH/.claude/commands/use-case.backup."* ] 2>/dev/null; then
+    if compgen -G "$PROJECT_PATH/.claude/commands/use-case.backup.*" > /dev/null; then
         echo ""
         echo -e "${CYAN}Note:${NC} Old slash commands backed up to .claude/commands/use-case.backup.*"
         echo "You can safely remove the backup once you've tested the update:"
