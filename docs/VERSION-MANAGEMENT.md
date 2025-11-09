@@ -2,6 +2,8 @@
 
 This document describes how to properly version the AI Use Case CLI following semantic versioning principles.
 
+**⚠️ IMPORTANT**: Before updating any version, see **[VERSION-UPDATE-CHECKLIST.md](./VERSION-UPDATE-CHECKLIST.md)** for a comprehensive checklist of ALL files that must be updated to prevent version inconsistencies.
+
 ## Semantic Versioning
 
 The project follows [Semantic Versioning 2.0.0](https://semver.org/):
