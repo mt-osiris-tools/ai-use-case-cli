@@ -122,7 +122,7 @@ bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
 - Can invoke multiple times to document several sessions
 - Clear audit trail between PRs and their documentation
 
-See [CLAUDE.md](CLAUDE.md) and [.claude/commands/use-case/document-session.md](../.claude/commands/use-case/document-session.md) for complete workflow.
+See [CLAUDE.md](../CLAUDE.md) and [.claude/commands/use-case/document-session.md](../.claude/commands/use-case/document-session.md) for complete workflow.
 
 ## Common Development Patterns
 
@@ -247,4 +247,4 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - [VERSION-MANAGEMENT.md](VERSION-MANAGEMENT.md) - Version bump guide
 - [VERSION-UPDATE-CHECKLIST.md](VERSION-UPDATE-CHECKLIST.md) - Verification checklist
 - [HUB-SYNC-CHECKLIST.md](HUB-SYNC-CHECKLIST.md) - Hub sync validation
-- [CLAUDE.md](CLAUDE.md) - Main comprehensive guide
+- [CLAUDE.md](../CLAUDE.md) - Main comprehensive guide

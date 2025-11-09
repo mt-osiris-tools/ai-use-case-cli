@@ -295,6 +295,6 @@ export XDG_CONFIG_HOME="~/.config"
 ## Related Documentation
 
 - [WORKFLOW.md](WORKFLOW.md) - Development workflow guide
-- [CLAUDE.md](CLAUDE.md) - Main comprehensive guide
+- [CLAUDE.md](../CLAUDE.md) - Main comprehensive guide
 - [VERSION-MANAGEMENT.md](VERSION-MANAGEMENT.md) - Version bump guide
 - [HUB-SYNC-CHECKLIST.md](HUB-SYNC-CHECKLIST.md) - Hub sync validation

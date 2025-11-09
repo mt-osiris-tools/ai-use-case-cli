@@ -3,7 +3,7 @@
 **Quick reference for AI assistants.** For detailed guides, see:
 - **[docs/WORKFLOW.md](docs/WORKFLOW.md)** - Branch workflow, version management, PR checklist
 - **[docs/COMMANDS.md](docs/COMMANDS.md)** - Complete command reference
-- **[docs/CLAUDE.md](docs/CLAUDE.md)** - Comprehensive 724-line guide
+- **[docs/CLAUDE.md](docs/CLAUDE.md)** - Comprehensive guide
 
 ## Repository Purpose
 
@@ -158,7 +158,7 @@ Examples:
 **📚 Documentation:**
 - **[docs/WORKFLOW.md](docs/WORKFLOW.md)** - Branch workflow, PR checklist, patterns
 - **[docs/COMMANDS.md](docs/COMMANDS.md)** - Complete command reference
-- **[docs/CLAUDE.md](docs/CLAUDE.md)** - Comprehensive guide (724 lines)
+- **[docs/CLAUDE.md](docs/CLAUDE.md)** - Comprehensive guide
 - **[docs/VERSION-MANAGEMENT.md](docs/VERSION-MANAGEMENT.md)** - Version bumps
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
 - **[README.md](README.md)** - User-facing documentation
