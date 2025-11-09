@@ -95,11 +95,47 @@ else
                     if [[ "$update_choice" =~ ^[Yy]$ ]]; then
                         echo -e "${CYAN}Updating repository...${NC}"
                         cd "$INSTALL_DIR"
+
+                        # Check for local changes
+                        if ! git diff-index --quiet HEAD --; then
+                            echo -e "${YELLOW}Local modifications detected, handling automatically...${NC}"
+
+                            # Check if changes are only permission changes
+                            TOTAL_CHANGES=$(git diff --numstat | wc -l)
+                            PERMISSION_ONLY_CHANGES=$(git diff --numstat | awk '$1 == "0" && $2 == "0" {print}' | wc -l)
+
+                            if [ "$TOTAL_CHANGES" -gt 0 ] && [ "$TOTAL_CHANGES" -eq "$PERMISSION_ONLY_CHANGES" ]; then
+                                # Only permission changes, safe to discard
+                                echo -e "${CYAN}Discarding permission-only changes...${NC}"
+                                git checkout -- .
+                            else
+                                # Content changes exist, stash them
+                                echo -e "${CYAN}Stashing local changes...${NC}"
+                                if ! git stash push -m "Auto-stash during update" 2>/dev/null; then
+                                    echo -e "${YELLOW}Warning: Could not stash changes${NC}"
+                                fi
+                            fi
+                        fi
+
+                        # Attempt to pull updates
                         if git pull origin main 2>/dev/null || git pull origin master 2>/dev/null; then
                             echo -e "${GREEN}✓${NC} Repository updated successfully"
+
+                            # Check if there are stashed changes to re-apply
+                            if git stash list | grep -q "Auto-stash during update"; then
+                                echo -e "${CYAN}Re-applying your local changes...${NC}"
+                                if git stash pop 2>/dev/null; then
+                                    echo -e "${GREEN}✓${NC} Local changes restored"
+                                else
+                                    echo -e "${YELLOW}⚠ Could not automatically restore changes${NC}"
+                                    echo "Your changes are preserved in: git stash list"
+                                    echo "Run 'git stash apply' to restore manually"
+                                fi
+                            fi
                         else
                             echo -e "${RED}✗ Failed to update repository${NC}"
                             echo "You may need to update manually:"
+                            echo "  cd $INSTALL_DIR && git status"
                             echo "  cd $INSTALL_DIR && git pull"
                             exit 1
                         fi

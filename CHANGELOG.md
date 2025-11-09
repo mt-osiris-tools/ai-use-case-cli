@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Installer Update Process**: Enhanced installer to handle local modifications automatically
+  - Detects and gracefully handles permission-only changes (automatically discarded)
+  - Stashes actual content changes before update and re-applies them after
+  - Prevents update failures when installation directory has local modifications
+  - Provides clear user feedback about what actions are being taken
+  - Fixes issue where `curl | bash` installer would fail with "Failed to update repository" error
+
 ## [3.4.2] - 2025-11-08
 
 ### Changed
