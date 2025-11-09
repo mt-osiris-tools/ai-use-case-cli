@@ -50,6 +50,7 @@ ${YELLOW}COMMANDS${NC}
   ${GREEN}search <term>${NC}             Search documented use cases
   ${GREEN}list${NC}                      List all registered projects
   ${GREEN}stats${NC}                     View use case statistics
+  ${GREEN}extract [hours] [format]${NC}  Extract session data for reporting
   ${GREEN}view${NC}                      Open hub directory in file explorer
   ${GREEN}push${NC}                      Push hub changes to remote repository
   ${GREEN}publish-confluence${NC}        Publish use case to Confluence
@@ -64,6 +65,7 @@ ${YELLOW}CLAUDE CODE INTEGRATION${NC}
   ${GREEN}/use-case:setup-project${NC}      Setup project (alternative to --init)
   ${GREEN}/use-case:sync-usecases${NC}      Sync to hub (alternative to sync)
   ${GREEN}/use-case:search-usecases${NC}    Search (alternative to search)
+  ${GREEN}/use-case:extract-session${NC}    Extract session data (alternative to extract)
   ${GREEN}/use-case:publish-confluence${NC} Publish (alternative)
   ${GREEN}/use-case:quick-start${NC}        Quick start guide
 
@@ -75,6 +77,7 @@ ${YELLOW}EXAMPLES${NC}
   ai-use-case search "auth"       # Search for auth-related use cases
   ai-use-case list                # List all projects
   ai-use-case stats               # View statistics
+  ai-use-case extract 8 json      # Extract last 8 hours as JSON
 
 ${YELLOW}PROJECT REGISTRY (v3.1.0+)${NC}
   ${GREEN}list-projects${NC}             List registered projects with versions
@@ -185,6 +188,16 @@ case "${1:-}" in
             bash "$SCRIPT_DIR/scripts/search/stats-use-cases.sh"
         else
             echo -e "${RED}Error: stats-use-cases.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    extract)
+        if [ -f "$SCRIPT_DIR/scripts/core/extract-session-data.sh" ]; then
+            # Pass all arguments to the script
+            shift
+            bash "$SCRIPT_DIR/scripts/core/extract-session-data.sh" "$@"
+        else
+            echo -e "${RED}Error: extract-session-data.sh not found${NC}"
             exit 1
         fi
         ;;

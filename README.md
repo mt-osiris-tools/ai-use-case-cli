@@ -45,6 +45,7 @@ Documentation shouldn't be a burden—it should be a valuable asset that grows y
 - 🎯 **Hybrid interface** - Use standalone CLI commands or Claude Code slash commands
 - 🚀 **AI-assisted documentation** - Automatic context capture with Claude Code integration
 - 🔬 **Research & implementation sessions** - Document both code changes and exploratory work
+- 📊 **Session data extraction** - Extract git history, token usage, and metrics for reporting (v3.4.0+)
 - 🔄 **Automatic syncing** - Git hooks sync docs to your chosen hub automatically
 - 🔧 **Flexible storage** - Choose between local-only or private git repository (v3.2.0+)
 - 🗂️ **Project registry** - Track and update all projects using the CLI (v3.1.0+)
@@ -101,6 +102,7 @@ Use **either** standalone CLI or Claude Code slash commands—whatever fits your
 | Sync to hub | `ai-use-case sync` | `/use-case:sync-usecases` |
 | Search use cases | `ai-use-case search <term>` | `/use-case:search-usecases` |
 | View statistics | `ai-use-case stats` | |
+| Extract session data | `ai-use-case extract [hours] [format]` | `/use-case:extract-session` |
 | List projects | `ai-use-case list` | `/use-case:list-projects` |
 | Check for updates | `ai-use-case check-updates` | `/use-case:check-updates` |
 | Update project | `ai-use-case update-project <path>` | `/use-case:update-project` |
