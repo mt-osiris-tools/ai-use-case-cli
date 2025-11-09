@@ -234,7 +234,7 @@ Before creating any PR:
 | File | Lines | Purpose | Auto-Updated by bump-version.sh |
 |------|-------|---------|----------------------------------|
 | `scripts/utils/version.sh` | 21 | Source of truth | ✅ Yes |
-| `README.md` | 4, 353 | User-facing docs | ✅ Yes (header), ⚠️ Partial (footer date manual) |
+| `README.md` | 4, 353 | User-facing docs | ✅ Yes (header version), Manual (footer date) |
 | `CHANGELOG.md` | Top | Release history | ⚠️ Prompts only (manual content) |
 | `CLAUDE.md` | Various | Feature docs | ❌ No (manual if new features) |
 | `ai-use-case` (main script) | N/A | CLI entry point | ✅ Auto (sources version.sh) |

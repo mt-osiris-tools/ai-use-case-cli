@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **Version inconsistency in README.md**: Updated header and footer version references from 3.3.0 to 3.4.0
+- **Version inconsistency in README.md**: Updated header and footer version references from 3.3.0 to 3.4.1
   - Fixed header badge (line 4)
   - Fixed footer metadata (line 353) with updated date
   - This was missed during the v3.4.0 release
