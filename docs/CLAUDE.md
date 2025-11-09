@@ -393,17 +393,27 @@ Before asking to create PR, verify:
 
 - [ ] Created feature branch (not on `main`)
 - [ ] Made atomic commits with conventional commit messages
-- [ ] Updated CHANGELOG.md under `## [Unreleased]`
+- [ ] **MANDATORY: Updated CHANGELOG.md under `## [Unreleased]`** (non-negotiable)
+- [ ] **MANDATORY: Reviewed and updated README.md** (non-negotiable if user-facing)
 - [ ] Reviewed HUB-SYNC-CHECKLIST.md (if applicable)
 - [ ] Tested changes locally (all scripts/commands work)
-- [ ] Updated README.md or CLAUDE.md (if behavior changed)
+- [ ] Updated all related documentation (docs/*, CLAUDE.md, CONTRIBUTING.md)
 - [ ] All commits include proper descriptions
 - [ ] Ready to ask user for PR approval
+
+**⚠️ DOCUMENTATION REVISION RULE:**
+Every code change MUST trigger a documentation review. This is non-negotiable:
+- **CHANGELOG.md**: MUST be updated for ALL changes (describe what changed and why)
+- **README.md**: MUST be reviewed and updated if any user-facing functionality changed
+- **Related docs**: MUST be updated if behavior, architecture, or workflows changed
+- No PR should be created without documentation updates
 
 ### Never Do These
 
 - ❌ Never commit directly to `main` branch
-- ❌ Never skip CHANGELOG.md updates
+- ❌ **Never skip CHANGELOG.md updates** (MANDATORY for all changes)
+- ❌ **Never skip README.md review** (MANDATORY for user-facing changes)
+- ❌ Never create PR without updating documentation
 - ❌ Never create PR without asking user first
 - ❌ Never skip testing changes locally
 - ❌ Never forget to check HUB-SYNC-CHECKLIST.md for hub-related changes

@@ -52,12 +52,19 @@ See [docs/VERSION-MANAGEMENT.md](docs/VERSION-MANAGEMENT.md) for complete guide.
 Before creating any PR:
 
 - [ ] Created feature branch (not on `main`)
-- [ ] Updated CHANGELOG.md
-- [ ] Updated version if adding features
+- [ ] **MANDATORY: Updated CHANGELOG.md** (non-negotiable for ALL changes)
+- [ ] **MANDATORY: Updated README.md** (non-negotiable if user-facing changes)
+- [ ] Updated version if adding features (scripts/utils/version.sh)
 - [ ] Tested changes locally
-- [ ] Updated README.md or docs if behavior changed
+- [ ] Updated all related documentation (docs/*, CLAUDE.md, CONTRIBUTING.md)
 - [ ] Used conventional commit messages
 - [ ] Reviewed HUB-SYNC-CHECKLIST.md if applicable
+
+**⚠️ DOCUMENTATION REVISION RULE:**
+Every code change MUST trigger a documentation review. At minimum:
+- CHANGELOG.md MUST be updated (describe what changed)
+- README.md MUST be reviewed and updated if user-facing functionality changed
+- All related docs/* files MUST be updated if behavior/architecture changed
 
 ## Key Commands
 
@@ -356,8 +363,10 @@ export AI_USECASES_DIR="/custom/path/to/hub"
 ## Never Do
 
 - ❌ Commit directly to `main`
-- ❌ Skip CHANGELOG.md updates
+- ❌ **Skip CHANGELOG.md updates** (MANDATORY for all changes)
+- ❌ **Skip README.md review** (MANDATORY for user-facing changes)
 - ❌ Create PR without testing
+- ❌ Create PR without updating documentation
 - ❌ Forget version bump for new features
 - ❌ Use placeholders in auto-generated docs
 - ❌ Skip HUB-SYNC-CHECKLIST.md review
@@ -376,4 +385,9 @@ export AI_USECASES_DIR="/custom/path/to/hub"
 **Project Type**: Bash CLI tool with hub integration
 **Main Branch**: `main` (protected, requires PRs – no direct commits allowed)
 **Commit Style**: Conventional commits (feat:, fix:, docs:, etc.)
-**Documentation Updates**: Always verify if we need to update the documentation, README, CHANGELOG and all related documentation
+
+**📚 MANDATORY DOCUMENTATION RULE:**
+- **CHANGELOG.md** → MUST update for ALL changes (no exceptions)
+- **README.md** → MUST review/update for user-facing changes (no exceptions)
+- **Related docs** → MUST update if behavior/architecture changes
+- PRs without documentation updates will be rejected
