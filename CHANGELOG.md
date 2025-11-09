@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Session Data Extraction**: New `ai-use-case extract` command and `/use-case:extract-session` slash command
+  - Extracts comprehensive session data from git history and file system
+  - **Token usage tracking**: Capture input/output tokens, context size, cache hits, and estimated costs
+  - **Multiple output formats**: JSON (structured data) or Markdown (human-readable reports)
+  - Calculates metrics: commits, files changed, lines added/removed, duration, interactions
+  - Automatic capture from Claude Code conversations when available
+  - Manual input via `--token-*` flags for standalone use
+  - Designed to support automated use case documentation and ROI reporting
+  - Script location: `scripts/core/extract-session-data.sh`
+  - Examples:
+    - `ai-use-case extract 8 json --token-input 95000 --token-output 9687 --cost 0.43`
+    - `ai-use-case extract 24 markdown -o session-report.md`
+
 ## [3.3.0] - 2025-11-07
 
 ### Changed
