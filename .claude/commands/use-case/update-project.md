@@ -10,26 +10,26 @@ Update a specific project's CLI installation to the latest version, ensuring all
 
 Run the update-project script with the project path:
 ```bash
-bash ~/.local/share/ai-use-case-cli/update-project.sh /path/to/project
+bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh /path/to/project
 ```
 
 ## Usage
 
 ### Update Current Directory
 ```bash
-bash ~/.local/share/ai-use-case-cli/update-project.sh .
+bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh .
 ```
 
 ### Update Specific Project
 ```bash
-bash ~/.local/share/ai-use-case-cli/update-project.sh /full/path/to/project
+bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh /full/path/to/project
 ```
 
 ### Update Multiple Projects
 ```bash
 # Update all outdated projects
-for p in $(bash ~/.local/share/ai-use-case-cli/check-updates.sh --paths-only); do
-  bash ~/.local/share/ai-use-case-cli/update-project.sh "$p"
+for p in $(bash ~/.local/share/ai-use-case-cli/scripts/project/check-updates.sh --paths-only); do
+  bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh "$p"
 done
 ```
 
@@ -90,23 +90,23 @@ If the script reports an error:
 ```
 User: "Update this project"
 Assistant: "I'll update the current project to the latest CLI version."
-[Runs: bash ~/.local/share/ai-use-case-cli/update-project.sh .]
+[Runs: bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh .]
 ```
 
 **Updating specific project:**
 ```
 User: "Update my-app to the latest version"
 Assistant: "I'll update the my-app project. Let me find the registered path first."
-[Runs: bash ~/.local/share/ai-use-case-cli/list-projects.sh --registry-only]
+[Runs: bash ~/.local/share/ai-use-case-cli/scripts/project/list-projects.sh --registry-only]
 [Finds path: /home/user/Projects/my-app]
-[Runs: bash ~/.local/share/ai-use-case-cli/update-project.sh /home/user/Projects/my-app]
+[Runs: bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh /home/user/Projects/my-app]
 ```
 
 **Multiple projects:**
 ```
 User: "Update all my projects"
 Assistant: "I'll check which projects need updates and update them all."
-[Runs: bash ~/.local/share/ai-use-case-cli/check-updates.sh]
+[Runs: bash ~/.local/share/ai-use-case-cli/scripts/project/check-updates.sh]
 [Shows list of outdated projects]
 [Asks: "Update all X projects? This will run the setup script for each."]
 [If yes, runs update-project.sh for each path]
@@ -127,7 +127,7 @@ After successfully updating, suggest:
 
 1. **Verify the update**:
    ```bash
-   bash ~/.local/share/ai-use-case-cli/list-projects.sh --registry-only
+   bash ~/.local/share/ai-use-case-cli/scripts/project/list-projects.sh --registry-only
    ```
 
 2. **Test in Claude Code**:

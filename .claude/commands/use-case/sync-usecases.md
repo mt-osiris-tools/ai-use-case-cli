@@ -22,18 +22,18 @@ Run the sync script to copy use case documents from the current project to the c
 
 3. Run the sync:
    ```bash
-   bash ~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh .
+   bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
    ```
 
 4. Show the results:
    ```bash
    # Show synced files stats
-   bash ~/.local/share/ai-use-case-cli/stats-use-cases.sh
+   bash ~/.local/share/ai-use-case-cli/scripts/search/stats-use-cases.sh
    ```
 
 5. Optionally show recent use cases:
    ```bash
-   bash ~/.local/share/ai-use-case-cli/list-projects.sh
+   bash ~/.local/share/ai-use-case-cli/scripts/project/list-projects.sh
    ```
 
 ## When to Use This

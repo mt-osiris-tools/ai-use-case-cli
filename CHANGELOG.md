@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Slash Command Paths**: Fixed incorrect script paths in Claude Code slash commands
+  - Updated `/use-case:update-project` to use correct `scripts/project/update-project.sh` path
+  - Updated `/use-case:check-updates` to use correct `scripts/project/check-updates.sh` path
+  - Updated `/use-case:list-projects` to use correct `scripts/project/list-projects.sh` path
+  - Updated `/use-case:sync-usecases` to use correct `scripts/core/sync-ai-use-cases.sh` and `scripts/search/stats-use-cases.sh` paths
+  - Fixes "No such file or directory" errors when running these commands on outdated CLI installations
+
 - **Installer Update Process**: Enhanced installer to handle local modifications automatically
   - Detects and gracefully handles permission-only changes (automatically discarded with `git reset --hard`)
   - Stashes actual content changes before update and re-applies them after
