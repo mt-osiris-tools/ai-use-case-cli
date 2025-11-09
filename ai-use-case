@@ -54,6 +54,7 @@ ${YELLOW}COMMANDS${NC}
   ${GREEN}view${NC}                      Open hub directory in file explorer
   ${GREEN}push${NC}                      Push hub changes to remote repository
   ${GREEN}publish-confluence${NC}        Publish use case to Confluence
+  ${GREEN}cleanup-backups [path]${NC}    Remove backup files from project
   ${GREEN}bump-version <type>${NC}       Bump version (major|minor|patch)
   ${GREEN}uninstall${NC}                 Uninstall the CLI tool
   ${GREEN}--version, -v, version${NC}    Show version information
@@ -86,6 +87,7 @@ ${YELLOW}PROJECT REGISTRY (v3.1.0+)${NC}
   ${GREEN}list-projects${NC}             List registered projects with versions
   ${GREEN}check-updates${NC}             Check which projects need CLI updates
   ${GREEN}update-project <path>${NC}     Update project to latest CLI version
+  ${GREEN}cleanup-backups [path]${NC}    Remove backup files from project
 
 ${YELLOW}ENVIRONMENT${NC}
   AI_USECASES_DIR      Hub directory (default: ~/Documents/ai-use-case-hub)
@@ -254,6 +256,16 @@ case "${1:-}" in
             bash "$SCRIPT_DIR/scripts/project/update-project.sh" "$2"
         else
             echo -e "${RED}Error: update-project.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    cleanup-backups)
+        if [ -f "$SCRIPT_DIR/scripts/utils/cleanup-backups.sh" ]; then
+            # Pass all arguments after the command to the script
+            shift
+            bash "$SCRIPT_DIR/scripts/utils/cleanup-backups.sh" "$@"
+        else
+            echo -e "${RED}Error: cleanup-backups.sh not found${NC}"
             exit 1
         fi
         ;;

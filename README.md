@@ -106,6 +106,7 @@ Use **either** standalone CLI or Claude Code slash commands—whatever fits your
 | List projects | `ai-use-case list` | `/use-case:list-projects` |
 | Check for updates | `ai-use-case check-updates` | `/use-case:check-updates` |
 | Update project | `ai-use-case update-project <path>` | `/use-case:update-project` |
+| Cleanup backups | `ai-use-case cleanup-backups [path]` | |
 | Publish to Confluence | `ai-use-case publish-confluence` | `/use-case:publish-confluence` |
 | View hub | `ai-use-case view` | |
 | Push hub changes | `ai-use-case push` | |
@@ -222,9 +223,16 @@ ai-use-case check-updates
 
 # Update a specific project
 ai-use-case update-project /path/to/project
+
+# Remove backup directories from a project
+ai-use-case cleanup-backups /path/to/project
+# Or cleanup current directory
+ai-use-case cleanup-backups
 ```
 
 Registry location: `~/.local/share/ai-use-case-cli/projects-registry.json`
+
+**Note**: During updates, the CLI automatically backs up old slash commands and git hooks to `.claude/backups/`. The update process keeps only the 3 most recent backups. Use `cleanup-backups` to manually remove all backup directories.
 
 ## Examples
 

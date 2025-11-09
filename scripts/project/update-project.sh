@@ -185,12 +185,16 @@ echo ""
 # This ensures outdated slash commands (with wrong paths) get replaced
 CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/commands/use-case"
 CLI_COMMANDS_SOURCE="$CLI_ROOT/.claude/commands/use-case"
+BACKUP_BASE_DIR="$PROJECT_PATH/.claude/backups"
 
 if [ -d "$CLAUDE_COMMANDS_DIR" ]; then
-    BACKUP_DIR="$CLAUDE_COMMANDS_DIR.backup.$(date +%Y%m%d%H%M%S)"
+    # Store backups outside .claude/commands/ to prevent them from being
+    # registered as slash commands by Claude Code
+    mkdir -p "$BACKUP_BASE_DIR"
+    BACKUP_DIR="$BACKUP_BASE_DIR/use-case.backup.$(date +%Y%m%d%H%M%S)"
     echo -e "${CYAN}Backing up old slash commands...${NC}"
     mv "$CLAUDE_COMMANDS_DIR" "$BACKUP_DIR"
-    echo -e "${GREEN}✓${NC} Old commands backed up to: $(basename "$BACKUP_DIR")"
+    echo -e "${GREEN}✓${NC} Old commands backed up to: .claude/backups/$(basename "$BACKUP_DIR")"
 
     # Copy fresh commands from the running CLI installation
     if [ -d "$CLI_COMMANDS_SOURCE" ]; then
@@ -243,12 +247,27 @@ if "$SCRIPT_DIR/setup-project.sh" "$PROJECT_PATH"; then
         echo -e "${YELLOW}⚠${NC} Warning: Registry may not have updated correctly"
     fi
 
-    # Note about backup cleanup
-    if compgen -G "$PROJECT_PATH/.claude/commands/use-case.backup.*" > /dev/null; then
+    # Cleanup old backups (keep only the most recent 3)
+    if [ -d "$BACKUP_BASE_DIR" ]; then
+        BACKUP_COUNT=$(find "$BACKUP_BASE_DIR" -maxdepth 1 -name "use-case.backup.*" -type d 2>/dev/null | wc -l)
+        if [ "$BACKUP_COUNT" -gt 3 ]; then
+            echo ""
+            echo -e "${CYAN}Cleaning up old backups (keeping 3 most recent)...${NC}"
+            # Delete all but the 3 most recent backups
+            find "$BACKUP_BASE_DIR" -maxdepth 1 -name "use-case.backup.*" -type d -print0 2>/dev/null | \
+                xargs -0 ls -dt 2>/dev/null | \
+                tail -n +4 | \
+                xargs -I {} rm -rf "{}" 2>/dev/null || true
+            NEW_COUNT=$(find "$BACKUP_BASE_DIR" -maxdepth 1 -name "use-case.backup.*" -type d 2>/dev/null | wc -l)
+            DELETED=$((BACKUP_COUNT - NEW_COUNT))
+            if [ "$DELETED" -gt 0 ]; then
+                echo -e "${GREEN}✓${NC} Removed $DELETED old backup(s)"
+            fi
+        fi
+
         echo ""
-        echo -e "${CYAN}Note:${NC} Old slash commands backed up to .claude/commands/use-case.backup.*"
-        echo "You can safely remove the backup once you've tested the update:"
-        echo "  rm -rf \"$PROJECT_PATH\"/.claude/commands/use-case.backup.*"
+        echo -e "${CYAN}Note:${NC} Old commands backed up to .claude/backups/"
+        echo "To remove all backups: $CLI_ROOT/scripts/utils/cleanup-backups.sh -y"
     fi
 else
     echo ""
