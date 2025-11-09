@@ -163,14 +163,15 @@ extract_title() {
     local filename=$(basename "$MARKDOWN_FILE" .md)
 
     # Pattern: YYYY-Www-MM-DD_TICKET-XXX_description-slug
-    if [[ $filename =~ ^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{2}_([A-Z]+-[0-9]+)_(.+)$ ]]; then
-        local ticket="${BASH_REMATCH[1]}"
-        local slug="${BASH_REMATCH[2]}"
+    if [[ $filename =~ ^([0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{2})_([A-Z]+-[0-9]+)_(.+)$ ]]; then
+        local date_prefix="${BASH_REMATCH[1]}"
+        local ticket="${BASH_REMATCH[2]}"
+        local slug="${BASH_REMATCH[3]}"
 
         # Convert slug to title case
         local title=$(echo "$slug" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
 
-        echo "$ticket: $title"
+        echo "${date_prefix}_${ticket}: $title"
     else
         # Fallback: just use filename with underscores converted to spaces
         echo "$filename" | sed 's/_/ /g'

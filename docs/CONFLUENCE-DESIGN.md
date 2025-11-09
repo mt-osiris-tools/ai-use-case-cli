@@ -64,10 +64,12 @@ Extract page ID using regex patterns.
 ### Title Extraction
 
 From filename `YYYY-Www-MM-DD_TICKET-XXX_description.md`:
-1. Remove date prefix: `YYYY-MM-DD_`
-2. Keep ticket: `TICKET-XXX`
+1. Extract date prefix: `YYYY-Www-MM-DD`
+2. Extract ticket: `TICKET-XXX`
 3. Convert slug to title: `description` → `Description`
-4. Final title: `TICKET-XXX: Description`
+4. Final title: `YYYY-Www-MM-DD_TICKET-XXX: Description`
+
+This maintains consistency with the local .md file naming convention.
 
 Or allow user override with `--title` flag.
 
