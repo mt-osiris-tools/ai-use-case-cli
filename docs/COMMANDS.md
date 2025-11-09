@@ -77,6 +77,51 @@ ai-use-case publish-confluence  # Publish to Confluence
                                # - Converts markdown to Confluence format
 ```
 
+### Tracing and Monitoring (v3.5.0+)
+
+```bash
+ai-use-case tracing configure   # Interactive tracing configuration
+                               # - Set OTLP endpoint
+                               # - Configure sampling ratio
+                               # - Test AI Toolkit connection
+
+ai-use-case tracing status      # Show tracing system status
+                               # - Check dependencies installed
+                               # - Show configuration
+                               # - Verify connectivity
+
+ai-use-case tracing enable      # Enable tracing
+ai-use-case tracing disable     # Disable tracing
+
+ai-use-case tracing install-deps # Install OpenTelemetry dependencies
+                               # - pip install opentelemetry packages
+                               # - User-level installation
+
+ai-use-case tracing test        # Test tracing functionality
+                               # - Send test traces
+                               # - Verify export works
+
+ai-use-case tracing show        # Show current configuration
+                               # - Display config file
+                               # - Show environment variables
+
+ai-use-case tracing set <key> <value>
+                               # Set configuration value
+                               # - sampling_ratio: 0.0-1.0
+                               # - endpoint: OTLP URL
+                               # - export_timeout: seconds
+```
+
+**Configuration:**
+- Config file: `~/.config/ai-use-case-cli/tracing.json`
+- Environment variables: `AI_USECASE_TRACING_ENABLED`, `AI_USECASE_TRACING_ENDPOINT`, `AI_USECASE_TRACING_SAMPLING`
+- See [docs/TRACING.md](TRACING.md) for complete guide
+
+**AI Toolkit Integration:**
+- Sends traces to `http://localhost:4318` by default
+- View in VS Code AI Toolkit > Tracing
+- Real-time performance monitoring
+
 ### Utility Commands
 
 ```bash

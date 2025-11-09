@@ -48,6 +48,7 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
   - `ai-use-case publish-confluence` - Publish to Confluence
   - `ai-use-case search` - Search use cases
   - `ai-use-case stats` - Show statistics
+  - `ai-use-case tracing` - Manage tracing configuration (v3.5.0+)
   - `ai-use-case list` - List projects
   - `ai-use-case view` - Open hub in file explorer
   - `ai-use-case update` - Update CLI to latest version
@@ -725,8 +726,47 @@ When an update is detected, users see:
 
 Implementation is in `ai-use-case:80-115` with the `check_for_updates()` function.
 
+## Tracing and Monitoring (v3.5.0+)
+
+The CLI includes comprehensive OpenTelemetry-based tracing for performance monitoring and observability:
+
+- **OpenTelemetry integration**: Full OTLP export via HTTP to localhost:4318
+- **AI Toolkit integration**: Direct connection to VS Code AI Toolkit's tracing viewer
+- **Graceful degradation**: CLI works normally when dependencies unavailable
+- **Zero overhead when disabled**: No performance impact if tracing is off
+- **Configurable**: JSON config files + environment variables
+
+**Key capabilities:**
+- Command execution tracking (duration, success/failure rates)
+- File operation monitoring (create, update, symlink)
+- Error tracking with full context and stack traces
+- Hub sync metrics (files synced, new, updated)
+- Search operation analytics
+
+**Configuration:**
+```bash
+# Setup tracing
+ai-use-case tracing configure
+ai-use-case tracing install-deps
+
+# Enable/disable
+ai-use-case tracing enable
+ai-use-case tracing disable
+
+# Check status
+ai-use-case tracing status
+```
+
+**Files:**
+- `scripts/utils/tracing.py`: OpenTelemetry Python integration (395 lines)
+- `scripts/utils/tracing.sh`: Shell wrapper for bash instrumentation (351 lines)
+- `docs/TRACING.md`: Comprehensive documentation (409 lines)
+
+See [docs/TRACING.md](TRACING.md) for complete setup and usage guide.
+
 ## Version History
 
+- **v3.5.0**: Distributed tracing system with OpenTelemetry, AI Toolkit integration, performance monitoring
 - **v3.3.0**: Refactored folder structure to `.usecase/cases/`, added hub configuration commands, restored ASCII art banner
 - **v3.2.0**: Optional hub repository (local-only or private git), automated version bump system, centralized version management
 - **v3.1.0**: Hybrid CLI + Claude Code interface, project registry system for version tracking
