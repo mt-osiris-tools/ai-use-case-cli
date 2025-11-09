@@ -260,6 +260,7 @@ fi
 GIT_HOOKS_DIR="$PROJECT_PATH/.git/hooks"
 POST_COMMIT_HOOK="$GIT_HOOKS_DIR/post-commit"
 PRE_COMMIT_HOOK="$GIT_HOOKS_DIR/pre-commit"
+BACKUP_BASE_DIR="$PROJECT_PATH/.claude/backups"
 
 # Verify hook sources exist
 if [ ! -f "$POST_COMMIT_HOOK_SOURCE" ]; then
@@ -279,9 +280,10 @@ if [ -f "$POST_COMMIT_HOOK" ]; then
         echo -e "${YELLOW}⚠${NC} Git post-commit hook already installed"
     else
         # Backup existing hook
-        BACKUP_HOOK="$POST_COMMIT_HOOK.backup.$(date +%Y%m%d%H%M%S)"
+        mkdir -p "$BACKUP_BASE_DIR"
+        BACKUP_HOOK="$BACKUP_BASE_DIR/post-commit.backup.$(date +%Y%m%d%H%M%S)"
         cp "$POST_COMMIT_HOOK" "$BACKUP_HOOK"
-        echo -e "${YELLOW}⚠${NC} Existing post-commit hook backed up to: $(basename "$BACKUP_HOOK")"
+        echo -e "${YELLOW}⚠${NC} Existing post-commit hook backed up to: .claude/backups/$(basename "$BACKUP_HOOK")"
 
         # Append our hook to existing hook
         echo "" >> "$POST_COMMIT_HOOK"
@@ -302,9 +304,10 @@ if [ -f "$PRE_COMMIT_HOOK" ]; then
         echo -e "${YELLOW}⚠${NC} Git pre-commit hook already installed"
     else
         # Backup existing hook
-        BACKUP_HOOK="$PRE_COMMIT_HOOK.backup.$(date +%Y%m%d%H%M%S)"
+        mkdir -p "$BACKUP_BASE_DIR"
+        BACKUP_HOOK="$BACKUP_BASE_DIR/pre-commit.backup.$(date +%Y%m%d%H%M%S)"
         cp "$PRE_COMMIT_HOOK" "$BACKUP_HOOK"
-        echo -e "${YELLOW}⚠${NC} Existing pre-commit hook backed up to: $(basename "$BACKUP_HOOK")"
+        echo -e "${YELLOW}⚠${NC} Existing pre-commit hook backed up to: .claude/backups/$(basename "$BACKUP_HOOK")"
 
         # Append our hook to existing hook
         echo "" >> "$PRE_COMMIT_HOOK"
@@ -338,14 +341,29 @@ if [ -f "$GITIGNORE" ]; then
         echo -e "${BLUE}Removed old gitignore patterns${NC}"
     fi
 
-    # Add new pattern if not present
+    # Add new patterns if not present
     if ! grep -q "^# Use Case Documentation" "$GITIGNORE"; then
         echo "" >> "$GITIGNORE"
         echo "# Use Case Documentation" >> "$GITIGNORE"
         echo ".usecase/cases/" >> "$GITIGNORE"
-        echo -e "${GREEN}✓${NC} Added .usecase/cases/ to .gitignore"
+        echo ".claude/backups/" >> "$GITIGNORE"
+        echo -e "${GREEN}✓${NC} Added .usecase/cases/ and .claude/backups/ to .gitignore"
     else
-        echo -e "${YELLOW}⚠${NC} .gitignore already configured"
+        # Check if backups line exists
+        if ! grep -q "^\.claude/backups/" "$GITIGNORE"; then
+            # Find the Use Case Documentation section and add backups line after .usecase/cases/
+            if [[ "$(uname)" == "Darwin" ]]; then
+                # macOS (BSD sed)
+                sed -i '' '/^\.usecase\/cases\//a\
+.claude/backups/' "$GITIGNORE"
+            else
+                # Linux (GNU sed)
+                sed -i '/^\.usecase\/cases\//a .claude/backups/' "$GITIGNORE"
+            fi
+            echo -e "${GREEN}✓${NC} Added .claude/backups/ to .gitignore"
+        else
+            echo -e "${YELLOW}⚠${NC} .gitignore already configured"
+        fi
     fi
 fi
 

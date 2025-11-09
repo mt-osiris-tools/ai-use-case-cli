@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Backup Cleanup Utility**: New `cleanup-backups` command to remove backup directories
+  - Added `scripts/utils/cleanup-backups.sh` script with dry-run and auto-confirm modes
+  - Integrated into main CLI: `ai-use-case cleanup-backups [path]`
+  - Finds and removes backups from `.claude/commands/`, `.claude/backups/`, and `.git/hooks/`
+  - Supports `-y` (auto-confirm), `-n` (dry-run), and `-h` (help) flags
+  - Provides detailed output showing backup locations and sizes
+
+### Fixed
+
+- **Duplicate Slash Commands**: Fixed issue where backup directories appeared as duplicate slash commands in Claude Code
+  - Changed backup location from `.claude/commands/use-case.backup.*` to `.claude/backups/use-case.backup.*`
+  - Prevents Claude Code from scanning backup directories and registering them as slash commands
+  - Updated `update-project.sh` to use new backup location (lines 184-197, 250-271)
+  - Updated `setup-project.sh` to use new backup location for git hook backups (lines 263, 283-286, 307-310)
+  - Added automatic cleanup that keeps only the 3 most recent backups during updates
+  - Added `.claude/backups/` to `.gitignore` entries in setup script
+
+### Changed
+
+- **Backup Management**: Improved backup handling to prevent clutter and conflicts
+  - Backups now stored outside `.claude/commands/` directory structure
+  - Git hook backups moved from `.git/hooks/*.backup.*` to `.claude/backups/*.backup.*`
+  - Project `.gitignore` now includes `.claude/backups/` pattern during setup
+  - Update script automatically cleans up old backups (keeping 3 most recent)
+
 ## [3.4.3] - 2025-11-09
 
 ### Fixed
