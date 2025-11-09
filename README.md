@@ -1,7 +1,7 @@
 <div align="center">
     <img src="./media/ai_use_case_cli_banner.webp" alt="AI Use Case CLI - The Documenter" width="800"/>
     <h1>AI Use Case CLI</h1>
-    <h3><em><strong>v3.4.2</strong> - Document AI-assisted development workflows with ease.</em></h3>
+    <h3><em><strong>v3.4.3</strong> - Document AI-assisted development workflows with ease.</em></h3>
 </div>
 
 ---
@@ -362,5 +362,5 @@ MIT License - see [LICENSE](./LICENSE) file for details
 
 ---
 
-**Version**: 3.4.2
-**Last Updated**: 2025-11-08
+**Version**: 3.4.3
+**Last Updated**: 2025-11-09
