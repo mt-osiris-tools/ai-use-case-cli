@@ -34,6 +34,8 @@ gh pr create --title "..." --body "..."
 
 ### Version Management
 
+**⚠️ CRITICAL**: When bumping versions, you MUST update ALL version references. See [docs/VERSION-UPDATE-CHECKLIST.md](docs/VERSION-UPDATE-CHECKLIST.md) for the complete checklist.
+
 When adding features or fixing bugs:
 
 1. **Update version** in `scripts/utils/version.sh` (line 21):
@@ -41,11 +43,14 @@ When adding features or fixing bugs:
    - MINOR: New features (0.X.0)
    - PATCH: Bug fixes (0.0.X)
 
-2. **Update CHANGELOG.md**: Add entry under appropriate version section
+2. **Update ALL version references** (see checklist):
+   - `README.md` (header on line ~4)
+   - `README.md` (footer on line ~353 + date)
+   - `CHANGELOG.md` (add new version section)
 
 3. **Test**: Run `./ai-use-case --version`
 
-See [docs/VERSION-MANAGEMENT.md](docs/VERSION-MANAGEMENT.md) for complete guide.
+See [docs/VERSION-MANAGEMENT.md](docs/VERSION-MANAGEMENT.md) for complete guide and [docs/VERSION-UPDATE-CHECKLIST.md](docs/VERSION-UPDATE-CHECKLIST.md) for verification checklist.
 
 ### Pre-PR Checklist
 

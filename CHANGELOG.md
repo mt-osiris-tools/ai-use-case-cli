@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.1] - 2025-11-08
+
+### Fixed
+
+- **Version inconsistency in README.md**: Updated header and footer version references from 3.3.0 to 3.4.0
+  - Fixed header badge (line 4)
+  - Fixed footer metadata (line 353) with updated date
+  - This was missed during the v3.4.0 release
+
+### Added
+
+- **VERSION-UPDATE-CHECKLIST.md**: Comprehensive checklist to prevent future version inconsistencies
+  - Lists ALL files requiring version updates
+  - Provides verification commands
+  - Documents common pitfalls and solutions
+  - Integrates with existing VERSION-MANAGEMENT.md workflow
+  - Updated CLAUDE.md to reference checklist in version management section
+  - Updated VERSION-MANAGEMENT.md with prominent checklist reference
+
 ## [3.4.0] - 2025-11-08
 
 ### Added
