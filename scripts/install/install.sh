@@ -101,18 +101,21 @@ else
                             echo -e "${YELLOW}Local modifications detected, handling automatically...${NC}"
 
                             # Check if changes are only permission changes
-                            TOTAL_CHANGES=$(git diff --numstat | wc -l)
-                            PERMISSION_ONLY_CHANGES=$(git diff --numstat | awk '$1 == "0" && $2 == "0" {print}' | wc -l)
+                            TOTAL_CHANGES=$(git diff HEAD --numstat | wc -l)
+                            PERMISSION_ONLY_CHANGES=$(git diff HEAD --numstat | awk '$1 == "0" && $2 == "0" {print}' | wc -l)
 
                             if [ "$TOTAL_CHANGES" -gt 0 ] && [ "$TOTAL_CHANGES" -eq "$PERMISSION_ONLY_CHANGES" ]; then
                                 # Only permission changes, safe to discard
                                 echo -e "${CYAN}Discarding permission-only changes...${NC}"
-                                git checkout -- .
+                                git reset --hard HEAD
                             else
                                 # Content changes exist, stash them
                                 echo -e "${CYAN}Stashing local changes...${NC}"
                                 if ! git stash push -m "Auto-stash during update" 2>/dev/null; then
-                                    echo -e "${YELLOW}Warning: Could not stash changes${NC}"
+                                    echo -e "${RED}✗ Failed to stash local changes. Cannot safely update repository.${NC}"
+                                    echo "Please resolve your local changes manually before updating."
+                                    echo "  cd $INSTALL_DIR && git status"
+                                    exit 1
                                 fi
                             fi
                         fi
@@ -122,14 +125,22 @@ else
                             echo -e "${GREEN}✓${NC} Repository updated successfully"
 
                             # Check if there are stashed changes to re-apply
-                            if git stash list | grep -q "Auto-stash during update"; then
+                            if git stash list | head -1 | grep -q "Auto-stash during update"; then
                                 echo -e "${CYAN}Re-applying your local changes...${NC}"
-                                if git stash pop 2>/dev/null; then
+                                if git stash apply 2>/dev/null; then
+                                    # Successfully applied, drop the stash
+                                    git stash drop "$(git stash list | grep "Auto-stash during update" | head -1 | cut -d: -f1)" 2>/dev/null
                                     echo -e "${GREEN}✓${NC} Local changes restored"
                                 else
-                                    echo -e "${YELLOW}⚠ Could not automatically restore changes${NC}"
-                                    echo "Your changes are preserved in: git stash list"
-                                    echo "Run 'git stash apply' to restore manually"
+                                    echo -e "${YELLOW}⚠ Merge conflicts detected while restoring your changes${NC}"
+                                    echo "Your changes are still preserved in the stash: git stash list"
+                                    echo "Resolve conflicts in the files marked with <<<<<<<, =======, >>>>>>>"
+                                    echo "After resolving, you can run:"
+                                    echo "  git add <conflicted-files>"
+                                    echo "  git stash drop \"\$(git stash list | grep 'Auto-stash during update' | head -1 | cut -d: -f1)\""
+                                    echo "Or, if you want to abort the merge and restore the previous state:"
+                                    echo "  git reset --hard"
+                                    echo "  git stash apply"
                                 fi
                             fi
                         else
