@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.2] - 2025-11-08
+
+### Changed
+
+- **Documentation Optimization**: Refactored CLAUDE.md to reduce token usage in Claude Code context
+  - Split large CLAUDE.md (418 lines) into focused documentation files:
+    - `CLAUDE.md` - Quick reference with links to detailed docs
+    - `docs/WORKFLOW.md` - Branch workflow, PR checklist, version management, development patterns
+    - `docs/COMMANDS.md` - Complete command reference, hub configuration, project registry
+  - Expected token reduction: ~60% reduction in base context (from ~4.4k to ~1.5k tokens)
+  - Maintains all critical information with improved organization and discoverability
+  - Each file serves specific use case: quick reference, workflow details, or command lookups
+  - Added cross-references between files for easy navigation
+  - Updated file structure section to reflect new documentation layout
+
 ## [3.4.1] - 2025-11-08
 
 ### Fixed
