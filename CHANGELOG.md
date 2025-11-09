@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Confluence Page Naming**: Updated Confluence publish to use full filename convention
+  - Page titles now include date/week prefix: `YYYY-Www-MM-DD_TICKET-XXX: Description`
+  - Maintains consistency with local .md file naming convention
+  - Example: `2025-W45-11-09_LSFB-60265: Add Environment Parameter to EditedDocument Message`
+  - Updated `scripts/core/publish-confluence.sh` `extract_title()` function
+
 ## [3.5.0] - 2025-11-09
 
 ### Added
