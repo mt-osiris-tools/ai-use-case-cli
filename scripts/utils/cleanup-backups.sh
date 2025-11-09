@@ -2,7 +2,7 @@
 # AI Use Case CLI - Cleanup Backups
 # Removes backup directories created during updates
 
-set -e
+set -euo pipefail
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -159,7 +159,7 @@ echo -e "${GREEN}=== Cleanup Complete ===${NC}"
 echo "Deleted $DELETED_COUNT backup(s)"
 
 # Note about Claude Code refresh
-if [ $DELETED_COUNT -gt 0 ]; then
+if [ "$DELETED_COUNT" -gt 0 ]; then
     echo ""
     echo -e "${CYAN}Note:${NC} If you still see duplicate slash commands in Claude Code,"
     echo "restart Claude Code to refresh the command list."
