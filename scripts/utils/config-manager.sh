@@ -313,7 +313,128 @@ show_config() {
 }
 
 # Main function for standalone execution
-if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    fi
+}
+
+# Function to get tracing configuration
+get_tracing_config() {
+    local tracing_config_file="$CONFIG_DIR/tracing.json"
+    
+    # Default tracing configuration
+    local default_config='{
+  "enabled": true,
+  "endpoint": "http://localhost:4318",
+  "sampling_ratio": 1.0,
+  "export_timeout": 30
+}'
+    
+    if [ -f "$tracing_config_file" ]; then
+        cat "$tracing_config_file"
+    else
+        echo "$default_config"
+    fi
+}
+
+# Function to set tracing configuration
+set_tracing_config() {
+    local key="$1"
+    local value="$2"
+    local tracing_config_file="$CONFIG_DIR/tracing.json"
+    
+    ensure_config_dir
+    
+    # Create config file if it doesn't exist
+    if [ ! -f "$tracing_config_file" ]; then
+        get_tracing_config > "$tracing_config_file"
+    fi
+    
+    # Update the configuration using jq if available
+    if command -v jq &> /dev/null; then
+        local temp_file=$(mktemp)
+        jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$tracing_config_file" > "$temp_file"
+        mv "$temp_file" "$tracing_config_file"
+        echo "Updated tracing.$key = $value"
+    else
+        echo "jq not available. Please manually edit $tracing_config_file"
+        echo "Set $key = $value"
+    fi
+}
+
+# Function to show tracing configuration
+show_tracing_config() {
+    local tracing_config_file="$CONFIG_DIR/tracing.json"
+    
+    echo -e "${BLUE}=== Tracing Configuration ===${NC}"
+    echo ""
+    
+    if [ -f "$tracing_config_file" ]; then
+        echo -e "${GREEN}Configuration file:${NC} $tracing_config_file"
+        echo ""
+        
+        if command -v jq &> /dev/null; then
+            jq '.' "$tracing_config_file"
+        else
+            cat "$tracing_config_file"
+        fi
+    else
+        echo -e "${YELLOW}No tracing configuration found${NC}"
+        echo "Default configuration:"
+        get_tracing_config | jq '.' 2>/dev/null || get_tracing_config
+    fi
+    
+    echo ""
+    echo -e "${CYAN}Environment Variables:${NC}"
+    printf "  %-30s %s\n" "AI_USECASE_TRACING_ENABLED" "${AI_USECASE_TRACING_ENABLED:-not set}"
+    printf "  %-30s %s\n" "AI_USECASE_TRACING_ENDPOINT" "${AI_USECASE_TRACING_ENDPOINT:-not set}"
+    printf "  %-30s %s\n" "AI_USECASE_TRACING_SAMPLING" "${AI_USECASE_TRACING_SAMPLING:-not set}"
+}
+
+# Function to configure tracing interactively
+configure_tracing() {
+    echo -e "${BLUE}=== Configure Tracing ===${NC}"
+    echo ""
+    
+    # Check if AI Toolkit tracing is available
+    if curl -s http://localhost:4318/v1/traces >/dev/null 2>&1; then
+        echo -e "${GREEN}✓ AI Toolkit tracing endpoint detected at localhost:4318${NC}"
+    else
+        echo -e "${YELLOW}⚠ AI Toolkit tracing endpoint not detected${NC}"
+        echo "  Make sure AI Toolkit is running with tracing enabled"
+    fi
+    echo ""
+    
+    local enabled
+    read -p "Enable tracing? (Y/n): " -r enabled
+    enabled=${enabled:-Y}
+    if [[ "$enabled" =~ ^[Yy]$ ]]; then
+        set_tracing_config "enabled" "true"
+    else
+        set_tracing_config "enabled" "false"
+        echo "Tracing disabled."
+        return 0
+    fi
+    
+    echo ""
+    local endpoint
+    read -p "OTLP endpoint (default: http://localhost:4318): " -r endpoint
+    endpoint=${endpoint:-http://localhost:4318}
+    set_tracing_config "endpoint" "$endpoint"
+    
+    echo ""
+    local sampling
+    read -p "Sampling ratio (0.0-1.0, default: 1.0): " -r sampling
+    sampling=${sampling:-1.0}
+    set_tracing_config "sampling_ratio" "$sampling"
+    
+    echo ""
+    echo -e "${GREEN}✓ Tracing configured successfully${NC}"
+    echo ""
+    echo "To install tracing dependencies:"
+    echo "  bash ~/.local/share/ai-use-case-cli/scripts/utils/tracing.sh install-deps"
+}
+
+# Main CLI interface
+if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
     case "${1:-}" in
         init)
             shift
@@ -324,6 +445,34 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
             ;;
         set)
             set_config "${2:-}" "${3:-}"
+            ;;
+        tracing)
+            case "$2" in
+                show)
+                    show_tracing_config
+                    ;;
+                configure)
+                    configure_tracing
+                    ;;
+                enable)
+                    set_tracing_config "enabled" "true"
+                    ;;
+                disable)
+                    set_tracing_config "enabled" "false"
+                    ;;
+                set)
+                    if [ -z "$3" ] || [ -z "$4" ]; then
+                        echo "Error: Usage: tracing set <key> <value>"
+                        exit 1
+                    fi
+                    set_tracing_config "$3" "$4"
+                    ;;
+                *)
+                    echo "Error: Unknown tracing command '${2:-}'"
+                    echo "Available: show, configure, enable, disable, set"
+                    exit 1
+                    ;;
+            esac
             ;;
         show)
             show_config
@@ -354,14 +503,20 @@ Usage:
   $(basename "$0") <command> [args]
 
 Commands:
-  init              Interactive hub mode selection
-  show              Show current configuration
-  mode              Get hub mode
-  path              Get hub path
-  url               Get git URL
-  is-git            Check if git mode is enabled
-  get <key>         Get configuration value
-  set <key> <val>   Set configuration value
+  init                    Interactive hub mode selection
+  show                    Show current configuration
+  mode                    Get hub mode
+  path                    Get hub path
+  url                     Get git URL
+  is-git                  Check if git mode is enabled
+  get <key>               Get configuration value
+  set <key> <val>         Set configuration value
+  tracing <subcommand>    Manage tracing configuration
+    show                  Show tracing configuration
+    configure             Interactive tracing setup
+    enable                Enable tracing
+    disable               Disable tracing
+    set <key> <value>     Set tracing configuration value
 
 Examples:
   $(basename "$0") init
