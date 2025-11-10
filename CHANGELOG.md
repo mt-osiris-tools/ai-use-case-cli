@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Reset Command Color Codes**: Fixed ANSI color codes not rendering in help output
+  - Changed `show_help()` function in `scripts/utils/reset.sh` from heredoc (`cat <<EOF`) to `echo -e` statements
+  - Color codes now properly render in terminal for improved readability
+  - Affects help output when running `ai-use-case reset` or `ai-use-case reset --help`
 - **Tracing Dependency Installation**: Fixed installation failure on externally-managed Python environments
   - Changed from `pip3 install --user` to virtual environment approach (`~/.local/share/ai-use-case-cli/venv`)
   - Updated `scripts/utils/tracing.sh` to create and use isolated venv for OpenTelemetry packages

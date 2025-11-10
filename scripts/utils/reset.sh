@@ -33,55 +33,53 @@ FORCE=false
 
 # Parse arguments
 show_help() {
-    cat <<EOF
-${BLUE}AI Use Case CLI - Reset Configuration${NC}
-
-${YELLOW}Usage:${NC}
-  $0 [options]
-
-${YELLOW}Options:${NC}
-  ${GREEN}--all${NC}           Reset everything (config, registry, tracing, hub)
-                  ${RED}⚠ WARNING: This includes your hub data!${NC}
-
-  ${GREEN}--config${NC}        Reset only configuration files
-                  (config.json, tracing.json)
-
-  ${GREEN}--registry${NC}      Reset only projects registry
-                  (projects-registry.json)
-
-  ${GREEN}--tracing${NC}       Reset only tracing configuration and virtual environment
-                  (tracing.json, tracing-venv/)
-
-  ${GREEN}--hub${NC}           Reset hub directory
-                  ${RED}⚠ WARNING: This deletes all your documented use cases!${NC}
-                  Only affects local-only mode hubs
-
-  ${GREEN}--dry-run${NC}       Show what would be deleted without actually deleting
-
-  ${GREEN}--force, -y${NC}     Skip confirmation prompts
-
-  ${GREEN}--help, -h${NC}      Show this help message
-
-${YELLOW}Examples:${NC}
-  $0 --config              # Reset only configuration files
-  $0 --tracing             # Reset tracing setup
-  $0 --registry --config   # Reset registry and config
-  $0 --all --dry-run       # See what --all would delete
-  $0 --config --force      # Reset config without confirmation
-
-${YELLOW}Safety:${NC}
-  • All operations require confirmation unless --force is used
-  • Use --dry-run to preview changes before executing
-  • Hub data is only deleted if explicitly requested with --hub or --all
-  • Git-based hubs are never deleted (only local-only mode)
-
-${YELLOW}What Gets Reset:${NC}
-  Config:   $CONFIG_DIR/
-  Registry: $REGISTRY_FILE
-  Tracing:  $TRACING_CONFIG + $TRACING_VENV/
-  Hub:      $HUB_DIR/ (local-only mode only)
-
-EOF
+    echo -e "${BLUE}AI Use Case CLI - Reset Configuration${NC}"
+    echo ""
+    echo -e "${YELLOW}Usage:${NC}"
+    echo "  $0 [options]"
+    echo ""
+    echo -e "${YELLOW}Options:${NC}"
+    echo -e "  ${GREEN}--all${NC}           Reset everything (config, registry, tracing, hub)"
+    echo -e "                  ${RED}⚠ WARNING: This includes your hub data!${NC}"
+    echo ""
+    echo -e "  ${GREEN}--config${NC}        Reset only configuration files"
+    echo "                  (config.json, tracing.json)"
+    echo ""
+    echo -e "  ${GREEN}--registry${NC}      Reset only projects registry"
+    echo "                  (projects-registry.json)"
+    echo ""
+    echo -e "  ${GREEN}--tracing${NC}       Reset only tracing configuration and virtual environment"
+    echo "                  (tracing.json, tracing-venv/)"
+    echo ""
+    echo -e "  ${GREEN}--hub${NC}           Reset hub directory"
+    echo -e "                  ${RED}⚠ WARNING: This deletes all your documented use cases!${NC}"
+    echo "                  Only affects local-only mode hubs"
+    echo ""
+    echo -e "  ${GREEN}--dry-run${NC}       Show what would be deleted without actually deleting"
+    echo ""
+    echo -e "  ${GREEN}--force, -y${NC}     Skip confirmation prompts"
+    echo ""
+    echo -e "  ${GREEN}--help, -h${NC}      Show this help message"
+    echo ""
+    echo -e "${YELLOW}Examples:${NC}"
+    echo "  $0 --config              # Reset only configuration files"
+    echo "  $0 --tracing             # Reset tracing setup"
+    echo "  $0 --registry --config   # Reset registry and config"
+    echo "  $0 --all --dry-run       # See what --all would delete"
+    echo "  $0 --config --force      # Reset config without confirmation"
+    echo ""
+    echo -e "${YELLOW}Safety:${NC}"
+    echo "  • All operations require confirmation unless --force is used"
+    echo "  • Use --dry-run to preview changes before executing"
+    echo "  • Hub data is only deleted if explicitly requested with --hub or --all"
+    echo "  • Git-based hubs are never deleted (only local-only mode)"
+    echo ""
+    echo -e "${YELLOW}What Gets Reset:${NC}"
+    echo "  Config:   $CONFIG_DIR/"
+    echo "  Registry: $REGISTRY_FILE"
+    echo "  Tracing:  $TRACING_CONFIG + $TRACING_VENV/"
+    echo "  Hub:      $HUB_DIR/ (local-only mode only)"
+    echo ""
 }
 
 # Parse flags
