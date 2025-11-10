@@ -69,6 +69,7 @@ ${YELLOW}COMMANDS${NC}
   ${GREEN}publish-confluence${NC}        Publish use case to Confluence
   ${GREEN}cleanup-backups [path]${NC}    Remove backup files from project
   ${GREEN}tracing [subcommand]${NC}      Manage tracing configuration
+  ${GREEN}reset [options]${NC}           Reset CLI configuration and data
   ${GREEN}bump-version <type>${NC}       Bump version (major|minor|patch)
   ${GREEN}uninstall${NC}                 Uninstall the CLI tool
   ${GREEN}--version, -v, version${NC}    Show version information
@@ -383,6 +384,18 @@ EOF
         else
             trace_event "error" "command=tracing" "error=config_manager_not_found"
             echo -e "${RED}Error: config-manager.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    reset)
+        trace_event "command_start" "command=reset" "args=$*"
+        if [ -f "$SCRIPT_DIR/scripts/utils/reset.sh" ]; then
+            # Pass all arguments after the command to the script
+            shift
+            trace_run "reset" bash "$SCRIPT_DIR/scripts/utils/reset.sh" "$@"
+        else
+            trace_event "error" "command=reset" "error=script_not_found" "script=reset.sh"
+            echo -e "${RED}Error: reset.sh not found${NC}"
             exit 1
         fi
         ;;

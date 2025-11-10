@@ -108,6 +108,7 @@ Use **either** standalone CLI or Claude Code slash commands—whatever fits your
 | Check for updates | `ai-use-case check-updates` | `/use-case:check-updates` |
 | Update project | `ai-use-case update-project <path>` | `/use-case:update-project` |
 | Cleanup backups | `ai-use-case cleanup-backups [path]` | |
+| Reset configuration | `ai-use-case reset [options]` | |
 | Publish to Confluence | `ai-use-case publish-confluence` | `/use-case:publish-confluence` |
 | View hub | `ai-use-case view` | |
 | Push hub changes | `ai-use-case push` | |
@@ -314,6 +315,32 @@ chmod +x /path/to/project/.git/hooks/post-commit
 # Test manual sync
 ai-use-case sync
 ```
+
+### Reset configuration or data
+
+If you need to start fresh or fix configuration issues:
+
+```bash
+# Preview what would be reset (dry-run)
+ai-use-case reset --config --dry-run
+
+# Reset only configuration files
+ai-use-case reset --config
+
+# Reset tracing setup
+ai-use-case reset --tracing
+
+# Reset project registry
+ai-use-case reset --registry
+
+# Reset everything (prompts for confirmation)
+ai-use-case reset --all
+
+# See all options
+ai-use-case reset --help
+```
+
+**Note**: The hub directory is protected and requires explicit `--hub` flag to delete (only for local-only mode).
 
 ### Colors not rendering
 
