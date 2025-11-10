@@ -2,14 +2,14 @@
 # AI Use Case CLI - Tracing Utilities for Shell Scripts
 # Provides tracing capabilities for bash scripts using Python tracer
 
-# Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TRACING_PY="$SCRIPT_DIR/tracing.py"
+# Get script directory (use TRACING_SCRIPT_DIR to avoid conflicts)
+TRACING_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TRACING_PY="$TRACING_SCRIPT_DIR/tracing.py"
 
 # Check if Python is available and tracing module works
 TRACING_AVAILABLE=false
 if command -v python3 &> /dev/null && [ -f "$TRACING_PY" ]; then
-    if python3 -c "import sys; sys.path.insert(0, '$SCRIPT_DIR'); from tracing import is_tracing_enabled; print('OK')" 2>/dev/null | grep -q "OK"; then
+    if python3 -c "import sys; sys.path.insert(0, '$TRACING_SCRIPT_DIR'); from tracing import is_tracing_enabled; print('OK')" 2>/dev/null | grep -q "OK"; then
         TRACING_AVAILABLE=true
     fi
 fi
@@ -19,7 +19,7 @@ is_tracing_enabled() {
     if [ "$TRACING_AVAILABLE" = true ]; then
         python3 -c "
 import sys
-sys.path.insert(0, '$SCRIPT_DIR')
+sys.path.insert(0, '$TRACING_SCRIPT_DIR')
 from tracing import is_tracing_enabled
 print('true' if is_tracing_enabled() else 'false')
 " 2>/dev/null | grep -q "true"
@@ -44,7 +44,7 @@ trace_command_start() {
         python3 -c "
 import sys
 import os
-sys.path.insert(0, '$SCRIPT_DIR')
+sys.path.insert(0, '$TRACING_SCRIPT_DIR')
 from tracing import get_tracing_manager, add_span_event
 manager = get_tracing_manager()
 manager.add_span_event('command_start', {
@@ -73,7 +73,7 @@ trace_command_end() {
         python3 -c "
 import sys
 import os
-sys.path.insert(0, '$SCRIPT_DIR')
+sys.path.insert(0, '$TRACING_SCRIPT_DIR')
 from tracing import get_tracing_manager, add_span_event
 manager = get_tracing_manager()
 manager.add_span_event('command_end', {
@@ -125,7 +125,7 @@ trace_operation() {
 import sys
 import os
 import json
-sys.path.insert(0, '$SCRIPT_DIR')
+sys.path.insert(0, '$TRACING_SCRIPT_DIR')
 from tracing import get_tracing_manager, add_span_event
 manager = get_tracing_manager()
 operation = os.environ.get('TRACE_OPERATION', '')
@@ -151,7 +151,7 @@ trace_file_operation() {
         TRACE_OPERATION_TYPE="$operation_type" TRACE_FILE_PATH="$file_path" python3 -c "
 import sys
 import os
-sys.path.insert(0, '$SCRIPT_DIR')
+sys.path.insert(0, '$TRACING_SCRIPT_DIR')
 from tracing import record_file_operation
 operation_type = os.environ.get('TRACE_OPERATION_TYPE', '')
 file_path = os.environ.get('TRACE_FILE_PATH', '')
@@ -168,7 +168,7 @@ trace_hub_sync() {
     if [ "$TRACING_AVAILABLE" = true ] && is_tracing_enabled; then
         python3 -c "
 import sys
-sys.path.insert(0, '$SCRIPT_DIR')
+sys.path.insert(0, '$TRACING_SCRIPT_DIR')
 from tracing import record_hub_sync
 record_hub_sync('$sync_type', $files_count)
 " 2>/dev/null || true
@@ -208,7 +208,7 @@ trace_event() {
 import sys
 import os
 import json
-sys.path.insert(0, '$SCRIPT_DIR')
+sys.path.insert(0, '$TRACING_SCRIPT_DIR')
 from tracing import add_span_event
 event_name = os.environ.get('TRACE_EVENT_NAME', '')
 attrs_json = os.environ.get('TRACE_EVENT_ATTRS', '{}')
@@ -231,7 +231,7 @@ trace_attribute() {
         TRACE_KEY="$key" TRACE_VALUE="$value" python3 -c "
 import sys
 import os
-sys.path.insert(0, '$SCRIPT_DIR')
+sys.path.insert(0, '$TRACING_SCRIPT_DIR')
 from tracing import set_span_attribute
 key = os.environ.get('TRACE_KEY', '')
 value = os.environ.get('TRACE_VALUE', '')
