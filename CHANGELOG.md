@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Distributed Tracing System**: Comprehensive OpenTelemetry-based tracing for CLI performance monitoring
+  - Added Python tracing module (`scripts/utils/tracing.py`) with OpenTelemetry integration
+  - Added shell tracing wrapper (`scripts/utils/tracing.sh`) for bash script instrumentation
+  - Instrumented main CLI script and core operations (sync, search, extract)
+  - Added tracing configuration management with JSON config files and environment variable support
+  - Integrated with VS Code AI Toolkit's tracing viewer via OTLP endpoint (localhost:4318)
+  - New tracing commands: `configure`, `status`, `enable`, `disable`, `install-deps`, `test`
+  - Captures command execution times, operation metrics, error tracking, and performance data
+  - Graceful degradation when OpenTelemetry dependencies are unavailable
+  - Comprehensive tracing documentation in `docs/TRACING.md`
+
 ### Fixed
 
 - **Confluence Page Naming**: Updated Confluence publish to use full filename convention

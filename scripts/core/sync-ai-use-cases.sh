@@ -21,6 +21,20 @@ NC='\033[0m' # No Color
 # Configuration - Auto-detect hub location
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Source tracing utilities
+if [ -f "$SCRIPT_DIR/../utils/tracing.sh" ]; then
+    source "$SCRIPT_DIR/../utils/tracing.sh"
+    # Enable tracing for this script
+    enable_script_tracing "sync-ai-use-cases.sh" "$@" || true
+else
+    # Define no-op functions if tracing not available
+    trace_operation() { true; }
+    trace_file_operation() { true; }
+    trace_hub_sync() { true; }
+    trace_event() { true; }
+    trace_attribute() { true; }
+fi
+
 # Source configuration manager
 CONFIG_MANAGER="$SCRIPT_DIR/../utils/config-manager.sh"
 if [ -f "$CONFIG_MANAGER" ]; then
@@ -140,6 +154,7 @@ if [ -z "$USE_CASE_DIRS" ]; then
 fi
 
 # Create project directory in central location
+trace_operation "create_project_directory" "project=$PROJECT_NAME" "path=$BY_PROJECT_DIR/$PROJECT_NAME"
 mkdir -p "$BY_PROJECT_DIR/$PROJECT_NAME"
 
 SYNC_COUNT=0
@@ -147,6 +162,7 @@ NEW_COUNT=0
 UPDATED_COUNT=0
 
 # Process each use case directory found
+trace_operation "process_use_case_directories" "project=$PROJECT_NAME" "count=$(echo "$USE_CASE_DIRS" | wc -l)"
 while IFS= read -r USE_CASE_DIR; do
     if [ ! -d "$USE_CASE_DIR" ]; then
         continue
@@ -182,18 +198,24 @@ while IFS= read -r USE_CASE_DIR; do
 
         # Copy/update file in by-project (canonical storage)
         if [ ! -f "$TARGET_FILE" ]; then
+            trace_file_operation "create" "$TARGET_FILE"
             if cp "$USE_CASE_FILE" "$TARGET_FILE" 2>/dev/null; then
                 echo -e "${GREEN}✓ New${NC}: $FILENAME"
                 NEW_COUNT=$((NEW_COUNT + 1))
+                trace_event "file_sync" "operation=new" "file=$FILENAME" "project=$PROJECT_NAME"
             else
+                trace_event "file_sync_error" "operation=new" "file=$FILENAME" "error=copy_failed"
                 echo -e "${RED}✗ Failed to copy${NC}: $FILENAME"
                 continue
             fi
         elif ! cmp -s "$USE_CASE_FILE" "$TARGET_FILE"; then
+            trace_file_operation "update" "$TARGET_FILE"
             if cp "$USE_CASE_FILE" "$TARGET_FILE" 2>/dev/null; then
                 echo -e "${BLUE}↻ Updated${NC}: $FILENAME"
                 UPDATED_COUNT=$((UPDATED_COUNT + 1))
+                trace_event "file_sync" "operation=update" "file=$FILENAME" "project=$PROJECT_NAME"
             else
+                trace_event "file_sync_error" "operation=update" "file=$FILENAME" "error=copy_failed"
                 echo -e "${RED}✗ Failed to update${NC}: $FILENAME"
                 continue
             fi
@@ -215,8 +237,11 @@ while IFS= read -r USE_CASE_DIR; do
             if [ ! -L "$SYMLINK_PATH" ] || [ ! -e "$SYMLINK_PATH" ]; then
                 # Create relative symlink
                 if REL_PATH=$(realpath --relative-to="$DATE_DIR" "$TARGET_FILE" 2>/dev/null); then
-                    ln -sf "$REL_PATH" "$SYMLINK_PATH" 2>/dev/null || \
+                    trace_file_operation "symlink_create" "$SYMLINK_PATH"
+                    ln -sf "$REL_PATH" "$SYMLINK_PATH" 2>/dev/null || {
+                        trace_event "symlink_error" "type=date" "file=$FILENAME" "error=create_failed"
                         echo -e "${YELLOW}⚠ Warning${NC}: Failed to create date symlink for $FILENAME"
+                    }
                 fi
             fi
         fi
@@ -236,8 +261,11 @@ while IFS= read -r USE_CASE_DIR; do
             if [ ! -L "$SYMLINK_PATH" ] || [ ! -e "$SYMLINK_PATH" ]; then
                 # Create relative symlink
                 if REL_PATH=$(realpath --relative-to="$TOPIC_DIR" "$TARGET_FILE" 2>/dev/null); then
-                    ln -sf "$REL_PATH" "$SYMLINK_PATH" 2>/dev/null || \
+                    trace_file_operation "symlink_create" "$SYMLINK_PATH"
+                    ln -sf "$REL_PATH" "$SYMLINK_PATH" 2>/dev/null || {
+                        trace_event "symlink_error" "type=topic" "file=$FILENAME" "topic=$TOPIC_SLUG" "error=create_failed"
                         echo -e "${YELLOW}⚠ Warning${NC}: Failed to create topic symlink for $FILENAME"
+                    }
                 fi
             fi
         fi
@@ -246,6 +274,10 @@ while IFS= read -r USE_CASE_DIR; do
     done < <(find "$USE_CASE_DIR" -type f -name "*.md")
 
 done <<< "$USE_CASE_DIRS"
+
+# Record sync completion metrics
+trace_hub_sync "sync_complete" $((NEW_COUNT + UPDATED_COUNT))
+trace_event "sync_summary" "project=$PROJECT_NAME" "total=$SYNC_COUNT" "new=$NEW_COUNT" "updated=$UPDATED_COUNT"
 
 echo ""
 if [ $NEW_COUNT -gt 0 ] || [ $UPDATED_COUNT -gt 0 ]; then

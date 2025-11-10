@@ -80,6 +80,7 @@ Before creating a pull request, ensure you have completed:
 
 - [ ] **MANDATORY: Update CHANGELOG.md** - Add entry under "Unreleased" section (non-negotiable for ALL changes)
 - [ ] **MANDATORY: Review and update README.md** - Update if any user-facing functionality changed (non-negotiable)
+- [ ] **MANDATORY: Validate version consistency** - Run `./scripts/utils/validate-versions.sh --unreleased` before creating PR
 - [ ] **Check docs/HUB-SYNC-CHECKLIST.md** - Review if changes affect hub repository
 - [ ] **Test changes locally** - Verify all scripts and CLI commands work
 - [ ] **Update all related documentation** - Update docs/*, CLAUDE.md, CONTRIBUTING.md if behavior/architecture changes
@@ -98,9 +99,96 @@ Every code change MUST trigger a documentation review:
    - New options/flags → document in usage section
 
 3. **Related documentation** - MUST be updated if applicable
-   - docs/CLAUDE.md - for AI assistant guidance changes
-   - docs/VERSION-MANAGEMENT.md - for version process changes
-   - CONTRIBUTING.md - for contribution workflow changes
+   - docs/COMMANDS.md - Update command reference for new commands
+   - docs/CLAUDE.md - Update developer guide for new features
+   - Use proper version markers for new features (e.g., `v3.6.0+`)
+
+---
+
+## Version Consistency Rules
+
+**CRITICAL**: Version references must be consistent across all files to avoid user confusion.
+
+### Version Validation
+
+Before creating any PR that touches version-related files, run:
+
+```bash
+# During development (allows unreleased version references)
+./scripts/utils/validate-versions.sh --unreleased
+
+# Before release (strict mode)
+./scripts/utils/validate-versions.sh
+```
+
+### Files That Must Match
+
+| File | What to Update |
+|------|----------------|
+| `scripts/utils/version.sh` | Source of truth (CLI_VERSION) |
+| `README.md` | Header version badge + footer version |
+| `CHANGELOG.md` | Latest release section |
+| `docs/COMMANDS.md` | Version markers for new features |
+| `docs/CLAUDE.md` | Version markers + version history |
+
+### Version Marker Format
+
+When documenting new features, use this format:
+
+```markdown
+### Feature Name (v3.6.0+)
+
+Description of the feature...
+```
+
+**Rules**:
+- ✅ **DO** add version markers for NEW features
+- ✅ **DO** use the NEXT version number if feature is unreleased
+- ❌ **DON'T** change historical version markers (keep `v3.1.0+` as is)
+- ❌ **DON'T** use version markers on every heading, only on major features
+
+**Example**:
+```markdown
+# Good
+### Tracing System (v3.6.0+)
+Monitor CLI performance with OpenTelemetry...
+
+### Project Registry (v3.1.0+)
+Track registered projects...
+
+# Bad
+### Configuration
+Shows configuration... (← no version needed for core features)
+```
+
+### Common Version Issues
+
+#### Issue: Future version references
+**Problem**: Documentation refers to `v3.6.0` but `version.sh` still shows `v3.5.0`
+
+**Solution**:
+- During development: This is OK, run validator with `--unreleased`
+- Before release: Bump version in `version.sh` or update docs
+
+#### Issue: Inconsistent version numbers
+**Problem**: README shows `v3.5.0` but CHANGELOG latest is `v3.4.3`
+
+**Solution**:
+- Run `./scripts/utils/validate-versions.sh` to find all inconsistencies
+- Use `ai-use-case bump-version` to update all locations automatically
+
+#### Issue: Missing version history
+**Problem**: New version released but not in docs/CLAUDE.md version history
+
+**Solution**:
+- Add entry to version history section in CLAUDE.md
+- Format: `- **v3.6.0**: Brief description of main features`
+
+### Complete Documentation
+
+See [docs/VERSION-UPDATE-CHECKLIST.md](docs/VERSION-UPDATE-CHECKLIST.md) for complete version management guidelines.
+
+---
 
 **PRs without proper documentation updates will be rejected.**
 

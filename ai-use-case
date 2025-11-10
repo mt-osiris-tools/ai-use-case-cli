@@ -32,6 +32,19 @@ else
     VERSION="unknown"
 fi
 
+# Source tracing utilities
+if [ -f "$SCRIPT_DIR/scripts/utils/tracing.sh" ]; then
+    source "$SCRIPT_DIR/scripts/utils/tracing.sh"
+    # Enable tracing for the main CLI script
+    enable_script_tracing "ai-use-case" "$@" || true
+else
+    # Define no-op functions if tracing not available
+    trace_command_start() { true; }
+    trace_command_end() { true; }
+    trace_event() { true; }
+    trace_attribute() { true; }
+fi
+
 # Show help
 show_help() {
     cat <<EOF
@@ -55,6 +68,7 @@ ${YELLOW}COMMANDS${NC}
   ${GREEN}push${NC}                      Push hub changes to remote repository
   ${GREEN}publish-confluence${NC}        Publish use case to Confluence
   ${GREEN}cleanup-backups [path]${NC}    Remove backup files from project
+  ${GREEN}tracing [subcommand]${NC}      Manage tracing configuration
   ${GREEN}bump-version <type>${NC}       Bump version (major|minor|patch)
   ${GREEN}uninstall${NC}                 Uninstall the CLI tool
   ${GREEN}--version, -v, version${NC}    Show version information
@@ -114,10 +128,12 @@ case "${1:-}" in
         exit 0
         ;;
     --init|init)
+        trace_event "command_start" "command=init" "args=$*"
         echo -e "${BLUE}Setting up project...${NC}"
         if [ -f "$SCRIPT_DIR/scripts/project/setup-project.sh" ]; then
-            bash "$SCRIPT_DIR/scripts/project/setup-project.sh" .
+            trace_run "init" bash "$SCRIPT_DIR/scripts/project/setup-project.sh" .
         else
+            trace_event "error" "command=init" "error=script_not_found" "script=setup-project.sh"
             echo -e "${RED}Error: setup-project.sh not found${NC}"
             exit 1
         fi
@@ -159,141 +175,248 @@ case "${1:-}" in
         fi
         ;;
     sync)
+        trace_event "command_start" "command=sync" "working_dir=$(pwd)"
         echo -e "${BLUE}Syncing use cases to hub...${NC}"
         if [ -f "$SCRIPT_DIR/scripts/core/sync-ai-use-cases.sh" ]; then
-            bash "$SCRIPT_DIR/scripts/core/sync-ai-use-cases.sh" .
+            trace_run "sync" bash "$SCRIPT_DIR/scripts/core/sync-ai-use-cases.sh" .
         else
+            trace_event "error" "command=sync" "error=script_not_found" "script=sync-ai-use-cases.sh"
             echo -e "${RED}Error: sync-ai-use-cases.sh not found${NC}"
             exit 1
         fi
         ;;
     search)
         if [ -z "${2:-}" ]; then
+            trace_event "error" "command=search" "error=missing_argument" "required=search_term"
             echo -e "${RED}Error: Search term required${NC}"
             echo "Usage: ai-use-case search <term>"
             exit 1
         fi
+        trace_event "command_start" "command=search" "search_term=$2"
         if [ -f "$SCRIPT_DIR/scripts/search/search-use-cases.sh" ]; then
-            bash "$SCRIPT_DIR/scripts/search/search-use-cases.sh" "$2"
+            trace_run "search" bash "$SCRIPT_DIR/scripts/search/search-use-cases.sh" "$2"
         else
+            trace_event "error" "command=search" "error=script_not_found" "script=search-use-cases.sh"
             echo -e "${RED}Error: search-use-cases.sh not found${NC}"
             exit 1
         fi
         ;;
     list)
+        trace_event "command_start" "command=list"
         if [ -f "$SCRIPT_DIR/scripts/project/list-projects.sh" ]; then
-            bash "$SCRIPT_DIR/scripts/project/list-projects.sh"
+            trace_run "list" bash "$SCRIPT_DIR/scripts/project/list-projects.sh"
         else
+            trace_event "error" "command=list" "error=script_not_found" "script=list-projects.sh"
             echo -e "${RED}Error: list-projects.sh not found${NC}"
             exit 1
         fi
         ;;
     stats)
+        trace_event "command_start" "command=stats"
         if [ -f "$SCRIPT_DIR/scripts/search/stats-use-cases.sh" ]; then
-            bash "$SCRIPT_DIR/scripts/search/stats-use-cases.sh"
+            trace_run "stats" bash "$SCRIPT_DIR/scripts/search/stats-use-cases.sh"
         else
+            trace_event "error" "command=stats" "error=script_not_found" "script=stats-use-cases.sh"
             echo -e "${RED}Error: stats-use-cases.sh not found${NC}"
             exit 1
         fi
         ;;
     extract)
+        trace_event "command_start" "command=extract" "args=$*"
         if [ -f "$SCRIPT_DIR/scripts/core/extract-session-data.sh" ]; then
             # Pass all arguments to the script
             shift
-            bash "$SCRIPT_DIR/scripts/core/extract-session-data.sh" "$@"
+            trace_run "extract" bash "$SCRIPT_DIR/scripts/core/extract-session-data.sh" "$@"
         else
+            trace_event "error" "command=extract" "error=script_not_found" "script=extract-session-data.sh"
             echo -e "${RED}Error: extract-session-data.sh not found${NC}"
             exit 1
         fi
         ;;
     view)
+        trace_event "command_start" "command=view"
         if [ -f "$SCRIPT_DIR/scripts/hub/view-hub.sh" ]; then
-            bash "$SCRIPT_DIR/scripts/hub/view-hub.sh"
+            trace_run "view" bash "$SCRIPT_DIR/scripts/hub/view-hub.sh"
         else
+            trace_event "error" "command=view" "error=script_not_found" "script=view-hub.sh"
             echo -e "${RED}Error: view-hub.sh not found${NC}"
             exit 1
         fi
         ;;
     push)
+        trace_event "command_start" "command=push"
         if [ -f "$SCRIPT_DIR/scripts/hub/push-hub.sh" ]; then
-            bash "$SCRIPT_DIR/scripts/hub/push-hub.sh"
+            trace_run "push" bash "$SCRIPT_DIR/scripts/hub/push-hub.sh"
         else
+            trace_event "error" "command=push" "error=script_not_found" "script=push-hub.sh"
             echo -e "${RED}Error: push-hub.sh not found${NC}"
             exit 1
         fi
         ;;
     publish-confluence)
+        trace_event "command_start" "command=publish-confluence" "arg=${2:-}"
         if [ -f "$SCRIPT_DIR/scripts/core/publish-confluence.sh" ]; then
-            bash "$SCRIPT_DIR/scripts/core/publish-confluence.sh" "${2:-}"
+            trace_run "publish-confluence" bash "$SCRIPT_DIR/scripts/core/publish-confluence.sh" "${2:-}"
         else
+            trace_event "error" "command=publish-confluence" "error=script_not_found" "script=publish-confluence.sh"
             echo -e "${RED}Error: publish-confluence.sh not found${NC}"
             exit 1
         fi
         ;;
     list-projects)
+        trace_event "command_start" "command=list-projects" "arg=${2:-}"
         if [ -f "$SCRIPT_DIR/scripts/project/list-projects.sh" ]; then
-            bash "$SCRIPT_DIR/scripts/project/list-projects.sh" "${2:-}"
+            trace_run "list-projects" bash "$SCRIPT_DIR/scripts/project/list-projects.sh" "${2:-}"
         else
+            trace_event "error" "command=list-projects" "error=script_not_found" "script=list-projects.sh"
             echo -e "${RED}Error: list-projects.sh not found${NC}"
             exit 1
         fi
         ;;
     check-updates)
+        trace_event "command_start" "command=check-updates" "arg=${2:-}"
         if [ -f "$SCRIPT_DIR/scripts/project/check-updates.sh" ]; then
-            bash "$SCRIPT_DIR/scripts/project/check-updates.sh" "${2:-}"
+            trace_run "check-updates" bash "$SCRIPT_DIR/scripts/project/check-updates.sh" "${2:-}"
         else
+            trace_event "error" "command=check-updates" "error=script_not_found" "script=check-updates.sh"
             echo -e "${RED}Error: check-updates.sh not found${NC}"
             exit 1
         fi
         ;;
     update-project)
         if [ -z "${2:-}" ]; then
+            trace_event "error" "command=update-project" "error=missing_argument" "required=project_path"
             echo -e "${RED}Error: Project path required${NC}"
             echo "Usage: ai-use-case update-project <path>"
             exit 1
         fi
+        trace_event "command_start" "command=update-project" "project_path=$2"
         if [ -f "$SCRIPT_DIR/scripts/project/update-project.sh" ]; then
-            bash "$SCRIPT_DIR/scripts/project/update-project.sh" "$2"
+            trace_run "update-project" bash "$SCRIPT_DIR/scripts/project/update-project.sh" "$2"
         else
+            trace_event "error" "command=update-project" "error=script_not_found" "script=update-project.sh"
             echo -e "${RED}Error: update-project.sh not found${NC}"
             exit 1
         fi
         ;;
     cleanup-backups)
+        trace_event "command_start" "command=cleanup-backups" "args=$*"
         if [ -f "$SCRIPT_DIR/scripts/utils/cleanup-backups.sh" ]; then
             # Pass all arguments after the command to the script
             shift
-            bash "$SCRIPT_DIR/scripts/utils/cleanup-backups.sh" "$@"
+            trace_run "cleanup-backups" bash "$SCRIPT_DIR/scripts/utils/cleanup-backups.sh" "$@"
         else
+            trace_event "error" "command=cleanup-backups" "error=script_not_found" "script=cleanup-backups.sh"
             echo -e "${RED}Error: cleanup-backups.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    tracing)
+        trace_event "command_start" "command=tracing" "subcommand=${2:-show}"
+        if [ -f "$SCRIPT_DIR/scripts/utils/config-manager.sh" ]; then
+            case "${2:-show}" in
+                show|configure|enable|disable|set)
+                    trace_run "tracing-${2:-show}" bash "$SCRIPT_DIR/scripts/utils/config-manager.sh" tracing "$2" "${3:-}" "${4:-}"
+                    ;;
+                status)
+                    # Show tracing status using tracing.sh
+                    if [ -f "$SCRIPT_DIR/scripts/utils/tracing.sh" ]; then
+                        trace_run "tracing-status" bash "$SCRIPT_DIR/scripts/utils/tracing.sh" status
+                    else
+                        echo "Tracing module not found"
+                    fi
+                    ;;
+                install-deps)
+                    # Install tracing dependencies
+                    if [ -f "$SCRIPT_DIR/scripts/utils/tracing.sh" ]; then
+                        trace_run "tracing-install" bash "$SCRIPT_DIR/scripts/utils/tracing.sh" install-deps
+                    else
+                        echo "Tracing module not found"
+                    fi
+                    ;;
+                test)
+                    # Run tracing test
+                    if [ -f "$SCRIPT_DIR/scripts/utils/tracing.sh" ]; then
+                        trace_run "tracing-test" bash "$SCRIPT_DIR/scripts/utils/tracing.sh" test
+                    else
+                        echo "Tracing module not found"
+                    fi
+                    ;;
+                --help|-h|help)
+                    cat <<EOF
+${BLUE}AI Use Case CLI - Tracing Management${NC}
+
+${YELLOW}Usage:${NC} ai-use-case tracing <subcommand>
+
+${YELLOW}Subcommands:${NC}
+  show              Show current tracing configuration
+  configure         Interactive tracing configuration setup
+  enable            Enable tracing
+  disable           Disable tracing
+  status            Show tracing system status
+  install-deps      Install required Python dependencies
+  test              Test tracing functionality
+  set <key> <val>   Set tracing configuration value
+
+${YELLOW}Examples:${NC}
+  ai-use-case tracing show
+  ai-use-case tracing configure
+  ai-use-case tracing enable
+  ai-use-case tracing status
+  ai-use-case tracing install-deps
+
+${YELLOW}Configuration:${NC}
+  Config file: ~/.config/ai-use-case-cli/tracing.json
+  Environment variables:
+    AI_USECASE_TRACING_ENABLED=true|false
+    AI_USECASE_TRACING_ENDPOINT=http://localhost:4318
+    AI_USECASE_TRACING_SAMPLING=1.0
+EOF
+                    ;;
+                *)
+                    trace_event "error" "command=tracing" "error=unknown_subcommand" "subcommand=${2:-}"
+                    echo -e "${RED}Error: Unknown tracing subcommand '${2:-}'${NC}"
+                    echo "Run ${CYAN}ai-use-case tracing --help${NC} for available subcommands"
+                    exit 1
+                    ;;
+            esac
+        else
+            trace_event "error" "command=tracing" "error=config_manager_not_found"
+            echo -e "${RED}Error: config-manager.sh not found${NC}"
             exit 1
         fi
         ;;
     bump-version|bump)
         if [ -z "${2:-}" ]; then
+            trace_event "error" "command=bump-version" "error=missing_argument" "required=bump_type"
             echo -e "${RED}Error: Bump type required${NC}"
             echo "Usage: ai-use-case bump-version [major|minor|patch|X.Y.Z] [options]"
             echo "Run: ai-use-case bump-version --help for more information"
             exit 1
         fi
+        trace_event "command_start" "command=bump-version" "type=$2" "args=$*"
         if [ -f "$SCRIPT_DIR/scripts/utils/bump-version.sh" ]; then
             # Pass all arguments after the command to the script
             shift
-            bash "$SCRIPT_DIR/scripts/utils/bump-version.sh" "$@"
+            trace_run "bump-version" bash "$SCRIPT_DIR/scripts/utils/bump-version.sh" "$@"
         else
+            trace_event "error" "command=bump-version" "error=script_not_found" "script=bump-version.sh"
             echo -e "${RED}Error: bump-version.sh not found${NC}"
             exit 1
         fi
         ;;
     uninstall)
+        trace_event "command_start" "command=uninstall"
         if [ -f "$SCRIPT_DIR/scripts/install/uninstall.sh" ]; then
-            bash "$SCRIPT_DIR/scripts/install/uninstall.sh"
+            trace_run "uninstall" bash "$SCRIPT_DIR/scripts/install/uninstall.sh"
         else
+            trace_event "error" "command=uninstall" "error=script_not_found" "script=uninstall.sh"
             echo -e "${RED}Error: uninstall.sh not found${NC}"
             exit 1
         fi
         ;;
     document)
+        trace_event "deprecated_command" "command=document" "replacement=/use-case:document-session"
         # Document command removed in v3.0.0 - now uses Claude Code
         cat <<EOF
 ${YELLOW}╭────────────────────────────────────────────────────────────╮${NC}
@@ -313,6 +436,7 @@ EOF
         exit 1
         ;;
     *)
+        trace_event "error" "command=unknown" "unknown_command=${1}" "available_commands=true"
         echo -e "${RED}Error: Unknown command '${1}'${NC}"
         echo ""
         echo "Run ${CYAN}ai-use-case --help${NC} for available commands"

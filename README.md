@@ -46,6 +46,7 @@ Documentation shouldn't be a burden—it should be a valuable asset that grows y
 - 🚀 **AI-assisted documentation** - Automatic context capture with Claude Code integration
 - 🔬 **Research & implementation sessions** - Document both code changes and exploratory work
 - 📊 **Session data extraction** - Extract git history, token usage, and metrics for reporting (v3.4.0+)
+- 📊 **OpenTelemetry tracing** - Monitor CLI performance and usage with distributed tracing (v3.6.0+)
 - 🔄 **Automatic syncing** - Git hooks sync docs to your chosen hub automatically
 - 🔧 **Flexible storage** - Choose between local-only or private git repository (v3.2.0+)
 - 🗂️ **Project registry** - Track and update all projects using the CLI (v3.1.0+)
@@ -110,6 +111,8 @@ Use **either** standalone CLI or Claude Code slash commands—whatever fits your
 | Publish to Confluence | `ai-use-case publish-confluence` | `/use-case:publish-confluence` |
 | View hub | `ai-use-case view` | |
 | Push hub changes | `ai-use-case push` | |
+| Configure tracing | `ai-use-case tracing configure` | |
+| View tracing status | `ai-use-case tracing status` | |
 
 ### Additional Commands
 
@@ -195,6 +198,30 @@ ai-use-case config show
 # Change hub mode (switch between local/private)
 ai-use-case config reconfigure
 ```
+
+### Tracing and Monitoring (v3.6.0+)
+
+Monitor CLI performance and usage with OpenTelemetry tracing:
+
+```bash
+# Setup tracing (installs dependencies)
+ai-use-case tracing install-deps
+
+# Configure tracing interactively
+ai-use-case tracing configure
+
+# Check tracing status
+ai-use-case tracing status
+
+# Enable/disable tracing
+ai-use-case tracing enable
+ai-use-case tracing disable
+```
+
+**AI Toolkit Integration**: Tracing data is sent to VS Code AI Toolkit's built-in tracing viewer for real-time monitoring and analysis.
+
+**Learn More**: See the [Tracing Guide](docs/TRACING.md) for comprehensive setup and usage instructions.
+
 
 ### Environment Variables
 
