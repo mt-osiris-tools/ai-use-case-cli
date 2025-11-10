@@ -222,7 +222,6 @@ ai-use-case tracing disable
 
 **Learn More**: See the [Tracing Guide](docs/TRACING.md) for comprehensive setup and usage instructions.
 
-```
 
 ### Environment Variables
 

@@ -312,17 +312,13 @@ show_config() {
     echo -e "Config file: ${CYAN}$CONFIG_FILE${NC}"
 }
 
-# Main function for standalone execution
-    fi
-}
-
 # Function to get tracing configuration
 get_tracing_config() {
     local tracing_config_file="$CONFIG_DIR/tracing.json"
-    
-    # Default tracing configuration
+
+    # Default tracing configuration (opt-in, not opt-out)
     local default_config='{
-  "enabled": true,
+  "enabled": false,
   "endpoint": "http://localhost:4318",
   "sampling_ratio": 1.0,
   "export_timeout": 30
@@ -351,7 +347,25 @@ set_tracing_config() {
     # Update the configuration using jq if available
     if command -v jq &> /dev/null; then
         local temp_file=$(mktemp)
-        jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$tracing_config_file" > "$temp_file"
+        # Use --argjson for boolean/numeric keys, --arg for strings
+        case "$key" in
+            enabled)
+                # Convert string "true"/"false" to boolean
+                if [[ "$value" == "true" ]]; then
+                    jq --arg key "$key" '.[$key] = true' "$tracing_config_file" > "$temp_file"
+                else
+                    jq --arg key "$key" '.[$key] = false' "$tracing_config_file" > "$temp_file"
+                fi
+                ;;
+            sampling_ratio|export_timeout)
+                # Numeric values
+                jq --arg key "$key" --argjson value "$value" '.[$key] = $value' "$tracing_config_file" > "$temp_file"
+                ;;
+            *)
+                # String values
+                jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$tracing_config_file" > "$temp_file"
+                ;;
+        esac
         mv "$temp_file" "$tracing_config_file"
         echo "Updated tracing.$key = $value"
     else
@@ -395,7 +409,7 @@ configure_tracing() {
     echo ""
     
     # Check if AI Toolkit tracing is available
-    if curl -s http://localhost:4318/v1/traces >/dev/null 2>&1; then
+    if curl -s --max-time 2 http://localhost:4318/v1/traces >/dev/null 2>&1; then
         echo -e "${GREEN}✓ AI Toolkit tracing endpoint detected at localhost:4318${NC}"
     else
         echo -e "${YELLOW}⚠ AI Toolkit tracing endpoint not detected${NC}"

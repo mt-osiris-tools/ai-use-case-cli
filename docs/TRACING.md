@@ -69,9 +69,10 @@ Location: `~/.config/ai-use-case-cli/tracing.json`
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `AI_USECASE_TRACING_ENABLED` | `true` | Enable/disable tracing |
+| `AI_USECASE_TRACING_ENABLED` | `false` | Enable/disable tracing (opt-in) |
 | `AI_USECASE_TRACING_ENDPOINT` | `http://localhost:4318` | OTLP HTTP endpoint |
 | `AI_USECASE_TRACING_SAMPLING` | `1.0` | Sampling ratio (0.0-1.0) |
+| `AI_USECASE_TRACING_TIMEOUT` | `30` | Export timeout in seconds |
 
 Environment variables take precedence over configuration file settings.
 

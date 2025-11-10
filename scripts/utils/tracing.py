@@ -15,7 +15,6 @@ import os
 import sys
 import json
 import time
-import subprocess
 from typing import Dict, Any, Optional, List
 from contextlib import contextmanager
 from pathlib import Path
@@ -48,13 +47,32 @@ class TracingManager:
     
     def _load_config(self) -> Dict[str, Any]:
         """Load tracing configuration from config file and environment variables."""
+        # Parse numeric environment variables with error handling
+        try:
+            sampling_ratio = float(os.getenv('AI_USECASE_TRACING_SAMPLING', '1.0'))
+            if not (0.0 <= sampling_ratio <= 1.0):
+                print(f"Warning: Invalid AI_USECASE_TRACING_SAMPLING value (must be 0.0-1.0), using default 1.0", file=sys.stderr)
+                sampling_ratio = 1.0
+        except ValueError:
+            print(f"Warning: Invalid AI_USECASE_TRACING_SAMPLING value (not a number), using default 1.0", file=sys.stderr)
+            sampling_ratio = 1.0
+
+        try:
+            export_timeout = int(os.getenv('AI_USECASE_TRACING_TIMEOUT', '30'))
+            if export_timeout <= 0:
+                print(f"Warning: Invalid AI_USECASE_TRACING_TIMEOUT value (must be > 0), using default 30", file=sys.stderr)
+                export_timeout = 30
+        except ValueError:
+            print(f"Warning: Invalid AI_USECASE_TRACING_TIMEOUT value (not an integer), using default 30", file=sys.stderr)
+            export_timeout = 30
+
         default_config = {
-            'enabled': os.getenv('AI_USECASE_TRACING_ENABLED', 'true').lower() in ('true', '1', 'yes'),
+            'enabled': os.getenv('AI_USECASE_TRACING_ENABLED', 'false').lower() in ('true', '1', 'yes'),
             'endpoint': os.getenv('AI_USECASE_TRACING_ENDPOINT', 'http://localhost:4318'),
             'service_name': 'ai-use-case-cli',
             'service_version': self._get_cli_version(),
-            'sampling_ratio': float(os.getenv('AI_USECASE_TRACING_SAMPLING', '1.0')),
-            'export_timeout': int(os.getenv('AI_USECASE_TRACING_TIMEOUT', '30')),
+            'sampling_ratio': sampling_ratio,
+            'export_timeout': export_timeout,
         }
         
         # Try to load from config file if it exists

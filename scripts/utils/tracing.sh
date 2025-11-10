@@ -96,37 +96,48 @@ if $exit_code != 0:
 trace_operation() {
     local operation="$1"
     shift
-    local attributes=""
-    
-    # Parse key=value attributes
-    while [[ $# -gt 0 ]]; do
-        if [[ "$1" =~ ^[a-zA-Z_][a-zA-Z0-9_]*=.* ]]; then
-            if [ -n "$attributes" ]; then
-                attributes="${attributes},"
+
+    # Build JSON attributes safely
+    local attrs_json="{}"
+    if [[ $# -gt 0 ]]; then
+        attrs_json="{"
+        local first=1
+        while [[ $# -gt 0 ]]; do
+            if [[ "$1" =~ ^[a-zA-Z_][a-zA-Z0-9_]*=.* ]]; then
+                local key="${1%%=*}"
+                local value="${1#*=}"
+                # Escape quotes and backslashes
+                value="${value//\\/\\\\}"
+                value="${value//\"/\\\"}"
+                if [ $first -eq 0 ]; then
+                    attrs_json="${attrs_json},"
+                fi
+                attrs_json="${attrs_json}\"$key\":\"$value\""
+                first=0
             fi
-            local key="${1%%=*}"
-            local value="${1#*=}"
-            attributes="${attributes}\"$key\":\"$value\""
-        fi
-        shift
-    done
-    
+            shift
+        done
+        attrs_json="${attrs_json}}"
+    fi
+
     if [ "$TRACING_AVAILABLE" = true ] && is_tracing_enabled; then
-        python3 -c "
+        TRACE_OPERATION="$operation" TRACE_ATTRS="$attrs_json" python3 -c "
 import sys
+import os
 import json
 sys.path.insert(0, '$SCRIPT_DIR')
 from tracing import get_tracing_manager, add_span_event
 manager = get_tracing_manager()
+operation = os.environ.get('TRACE_OPERATION', '')
+attrs_json = os.environ.get('TRACE_ATTRS', '{}')
 attrs = {}
-if '$attributes':
-    try:
-        attrs = json.loads('{$attributes}')
-    except:
-        pass
-attrs['operation'] = '$operation'
+try:
+    attrs = json.loads(attrs_json)
+except Exception:
+    pass
+attrs['operation'] = operation
 manager.add_span_event('operation', attrs)
-manager.record_operation_start('$operation')
+manager.record_operation_start(operation)
 " 2>/dev/null || true
     fi
 }
@@ -135,13 +146,16 @@ manager.record_operation_start('$operation')
 trace_file_operation() {
     local operation_type="$1"
     local file_path="${2:-}"
-    
+
     if [ "$TRACING_AVAILABLE" = true ] && is_tracing_enabled; then
-        python3 -c "
+        TRACE_OPERATION_TYPE="$operation_type" TRACE_FILE_PATH="$file_path" python3 -c "
 import sys
+import os
 sys.path.insert(0, '$SCRIPT_DIR')
 from tracing import record_file_operation
-record_file_operation('$operation_type', '$file_path')
+operation_type = os.environ.get('TRACE_OPERATION_TYPE', '')
+file_path = os.environ.get('TRACE_FILE_PATH', '')
+record_file_operation(operation_type, file_path if file_path else None)
 " 2>/dev/null || true
     fi
 }
@@ -165,34 +179,45 @@ record_hub_sync('$sync_type', $files_count)
 trace_event() {
     local event_name="$1"
     shift
-    local attributes=""
-    
-    # Parse key=value attributes
-    while [[ $# -gt 0 ]]; do
-        if [[ "$1" =~ ^[a-zA-Z_][a-zA-Z0-9_]*=.* ]]; then
-            if [ -n "$attributes" ]; then
-                attributes="${attributes},"
+
+    # Build JSON attributes safely
+    local attrs_json="{}"
+    if [[ $# -gt 0 ]]; then
+        attrs_json="{"
+        local first=1
+        while [[ $# -gt 0 ]]; do
+            if [[ "$1" =~ ^[a-zA-Z_][a-zA-Z0-9_]*=.* ]]; then
+                local key="${1%%=*}"
+                local value="${1#*=}"
+                # Escape quotes and backslashes
+                value="${value//\\/\\\\}"
+                value="${value//\"/\\\"}"
+                if [ $first -eq 0 ]; then
+                    attrs_json="${attrs_json},"
+                fi
+                attrs_json="${attrs_json}\"$key\":\"$value\""
+                first=0
             fi
-            local key="${1%%=*}"
-            local value="${1#*=}"
-            attributes="${attributes}\"$key\":\"$value\""
-        fi
-        shift
-    done
-    
+            shift
+        done
+        attrs_json="${attrs_json}}"
+    fi
+
     if [ "$TRACING_AVAILABLE" = true ] && is_tracing_enabled; then
-        python3 -c "
+        TRACE_EVENT_NAME="$event_name" TRACE_EVENT_ATTRS="$attrs_json" python3 -c "
 import sys
+import os
 import json
 sys.path.insert(0, '$SCRIPT_DIR')
 from tracing import add_span_event
+event_name = os.environ.get('TRACE_EVENT_NAME', '')
+attrs_json = os.environ.get('TRACE_EVENT_ATTRS', '{}')
 attrs = {}
-if '$attributes':
-    try:
-        attrs = json.loads('{$attributes}')
-    except:
-        pass
-add_span_event('$event_name', attrs)
+try:
+    attrs = json.loads(attrs_json)
+except Exception:
+    pass
+add_span_event(event_name, attrs)
 " 2>/dev/null || true
     fi
 }
@@ -201,13 +226,16 @@ add_span_event('$event_name', attrs)
 trace_attribute() {
     local key="$1"
     local value="$2"
-    
+
     if [ "$TRACING_AVAILABLE" = true ] && is_tracing_enabled; then
-        python3 -c "
+        TRACE_KEY="$key" TRACE_VALUE="$value" python3 -c "
 import sys
+import os
 sys.path.insert(0, '$SCRIPT_DIR')
 from tracing import set_span_attribute
-set_span_attribute('$key', '$value')
+key = os.environ.get('TRACE_KEY', '')
+value = os.environ.get('TRACE_VALUE', '')
+set_span_attribute(key, value)
 " 2>/dev/null || true
     fi
 }
@@ -279,17 +307,25 @@ enable_script_tracing() {
 
 # Function to install tracing dependencies
 install_tracing_deps() {
-    echo "Installing OpenTelemetry dependencies..."
-    
+    echo "Installing OpenTelemetry dependencies (v1.20.0+)..."
+
+    # Install with version constraints for compatibility
+    local packages=(
+        "opentelemetry-api>=1.20.0,<2.0.0"
+        "opentelemetry-sdk>=1.20.0,<2.0.0"
+        "opentelemetry-exporter-otlp>=1.20.0,<2.0.0"
+        "opentelemetry-instrumentation-subprocess>=0.41b0,<1.0.0"
+    )
+
     if command -v pip3 &> /dev/null; then
-        pip3 install --user opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp opentelemetry-instrumentation-subprocess
+        pip3 install --user "${packages[@]}"
     elif command -v pip &> /dev/null; then
-        pip install --user opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp opentelemetry-instrumentation-subprocess
+        pip install --user "${packages[@]}"
     else
         echo "Error: pip not found. Please install pip and try again."
         return 1
     fi
-    
+
     echo "Dependencies installed. You may need to restart your shell."
 }
 
@@ -323,7 +359,7 @@ Usage: $0 [command]
 
 Commands:
   status       Show tracing status and configuration
-  install-deps Install required Python dependencies  
+  install-deps Install required Python dependencies
   test         Run a test trace to verify functionality
 
 Environment Variables:
@@ -338,7 +374,7 @@ Available functions:
   enable_script_tracing [script_name] [args...]  - Enable tracing for current script
   trace_run command [args...]                   - Run command with automatic tracing
   trace_command_start command [args]            - Start tracing a command
-  trace_command_end [exit_code]                 - End tracing a command  
+  trace_command_end [exit_code]                 - End tracing a command
   trace_operation operation [key=value...]      - Record an operation
   trace_event event_name [key=value...]         - Add span event
   trace_attribute key value                     - Set span attribute
