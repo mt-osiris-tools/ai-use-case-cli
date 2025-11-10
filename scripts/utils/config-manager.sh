@@ -12,7 +12,16 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 RED='\033[0;31m'
 CYAN='\033[0;36m'
+BOLD='\033[1m'
 NC='\033[0m' # No Color
+
+# Default tracing configuration (single source of truth)
+readonly DEFAULT_TRACING_CONFIG='{
+  "enabled": false,
+  "endpoint": "http://localhost:4318",
+  "sampling_ratio": 1.0,
+  "export_timeout": 30
+}'
 
 # Ensure config directory exists
 ensure_config_dir() {
@@ -350,16 +359,8 @@ init_tracing_config() {
     # Ensure config directory exists
     ensure_config_dir
 
-    # Default tracing configuration (opt-in, not opt-out)
-    local default_config='{
-  "enabled": false,
-  "endpoint": "http://localhost:4318",
-  "sampling_ratio": 1.0,
-  "export_timeout": 30
-}'
-
-    # Write to temp file first
-    echo "$default_config" > "$temp_file"
+    # Write to temp file first (using shared constant)
+    echo "$DEFAULT_TRACING_CONFIG" > "$temp_file"
 
     # Validate the content
     if [ ! -s "$temp_file" ]; then
@@ -392,18 +393,10 @@ init_tracing_config() {
 get_tracing_config() {
     local tracing_config_file="$CONFIG_DIR/tracing.json"
 
-    # Default tracing configuration (opt-in, not opt-out)
-    local default_config='{
-  "enabled": false,
-  "endpoint": "http://localhost:4318",
-  "sampling_ratio": 1.0,
-  "export_timeout": 30
-}'
-    
     if [ -f "$tracing_config_file" ]; then
         cat "$tracing_config_file"
     else
-        echo "$default_config"
+        echo "$DEFAULT_TRACING_CONFIG"
     fi
 }
 
@@ -437,8 +430,8 @@ set_tracing_config() {
     fi
 
     local temp_file=$(mktemp)
-    # Setup cleanup trap
-    trap "rm -f '$temp_file'" EXIT RETURN
+    # Setup cleanup trap (EXIT only to avoid firing on every function return)
+    trap "rm -f '$temp_file'" EXIT
 
     # Use --argjson for boolean/numeric keys, --arg for strings
     case "$key" in
@@ -463,14 +456,14 @@ set_tracing_config() {
     # Validate temp file before moving
     if [ ! -s "$temp_file" ]; then
         echo -e "${RED}Error: Failed to update configuration (empty result)${NC}" >&2
-        trap - EXIT RETURN
+        trap - EXIT
         rm -f "$temp_file"
         return 1
     fi
 
     if ! jq empty "$temp_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to update configuration (invalid JSON)${NC}" >&2
-        trap - EXIT RETURN
+        trap - EXIT
         rm -f "$temp_file"
         return 1
     fi
@@ -478,12 +471,12 @@ set_tracing_config() {
     # Atomic move
     if ! mv "$temp_file" "$tracing_config_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to save configuration${NC}" >&2
-        trap - EXIT RETURN
+        trap - EXIT
         rm -f "$temp_file"
         return 1
     fi
 
-    trap - EXIT RETURN
+    trap - EXIT
     echo "Updated tracing.$key = $value"
     return 0
 }
@@ -585,11 +578,14 @@ if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
                     echo -e "${CYAN}Checking dependencies...${NC}"
                     # Get script directory
                     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-                    if ! bash "$SCRIPT_DIR/tracing.sh" status 2>&1 | grep -q "Available"; then
+
+                    # Check if tracing dependencies are available (more robust than parsing output)
+                    # Source the tracing script to access TRACING_AVAILABLE variable
+                    if source "$SCRIPT_DIR/tracing.sh" && [ "$TRACING_AVAILABLE" = true ]; then
+                        echo -e "${GREEN}✓${NC} Tracing dependencies already installed"
+                    else
                         echo -e "${YELLOW}Installing tracing dependencies...${NC}"
                         bash "$SCRIPT_DIR/tracing.sh" install-deps
-                    else
-                        echo -e "${GREEN}✓${NC} Tracing dependencies already installed"
                     fi
                     echo ""
                     echo -e "${GREEN}╭────────────────────────────────────────────────────────────╮${NC}"
