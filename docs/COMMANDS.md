@@ -77,7 +77,7 @@ ai-use-case publish-confluence  # Publish to Confluence
                                # - Converts markdown to Confluence format
 ```
 
-### Tracing and Monitoring (v3.5.0+)
+### Tracing and Monitoring (v3.6.0+)
 
 ```bash
 ai-use-case tracing configure   # Interactive tracing configuration

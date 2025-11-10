@@ -48,7 +48,7 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
   - `ai-use-case publish-confluence` - Publish to Confluence
   - `ai-use-case search` - Search use cases
   - `ai-use-case stats` - Show statistics
-  - `ai-use-case tracing` - Manage tracing configuration (v3.5.0+)
+  - `ai-use-case tracing` - Manage tracing configuration (v3.6.0+)
   - `ai-use-case list` - List projects
   - `ai-use-case view` - Open hub in file explorer
   - `ai-use-case update` - Update CLI to latest version
@@ -726,7 +726,7 @@ When an update is detected, users see:
 
 Implementation is in `ai-use-case:80-115` with the `check_for_updates()` function.
 
-## Tracing and Monitoring (v3.5.0+)
+## Tracing and Monitoring (v3.6.0+)
 
 The CLI includes comprehensive OpenTelemetry-based tracing for performance monitoring and observability:
 
@@ -766,7 +766,12 @@ See [docs/TRACING.md](TRACING.md) for complete setup and usage guide.
 
 ## Version History
 
-- **v3.5.0**: Distributed tracing system with OpenTelemetry, AI Toolkit integration, performance monitoring
+- **v3.6.0**: Distributed tracing system with OpenTelemetry, AI Toolkit integration, performance monitoring (unreleased)
+- **v3.5.0**: Backup cleanup utility, fixed duplicate slash commands from backup directories
+- **v3.4.3**: Force refresh slash commands during project updates
+- **v3.4.2**: Optimize CLAUDE.md token usage, split into WORKFLOW.md and COMMANDS.md
+- **v3.4.1**: Fix version references, add version update checklist
+- **v3.4.0**: Interactive session selection for documentation
 - **v3.3.0**: Refactored folder structure to `.usecase/cases/`, added hub configuration commands, restored ASCII art banner
 - **v3.2.0**: Optional hub repository (local-only or private git), automated version bump system, centralized version management
 - **v3.1.0**: Hybrid CLI + Claude Code interface, project registry system for version tracking

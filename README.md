@@ -46,8 +46,8 @@ Documentation shouldn't be a burden—it should be a valuable asset that grows y
 - 🚀 **AI-assisted documentation** - Automatic context capture with Claude Code integration
 - 🔬 **Research & implementation sessions** - Document both code changes and exploratory work
 - 📊 **Session data extraction** - Extract git history, token usage, and metrics for reporting (v3.4.0+)
-- � **OpenTelemetry tracing** - Monitor CLI performance and usage with distributed tracing (v3.5.0+)
-- �🔄 **Automatic syncing** - Git hooks sync docs to your chosen hub automatically
+- 📊 **OpenTelemetry tracing** - Monitor CLI performance and usage with distributed tracing (v3.6.0+)
+- 🔄 **Automatic syncing** - Git hooks sync docs to your chosen hub automatically
 - 🔧 **Flexible storage** - Choose between local-only or private git repository (v3.2.0+)
 - 🗂️ **Project registry** - Track and update all projects using the CLI (v3.1.0+)
 - 🔍 **Search & stats** - Find and analyze documented use cases
@@ -199,7 +199,7 @@ ai-use-case config show
 ai-use-case config reconfigure
 ```
 
-### Tracing and Monitoring (v3.5.0+)
+### Tracing and Monitoring (v3.6.0+)
 
 Monitor CLI performance and usage with OpenTelemetry tracing:
 
