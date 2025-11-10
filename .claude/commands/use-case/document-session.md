@@ -297,7 +297,7 @@ Create documentation file but DO NOT commit (since there are no code changes):
 
 **Then sync to central hub (both session types):**
 ```bash
-bash ~/.local/share/ai-use-case-cli/sync-ai-use-cases.sh .
+bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
 ```
 
 ## Key Principles
