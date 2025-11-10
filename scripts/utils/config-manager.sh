@@ -312,6 +312,82 @@ show_config() {
     echo -e "Config file: ${CYAN}$CONFIG_FILE${NC}"
 }
 
+# Function to validate and repair tracing configuration
+validate_and_repair_tracing_config() {
+    local tracing_config_file="$CONFIG_DIR/tracing.json"
+
+    # Check if file exists
+    if [ ! -f "$tracing_config_file" ]; then
+        return 0  # Not an error, will be created
+    fi
+
+    # Check if empty
+    if [ ! -s "$tracing_config_file" ]; then
+        echo -e "${YELLOW}Warning: Empty tracing config detected, repairing...${NC}" >&2
+        rm -f "$tracing_config_file"
+        init_tracing_config
+        return $?
+    fi
+
+    # Check if valid JSON
+    if command -v jq &> /dev/null; then
+        if ! jq empty "$tracing_config_file" 2>/dev/null; then
+            echo -e "${YELLOW}Warning: Corrupted tracing config detected, repairing...${NC}" >&2
+            rm -f "$tracing_config_file"
+            init_tracing_config
+            return $?
+        fi
+    fi
+
+    return 0
+}
+
+# Function to initialize tracing configuration (atomic operation)
+init_tracing_config() {
+    local tracing_config_file="$CONFIG_DIR/tracing.json"
+    local temp_file=$(mktemp)
+
+    # Ensure config directory exists
+    ensure_config_dir
+
+    # Default tracing configuration (opt-in, not opt-out)
+    local default_config='{
+  "enabled": false,
+  "endpoint": "http://localhost:4318",
+  "sampling_ratio": 1.0,
+  "export_timeout": 30
+}'
+
+    # Write to temp file first
+    echo "$default_config" > "$temp_file"
+
+    # Validate the content
+    if [ ! -s "$temp_file" ]; then
+        echo -e "${RED}Error: Failed to create tracing configuration${NC}" >&2
+        rm -f "$temp_file"
+        return 1
+    fi
+
+    # Validate JSON syntax if jq available
+    if command -v jq &> /dev/null; then
+        if ! jq empty "$temp_file" 2>/dev/null; then
+            echo -e "${RED}Error: Invalid JSON in tracing configuration${NC}" >&2
+            rm -f "$temp_file"
+            return 1
+        fi
+    fi
+
+    # Atomic move (safer than cp)
+    if ! mv "$temp_file" "$tracing_config_file" 2>/dev/null; then
+        echo -e "${RED}Error: Failed to save tracing configuration${NC}" >&2
+        rm -f "$temp_file"
+        return 1
+    fi
+
+    echo -e "${GREEN}✓${NC} Tracing configuration initialized" >&2
+    return 0
+}
+
 # Function to get tracing configuration
 get_tracing_config() {
     local tracing_config_file="$CONFIG_DIR/tracing.json"
@@ -336,42 +412,80 @@ set_tracing_config() {
     local key="$1"
     local value="$2"
     local tracing_config_file="$CONFIG_DIR/tracing.json"
-    
+
     ensure_config_dir
-    
-    # Create config file if it doesn't exist
+
+    # Initialize if doesn't exist or validate if exists
     if [ ! -f "$tracing_config_file" ]; then
-        get_tracing_config > "$tracing_config_file"
-    fi
-    
-    # Update the configuration using jq if available
-    if command -v jq &> /dev/null; then
-        local temp_file=$(mktemp)
-        # Use --argjson for boolean/numeric keys, --arg for strings
-        case "$key" in
-            enabled)
-                # Convert string "true"/"false" to boolean
-                if [[ "$value" == "true" ]]; then
-                    jq --arg key "$key" '.[$key] = true' "$tracing_config_file" > "$temp_file"
-                else
-                    jq --arg key "$key" '.[$key] = false' "$tracing_config_file" > "$temp_file"
-                fi
-                ;;
-            sampling_ratio|export_timeout)
-                # Numeric values
-                jq --arg key "$key" --argjson value "$value" '.[$key] = $value' "$tracing_config_file" > "$temp_file"
-                ;;
-            *)
-                # String values
-                jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$tracing_config_file" > "$temp_file"
-                ;;
-        esac
-        mv "$temp_file" "$tracing_config_file"
-        echo "Updated tracing.$key = $value"
+        if ! init_tracing_config; then
+            echo -e "${RED}Error: Failed to initialize tracing configuration${NC}" >&2
+            return 1
+        fi
     else
-        echo "jq not available. Please manually edit $tracing_config_file"
-        echo "Set $key = $value"
+        # Validate existing file and repair if needed
+        if ! validate_and_repair_tracing_config; then
+            echo -e "${RED}Error: Failed to validate tracing configuration${NC}" >&2
+            return 1
+        fi
     fi
+
+    # Require jq for safe updates
+    if ! command -v jq &> /dev/null; then
+        echo -e "${RED}Error: jq not available. Cannot update configuration safely.${NC}" >&2
+        echo "Install jq: sudo apt-get install jq  # or appropriate package manager" >&2
+        return 1
+    fi
+
+    local temp_file=$(mktemp)
+    # Setup cleanup trap
+    trap "rm -f '$temp_file'" EXIT RETURN
+
+    # Use --argjson for boolean/numeric keys, --arg for strings
+    case "$key" in
+        enabled)
+            # Convert string "true"/"false" to boolean
+            if [[ "$value" == "true" ]]; then
+                jq --arg key "$key" '.[$key] = true' "$tracing_config_file" > "$temp_file"
+            else
+                jq --arg key "$key" '.[$key] = false' "$tracing_config_file" > "$temp_file"
+            fi
+            ;;
+        sampling_ratio|export_timeout)
+            # Numeric values
+            jq --arg key "$key" --argjson value "$value" '.[$key] = $value' "$tracing_config_file" > "$temp_file"
+            ;;
+        *)
+            # String values
+            jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$tracing_config_file" > "$temp_file"
+            ;;
+    esac
+
+    # Validate temp file before moving
+    if [ ! -s "$temp_file" ]; then
+        echo -e "${RED}Error: Failed to update configuration (empty result)${NC}" >&2
+        trap - EXIT RETURN
+        rm -f "$temp_file"
+        return 1
+    fi
+
+    if ! jq empty "$temp_file" 2>/dev/null; then
+        echo -e "${RED}Error: Failed to update configuration (invalid JSON)${NC}" >&2
+        trap - EXIT RETURN
+        rm -f "$temp_file"
+        return 1
+    fi
+
+    # Atomic move
+    if ! mv "$temp_file" "$tracing_config_file" 2>/dev/null; then
+        echo -e "${RED}Error: Failed to save configuration${NC}" >&2
+        trap - EXIT RETURN
+        rm -f "$temp_file"
+        return 1
+    fi
+
+    trap - EXIT RETURN
+    echo "Updated tracing.$key = $value"
+    return 0
 }
 
 # Function to show tracing configuration
@@ -462,6 +576,32 @@ if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
             ;;
         tracing)
             case "$2" in
+                init)
+                    echo -e "${BLUE}Initializing tracing configuration...${NC}"
+                    if ! init_tracing_config; then
+                        exit 1
+                    fi
+                    echo ""
+                    echo -e "${CYAN}Checking dependencies...${NC}"
+                    # Get script directory
+                    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+                    if ! bash "$SCRIPT_DIR/tracing.sh" status 2>&1 | grep -q "Available"; then
+                        echo -e "${YELLOW}Installing tracing dependencies...${NC}"
+                        bash "$SCRIPT_DIR/tracing.sh" install-deps
+                    else
+                        echo -e "${GREEN}✓${NC} Tracing dependencies already installed"
+                    fi
+                    echo ""
+                    echo -e "${GREEN}╭────────────────────────────────────────────────────────────╮${NC}"
+                    echo -e "${GREEN}│${NC} ${BOLD}Tracing Initialization Complete${NC}                       ${GREEN}│${NC}"
+                    echo -e "${GREEN}╰────────────────────────────────────────────────────────────╯${NC}"
+                    echo ""
+                    echo -e "${CYAN}Next steps:${NC}"
+                    echo "  • Run: ${GREEN}ai-use-case tracing enable${NC}       (Enable tracing)"
+                    echo "  • Run: ${GREEN}ai-use-case tracing configure${NC}    (Custom settings)"
+                    echo "  • Run: ${GREEN}ai-use-case tracing test${NC}         (Test functionality)"
+                    echo ""
+                    ;;
                 show)
                     show_tracing_config
                     ;;
@@ -483,7 +623,7 @@ if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
                     ;;
                 *)
                     echo "Error: Unknown tracing command '${2:-}'"
-                    echo "Available: show, configure, enable, disable, set"
+                    echo "Available: init, show, configure, enable, disable, set"
                     exit 1
                     ;;
             esac
