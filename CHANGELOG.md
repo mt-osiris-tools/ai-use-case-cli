@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Reset Command**: New `reset` command to safely clean CLI configuration and data
+  - Added `scripts/utils/reset.sh` with comprehensive safety features
+  - Selective reset options: `--config`, `--registry`, `--tracing`, `--hub`, `--all`
+  - Safety features: confirmation prompts, dry-run mode (`--dry-run`), force mode (`--force`)
+  - Special protection for git-based hubs (prevents accidental deletion)
+  - Displays file sizes and clear warnings before deletion
+  - Provides next steps after reset completion
+  - Usage: `ai-use-case reset --config` or `ai-use-case reset --all --dry-run`
+
 ### Fixed
 
 - **Tracing Dependency Installation**: Fixed installation failure on externally-managed Python environments
