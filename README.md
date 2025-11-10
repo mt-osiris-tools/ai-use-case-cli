@@ -112,6 +112,7 @@ Use **either** standalone CLI or Claude Code slash commands—whatever fits your
 | Publish to Confluence | `ai-use-case publish-confluence` | `/use-case:publish-confluence` |
 | View hub | `ai-use-case view` | |
 | Push hub changes | `ai-use-case push` | |
+| **Initialize tracing** | `ai-use-case tracing init` | |
 | Configure tracing | `ai-use-case tracing configure` | |
 | View tracing status | `ai-use-case tracing status` | |
 
@@ -205,11 +206,14 @@ ai-use-case config reconfigure
 Monitor CLI performance and usage with OpenTelemetry tracing:
 
 ```bash
-# Setup tracing (installs dependencies)
-ai-use-case tracing install-deps
+# Quick setup (one command - recommended)
+ai-use-case tracing init      # Initialize config + install dependencies
+ai-use-case tracing enable    # Enable tracing
+ai-use-case tracing test      # Verify it works
 
-# Configure tracing interactively
-ai-use-case tracing configure
+# Or manual setup
+ai-use-case tracing install-deps   # Install dependencies
+ai-use-case tracing configure      # Configure interactively
 
 # Check tracing status
 ai-use-case tracing status

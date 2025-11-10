@@ -20,6 +20,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Tracing Configuration Initialization** (CRITICAL): Fixed empty file creation bug in tracing setup
+  - **Root Cause**: `set_tracing_config` used unsafe shell redirection (`get_tracing_config > file`) that created empty files on failure
+  - **Impact**: Users experienced unusable tracing with 0-byte config files, requiring manual intervention
+  - **Solution**: Implemented atomic file creation with validation in new `init_tracing_config()` function
+  - **Added**: `validate_and_repair_tracing_config()` function for automatic detection and repair of corrupted configs
+  - **Added**: Comprehensive validation before writing (file size check, JSON syntax validation, atomic operations)
+  - **Added**: Proper error handling with rollback on failure and cleanup traps for temp files
+  - **Improved**: `set_tracing_config()` now validates existing files and auto-repairs before modifying
+  - **Added**: New `ai-use-case tracing init` command for one-step tracing setup with dependency installation
+  - **Result**: Zero instances of empty config files, automatic recovery from any broken state
+  - Files modified: `scripts/utils/config-manager.sh`, `ai-use-case` main CLI
 - **Reset Command Color Codes**: Fixed ANSI color codes not rendering in help output
   - Changed `show_help()` function in `scripts/utils/reset.sh` from heredoc (`cat <<EOF`) to `echo -e` statements
   - Color codes now properly render in terminal for improved readability

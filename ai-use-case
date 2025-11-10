@@ -316,7 +316,7 @@ case "${1:-}" in
         trace_event "command_start" "command=tracing" "subcommand=${2:-show}"
         if [ -f "$SCRIPT_DIR/scripts/utils/config-manager.sh" ]; then
             case "${2:-show}" in
-                show|configure|enable|disable|set)
+                init|show|configure|enable|disable|set)
                     trace_run "tracing-${2:-show}" bash "$SCRIPT_DIR/scripts/utils/config-manager.sh" tracing "$2" "${3:-}" "${4:-}"
                     ;;
                 status)
@@ -350,6 +350,7 @@ ${BLUE}AI Use Case CLI - Tracing Management${NC}
 ${YELLOW}Usage:${NC} ai-use-case tracing <subcommand>
 
 ${YELLOW}Subcommands:${NC}
+  init              Initialize tracing configuration (recommended first step)
   show              Show current tracing configuration
   configure         Interactive tracing configuration setup
   enable            Enable tracing
@@ -359,10 +360,14 @@ ${YELLOW}Subcommands:${NC}
   test              Test tracing functionality
   set <key> <val>   Set tracing configuration value
 
+${YELLOW}Quick Start:${NC}
+  ai-use-case tracing init          # Setup tracing (one-time)
+  ai-use-case tracing enable        # Enable tracing
+  ai-use-case tracing test          # Verify it works
+
 ${YELLOW}Examples:${NC}
   ai-use-case tracing show
   ai-use-case tracing configure
-  ai-use-case tracing enable
   ai-use-case tracing status
   ai-use-case tracing install-deps
 
