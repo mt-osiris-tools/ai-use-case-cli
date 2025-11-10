@@ -6,10 +6,23 @@
 TRACING_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TRACING_PY="$TRACING_SCRIPT_DIR/tracing.py"
 
+# Virtual environment for tracing dependencies
+TRACING_VENV_DIR="${AI_USECASE_VENV_DIR:-$HOME/.local/share/ai-use-case-cli/venv}"
+TRACING_PYTHON="${TRACING_VENV_DIR}/bin/python3"
+
+# Determine which Python to use (prefer venv if available)
+if [ -x "$TRACING_PYTHON" ]; then
+    PYTHON_CMD="$TRACING_PYTHON"
+elif command -v python3 &> /dev/null; then
+    PYTHON_CMD="python3"
+else
+    PYTHON_CMD=""
+fi
+
 # Check if Python is available and tracing module works
 TRACING_AVAILABLE=false
-if command -v python3 &> /dev/null && [ -f "$TRACING_PY" ]; then
-    if python3 -c "import sys; sys.path.insert(0, '$TRACING_SCRIPT_DIR'); from tracing import is_tracing_enabled; print('OK')" 2>/dev/null | grep -q "OK"; then
+if [ -n "$PYTHON_CMD" ] && [ -f "$TRACING_PY" ]; then
+    if "$PYTHON_CMD" -c "import sys; sys.path.insert(0, '$TRACING_SCRIPT_DIR'); from tracing import is_tracing_enabled; print('OK')" 2>/dev/null | grep -q "OK"; then
         TRACING_AVAILABLE=true
     fi
 fi
@@ -17,7 +30,7 @@ fi
 # Function to check if tracing is enabled
 is_tracing_enabled() {
     if [ "$TRACING_AVAILABLE" = true ]; then
-        python3 -c "
+        "$PYTHON_CMD" -c "
 import sys
 sys.path.insert(0, '$TRACING_SCRIPT_DIR')
 from tracing import is_tracing_enabled
@@ -41,7 +54,7 @@ trace_command_start() {
         # Create a unique trace ID for this command execution
         export TRACE_ID="$(date +%s)_$$_$(printf '%s' "$command" | sed 's/[^a-zA-Z0-9]/_/g')"
         
-        python3 -c "
+        "$PYTHON_CMD" -c "
 import sys
 import os
 sys.path.insert(0, '$TRACING_SCRIPT_DIR')
@@ -70,7 +83,7 @@ trace_command_end() {
             duration="$(echo "$end_time - $TRACE_START_TIME" | bc 2>/dev/null || echo "0")"
         fi
         
-        python3 -c "
+        "$PYTHON_CMD" -c "
 import sys
 import os
 sys.path.insert(0, '$TRACING_SCRIPT_DIR')
@@ -121,7 +134,7 @@ trace_operation() {
     fi
 
     if [ "$TRACING_AVAILABLE" = true ] && is_tracing_enabled; then
-        TRACE_OPERATION="$operation" TRACE_ATTRS="$attrs_json" python3 -c "
+        TRACE_OPERATION="$operation" TRACE_ATTRS="$attrs_json" "$PYTHON_CMD" -c "
 import sys
 import os
 import json
@@ -148,7 +161,7 @@ trace_file_operation() {
     local file_path="${2:-}"
 
     if [ "$TRACING_AVAILABLE" = true ] && is_tracing_enabled; then
-        TRACE_OPERATION_TYPE="$operation_type" TRACE_FILE_PATH="$file_path" python3 -c "
+        TRACE_OPERATION_TYPE="$operation_type" TRACE_FILE_PATH="$file_path" "$PYTHON_CMD" -c "
 import sys
 import os
 sys.path.insert(0, '$TRACING_SCRIPT_DIR')
@@ -166,7 +179,7 @@ trace_hub_sync() {
     local files_count="${2:-0}"
     
     if [ "$TRACING_AVAILABLE" = true ] && is_tracing_enabled; then
-        python3 -c "
+        "$PYTHON_CMD" -c "
 import sys
 sys.path.insert(0, '$TRACING_SCRIPT_DIR')
 from tracing import record_hub_sync
@@ -204,7 +217,7 @@ trace_event() {
     fi
 
     if [ "$TRACING_AVAILABLE" = true ] && is_tracing_enabled; then
-        TRACE_EVENT_NAME="$event_name" TRACE_EVENT_ATTRS="$attrs_json" python3 -c "
+        TRACE_EVENT_NAME="$event_name" TRACE_EVENT_ATTRS="$attrs_json" "$PYTHON_CMD" -c "
 import sys
 import os
 import json
@@ -228,7 +241,7 @@ trace_attribute() {
     local value="$2"
 
     if [ "$TRACING_AVAILABLE" = true ] && is_tracing_enabled; then
-        TRACE_KEY="$key" TRACE_VALUE="$value" python3 -c "
+        TRACE_KEY="$key" TRACE_VALUE="$value" "$PYTHON_CMD" -c "
 import sys
 import os
 sys.path.insert(0, '$TRACING_SCRIPT_DIR')
@@ -246,7 +259,7 @@ trace_status() {
         echo "Tracing module: Available"
         if is_tracing_enabled; then
             echo "Tracing status: Enabled"
-            python3 "$TRACING_PY" status 2>/dev/null || true
+            "$PYTHON_CMD" "$TRACING_PY" status 2>/dev/null || true
         else
             echo "Tracing status: Disabled"
         fi
@@ -258,7 +271,12 @@ trace_status() {
             echo "Reason: Tracing module not found at $TRACING_PY"
         else
             echo "Reason: Import error (missing dependencies?)"
-            echo "Install with: pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp opentelemetry-instrumentation-subprocess"
+            echo ""
+            echo "Install dependencies with:"
+            echo "  ai-use-case tracing install-deps"
+            echo ""
+            echo "Or manually:"
+            echo "  $0 install-deps"
         fi
     fi
 }
@@ -308,25 +326,47 @@ enable_script_tracing() {
 # Function to install tracing dependencies
 install_tracing_deps() {
     echo "Installing OpenTelemetry dependencies (v1.20.0+)..."
+    echo "Using virtual environment at: $TRACING_VENV_DIR"
 
-    # Install with version constraints for compatibility
+    # Check if Python 3 is available
+    if ! command -v python3 &> /dev/null; then
+        echo "Error: python3 not found. Please install Python 3 and try again."
+        return 1
+    fi
+
+    # Create virtual environment if it doesn't exist
+    if [ ! -d "$TRACING_VENV_DIR" ]; then
+        echo "Creating virtual environment..."
+        mkdir -p "$(dirname "$TRACING_VENV_DIR")"
+        python3 -m venv "$TRACING_VENV_DIR" || {
+            echo "Error: Failed to create virtual environment."
+            echo "You may need to install python3-venv: sudo apt install python3-venv"
+            return 1
+        }
+        echo "Virtual environment created."
+    else
+        echo "Using existing virtual environment."
+    fi
+
+    # Install packages into the virtual environment
     local packages=(
         "opentelemetry-api>=1.20.0,<2.0.0"
         "opentelemetry-sdk>=1.20.0,<2.0.0"
         "opentelemetry-exporter-otlp>=1.20.0,<2.0.0"
-        "opentelemetry-instrumentation-subprocess>=0.41b0,<1.0.0"
     )
 
-    if command -v pip3 &> /dev/null; then
-        pip3 install --user "${packages[@]}"
-    elif command -v pip &> /dev/null; then
-        pip install --user "${packages[@]}"
-    else
-        echo "Error: pip not found. Please install pip and try again."
+    echo "Installing packages into virtual environment..."
+    "${TRACING_VENV_DIR}/bin/pip" install --upgrade pip >/dev/null 2>&1
+    "${TRACING_VENV_DIR}/bin/pip" install "${packages[@]}" || {
+        echo "Error: Failed to install packages."
         return 1
-    fi
+    }
 
-    echo "Dependencies installed. You may need to restart your shell."
+    echo ""
+    echo "Dependencies installed successfully!"
+    echo "Virtual environment location: $TRACING_VENV_DIR"
+    echo ""
+    echo "To customize the venv location, set: export AI_USECASE_VENV_DIR=/path/to/venv"
 }
 
 # Export functions for use in other scripts

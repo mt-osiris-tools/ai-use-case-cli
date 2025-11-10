@@ -28,12 +28,19 @@ try:
     from opentelemetry.sdk.metrics import MeterProvider
     from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
     from opentelemetry.sdk.resources import Resource
-    from opentelemetry.instrumentation.subprocess import SubprocessInstrumentor
     from opentelemetry.trace.status import Status, StatusCode
     from opentelemetry.semconv.trace import SpanAttributes
     TELEMETRY_AVAILABLE = True
+
+    # Subprocess instrumentation is optional
+    try:
+        from opentelemetry.instrumentation.subprocess import SubprocessInstrumentor
+        SUBPROCESS_INSTRUMENTATION_AVAILABLE = True
+    except ImportError:
+        SUBPROCESS_INSTRUMENTATION_AVAILABLE = False
 except ImportError:
     TELEMETRY_AVAILABLE = False
+    SUBPROCESS_INSTRUMENTATION_AVAILABLE = False
 
 class TracingManager:
     """Manages OpenTelemetry tracing setup and operations for the AI Use Case CLI."""
@@ -144,8 +151,9 @@ class TracingManager:
             metrics.set_meter_provider(MeterProvider(resource=resource, metric_readers=[metric_reader]))
             self.meter = metrics.get_meter(__name__)
             
-            # Auto-instrument subprocess calls
-            SubprocessInstrumentor().instrument()
+            # Auto-instrument subprocess calls (optional)
+            if SUBPROCESS_INSTRUMENTATION_AVAILABLE:
+                SubprocessInstrumentor().instrument()
             
             self.enabled = True
             
