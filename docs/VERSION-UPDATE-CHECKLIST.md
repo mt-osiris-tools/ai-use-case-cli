@@ -82,6 +82,37 @@ export CLI_VERSION="X.Y.Z"
 
 ---
 
+## Version Consistency Validation
+
+**NEW in v3.6.0**: Automated version consistency validator
+
+Before releasing, always run the version validator to catch inconsistencies:
+
+```bash
+# Check all version references (during release)
+./scripts/utils/validate-versions.sh
+
+# Check with unreleased features (during development)
+./scripts/utils/validate-versions.sh --unreleased
+
+# Show help
+./scripts/utils/validate-versions.sh --help
+```
+
+**What it checks**:
+- ✅ `scripts/utils/version.sh` (source of truth)
+- ✅ `README.md` (header and footer)
+- ✅ `CHANGELOG.md` (latest release matches version.sh)
+- ✅ `docs/COMMANDS.md` (no future version references)
+- ✅ `docs/CLAUDE.md` (no future version references, version history)
+
+**Usage**:
+- **During development**: Use `--unreleased` flag when working on features for next version
+- **Before release**: Run without flags to ensure everything is consistent
+- **After bumping version**: Automatically run by `bump-version.sh`
+
+---
+
 ## Automated Version Update Script
 
 Use the built-in bump-version script:
@@ -106,12 +137,14 @@ ai-use-case bump-version 3.5.0
 - ✅ Updates `scripts/utils/version.sh`
 - ✅ Updates `README.md` (both locations)
 - ✅ Prompts for CHANGELOG.md update
+- ✅ Runs version consistency validator
 - ✅ Creates git commit with version bump message
 - ✅ Creates git tag
 
 **What it does NOT automate** (manual check required):
 - ❌ CHANGELOG.md content (you must write release notes)
-- ❌ Version-specific feature documentation in CLAUDE.md
+- ❌ Version-specific feature documentation in docs/COMMANDS.md
+- ❌ Version-specific feature documentation in docs/CLAUDE.md
 - ❌ Historical version references (should not be changed)
 
 ---
@@ -231,15 +264,21 @@ Before creating any PR:
 
 ## Quick Reference: Version Files Map
 
-| File | Lines | Purpose | Auto-Updated by bump-version.sh |
-|------|-------|---------|----------------------------------|
-| `scripts/utils/version.sh` | 21 | Source of truth | ✅ Yes |
-| `README.md` | 4, 353 | User-facing docs | ✅ Yes (header version), Manual (footer date) |
-| `CHANGELOG.md` | Top | Release history | ⚠️ Prompts only (manual content) |
-| `CLAUDE.md` | Various | Feature docs | ❌ No (manual if new features) |
-| `ai-use-case` (main script) | N/A | CLI entry point | ✅ Auto (sources version.sh) |
+| File | Lines | Purpose | Auto-Updated by bump-version.sh | Validated by validate-versions.sh |
+|------|-------|---------|----------------------------------|-----------------------------------|
+| `scripts/utils/version.sh` | 21 | Source of truth | ✅ Yes | ✅ Yes |
+| `README.md` | 4, 353 | User-facing docs | ✅ Yes (header), Manual (footer date) | ✅ Yes |
+| `CHANGELOG.md` | Top | Release history | ⚠️ Prompts only (manual content) | ✅ Yes |
+| `docs/COMMANDS.md` | Various | Command reference with version markers | ❌ No (manual) | ✅ Yes |
+| `docs/CLAUDE.md` | Various | Developer guide with version markers | ❌ No (manual) | ✅ Yes |
+| `ai-use-case` (main script) | N/A | CLI entry point | ✅ Auto (sources version.sh) | N/A |
+
+**Version Marker Format**:
+- Use `(v3.6.0+)` for features added in that version
+- Example: `### Tracing and Monitoring (v3.6.0+)`
+- Never change historical markers (keep `v3.1.0+` as is)
 
 ---
 
-**Last Updated**: 2025-11-08
-**Checklist Version**: 1.0.0
+**Last Updated**: 2025-11-09
+**Checklist Version**: 2.0.0 (Added version validation)
