@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Tracing Dependency Installation**: Fixed installation failure on externally-managed Python environments
+  - Changed from `pip3 install --user` to virtual environment approach (`~/.local/share/ai-use-case-cli/venv`)
+  - Updated `scripts/utils/tracing.sh` to create and use isolated venv for OpenTelemetry packages
+  - Updated `scripts/utils/tracing.py` to make subprocess instrumentation optional (package not available in PyPI)
+  - Resolves PEP 668 externally-managed-environment errors on modern Debian/Ubuntu systems
+  - Added `AI_USECASE_VENV_DIR` environment variable to customize venv location
+  - Automatic fallback to system Python if venv not available
+
 ## [3.6.0] - 2025-11-09
 
 ### Added
