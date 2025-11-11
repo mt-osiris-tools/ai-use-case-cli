@@ -37,8 +37,17 @@ Check for recent PRs and commits by the **current git user** that haven't been d
 USER_EMAIL=$(git config user.email)
 GH_USERNAME=$(gh api user --jq '.login' 2>/dev/null)
 
-# Get recent merged PRs by current user (last 24 hours)
-gh pr list --limit 20 --state merged --author="$GH_USERNAME" --json number,title,mergedAt,headRefName,author --jq '.[] | select(.mergedAt | fromdateiso8601 > (now - 86400)) | "PR #\(.number): \(.title) (branch: \(.headRefName))"'
+# Validate user email
+if [ -z "$USER_EMAIL" ]; then
+    echo "Warning: Could not determine git user email"
+fi
+
+# Get recent merged PRs by current user (last 24 hours) - only if GitHub CLI is configured
+if [ -n "$GH_USERNAME" ]; then
+    gh pr list --limit 20 --state merged --author="$GH_USERNAME" --json number,title,mergedAt,headRefName,author --jq '.[] | select(.mergedAt | fromdateiso8601 > (now - 86400)) | "PR #\(.number): \(.title) (branch: \(.headRefName))"'
+else
+    echo "Note: Skipping PR detection (GitHub CLI not configured or authenticated)"
+fi
 
 # Get recent commits by current user on current branch
 git log --since="24 hours ago" --author="$USER_EMAIL" --pretty=format:"%h - %s (%ar)" --first-parent
@@ -48,6 +57,12 @@ ls -1 .usecase/cases/ 2>/dev/null | grep -E '^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{
 ```
 
 **IMPORTANT**: Only show work (PRs and commits) by the current git user. Do not show work by other team members.
+
+> **Design Note:**
+> This user filtering applies specifically to the Claude Code `/use-case:document-session` command.
+> The related shell script (`scripts/core/document-ai-session.sh`) intentionally shows all recent work (unfiltered), so shell users see the full history.
+> This distinction is by design: Claude Code users get a personalized, user-scoped view, while shell script users get a team-wide view.
+> If you need to see all work (not just your own), use the shell script directly.
 
 #### 0.2: Analyze Current Conversation
 
@@ -200,7 +215,8 @@ git status --porcelain | wc -l
 # Check for any file modifications in latest commit by current user
 LATEST_USER_COMMIT=$(git log --author="$USER_EMAIL" --format="%H" -n 1 2>/dev/null)
 if [ -n "$LATEST_USER_COMMIT" ]; then
-    git diff --name-only "${LATEST_USER_COMMIT}~1..$LATEST_USER_COMMIT" 2>/dev/null || echo "No previous commit"
+    # Use git show which handles first commits gracefully
+    git show --name-only --format="" "$LATEST_USER_COMMIT"
 else
     echo "No commits by current user"
 fi
@@ -227,7 +243,13 @@ if [ -n "$LATEST_USER_COMMIT" ]; then
     git show --stat "$LATEST_USER_COMMIT"
 
     # Full diff of latest changes by current user
-    git diff "${LATEST_USER_COMMIT}~1..$LATEST_USER_COMMIT" 2>/dev/null
+    # Check if commit has a parent before using ~1 notation
+    if git rev-parse "${LATEST_USER_COMMIT}~1" >/dev/null 2>&1; then
+        git diff "${LATEST_USER_COMMIT}~1..$LATEST_USER_COMMIT"
+    else
+        # First commit - show the commit itself
+        git show "$LATEST_USER_COMMIT"
+    fi
 fi
 
 # Current status

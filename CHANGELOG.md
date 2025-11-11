@@ -36,10 +36,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Added Key Principle #10: "Include Research Sessions"
   - **Enhanced Examples**: Added research session example showing documentation without commits
   - **Updated Workflow Benefits**: Added "Captures Research Value" benefit
-  - **Improved Filtering Consistency**: Fixed `git show` and `git diff` commands to use latest commit by current user
-    - Changed from using HEAD (any author) to LATEST_USER_COMMIT (current user only)
+  - **Improved Filtering Consistency**: Enhanced `git show` and `git diff` commands to consistently use the latest commit by the current user
+    - Changed from using HEAD (any author) to LATEST_USER_COMMIT (current user only) for improved user filtering
     - Applied in Step 3 (session type determination) and Step 4a (git history analysis)
-    - Ensures all git operations consistently filter by current user
+    - Ensures all git operations consistently filter by current user as an intentional behavior change
+  - **Error Handling**: Added validation for GitHub CLI authentication and git user configuration
+    - Validates USER_EMAIL is available, warns if not configured
+    - Checks GH_USERNAME before querying PRs, skips PR detection if gh CLI not authenticated
+    - Gracefully handles first commits (no parent commit) in git diff operations
+  - **Design Documentation**: Added note clarifying Claude Code command vs shell script filtering behavior
 
 ### Fixed
 
