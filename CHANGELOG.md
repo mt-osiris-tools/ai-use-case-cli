@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Self-Update Command**: New `ai-use-case update` command for automated CLI updates
+  - Updates CLI installation to latest version from git repository
+  - Checks for updates and shows what changed before updating
+  - Safely handles local changes with git stash/restore
+  - Options:
+    - `-y, --yes`: Skip confirmation and update automatically
+    - `--update-projects`: Also update all registered projects after CLI update
+    - `--dry-run`: Preview what would be updated without making changes
+  - Usage: `ai-use-case update` or `ai-use-case self-update`
+  - Eliminates need for manual `cd ~/.local/share/ai-use-case-cli && git pull`
+  - Shows version changes and git commit history
+  - Can update CLI and all projects in one command with `--update-projects` flag
 - **Project Update Flag**: New `--update` flag for `setup-project.sh` and `ai-use-case --init`
   - Allows refreshing existing project installations with latest CLI components
   - Updates Claude Code slash commands with newer versions from CLI

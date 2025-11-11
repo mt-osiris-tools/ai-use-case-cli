@@ -70,6 +70,7 @@ ${YELLOW}COMMANDS${NC}
   ${GREEN}cleanup-backups [path]${NC}    Remove backup files from project
   ${GREEN}tracing [subcommand]${NC}      Manage tracing configuration
   ${GREEN}reset [options]${NC}           Reset CLI configuration and data
+  ${GREEN}update [options]${NC}          Update CLI to latest version
   ${GREEN}bump-version <type>${NC}       Bump version (major|minor|patch)
   ${GREEN}uninstall${NC}                 Uninstall the CLI tool
   ${GREEN}--version, -v, version${NC}    Show version information
@@ -404,6 +405,18 @@ EOF
         else
             trace_event "error" "command=reset" "error=script_not_found" "script=reset.sh"
             echo -e "${RED}Error: reset.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    update|self-update)
+        trace_event "command_start" "command=update" "args=$*"
+        if [ -f "$SCRIPT_DIR/scripts/utils/self-update.sh" ]; then
+            # Pass all arguments after the command to the script
+            shift
+            trace_run "update" bash "$SCRIPT_DIR/scripts/utils/self-update.sh" "$@"
+        else
+            trace_event "error" "command=update" "error=script_not_found" "script=self-update.sh"
+            echo -e "${RED}Error: self-update.sh not found${NC}"
             exit 1
         fi
         ;;
