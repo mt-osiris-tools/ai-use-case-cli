@@ -18,6 +18,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Usage: `ai-use-case --init --update` or `./scripts/project/setup-project.sh --update`
   - Helpful message when components already exist: suggests using `--update` to refresh
 
+### Changed
+
+- **Document Session Command**: Enhanced research session detection and user filtering
+  - **User Filtering**: Now shows only work by the current git user
+    - PR detection uses `gh pr list --author="$GH_USERNAME"` to filter PRs
+    - Commit detection uses `git log --author="$USER_EMAIL"` to filter commits
+    - Prevents showing work by other team members in documentation options
+    - Added Key Principle #8: "Filter by Current User"
+  - **Research Session Detection**: Better detection of substantial conversations for documentation
+    - Added Section 0.2: "Analyze Current Conversation" with comprehensive criteria
+    - Detects substantial conversations (5+ exchanges, iterative discussions, technical decisions)
+    - **ALWAYS includes research session option** when conversation is substantial, even without git commits
+    - Shows research sessions with 🔬 indicator and conversation summary
+    - Added conversation analysis indicators (substantial vs. not substantial)
+    - Added Key Principle #9: "Detect Substantial Conversations"
+    - Added Key Principle #10: "Include Research Sessions"
+  - **Enhanced Examples**: Added research session example showing documentation without commits
+  - **Updated Workflow Benefits**: Added "Captures Research Value" benefit
+  - **Improved Filtering Consistency**: Enhanced `git show` and `git diff` commands to consistently use the latest commit by the current user
+    - Changed from using HEAD (any author) to LATEST_USER_COMMIT (current user only) for improved user filtering
+    - Applied in Step 3 (session type determination) and Step 4a (git history analysis)
+    - Ensures all git operations consistently filter by current user as an intentional behavior change
+  - **Error Handling**: Added validation for GitHub CLI authentication and git user configuration
+    - Validates USER_EMAIL is available, warns if not configured
+    - Checks GH_USERNAME before querying PRs, skips PR detection if gh CLI not authenticated
+    - Gracefully handles first commits (no parent commit) in git diff operations
+  - **Design Documentation**: Added note clarifying Claude Code command vs shell script filtering behavior
+
 ### Fixed
 
 - **Check Updates Script**: Fixed bash syntax error in `check-updates.sh`
