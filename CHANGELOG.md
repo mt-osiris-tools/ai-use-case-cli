@@ -36,6 +36,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Added Key Principle #10: "Include Research Sessions"
   - **Enhanced Examples**: Added research session example showing documentation without commits
   - **Updated Workflow Benefits**: Added "Captures Research Value" benefit
+  - **Improved Filtering Consistency**: Fixed `git show` and `git diff` commands to use latest commit by current user
+    - Changed from using HEAD (any author) to LATEST_USER_COMMIT (current user only)
+    - Applied in Step 3 (session type determination) and Step 4a (git history analysis)
+    - Ensures all git operations consistently filter by current user
 
 ### Fixed
 

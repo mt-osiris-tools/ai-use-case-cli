@@ -198,7 +198,12 @@ git log --since="24 hours ago" --author="$USER_EMAIL" --oneline | wc -l
 git status --porcelain | wc -l
 
 # Check for any file modifications in latest commit by current user
-git diff --name-only HEAD~1..HEAD 2>/dev/null || echo "No commits"
+LATEST_USER_COMMIT=$(git log --author="$USER_EMAIL" --format="%H" -n 1 2>/dev/null)
+if [ -n "$LATEST_USER_COMMIT" ]; then
+    git diff --name-only "${LATEST_USER_COMMIT}~1..$LATEST_USER_COMMIT" 2>/dev/null || echo "No previous commit"
+else
+    echo "No commits by current user"
+fi
 ```
 
 **If commits exist:** Implementation Session → Continue to Step 4a
@@ -214,11 +219,16 @@ USER_EMAIL=$(git config user.email)
 # Recent commits by current user with relative time
 git log --since="24 hours ago" --author="$USER_EMAIL" --pretty=format:"%h - %s (%ar)" | head -20
 
-# Latest commit details and stats
-git show --stat HEAD
+# Get latest commit by current user
+LATEST_USER_COMMIT=$(git log --author="$USER_EMAIL" --format="%H" -n 1 2>/dev/null)
 
-# Full diff of latest changes
-git diff HEAD~1..HEAD
+# Latest commit details and stats (by current user)
+if [ -n "$LATEST_USER_COMMIT" ]; then
+    git show --stat "$LATEST_USER_COMMIT"
+
+    # Full diff of latest changes by current user
+    git diff "${LATEST_USER_COMMIT}~1..$LATEST_USER_COMMIT" 2>/dev/null
+fi
 
 # Current status
 git status --short
