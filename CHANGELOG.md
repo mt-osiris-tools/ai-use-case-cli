@@ -20,13 +20,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Document Session Command**: Filter by current git user only
-  - `/use-case:document-session` now shows only work by the current git user
-  - PR detection uses `gh pr list --author="$GH_USERNAME"` to filter PRs
-  - Commit detection uses `git log --author="$USER_EMAIL"` to filter commits
-  - Prevents showing work by other team members in documentation options
-  - Ensures users only document their own work sessions
-  - Added Key Principle #8: "Filter by Current User"
+- **Document Session Command**: Enhanced research session detection and user filtering
+  - **User Filtering**: Now shows only work by the current git user
+    - PR detection uses `gh pr list --author="$GH_USERNAME"` to filter PRs
+    - Commit detection uses `git log --author="$USER_EMAIL"` to filter commits
+    - Prevents showing work by other team members in documentation options
+    - Added Key Principle #8: "Filter by Current User"
+  - **Research Session Detection**: Better detection of substantial conversations for documentation
+    - Added Section 0.2: "Analyze Current Conversation" with comprehensive criteria
+    - Detects substantial conversations (5+ exchanges, iterative discussions, technical decisions)
+    - **ALWAYS includes research session option** when conversation is substantial, even without git commits
+    - Shows research sessions with 🔬 indicator and conversation summary
+    - Added conversation analysis indicators (substantial vs. not substantial)
+    - Added Key Principle #9: "Detect Substantial Conversations"
+    - Added Key Principle #10: "Include Research Sessions"
+  - **Enhanced Examples**: Added research session example showing documentation without commits
+  - **Updated Workflow Benefits**: Added "Captures Research Value" benefit
 
 ### Fixed
 

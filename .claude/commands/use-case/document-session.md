@@ -49,7 +49,36 @@ ls -1 .usecase/cases/ 2>/dev/null | grep -E '^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{
 
 **IMPORTANT**: Only show work (PRs and commits) by the current git user. Do not show work by other team members.
 
-#### 0.2: Build Options List
+#### 0.2: Analyze Current Conversation
+
+Analyze the current Claude Code conversation to determine if it's substantial enough for documentation:
+
+**Conversation Analysis Criteria:**
+- Check conversation length (number of user messages and AI responses)
+- Identify if conversation involves:
+  - Technical research or exploration
+  - Architecture or design discussions
+  - Problem-solving or debugging approaches
+  - Evaluation of multiple options/approaches
+  - Learning about technologies or patterns
+  - Planning or discovery work
+- Determine conversation depth (simple Q&A vs. multi-round discussion)
+
+**Substantial Conversation Indicators:**
+- ✅ 5+ exchanges between user and AI
+- ✅ Discussion spans multiple topics or approaches
+- ✅ Iterative refinement of understanding
+- ✅ Evaluation of trade-offs or alternatives
+- ✅ Architectural or design decisions
+- ✅ Learning/discovery of new information
+
+**Not Substantial:**
+- ❌ Single question/answer exchange
+- ❌ Simple command executions
+- ❌ Trivial file reads or searches
+- ❌ Basic clarifications
+
+#### 0.3: Build Options List
 
 Create a prioritized list of documentation options:
 
@@ -60,14 +89,16 @@ Create a prioritized list of documentation options:
    - Mark undocumented PRs prominently
 
 2. **Current Conversation/Research Session** (Priority 2):
-   - What happened in the current Claude Code conversation
-   - Only if it's substantial enough to warrant documentation
+   - **ALWAYS include if conversation is substantial** (based on analysis above)
+   - Show even when there are NO git commits
+   - Label with conversation summary (e.g., "Research: Evaluate authentication approaches")
+   - Indicate this is a research/exploration session
 
 3. **Recent Commits Not in PRs** (Priority 3):
-   - Direct commits to main/current branch
+   - Direct commits to main/current branch by current user
    - Check if already documented
 
-#### 0.3: Present Options to User
+#### 0.4: Present Options to User
 
 Use the `AskUserQuestion` tool to present options:
 
@@ -84,9 +115,9 @@ Use the `AskUserQuestion` tool to present options:
    - Description: "Document the implementation work from this PR"
    - Status: ⚠️ Not yet documented
 
-3. **Current Research Session**
-   - Description: "Document the current exploratory conversation"
-   - Status: Current session
+3. **Current Research Session: [Topic Summary]**
+   - Description: "Document research/exploration conversation (X exchanges, no commits)"
+   - Status: 🔬 Research session (substantial conversation detected)
 
 4. **Recent Commits** (X commits in last 24h)
    - Description: "Document recent direct commits"
@@ -95,11 +126,12 @@ Use the `AskUserQuestion` tool to present options:
 
 **IMPORTANT**: Use the `AskUserQuestion` tool with:
 - `multiSelect: false` (user picks ONE session)
-- Clear labels like "PR #59: Enhance copilot instructions"
+- Clear labels like "PR #59: Enhance copilot instructions" or "Research: Authentication Approaches"
 - Descriptions that explain what will be documented
-- Visual indicators (⚠️/✅) for documentation status
+- Visual indicators (⚠️/✅ for PRs, 🔬 for research sessions)
+- **ALWAYS include research session option if conversation is substantial**, even with no commits
 
-#### 0.4: Process User Selection
+#### 0.5: Process User Selection
 
 Based on the user's selection:
 
@@ -109,10 +141,13 @@ Based on the user's selection:
 3. Extract PR metadata (title, description, files changed)
 4. Proceed to Implementation Session workflow (Step 2+)
 
-**If user selected Current Session**:
-1. Analyze the current conversation history
-2. Determine if it's research or implementation based on git activity
-3. Proceed to appropriate workflow (Step 2+)
+**If user selected Current Session/Research Session**:
+1. Analyze the current conversation history thoroughly
+2. Check for git commits by current user to determine session type:
+   - If commits exist: Implementation Session (Step 2+)
+   - If NO commits: Research Session (Step 2+ with Research workflow)
+3. Extract conversation context (questions, iterations, insights, decisions)
+4. Proceed to appropriate workflow (Step 2+)
 
 **If user selected Recent Commits**:
 1. Analyze the specified commits
@@ -322,6 +357,8 @@ bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
 6. **Be Professional**: Follow template structure, use proper formatting
 7. **Prioritize Implementation Over Research**: Real code changes and PRs should always be documented before research sessions
 8. **Filter by Current User**: Only show PRs and commits by the current git user - never show work by other team members
+9. **Detect Substantial Conversations**: Always analyze current conversation for research documentation potential, even without git commits
+10. **Include Research Sessions**: Show research/exploration conversations as documentation options when substantial (5+ exchanges, iterative discussions, technical decisions)
 
 ## Example Workflow
 
@@ -358,14 +395,49 @@ Available in hub at:
 - by-topic/feature-development/
 ```
 
+### Example: Research Session (No Commits)
+
+```
+I analyzed your current conversation and found documentation options:
+
+🔬 Current Research Session: Evaluate authentication approaches
+   - 8 exchanges with iterative refinement
+   - Discussed OAuth 2.0, JWT, and session-based auth
+   - Architecture and security trade-offs explored
+   - Status: Substantial conversation detected (no git commits)
+
+Which session would you like to document?
+```
+
+**After User Selects Research Session:**
+
+```
+✅ Research documentation created and synced!
+
+File: .usecase/cases/2025-W46-11-11_RESEARCH-001_evaluate-authentication-approaches.md
+
+Summary:
+- Research session on authentication strategies
+- Evaluated 3 different approaches
+- Key decision: Recommended JWT with refresh tokens
+- Time spent: ~45 minutes
+- No code changes (research only)
+
+Available in hub at:
+- by-project/my-app/
+- by-date/2025/11/
+- by-topic/architecture/
+```
+
 ## Workflow Benefits
 
 **Why Interactive Selection Matters:**
-1. **Prevents Documentation Gaps**: Ensures all PRs and implementation work get documented, not just research sessions
+1. **Prevents Documentation Gaps**: Ensures all PRs, implementation work, AND research sessions get documented
 2. **User Control**: Developer chooses what's most important to document right now
 3. **Batch Documentation**: Can invoke multiple times to document several sessions sequentially
 4. **Context Awareness**: AI has full context of the selected session for better documentation quality
-5. **Audit Trail**: Clear mapping between PRs and their documentation
+5. **Audit Trail**: Clear mapping between PRs/conversations and their documentation
+6. **Captures Research Value**: Documents exploratory work and architectural decisions even without code changes
 
 ## When NOT to Use Manual Input
 
