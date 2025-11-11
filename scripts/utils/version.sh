@@ -18,9 +18,12 @@
 # 4. Commit with message: "chore: bump version to X.Y.Z"
 
 # Current CLI version
-export CLI_VERSION="3.6.0"
+export CLI_VERSION="3.7.0"
 
 # Version history (for reference)
+# 3.7.0 - 2025-11-10 - Reset command and critical tracing fixes
+# 3.6.0 - 2025-11-09 - Distributed tracing system
+# 3.5.0 - 2025-11-09 - Backup cleanup utility
 # 3.4.3 - 2025-11-09 - Force refresh slash commands during project updates
 # 3.4.2 - 2025-11-08 - Optimize CLAUDE.md token usage (split into WORKFLOW.md, COMMANDS.md)
 # 3.4.1 - 2025-11-08 - Fix version references + add version update checklist
