@@ -110,32 +110,50 @@ POST_COMMIT_HOOK_SOURCE="$CLI_ROOT/git-hooks/post-commit"
 PRE_COMMIT_HOOK_SOURCE="$CLI_ROOT/git-hooks/pre-commit"
 SYNC_SCRIPT="$CLI_ROOT/scripts/core/sync-ai-use-cases.sh"
 
-# Show help
-if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-    echo "AI Use Cases Setup Script"
-    echo ""
-    echo "Usage:"
-    echo "  $0 [project_path]"
-    echo ""
-    echo "Description:"
-    echo "  Sets up AI use case documentation automation for a project."
-    echo "  Creates .usecase/cases/ directory, installs git hook,"
-    echo "  and performs initial sync to central repository."
-    echo ""
-    echo "Arguments:"
-    echo "  project_path    Path to project directory (default: current directory)"
-    echo ""
-    echo "Examples:"
-    echo "  $0                        # Setup current directory"
-    echo "  $0 /path/to/project       # Setup specific project"
-    echo ""
-    echo "Options:"
-    echo "  -h, --help    Show this help message"
-    exit 0
-fi
+# Parse flags
+UPDATE_MODE=false
+PROJECT_PATH=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --update)
+            UPDATE_MODE=true
+            shift
+            ;;
+        --help|-h)
+            echo "AI Use Cases Setup Script"
+            echo ""
+            echo "Usage:"
+            echo "  $0 [options] [project_path]"
+            echo ""
+            echo "Description:"
+            echo "  Sets up AI use case documentation automation for a project."
+            echo "  Creates .usecase/cases/ directory, installs git hooks,"
+            echo "  and performs initial sync to central repository."
+            echo ""
+            echo "Options:"
+            echo "  --update      Update existing installation (refresh slash commands and hooks)"
+            echo "  -h, --help    Show this help message"
+            echo ""
+            echo "Arguments:"
+            echo "  project_path  Path to project directory (default: current directory)"
+            echo ""
+            echo "Examples:"
+            echo "  $0                        # Setup current directory"
+            echo "  $0 /path/to/project       # Setup specific project"
+            echo "  $0 --update               # Update current directory installation"
+            echo "  $0 --update /path/to/proj # Update specific project installation"
+            exit 0
+            ;;
+        *)
+            PROJECT_PATH="$1"
+            shift
+            ;;
+    esac
+done
 
 # Get project path (use provided argument or current directory)
-PROJECT_PATH="${1:-$(pwd)}"
+PROJECT_PATH="${PROJECT_PATH:-$(pwd)}"
 
 # Ensure we're in a project directory
 if [ ! -d "$PROJECT_PATH" ]; then
@@ -235,22 +253,35 @@ if [ -d "$CLAUDE_COMMANDS_SOURCE" ]; then
 
     # Copy all command files from use-case directory
     COMMANDS_COPIED=0
+    COMMANDS_UPDATED=0
     for cmd_file in "$CLAUDE_COMMANDS_SOURCE"/*.md; do
         if [ -f "$cmd_file" ]; then
             cmd_name=$(basename "$cmd_file")
             target_file="$CLAUDE_COMMANDS_DIR/$cmd_name"
 
+            # Skip if source and target are the same file (self-setup scenario)
+            if [ "$cmd_file" -ef "$target_file" ]; then
+                continue
+            fi
+
             if [ ! -f "$target_file" ]; then
                 cp "$cmd_file" "$target_file"
                 COMMANDS_COPIED=$((COMMANDS_COPIED + 1))
+            elif [ "$UPDATE_MODE" = true ]; then
+                cp "$cmd_file" "$target_file"
+                COMMANDS_UPDATED=$((COMMANDS_UPDATED + 1))
             fi
         fi
     done
 
     if [ $COMMANDS_COPIED -gt 0 ]; then
         echo -e "${GREEN}✓${NC} Installed $COMMANDS_COPIED Claude Code slash command(s)"
-    else
-        echo -e "${YELLOW}⚠${NC} Claude Code slash commands already installed"
+    fi
+    if [ $COMMANDS_UPDATED -gt 0 ]; then
+        echo -e "${GREEN}✓${NC} Updated $COMMANDS_UPDATED Claude Code slash command(s)"
+    fi
+    if [ $COMMANDS_COPIED -eq 0 ] && [ $COMMANDS_UPDATED -eq 0 ]; then
+        echo -e "${YELLOW}⚠${NC} Claude Code slash commands already installed (use --update to refresh)"
     fi
 else
     echo -e "${YELLOW}⚠${NC} Claude Code commands not found in CLI installation"
@@ -277,7 +308,20 @@ fi
 if [ -f "$POST_COMMIT_HOOK" ]; then
     # Check if our hook is already installed
     if grep -q "AI Use Cases" "$POST_COMMIT_HOOK"; then
-        echo -e "${YELLOW}⚠${NC} Git post-commit hook already installed"
+        if [ "$UPDATE_MODE" = true ]; then
+            # Backup existing hook
+            mkdir -p "$BACKUP_BASE_DIR"
+            BACKUP_HOOK="$BACKUP_BASE_DIR/post-commit.backup.$(date +%Y%m%d%H%M%S)"
+            cp "$POST_COMMIT_HOOK" "$BACKUP_HOOK"
+            echo -e "${BLUE}ℹ${NC} Existing post-commit hook backed up to: .claude/backups/$(basename "$BACKUP_HOOK")"
+
+            # Replace with fresh hook
+            cp "$POST_COMMIT_HOOK_SOURCE" "$POST_COMMIT_HOOK"
+            chmod +x "$POST_COMMIT_HOOK"
+            echo -e "${GREEN}✓${NC} Git post-commit hook updated"
+        else
+            echo -e "${YELLOW}⚠${NC} Git post-commit hook already installed (use --update to refresh)"
+        fi
     else
         # Backup existing hook
         mkdir -p "$BACKUP_BASE_DIR"
@@ -301,7 +345,20 @@ fi
 if [ -f "$PRE_COMMIT_HOOK" ]; then
     # Check if our hook is already installed
     if grep -q "Branch Protection" "$PRE_COMMIT_HOOK"; then
-        echo -e "${YELLOW}⚠${NC} Git pre-commit hook already installed"
+        if [ "$UPDATE_MODE" = true ]; then
+            # Backup existing hook
+            mkdir -p "$BACKUP_BASE_DIR"
+            BACKUP_HOOK="$BACKUP_BASE_DIR/pre-commit.backup.$(date +%Y%m%d%H%M%S)"
+            cp "$PRE_COMMIT_HOOK" "$BACKUP_HOOK"
+            echo -e "${BLUE}ℹ${NC} Existing pre-commit hook backed up to: .claude/backups/$(basename "$BACKUP_HOOK")"
+
+            # Replace with fresh hook
+            cp "$PRE_COMMIT_HOOK_SOURCE" "$PRE_COMMIT_HOOK"
+            chmod +x "$PRE_COMMIT_HOOK"
+            echo -e "${GREEN}✓${NC} Git pre-commit hook updated"
+        else
+            echo -e "${YELLOW}⚠${NC} Git pre-commit hook already installed (use --update to refresh)"
+        fi
     else
         # Backup existing hook
         mkdir -p "$BACKUP_BASE_DIR"
