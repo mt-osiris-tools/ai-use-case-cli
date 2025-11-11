@@ -2,7 +2,7 @@
 # AI Use Case CLI - Self Update
 # Updates the CLI installation to the latest version from git
 
-set -e
+set -euo pipefail
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -127,8 +127,8 @@ echo -e "${BLUE}Checking for updates...${NC}"
 git fetch origin --quiet
 
 # Get remote version
-REMOTE_COMMIT=$(git rev-parse --short origin/$CURRENT_BRANCH)
-REMOTE_VERSION=$(git show origin/$CURRENT_BRANCH:scripts/utils/version.sh 2>/dev/null | grep 'export CLI_VERSION=' | head -1 | cut -d'"' -f2 || echo "unknown")
+REMOTE_COMMIT=$(git rev-parse --short "origin/$CURRENT_BRANCH")
+REMOTE_VERSION=$(git show "origin/$CURRENT_BRANCH:scripts/utils/version.sh" 2>/dev/null | grep 'export CLI_VERSION=' | head -1 | cut -d'"' -f2 || echo "unknown")
 
 # Check if update is needed
 if [ "$CURRENT_COMMIT" = "$REMOTE_COMMIT" ]; then
@@ -146,7 +146,7 @@ echo ""
 
 # Show changes
 echo -e "${CYAN}Changes:${NC}"
-git --no-pager log --oneline --pretty=format:"  %C(yellow)%h%C(reset) - %s %C(green)(%ar)%C(reset)" HEAD..origin/$CURRENT_BRANCH | head -10
+git --no-pager log --oneline --pretty=format:"  %C(yellow)%h%C(reset) - %s %C(green)(%ar)%C(reset)" HEAD..origin/"$CURRENT_BRANCH" | head -10
 echo ""
 echo ""
 
@@ -164,7 +164,7 @@ if [ "$AUTO_CONFIRM" = false ]; then
     echo -e "${YELLOW}Update CLI to version $REMOTE_VERSION?${NC}"
     read -p "[Y/n] " -n 1 -r
     echo ""
-    if [[ $REPLY =~ ^[Nn]$ ]]; then
+    if [[ ! $REPLY =~ ^[Yy]$ ]] && [[ ! -z $REPLY ]]; then
         echo "Update cancelled"
         exit 0
     fi
@@ -184,7 +184,10 @@ else
 fi
 
 # Pull latest changes
-if git pull origin $CURRENT_BRANCH --quiet; then
+NEW_VERSION="unknown"  # Initialize to prevent undefined variable errors
+NEW_COMMIT="unknown"
+
+if git pull origin "$CURRENT_BRANCH" --quiet; then
     NEW_COMMIT=$(git rev-parse --short HEAD)
     NEW_VERSION=$(grep 'export CLI_VERSION=' "$CLI_ROOT/scripts/utils/version.sh" 2>/dev/null | head -1 | cut -d'"' -f2 || echo "unknown")
 
@@ -228,12 +231,13 @@ if [ "$UPDATE_PROJECTS" = true ]; then
 
             for project_path in $OUTDATED_PROJECTS; do
                 echo -e "${CYAN}Updating: $project_path${NC}"
-                if bash "$CLI_ROOT/scripts/project/update-project.sh" -y "$project_path" 2>&1 | grep -E "(✓|✗|Updated|Error)"; then
-                    echo ""
-                else
+                UPDATE_OUTPUT=$(bash "$CLI_ROOT/scripts/project/update-project.sh" -y "$project_path" 2>&1)
+                UPDATE_EXIT=$?
+                echo "$UPDATE_OUTPUT"
+                if [ $UPDATE_EXIT -ne 0 ]; then
                     echo -e "${RED}✗ Failed to update project${NC}"
-                    echo ""
                 fi
+                echo ""
             done
 
             echo -e "${GREEN}✓ Project updates complete${NC}"
