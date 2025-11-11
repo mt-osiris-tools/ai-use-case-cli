@@ -131,7 +131,6 @@ while IFS= read -r project_json; do
     if [ -n "$project_json" ]; then
         outdated_count=$((outdated_count + 1))
 
-        local path name version installed updated
         path=$(echo "$project_json" | jq -r '.key')
         name=$(echo "$project_json" | jq -r '.value.name')
         version=$(echo "$project_json" | jq -r '.value.version')
