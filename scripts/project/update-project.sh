@@ -231,8 +231,8 @@ echo ""
 echo -e "${BLUE}Running setup script...${NC}"
 echo ""
 
-# Run setup script
-if "$SCRIPT_DIR/setup-project.sh" "$PROJECT_PATH"; then
+# Run setup script with --update flag
+if "$SCRIPT_DIR/setup-project.sh" --update "$PROJECT_PATH"; then
     echo ""
     echo -e "${GREEN}=== Update Complete! ===${NC}"
     echo ""

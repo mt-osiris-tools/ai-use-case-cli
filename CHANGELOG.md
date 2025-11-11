@@ -24,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed invalid `local` keyword usage outside of function (line 134)
   - Variables declared in while loop no longer cause script to fail
   - Affects `ai-use-case check-updates` command
+- **Update Project Script**: Fixed `update-project.sh` to pass `--update` flag to setup script
+  - Update script now calls `setup-project.sh --update` instead of just passing project path
+  - Ensures components (slash commands and hooks) are properly refreshed during updates
+  - Fixes update failures where setup script would skip already-installed components
+  - Resolves integration issue between update workflow and new --update flag feature (v3.7.0+)
 
 ## [3.7.0] - 2025-11-10
 
