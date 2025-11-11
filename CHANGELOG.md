@@ -18,6 +18,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Usage: `ai-use-case --init --update` or `./scripts/project/setup-project.sh --update`
   - Helpful message when components already exist: suggests using `--update` to refresh
 
+### Changed
+
+- **Document Session Command**: Filter by current git user only
+  - `/use-case:document-session` now shows only work by the current git user
+  - PR detection uses `gh pr list --author="$GH_USERNAME"` to filter PRs
+  - Commit detection uses `git log --author="$USER_EMAIL"` to filter commits
+  - Prevents showing work by other team members in documentation options
+  - Ensures users only document their own work sessions
+  - Added Key Principle #8: "Filter by Current User"
+
 ### Fixed
 
 - **Check Updates Script**: Fixed bash syntax error in `check-updates.sh`

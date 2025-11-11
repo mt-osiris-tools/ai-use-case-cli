@@ -30,18 +30,24 @@ Session types:
 
 #### 0.1: Detect Recent Undocumented Work
 
-Check for recent PRs and commits that haven't been documented yet:
+Check for recent PRs and commits by the **current git user** that haven't been documented yet:
 
 ```bash
-# Get recent merged PRs (last 24 hours)
-gh pr list --limit 20 --state merged --json number,title,mergedAt,headRefName,author --jq '.[] | select(.mergedAt | fromdateiso8601 > (now - 86400)) | "PR #\(.number): \(.title) (branch: \(.headRefName))"'
+# Get current user's git email and GitHub username
+USER_EMAIL=$(git config user.email)
+GH_USERNAME=$(gh api user --jq '.login' 2>/dev/null)
 
-# Get recent commits on current branch
-git log --since="24 hours ago" --pretty=format:"%h - %s (%ar)" --first-parent
+# Get recent merged PRs by current user (last 24 hours)
+gh pr list --limit 20 --state merged --author="$GH_USERNAME" --json number,title,mergedAt,headRefName,author --jq '.[] | select(.mergedAt | fromdateiso8601 > (now - 86400)) | "PR #\(.number): \(.title) (branch: \(.headRefName))"'
+
+# Get recent commits by current user on current branch
+git log --since="24 hours ago" --author="$USER_EMAIL" --pretty=format:"%h - %s (%ar)" --first-parent
 
 # Check existing documentation
 ls -1 .usecase/cases/ 2>/dev/null | grep -E '^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{2}_.*\.md$'
 ```
+
+**IMPORTANT**: Only show work (PRs and commits) by the current git user. Do not show work by other team members.
 
 #### 0.2: Build Options List
 
@@ -145,15 +151,18 @@ If not set up, offer to run: `bash ~/.local/share/ai-use-case-cli/setup-project.
 
 ### Step 3: Determine Session Type
 
-Check for commits and file changes:
+Check for commits and file changes by the current user:
 ```bash
-# Check for recent commits
-git log --since="24 hours ago" --oneline | wc -l
+# Get current user's git email
+USER_EMAIL=$(git config user.email)
+
+# Check for recent commits by current user
+git log --since="24 hours ago" --author="$USER_EMAIL" --oneline | wc -l
 
 # Check for uncommitted changes
 git status --porcelain | wc -l
 
-# Check for any file modifications
+# Check for any file modifications in latest commit by current user
 git diff --name-only HEAD~1..HEAD 2>/dev/null || echo "No commits"
 ```
 
@@ -162,10 +171,13 @@ git diff --name-only HEAD~1..HEAD 2>/dev/null || echo "No commits"
 
 ### Step 4a: Analyze Git History (Implementation Session)
 
-Gather comprehensive git data (Run in parallel):
+Gather comprehensive git data for the current user (Run in parallel):
 ```bash
-# Recent commits with relative time
-git log --since="24 hours ago" --pretty=format:"%h - %s (%ar)" | head -20
+# Get current user's git email
+USER_EMAIL=$(git config user.email)
+
+# Recent commits by current user with relative time
+git log --since="24 hours ago" --author="$USER_EMAIL" --pretty=format:"%h - %s (%ar)" | head -20
 
 # Latest commit details and stats
 git show --stat HEAD
@@ -309,6 +321,7 @@ bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
 5. **Be Contextual**: Use conversation history to add qualitative insights
 6. **Be Professional**: Follow template structure, use proper formatting
 7. **Prioritize Implementation Over Research**: Real code changes and PRs should always be documented before research sessions
+8. **Filter by Current User**: Only show PRs and commits by the current git user - never show work by other team members
 
 ## Example Workflow
 
