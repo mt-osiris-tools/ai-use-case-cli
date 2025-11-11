@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **New Project Template Documents**: Comprehensive guides for replicating git workflow to new repositories
+  - `docs/NEW-PROJECT-SETUP-PROMPT.md`: Copy-paste ready prompt for AI assistants to set up repositories
+  - `docs/NEW-PROJECT-TEMPLATE.md`: Detailed manual setup guide with complete code examples
+  - Includes templates for CLAUDE.md, CONTRIBUTING.md, CHANGELOG.md, git hooks
+  - Provides automated setup script, testing instructions, and customization guide
+  - Helps users establish branch-based workflow and documentation standards in their own projects
+  - Makes it easy to replicate the AI Use Case CLI git workflow best practices
+
 - **Project Update Flag**: New `--update` flag for `setup-project.sh` and `ai-use-case --init`
   - Allows refreshing existing project installations with latest CLI components
   - Updates Claude Code slash commands with newer versions from CLI

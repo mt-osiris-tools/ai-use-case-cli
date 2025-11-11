@@ -417,6 +417,15 @@ We welcome contributions! This project follows a branch-based workflow with pull
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for complete guidelines.
 
+### Replicating the Workflow in Your Projects
+
+Want to use the same git workflow and documentation standards in your own projects? Check out these guides:
+
+- **[docs/NEW-PROJECT-SETUP-PROMPT.md](docs/NEW-PROJECT-SETUP-PROMPT.md)** - Copy-paste ready prompt for AI assistants to set up your repository with branch protection, git hooks, and documentation standards
+- **[docs/NEW-PROJECT-TEMPLATE.md](docs/NEW-PROJECT-TEMPLATE.md)** - Detailed manual setup guide with complete code examples, templates, and customization options
+
+These templates help you establish the same branch-based workflow, git hooks, CLAUDE.md guidance, and documentation requirements that this project uses.
+
 ## Requirements
 
 - **OS**: Linux, macOS, WSL on Windows
