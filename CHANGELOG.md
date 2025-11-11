@@ -18,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Usage: `ai-use-case --init --update` or `./scripts/project/setup-project.sh --update`
   - Helpful message when components already exist: suggests using `--update` to refresh
 
+### Fixed
+
+- **Check Updates Script**: Fixed bash syntax error in `check-updates.sh`
+  - Removed invalid `local` keyword usage outside of function (line 134)
+  - Variables declared in while loop no longer cause script to fail
+  - Affects `ai-use-case check-updates` command
+
 ## [3.7.0] - 2025-11-10
 
 ### Added
