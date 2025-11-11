@@ -315,10 +315,18 @@ if [ -f "$POST_COMMIT_HOOK" ]; then
             cp "$POST_COMMIT_HOOK" "$BACKUP_HOOK"
             echo -e "${BLUE}ℹ${NC} Existing post-commit hook backed up to: .claude/backups/$(basename "$BACKUP_HOOK")"
 
-            # Replace with fresh hook
-            cp "$POST_COMMIT_HOOK_SOURCE" "$POST_COMMIT_HOOK"
-            chmod +x "$POST_COMMIT_HOOK"
-            echo -e "${GREEN}✓${NC} Git post-commit hook updated"
+            # Check if existing hook is identical to our source (no customizations)
+            if cmp -s "$POST_COMMIT_HOOK" "$POST_COMMIT_HOOK_SOURCE"; then
+                # Safe to replace - hook contains only our code
+                cp "$POST_COMMIT_HOOK_SOURCE" "$POST_COMMIT_HOOK"
+                chmod +x "$POST_COMMIT_HOOK"
+                echo -e "${GREEN}✓${NC} Git post-commit hook updated"
+            else
+                # Hook has customizations - do not overwrite
+                echo -e "${YELLOW}⚠${NC} Git post-commit hook contains customizations"
+                echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes (backup created)"
+                echo -e "${BLUE}ℹ${NC} To manually update: compare $BACKUP_HOOK with $POST_COMMIT_HOOK_SOURCE"
+            fi
         else
             echo -e "${YELLOW}⚠${NC} Git post-commit hook already installed (use --update to refresh)"
         fi
@@ -352,10 +360,18 @@ if [ -f "$PRE_COMMIT_HOOK" ]; then
             cp "$PRE_COMMIT_HOOK" "$BACKUP_HOOK"
             echo -e "${BLUE}ℹ${NC} Existing pre-commit hook backed up to: .claude/backups/$(basename "$BACKUP_HOOK")"
 
-            # Replace with fresh hook
-            cp "$PRE_COMMIT_HOOK_SOURCE" "$PRE_COMMIT_HOOK"
-            chmod +x "$PRE_COMMIT_HOOK"
-            echo -e "${GREEN}✓${NC} Git pre-commit hook updated"
+            # Check if existing hook is identical to our source (no customizations)
+            if cmp -s "$PRE_COMMIT_HOOK" "$PRE_COMMIT_HOOK_SOURCE"; then
+                # Safe to replace - hook contains only our code
+                cp "$PRE_COMMIT_HOOK_SOURCE" "$PRE_COMMIT_HOOK"
+                chmod +x "$PRE_COMMIT_HOOK"
+                echo -e "${GREEN}✓${NC} Git pre-commit hook updated"
+            else
+                # Hook has customizations - do not overwrite
+                echo -e "${YELLOW}⚠${NC} Git pre-commit hook contains customizations"
+                echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes (backup created)"
+                echo -e "${BLUE}ℹ${NC} To manually update: compare $BACKUP_HOOK with $PRE_COMMIT_HOOK_SOURCE"
+            fi
         else
             echo -e "${YELLOW}⚠${NC} Git pre-commit hook already installed (use --update to refresh)"
         fi
