@@ -57,7 +57,7 @@ ${YELLOW}USAGE${NC}
   ai-use-case <command> [options]
 
 ${YELLOW}COMMANDS${NC}
-  ${GREEN}--init, init${NC}              Setup current project for use case tracking
+  ${GREEN}--init, init [--update]${NC}   Setup current project (use --update to refresh)
   ${GREEN}config [show|reconfigure]${NC} Show or reconfigure hub settings
   ${GREEN}sync${NC}                      Sync use cases from project to hub
   ${GREEN}search <term>${NC}             Search documented use cases
@@ -90,6 +90,7 @@ ${YELLOW}CLAUDE CODE INTEGRATION${NC}
 
 ${YELLOW}EXAMPLES${NC}
   ai-use-case --init              # Setup current project
+  ai-use-case --init --update     # Update project installation
   ai-use-case config show         # Show current hub configuration
   ai-use-case config reconfigure  # Change hub mode (local/private)
   ai-use-case sync                # Sync use cases to hub
@@ -132,7 +133,9 @@ case "${1:-}" in
         trace_event "command_start" "command=init" "args=$*"
         echo -e "${BLUE}Setting up project...${NC}"
         if [ -f "$SCRIPT_DIR/scripts/project/setup-project.sh" ]; then
-            trace_run "init" bash "$SCRIPT_DIR/scripts/project/setup-project.sh" .
+            # Pass through all remaining arguments (e.g., --update)
+            shift
+            trace_run "init" bash "$SCRIPT_DIR/scripts/project/setup-project.sh" "$@" .
         else
             trace_event "error" "command=init" "error=script_not_found" "script=setup-project.sh"
             echo -e "${RED}Error: setup-project.sh not found${NC}"

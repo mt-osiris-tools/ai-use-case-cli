@@ -22,6 +22,12 @@ ai-use-case --init              # Setup current project
                                # - Creates .usecase/ directory
                                # - Registers project in registry
                                # - Prompts for hub configuration
+
+ai-use-case --init --update    # Update existing project installation
+                               # - Refreshes Claude Code slash commands
+                               # - Updates git hooks (pre-commit, post-commit)
+                               # - Creates backups before updating
+                               # - Preserves existing documentation
 ```
 
 ### Configuration Management (v3.2.0+)

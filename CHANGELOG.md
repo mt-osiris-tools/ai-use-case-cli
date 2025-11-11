@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Project Update Flag**: New `--update` flag for `setup-project.sh` and `ai-use-case --init`
+  - Allows refreshing existing project installations with latest CLI components
+  - Updates Claude Code slash commands with newer versions from CLI
+  - Updates git hooks (pre-commit and post-commit) with latest versions
+  - Creates timestamped backups of hooks before updating
+  - Preserves existing `.usecase/cases/` directory and documentation
+  - Usage: `ai-use-case --init --update` or `./scripts/project/setup-project.sh --update`
+  - Helpful message when components already exist: suggests using `--update` to refresh
+
 ## [3.7.0] - 2025-11-10
 
 ### Added
