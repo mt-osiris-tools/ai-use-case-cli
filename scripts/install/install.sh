@@ -285,7 +285,7 @@ if [[ "$setup_hub" =~ ^[Yy]$ ]]; then
             echo '' >> "$SHELL_PROFILE"
             echo '# AI Use Case Hub' >> "$SHELL_PROFILE"
             echo "export AI_USECASES_DIR=\"$HUB_DIR\"" >> "$SHELL_PROFILE"
-            echo "export AI_USECASES_SYNC_SCRIPT=\"\$HOME/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh\"" >> "$SHELL_PROFILE"
+            echo "export AI_USECASES_SYNC_SCRIPT=\"$INSTALL_DIR/scripts/core/sync-ai-use-cases.sh\"" >> "$SHELL_PROFILE"
             echo -e "${GREEN}✓${NC} Added AI_USECASES_DIR and AI_USECASES_SYNC_SCRIPT to $SHELL_PROFILE"
         else
             echo -e "${YELLOW}AI_USECASES_DIR already in $SHELL_PROFILE${NC}"
@@ -296,7 +296,7 @@ if [[ "$setup_hub" =~ ^[Yy]$ ]]; then
                     echo '' >> "$SHELL_PROFILE"
                     echo '# AI Use Case Hub' >> "$SHELL_PROFILE"
                 fi
-                echo "export AI_USECASES_SYNC_SCRIPT=\"\$HOME/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh\"" >> "$SHELL_PROFILE"
+                echo "export AI_USECASES_SYNC_SCRIPT=\"$INSTALL_DIR/scripts/core/sync-ai-use-cases.sh\"" >> "$SHELL_PROFILE"
                 echo -e "${GREEN}✓${NC} Added AI_USECASES_SYNC_SCRIPT to $SHELL_PROFILE"
             fi
         fi
@@ -304,13 +304,13 @@ if [[ "$setup_hub" =~ ^[Yy]$ ]]; then
         echo -e "${YELLOW}⚠ No .bashrc or .zshrc found${NC}"
         echo -e "${BLUE}ℹ${NC} Add these to your shell profile manually:"
         echo -e "${CYAN}export AI_USECASES_DIR=\"$HUB_DIR\"${NC}"
-        echo -e "${CYAN}export AI_USECASES_SYNC_SCRIPT=\"\$HOME/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh\"${NC}"
+        echo -e "${CYAN}export AI_USECASES_SYNC_SCRIPT=\"$INSTALL_DIR/scripts/core/sync-ai-use-cases.sh\"${NC}"
     fi
 else
     echo -e "${YELLOW}Skipped hub setup.${NC} You can set it up later with:"
     echo -e "  ${CYAN}git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git ~/Documents/ai-use-case-hub${NC}"
     echo -e "  ${CYAN}export AI_USECASES_DIR=\"\$HOME/Documents/ai-use-case-hub\"${NC}"
-    echo -e "  ${CYAN}export AI_USECASES_SYNC_SCRIPT=\"\$HOME/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh\"${NC}"
+    echo -e "  ${CYAN}export AI_USECASES_SYNC_SCRIPT=\"$INSTALL_DIR/scripts/core/sync-ai-use-cases.sh\"${NC}"
 fi
 
 echo ""

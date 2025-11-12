@@ -7,15 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-
-- **Confluence Page Naming**: Updated page title format for better readability
-  - New format: `🎯 Week XX | TICKET-ID: Description`
-  - Example: `🎯 Week 45 | LSFB-63590: Remove Deprecated Document Handler Exchange Queue Parameter`
-  - More concise than previous `YYYY-Www-MM-DD_TICKET-XXX: Description` format
-  - Highlights week number prominently with emoji indicator
-  - Updated `scripts/core/publish-confluence.sh` `extract_title()` function
-
 ## [3.7.1] - 2025-11-11
 
 ### Added
@@ -43,6 +34,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Confluence Page Naming**: Updated page title format for better readability
+  - New format: `🎯 Week XX | TICKET-ID: Description`
+  - Example: `🎯 Week 45 | LSFB-63590: Remove Deprecated Document Handler Exchange Queue Parameter`
+  - More concise than previous `YYYY-Www-MM-DD_TICKET-XXX: Description` format
+  - Highlights week number prominently with emoji indicator
+  - Updated `scripts/core/publish-confluence.sh` `extract_title()` function
 - **Document Session Command**: Enhanced research session detection and user filtering
   - **User Filtering**: Now shows only work by the current git user
     - PR detection uses `gh pr list --author="$GH_USERNAME"` to filter PRs
