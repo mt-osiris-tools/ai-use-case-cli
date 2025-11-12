@@ -291,6 +291,11 @@ if [[ "$setup_hub" =~ ^[Yy]$ ]]; then
             echo -e "${YELLOW}AI_USECASES_DIR already in $SHELL_PROFILE${NC}"
             # Check if sync script env var is also present
             if ! grep -q "AI_USECASES_SYNC_SCRIPT" "$SHELL_PROFILE"; then
+                # Ensure section header exists before adding sync script
+                if ! grep -q "# AI Use Case Hub" "$SHELL_PROFILE"; then
+                    echo '' >> "$SHELL_PROFILE"
+                    echo '# AI Use Case Hub' >> "$SHELL_PROFILE"
+                fi
                 echo "export AI_USECASES_SYNC_SCRIPT=\"\$HOME/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh\"" >> "$SHELL_PROFILE"
                 echo -e "${GREEN}✓${NC} Added AI_USECASES_SYNC_SCRIPT to $SHELL_PROFILE"
             fi
