@@ -295,6 +295,11 @@ if [[ "$setup_hub" =~ ^[Yy]$ ]]; then
                 echo -e "${GREEN}✓${NC} Added AI_USECASES_SYNC_SCRIPT to $SHELL_PROFILE"
             fi
         fi
+    else
+        echo -e "${YELLOW}⚠ No .bashrc or .zshrc found${NC}"
+        echo -e "${BLUE}ℹ${NC} Add these to your shell profile manually:"
+        echo -e "${CYAN}export AI_USECASES_DIR=\"$HUB_DIR\"${NC}"
+        echo -e "${CYAN}export AI_USECASES_SYNC_SCRIPT=\"\$HOME/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh\"${NC}"
     fi
 else
     echo -e "${YELLOW}Skipped hub setup.${NC} You can set it up later with:"

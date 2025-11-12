@@ -272,10 +272,12 @@ sed "s/^export CLI_VERSION=\".*\"/export CLI_VERSION=\"${NEW_VERSION}\"/" "$VERS
 mv "$TEMP_VERSION_FILE" "$VERSION_FILE"
 echo -e "${GREEN}✓${NC} version.sh updated"
 
+# Calculate current date once for all updates
+CURRENT_DATE=$(date +%Y-%m-%d)
+
 # Step 2: Update README.md
 echo -e "${CYAN}[2/6]${NC} Updating README.md..."
 README_FILE="$CLI_ROOT/README.md"
-CURRENT_DATE=$(date +%Y-%m-%d)
 
 if [ -f "$README_FILE" ]; then
     TEMP_README_FILE=$(mktemp)
@@ -293,7 +295,6 @@ fi
 
 # Step 3: Update CHANGELOG.md
 echo -e "${CYAN}[3/6]${NC} Updating CHANGELOG.md..."
-CURRENT_DATE=$(date +%Y-%m-%d)
 
 # Create temporary file for CHANGELOG update
 TEMP_FILE=$(mktemp)
