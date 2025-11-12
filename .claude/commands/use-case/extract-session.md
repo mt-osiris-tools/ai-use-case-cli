@@ -294,7 +294,7 @@ This extracted data directly supports:
     "totalTokens": 104687,
     "contextTokens": 1000000,
     "cacheHits": 8,
-    "estimatedCostUSD": "0.43"
+    "estimatedCostUSD": "0.4303"
   },
   "calculatedMetrics": {
     "estimatedInteractions": 35,
