@@ -60,7 +60,7 @@ OUTPUT_FILE="/tmp/session-data-${SESSION_DATE}.json"
 
 Execute the extraction script with robust error handling:
 ```bash
-# Run extraction and capture exit code
+# Run extraction
 bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . <hours> json \
   --token-input <INPUT_TOKENS> \
   --token-output <OUTPUT_TOKENS> \
@@ -68,13 +68,19 @@ bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . <hour
   --cost <ESTIMATED_COST> \
   -o "$OUTPUT_FILE"
 
+# Capture exit code immediately after command
 EXIT_CODE=$?
 
 # Handle exit codes
 if [ $EXIT_CODE -eq 0 ] || [ $EXIT_CODE -eq 141 ]; then
   echo "✓ Extraction completed successfully"
   # Display the results
-  cat "$OUTPUT_FILE"
+  if [ -f "$OUTPUT_FILE" ]; then
+    cat "$OUTPUT_FILE"
+  else
+    echo "✗ Output file '$OUTPUT_FILE' not found. Extraction may have failed or produced no output."
+    exit 1
+  fi
 elif [ $EXIT_CODE -eq 2 ]; then
   echo "✗ Syntax error - check command formatting"
   exit $EXIT_CODE
@@ -90,7 +96,7 @@ fi
 **Important Notes**:
 - Exit code 141 (SIGPIPE) is **SUCCESS** - occurs when output pipe closes early
 - Exit code 0 is standard success
-- Always use the `|| EXIT_CODE=$?` pattern to capture the code before handling
+- Always assign the exit code immediately after running the command: `EXIT_CODE=$?`
 - Pre-generate ALL dynamic filenames to avoid bash substitution issues
 
 ### Step 5: Present Results
@@ -100,7 +106,7 @@ fi
 #### Session Summary Template
 
 ```text
-📊 Session Extract - <Project Name>
+📊 Session Extract - PROJECT-NAME
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Git Activity:
@@ -216,7 +222,12 @@ bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . 8 jso
 EXIT_CODE=$?
 if [ $EXIT_CODE -eq 0 ] || [ $EXIT_CODE -eq 141 ]; then
   echo "✓ Extraction completed successfully"
-  cat "$OUTPUT_FILE"
+  if [ -f "$OUTPUT_FILE" ]; then
+    cat "$OUTPUT_FILE"
+  else
+    echo "✗ Output file '$OUTPUT_FILE' not found. Extraction may have failed or produced no output."
+    exit 1
+  fi
 else
   echo "✗ Extraction failed with exit code $EXIT_CODE"
   exit $EXIT_CODE
@@ -251,7 +262,12 @@ bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . 8 mar
 
 EXIT_CODE=$?
 if [ $EXIT_CODE -eq 0 ] || [ $EXIT_CODE -eq 141 ]; then
-  cat "$OUTPUT_FILE"
+  if [ -f "$OUTPUT_FILE" ]; then
+    cat "$OUTPUT_FILE"
+  else
+    echo "✗ Output file '$OUTPUT_FILE' not found. Extraction may have failed or produced no output."
+    exit 1
+  fi
 fi
 ```
 
