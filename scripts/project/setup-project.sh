@@ -175,6 +175,15 @@ echo "Project: $PROJECT_NAME"
 echo "Path: $PROJECT_PATH"
 echo ""
 
+# Validate environment configuration
+if [ -z "$AI_USECASES_SYNC_SCRIPT" ]; then
+    echo -e "${YELLOW}⚠ Warning: AI_USECASES_SYNC_SCRIPT environment variable not set${NC}"
+    echo -e "${BLUE}ℹ${NC} Post-commit hooks may not work correctly after repository separation"
+    echo -e "${BLUE}ℹ${NC} Add to your shell profile (~/.bashrc or ~/.zshrc):"
+    echo -e "${CYAN}export AI_USECASES_SYNC_SCRIPT=\"\$HOME/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh\"${NC}"
+    echo ""
+fi
+
 # Check for old structure and migrate if needed
 OLD_USECASES_DIR="$PROJECT_PATH/docs/ai-use-cases"
 AI_USECASES_DIR="$PROJECT_PATH/.usecase/cases"
