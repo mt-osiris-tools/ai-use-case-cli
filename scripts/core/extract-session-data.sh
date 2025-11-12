@@ -226,8 +226,11 @@ UNCOMMITTED_DELETED=$(git status --short | grep '^ D' | awk '{print $2}' | jq -R
 
 # Calculate session duration
 if [ "$TOTAL_COMMITS" -gt 0 ]; then
+    # Temporarily disable pipefail to avoid SIGPIPE from head -1
+    set +o pipefail
     FIRST_COMMIT_TIME=$(git log --since="${SINCE_DATE}" --reverse --pretty=format:'%at' | head -1)
     LAST_COMMIT_TIME=$(git log --since="${SINCE_DATE}" --pretty=format:'%at' | head -1)
+    set -o pipefail
     DURATION_SECONDS=$((LAST_COMMIT_TIME - FIRST_COMMIT_TIME))
     # Use shell arithmetic for hours and minutes (no external dependencies)
     DURATION_HOURS=$((DURATION_SECONDS / 3600))
@@ -264,6 +267,15 @@ EXTRACTED_AT=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
 
 # Detect AI tool (default to Claude Code if in Claude Code context)
 AI_TOOL="Claude Code (Sonnet 4.5)"
+
+# Pre-capture recent commits for markdown (avoid SIGPIPE in heredoc)
+if [ "$TOTAL_COMMITS" -gt 0 ]; then
+    set +o pipefail
+    RECENT_COMMITS=$(git log --since="${SINCE_DATE}" --pretty=format:'- %h - %s (%ar) - %an' | head -10)
+    set -o pipefail
+else
+    RECENT_COMMITS="No commits in time window"
+fi
 
 # Generate output
 if [ "$OUTPUT_FORMAT" = "json" ]; then
@@ -348,7 +360,7 @@ else
 - **Net Change:** $NET_LINES lines
 
 ### Recent Commits
-$(git log --since="${SINCE_DATE}" --pretty=format:'- %h - %s (%ar) - %an' | head -10)
+$RECENT_COMMITS
 
 ---
 
