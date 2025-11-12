@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.7.1] - 2025-11-11
+
 ### Added
 
 - **Self-Update Command**: New `ai-use-case update` command for automated CLI updates
@@ -32,6 +34,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Confluence Page Naming**: Updated page title format for better readability
+  - New format: `🎯 Week XX | TICKET-ID: Description`
+  - Example: `🎯 Week 45 | LSFB-63590: Remove Deprecated Document Handler Exchange Queue Parameter`
+  - More concise than previous `YYYY-Www-MM-DD_TICKET-XXX: Description` format
+  - Highlights week number prominently with emoji indicator
+  - Updated `scripts/core/publish-confluence.sh` `extract_title()` function
 - **Document Session Command**: Enhanced research session detection and user filtering
   - **User Filtering**: Now shows only work by the current git user
     - PR detection uses `gh pr list --author="$GH_USERNAME"` to filter PRs
@@ -60,6 +68,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Post-Commit Hook Sync Script Path**: Fixed sync script not found after repository separation
+  - **Root Cause**: After separating CLI tools from hub repo (commit f9ab996), sync script moved from `~/Documents/ai-use-case-hub/sync-ai-use-cases.sh` to `~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh`
+  - **Impact**: Post-commit hooks in existing projects failed to sync use cases because they looked for script in old location
+  - **Solution**:
+    - `install.sh` now automatically adds `AI_USECASES_SYNC_SCRIPT` environment variable to shell profile
+    - Handles both new installs and existing installations (adds missing variable if needed)
+    - `setup-project.sh` validates environment is configured and warns if variable is missing
+  - **Benefit**: Post-commit hooks now work correctly for all users (new and existing)
+  - Files modified: `scripts/install/install.sh`, `scripts/project/setup-project.sh`
 - **Check Updates Script**: Fixed bash syntax error in `check-updates.sh`
   - Removed invalid `local` keyword usage outside of function (line 134)
   - Variables declared in while loop no longer cause script to fail

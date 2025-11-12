@@ -18,7 +18,7 @@
 # 4. Commit with message: "chore: bump version to X.Y.Z"
 
 # Current CLI version
-export CLI_VERSION="3.7.0"
+export CLI_VERSION="3.7.1"
 
 # Version history (for reference)
 # 3.7.0 - 2025-11-10 - Reset command and critical tracing fixes

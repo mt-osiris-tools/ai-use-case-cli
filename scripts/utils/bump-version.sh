@@ -79,10 +79,11 @@ ${CYAN}What it does:${NC}
   1. Parses current version from version.sh
   2. Calculates new version based on bump type
   3. Updates version.sh with new version
-  4. Updates CHANGELOG.md (moves Unreleased to versioned section)
-  5. Creates git commit with conventional commit message
-  6. Creates git tag (vX.Y.Z)
-  7. Pushes commit and tag to remote
+  4. Updates README.md header and footer (version + date)
+  5. Updates CHANGELOG.md (moves Unreleased to versioned section)
+  6. Creates git commit with conventional commit message
+  7. Creates git tag (vX.Y.Z)
+  8. Pushes commit and tag to remote
 
 ${CYAN}Workflow:${NC}
   • Must be run from a clean git working directory
@@ -231,14 +232,15 @@ fi
 # Preview changes
 echo -e "${BOLD}Changes to be made:${NC}"
 echo -e "  ${CYAN}1.${NC} Update version.sh: CLI_VERSION=\"${CURRENT_VERSION}\" -> \"${NEW_VERSION}\""
-echo -e "  ${CYAN}2.${NC} Update CHANGELOG.md: Move [Unreleased] to [${NEW_VERSION}] with date"
+echo -e "  ${CYAN}2.${NC} Update README.md: Header and footer version/date"
+echo -e "  ${CYAN}3.${NC} Update CHANGELOG.md: Move [Unreleased] to [${NEW_VERSION}] with date"
 if [ "$NO_COMMIT" = false ]; then
-    echo -e "  ${CYAN}3.${NC} Create git commit: 'chore: bump version to ${NEW_VERSION}'"
+    echo -e "  ${CYAN}4.${NC} Create git commit: 'chore: bump version to ${NEW_VERSION}'"
     if [ "$NO_TAG" = false ]; then
-        echo -e "  ${CYAN}4.${NC} Create git tag: v${NEW_VERSION}"
+        echo -e "  ${CYAN}5.${NC} Create git tag: v${NEW_VERSION}"
     fi
     if [ "$NO_PUSH" = false ]; then
-        echo -e "  ${CYAN}5.${NC} Push to remote: origin/${CURRENT_BRANCH} with tags"
+        echo -e "  ${CYAN}6.${NC} Push to remote: origin/${CURRENT_BRANCH} with tags"
     fi
 fi
 echo ""
@@ -263,16 +265,36 @@ echo -e "${BLUE}Applying changes...${NC}"
 echo ""
 
 # Step 1: Update version.sh
-echo -e "${CYAN}[1/5]${NC} Updating version.sh..."
+echo -e "${CYAN}[1/6]${NC} Updating version.sh..."
 # Use portable sed approach (works on both macOS and Linux)
 TEMP_VERSION_FILE=$(mktemp)
 sed "s/^export CLI_VERSION=\".*\"/export CLI_VERSION=\"${NEW_VERSION}\"/" "$VERSION_FILE" > "$TEMP_VERSION_FILE"
 mv "$TEMP_VERSION_FILE" "$VERSION_FILE"
 echo -e "${GREEN}✓${NC} version.sh updated"
 
-# Step 2: Update CHANGELOG.md
-echo -e "${CYAN}[2/5]${NC} Updating CHANGELOG.md..."
+# Calculate current date once for all updates
 CURRENT_DATE=$(date +%Y-%m-%d)
+
+# Step 2: Update README.md
+echo -e "${CYAN}[2/6]${NC} Updating README.md..."
+README_FILE="$CLI_ROOT/README.md"
+
+if [ -f "$README_FILE" ]; then
+    TEMP_README_FILE=$(mktemp)
+    # Update header version (line 4)
+    sed "s/<strong>v[0-9]\+\.[0-9]\+\.[0-9]\+<\/strong>/<strong>v${NEW_VERSION}<\/strong>/" "$README_FILE" | \
+    # Update footer version
+    sed "s/\*\*Version\*\*: [0-9]\+\.[0-9]\+\.[0-9]\+/**Version**: ${NEW_VERSION}/" | \
+    # Update footer date
+    sed "s/\*\*Last Updated\*\*: [0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}/**Last Updated**: ${CURRENT_DATE}/" > "$TEMP_README_FILE"
+    mv "$TEMP_README_FILE" "$README_FILE"
+    echo -e "${GREEN}✓${NC} README.md updated (header and footer)"
+else
+    echo -e "${YELLOW}⚠${NC} README.md not found, skipping"
+fi
+
+# Step 3: Update CHANGELOG.md
+echo -e "${CYAN}[3/6]${NC} Updating CHANGELOG.md..."
 
 # Create temporary file for CHANGELOG update
 TEMP_FILE=$(mktemp)
@@ -291,27 +313,28 @@ awk -v new_version="$NEW_VERSION" -v current_date="$CURRENT_DATE" '
 mv "$TEMP_FILE" "$CHANGELOG_FILE"
 echo -e "${GREEN}✓${NC} CHANGELOG.md updated"
 
-# Step 3: Commit changes
+# Step 4: Commit changes
 if [ "$NO_COMMIT" = false ]; then
-    echo -e "${CYAN}[3/5]${NC} Creating git commit..."
-    git add "$VERSION_FILE" "$CHANGELOG_FILE"
+    echo -e "${CYAN}[4/6]${NC} Creating git commit..."
+    git add "$VERSION_FILE" "$README_FILE" "$CHANGELOG_FILE"
     git commit -m "chore: bump version to ${NEW_VERSION}" -m "Automated version bump from ${CURRENT_VERSION} to ${NEW_VERSION}.
 
 Updates:
 - version.sh: CLI_VERSION updated
+- README.md: Header and footer version/date updated
 - CHANGELOG.md: Unreleased section moved to ${NEW_VERSION}"
     echo -e "${GREEN}✓${NC} Commit created"
 
-    # Step 4: Create tag
+    # Step 5: Create tag
     if [ "$NO_TAG" = false ]; then
-        echo -e "${CYAN}[4/5]${NC} Creating git tag..."
+        echo -e "${CYAN}[5/6]${NC} Creating git tag..."
         git tag -a "v${NEW_VERSION}" -m "Release version ${NEW_VERSION}"
         echo -e "${GREEN}✓${NC} Tag v${NEW_VERSION} created"
     fi
 
-    # Step 5: Push to remote
+    # Step 6: Push to remote
     if [ "$NO_PUSH" = false ]; then
-        echo -e "${CYAN}[5/5]${NC} Pushing to remote..."
+        echo -e "${CYAN}[6/6]${NC} Pushing to remote..."
 
         # Push commit
         git push origin "$CURRENT_BRANCH"

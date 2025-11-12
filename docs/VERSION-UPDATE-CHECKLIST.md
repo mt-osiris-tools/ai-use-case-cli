@@ -135,14 +135,14 @@ ai-use-case bump-version 3.5.0
 
 **What it automates**:
 - ✅ Updates `scripts/utils/version.sh`
-- ✅ Updates `README.md` (both locations)
-- ✅ Prompts for CHANGELOG.md update
-- ✅ Runs version consistency validator
+- ✅ Updates `README.md` (header version, footer version, and footer date)
+- ✅ Updates `CHANGELOG.md` (moves [Unreleased] to new version section with date)
 - ✅ Creates git commit with version bump message
 - ✅ Creates git tag
+- ✅ Pushes to remote (with --no-push to skip)
 
 **What it does NOT automate** (manual check required):
-- ❌ CHANGELOG.md content (you must write release notes)
+- ❌ CHANGELOG.md content (you must write release notes in [Unreleased] section BEFORE bumping)
 - ❌ Version-specific feature documentation in docs/COMMANDS.md
 - ❌ Version-specific feature documentation in docs/CLAUDE.md
 - ❌ Historical version references (should not be changed)
@@ -267,8 +267,8 @@ Before creating any PR:
 | File | Lines | Purpose | Auto-Updated by bump-version.sh | Validated by validate-versions.sh |
 |------|-------|---------|----------------------------------|-----------------------------------|
 | `scripts/utils/version.sh` | 21 | Source of truth | ✅ Yes | ✅ Yes |
-| `README.md` | 4, 353 | User-facing docs | ✅ Yes (header), Manual (footer date) | ✅ Yes |
-| `CHANGELOG.md` | Top | Release history | ⚠️ Prompts only (manual content) | ✅ Yes |
+| `README.md` | 4, footer | User-facing docs | ✅ Yes (header + footer version + date) | ✅ Yes |
+| `CHANGELOG.md` | Top | Release history | ✅ Yes (structure), ❌ No (content - must be in [Unreleased] first) | ✅ Yes |
 | `docs/COMMANDS.md` | Various | Command reference with version markers | ❌ No (manual) | ✅ Yes |
 | `docs/CLAUDE.md` | Various | Developer guide with version markers | ❌ No (manual) | ✅ Yes |
 | `ai-use-case` (main script) | N/A | CLI entry point | ✅ Auto (sources version.sh) | N/A |
