@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Confluence Page Naming**: Updated page title format for better readability
+  - New format: `🎯 Week XX | TICKET-ID: Description`
+  - Example: `🎯 Week 45 | LSFB-63590: Remove Deprecated Document Handler Exchange Queue Parameter`
+  - More concise than previous `YYYY-Www-MM-DD_TICKET-XXX: Description` format
+  - Highlights week number prominently with emoji indicator
+  - Updated `scripts/core/publish-confluence.sh` `extract_title()` function
+
 ## [3.7.1] - 2025-11-11
 
 ### Added
