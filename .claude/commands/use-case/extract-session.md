@@ -45,36 +45,61 @@ Context: 1000000 tokens
 
 ### Step 4: Run Extraction with Token Data
 
-Execute the extraction script with captured token data:
-```bash
-bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . <hours> json \
-  --token-input <INPUT_TOKENS> \
-  --token-output <OUTPUT_TOKENS> \
-  --context-total <CONTEXT_SIZE> \
-  --cost <ESTIMATED_COST> || {
-  EXIT_CODE=$?
-  if [ $EXIT_CODE -eq 141 ]; then
-    echo "✓ Extraction completed successfully"
-  else
-    echo "✗ Extraction failed with exit code $EXIT_CODE"
-    exit $EXIT_CODE
-  fi
-}
-```
-
 **Calculate cost** (Sonnet 4.5 pricing as of 2025):
 - Input: $3 per 1M tokens
 - Output: $15 per 1M tokens
 - Formula: `cost = (input * 3 / 1000000) + (output * 15 / 1000000)`
+- **Use 4 decimal precision** for accuracy (e.g., 0.1068 not 0.11)
 
-**Note**: Exit code 141 (SIGPIPE) is normal when piping to `head` or similar commands. The script has completed successfully.
+**CRITICAL**: Pre-generate filenames to avoid command substitution failures:
+```bash
+# Generate timestamp-based filename BEFORE calling script
+SESSION_DATE=$(date +%Y-%m-%d)
+OUTPUT_FILE="/tmp/session-data-${SESSION_DATE}.json"
+```
+
+Execute the extraction script with robust error handling:
+```bash
+# Run extraction and capture exit code
+bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . <hours> json \
+  --token-input <INPUT_TOKENS> \
+  --token-output <OUTPUT_TOKENS> \
+  --context-total <CONTEXT_SIZE> \
+  --cost <ESTIMATED_COST> \
+  -o "$OUTPUT_FILE"
+
+EXIT_CODE=$?
+
+# Handle exit codes
+if [ $EXIT_CODE -eq 0 ] || [ $EXIT_CODE -eq 141 ]; then
+  echo "✓ Extraction completed successfully"
+  # Display the results
+  cat "$OUTPUT_FILE"
+elif [ $EXIT_CODE -eq 2 ]; then
+  echo "✗ Syntax error - check command formatting"
+  exit $EXIT_CODE
+elif [ $EXIT_CODE -eq 127 ]; then
+  echo "✗ Script not found - check installation"
+  exit $EXIT_CODE
+else
+  echo "✗ Extraction failed with exit code $EXIT_CODE"
+  exit $EXIT_CODE
+fi
+```
+
+**Important Notes**:
+- Exit code 141 (SIGPIPE) is **SUCCESS** - occurs when output pipe closes early
+- Exit code 0 is standard success
+- Always use the `|| EXIT_CODE=$?` pattern to capture the code before handling
+- Pre-generate ALL dynamic filenames to avoid bash substitution issues
 
 ### Step 5: Present Results
 
-After extraction, present the data in a clear, actionable format:
+**MANDATORY**: After successful extraction, ALWAYS present the data in a clear, actionable format. Parse the JSON output and create a human-readable summary.
 
-#### Session Summary
-```
+#### Session Summary Template
+
+```text
 📊 Session Extract - <Project Name>
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -82,31 +107,58 @@ Git Activity:
   • Commits: X
   • Files Changed: Y
   • Lines: +A / -B
+  • Branch: <branch-name>
 
 Token Usage:
-  • Input: X tokens
-  • Output: Y tokens
-  • Total: Z tokens
-  • Cost: $X.XX USD
+  • Input: X,XXX tokens
+  • Output: Y,YYY tokens
+  • Total: Z,ZZZ tokens
+  • Cost: $X.XXXX USD
 
-Duration: X hours
-Estimated Interactions: ~Y
+Session Details:
+  • Duration: X hours
+  • Estimated Interactions: ~Y
+  • Time Window: Last X hours
+  • Extracted: YYYY-MM-DD HH:MM
+
+📁 Data saved to: /tmp/session-data-YYYY-MM-DD.json
 ```
+
+**Implementation Requirements**:
+- Parse the JSON output to extract actual values
+- Format numbers with commas for readability (e.g., 30,000 not 30000)
+- Always show 4 decimal places for cost (e.g., $0.1068)
+- Include the output file path
+- Present this BEFORE Step 6
 
 ### Step 6: Offer Next Actions
 
-Provide helpful options:
-```
-What would you like to do with this data?
+**MANDATORY**: ALWAYS present these options after showing the session summary.
 
-1. 📁 Save to file (/tmp/session-data-YYYY-MM-DD.json)
-2. 📝 Generate AI use case documentation
-3. 📊 View detailed breakdown
-4. 📄 Export as markdown report (/tmp/session-report-YYYY-MM-DD.md)
-5. 🔍 Analyze patterns and insights
+```text
+What would you like to do next?
+
+1. 📝 Generate AI use case documentation from this session
+2. 📄 Export as markdown report
+3. 📊 View detailed commit breakdown
+4. 🔍 Analyze patterns and insights
+5. ✅ Done - session data saved
 ```
 
-**Implementation note**: When saving to file, use pre-generated filenames to avoid command substitution issues in bash commands.
+**Interactive Flow**:
+- Wait for user to select an option
+- Implement the selected action
+- For option 1: Use `/use-case:document-session`
+- For option 2: Generate markdown using the extracted data
+- For option 3: Show detailed git commit history
+- For option 4: Analyze metrics and provide insights
+- For option 5: Confirm completion
+
+**Implementation Notes**:
+- Use pre-generated filenames for all file operations
+- Never skip Step 5 or Step 6
+- If extraction succeeded but no output visible, read the file and present it
+- The user should always see both summary AND next actions
 
 ## Output Formats
 
@@ -143,38 +195,64 @@ Human-readable report with:
 
 ## Usage Examples
 
-**Auto-extract with current session tokens:**
+### Complete Extraction with Error Handling
+
+**Recommended Pattern** (used by `/use-case:extract-session`):
+
 ```bash
-# Claude Code will automatically populate token data
+# Step 1: Pre-generate filename
+SESSION_DATE=$(date +%Y-%m-%d)
+OUTPUT_FILE="/tmp/session-data-${SESSION_DATE}.json"
+
+# Step 2: Run extraction
 bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . 8 json \
   --token-input 95000 \
   --token-output 9687 \
   --context-total 1000000 \
-  --cost 0.43
+  --cost 0.4303 \
+  -o "$OUTPUT_FILE"
+
+# Step 3: Capture and handle exit code
+EXIT_CODE=$?
+if [ $EXIT_CODE -eq 0 ] || [ $EXIT_CODE -eq 141 ]; then
+  echo "✓ Extraction completed successfully"
+  cat "$OUTPUT_FILE"
+else
+  echo "✗ Extraction failed with exit code $EXIT_CODE"
+  exit $EXIT_CODE
+fi
 ```
 
-**Save to file:**
+### Simple Extraction (stdout)
+
 ```bash
-# Pre-generate filename to avoid command substitution issues
-OUTPUT_FILE="/tmp/session-data-$(date +%Y-%m-%d).json"
+# Direct output to stdout (no file)
 bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . 8 json \
   --token-input 95000 \
   --token-output 9687 \
-  --cost 0.43 \
-  -o "$OUTPUT_FILE"
-cat "$OUTPUT_FILE"
+  --context-total 1000000 \
+  --cost 0.4303
 ```
 
-**Generate markdown report:**
+### Markdown Report
+
 ```bash
-# Pre-generate filename to avoid command substitution issues
-OUTPUT_FILE="/tmp/session-report-$(date +%Y-%m-%d).md"
+# Pre-generate filename
+SESSION_DATE=$(date +%Y-%m-%d)
+OUTPUT_FILE="/tmp/session-report-${SESSION_DATE}.md"
+
+# Generate markdown
 bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . 8 markdown \
   --token-input 95000 \
   --token-output 9687 \
-  --cost 0.43 \
+  --context-total 1000000 \
+  --cost 0.4303 \
   -o "$OUTPUT_FILE"
-cat "$OUTPUT_FILE"
+
+EXIT_CODE=$?
+if [ $EXIT_CODE -eq 0 ] || [ $EXIT_CODE -eq 141 ]; then
+  cat "$OUTPUT_FILE"
+fi
 ```
 
 ## Integration with Documentation
@@ -243,11 +321,14 @@ This extracted data directly supports:
 - Prompt caching: Reduced cost for cached content
 
 **Example calculation:**
+
+```text
+Input: 95,000 tokens = 95,000 * $3 / 1,000,000 = $0.2850
+Output: 9,687 tokens = 9,687 * $15 / 1,000,000 = $0.1453
+Total: $0.4303
 ```
-Input: 95,000 tokens = 95,000 * $3 / 1,000,000 = $0.29
-Output: 9,687 tokens = 9,687 * $15 / 1,000,000 = $0.15
-Total: $0.44
-```
+
+**Precision matters**: Always use 4 decimal places to accurately track costs across multiple sessions.
 
 ## Error Handling
 
@@ -267,14 +348,29 @@ If extraction fails:
 - **Exit 2**: Syntax error in command (check command substitution and quoting)
 - **Exit 127**: Command not found (check script path)
 
-### Command Substitution Tips
+### Command Substitution Best Practices
 
-When using date in filenames:
+**ALWAYS** pre-generate dynamic values before passing to scripts:
+
 ```bash
-# ✓ CORRECT - Pre-generate filename
-OUTPUT_FILE="/tmp/session-$(date +%Y-%m-%d).json"
+# ✓ CORRECT - Pre-generate all dynamic values
+SESSION_DATE=$(date +%Y-%m-%d)
+SESSION_TIME=$(date +%H-%M-%S)
+OUTPUT_FILE="/tmp/session-${SESSION_DATE}-${SESSION_TIME}.json"
 bash script.sh -o "$OUTPUT_FILE"
 
-# ✗ WRONG - May fail when commands are processed through eval or similar contexts (e.g., Claude Code's command execution)
+# ✗ WRONG - Inline substitution may fail in certain execution contexts
 bash script.sh -o "/tmp/session-$(date +%Y-%m-%d).json"
 ```
+
+**Why this matters:**
+- Inline command substitution can fail in eval contexts or restricted shells
+- Pre-generation makes debugging easier (you can see the actual values)
+- Consistent pattern across all script invocations
+- Better error messages when paths are invalid
+
+**Apply this pattern to:**
+- Date/time stamps
+- Git commit hashes
+- Branch names
+- Any dynamic value used in paths or parameters
