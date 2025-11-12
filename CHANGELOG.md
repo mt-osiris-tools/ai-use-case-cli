@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Extract Session Command**: Improved error handling and command syntax
+  - Added proper handling for exit code 141 (SIGPIPE) - clarified this is normal, not an error
+  - Fixed command substitution syntax in examples that caused bash errors
+  - Pre-generate filenames before passing to script to avoid `$(date)` substitution issues
+  - Added comprehensive troubleshooting section with common exit codes
+  - Added command substitution tips showing correct vs incorrect patterns
+  - Updated examples to use `/tmp` paths and include `cat` commands
+  - Fixes issues where exit 141 was incorrectly treated as failure
+
 ## [3.7.1] - 2025-11-11
 
 ### Added
