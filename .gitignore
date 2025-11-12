@@ -30,3 +30,12 @@ Thumbs.db
 # Backup directories
 .claude/backups/
 __pycache__/
+
+# User data files (created during CLI usage)
+projects-registry.json
+config.json
+tracing.json
+
+# Python virtual environment (created by tracing setup)
+venv/
+*.pyc
