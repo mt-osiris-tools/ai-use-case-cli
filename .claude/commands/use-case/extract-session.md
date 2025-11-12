@@ -275,6 +275,6 @@ When using date in filenames:
 OUTPUT_FILE="/tmp/session-$(date +%Y-%m-%d).json"
 bash script.sh -o "$OUTPUT_FILE"
 
-# ✗ WRONG - Direct substitution may fail in some contexts
+# ✗ WRONG - May fail when commands are processed through eval or similar contexts (e.g., Claude Code's command execution)
 bash script.sh -o "/tmp/session-$(date +%Y-%m-%d).json"
 ```
