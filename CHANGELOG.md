@@ -62,6 +62,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Post-Commit Hook Sync Script Path**: Fixed sync script not found after repository separation
+  - **Root Cause**: After separating CLI tools from hub repo (commit f9ab996), sync script moved from `~/Documents/ai-use-case-hub/sync-ai-use-cases.sh` to `~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh`
+  - **Impact**: Post-commit hooks in existing projects failed to sync use cases because they looked for script in old location
+  - **Solution**:
+    - `install.sh` now automatically adds `AI_USECASES_SYNC_SCRIPT` environment variable to shell profile
+    - Handles both new installs and existing installations (adds missing variable if needed)
+    - `setup-project.sh` validates environment is configured and warns if variable is missing
+  - **Benefit**: Post-commit hooks now work correctly for all users (new and existing)
+  - Files modified: `scripts/install/install.sh`, `scripts/project/setup-project.sh`
 - **Check Updates Script**: Fixed bash syntax error in `check-updates.sh`
   - Removed invalid `local` keyword usage outside of function (line 134)
   - Variables declared in while loop no longer cause script to fail
