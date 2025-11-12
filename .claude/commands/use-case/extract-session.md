@@ -51,13 +51,23 @@ bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . <hour
   --token-input <INPUT_TOKENS> \
   --token-output <OUTPUT_TOKENS> \
   --context-total <CONTEXT_SIZE> \
-  --cost <ESTIMATED_COST>
+  --cost <ESTIMATED_COST> || {
+  EXIT_CODE=$?
+  if [ $EXIT_CODE -eq 141 ]; then
+    echo "✓ Extraction completed successfully"
+  else
+    echo "✗ Extraction failed with exit code $EXIT_CODE"
+    exit $EXIT_CODE
+  fi
+}
 ```
 
 **Calculate cost** (Sonnet 4.5 pricing as of 2025):
 - Input: $3 per 1M tokens
 - Output: $15 per 1M tokens
 - Formula: `cost = (input * 3 / 1000000) + (output * 15 / 1000000)`
+
+**Note**: Exit code 141 (SIGPIPE) is normal when piping to `head` or similar commands. The script has completed successfully.
 
 ### Step 5: Present Results
 
@@ -89,12 +99,14 @@ Provide helpful options:
 ```
 What would you like to do with this data?
 
-1. 📁 Save to file (session-data-2025-11-08.json)
+1. 📁 Save to file (/tmp/session-data-YYYY-MM-DD.json)
 2. 📝 Generate AI use case documentation
 3. 📊 View detailed breakdown
-4. 📄 Export as markdown report
+4. 📄 Export as markdown report (/tmp/session-report-YYYY-MM-DD.md)
 5. 🔍 Analyze patterns and insights
 ```
+
+**Implementation note**: When saving to file, use pre-generated filenames to avoid command substitution issues in bash commands.
 
 ## Output Formats
 
@@ -143,20 +155,26 @@ bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . 8 jso
 
 **Save to file:**
 ```bash
+# Pre-generate filename to avoid command substitution issues
+OUTPUT_FILE="/tmp/session-data-$(date +%Y-%m-%d).json"
 bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . 8 json \
   --token-input 95000 \
   --token-output 9687 \
   --cost 0.43 \
-  -o session-data-$(date +%Y-%m-%d).json
+  -o "$OUTPUT_FILE"
+cat "$OUTPUT_FILE"
 ```
 
 **Generate markdown report:**
 ```bash
+# Pre-generate filename to avoid command substitution issues
+OUTPUT_FILE="/tmp/session-report-$(date +%Y-%m-%d).md"
 bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . 8 markdown \
   --token-input 95000 \
   --token-output 9687 \
   --cost 0.43 \
-  -o session-report-$(date +%Y-%m-%d).md
+  -o "$OUTPUT_FILE"
+cat "$OUTPUT_FILE"
 ```
 
 ## Integration with Documentation
@@ -238,3 +256,25 @@ If extraction fails:
 2. **No commits**: Suggest manual documentation or wait for commits
 3. **Token data unavailable**: Use manual input or estimates
 4. **Script errors**: Check permissions and dependencies
+
+### Common Exit Codes
+
+- **Exit 0**: Successful extraction
+- **Exit 141 (SIGPIPE)**: Normal termination when output is piped and pipe closes early
+  - This is **NOT an error** - extraction completed successfully
+  - Occurs when piping to `head`, `less`, or similar commands
+  - The script finished writing all data, but the receiving end closed the pipe
+- **Exit 2**: Syntax error in command (check command substitution and quoting)
+- **Exit 127**: Command not found (check script path)
+
+### Command Substitution Tips
+
+When using date in filenames:
+```bash
+# ✓ CORRECT - Pre-generate filename
+OUTPUT_FILE="/tmp/session-$(date +%Y-%m-%d).json"
+bash script.sh -o "$OUTPUT_FILE"
+
+# ✗ WRONG - Direct substitution may fail in some contexts
+bash script.sh -o "/tmp/session-$(date +%Y-%m-%d).json"
+```
