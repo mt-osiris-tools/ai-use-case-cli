@@ -18,9 +18,11 @@
 # 4. Commit with message: "chore: bump version to X.Y.Z"
 
 # Current CLI version
-export CLI_VERSION="3.7.1"
+export CLI_VERSION="3.8.0"
 
 # Version history (for reference)
+# 3.8.0 - 2025-11-13 - Command-specific progress tracking
+# 3.7.1 - 2025-11-10 - Fix extract-session-data SIGPIPE handling
 # 3.7.0 - 2025-11-10 - Reset command and critical tracing fixes
 # 3.6.0 - 2025-11-09 - Distributed tracing system
 # 3.5.0 - 2025-11-09 - Backup cleanup utility
