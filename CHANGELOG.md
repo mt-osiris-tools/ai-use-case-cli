@@ -48,9 +48,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Changed `((var++))` to `var=$((var + 1))` to prevent exit code 1 when var is 0
   - Prevents premature script termination in scripts using `set -e`
   - Affects `progress_summary()` and `progress_percentage()` functions
-
-### Changed
-
 - **Extract Session Command**: Fixed SIGPIPE errors causing premature script termination (moved from Unreleased)
   - Prevented exit code 141 (SIGPIPE) by temporarily disabling pipefail around pipe operations with `head`
   - Fixed duration calculation pipes (lines 229-233)

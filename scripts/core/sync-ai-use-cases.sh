@@ -172,7 +172,15 @@ fi
 if [ -z "$USE_CASE_DIRS" ]; then
     echo -e "${YELLOW}No use case directories found in $PROJECT_PATH${NC}"
     echo -e "${BLUE}Run 'ai-use-case --init' to set up use case documentation.${NC}"
-    [ "$PROGRESS_ENABLED" = true ] && progress_skip "Validate use case directories" "no use case directories found"
+    if [ "$PROGRESS_ENABLED" = true ]; then
+        progress_skip "Validate use case directories" "no use case directories found"
+        progress_skip "Create project directory in hub" "skipped due to missing use case directories"
+        progress_skip "Sync use case files" "skipped due to missing use case directories"
+        progress_skip "Create by-date symlinks" "skipped due to missing use case directories"
+        progress_skip "Create by-topic symlinks" "skipped due to missing use case directories"
+        progress_skip "Commit to hub repository" "skipped due to missing use case directories"
+        progress_summary
+    fi
     exit 0
 fi
 

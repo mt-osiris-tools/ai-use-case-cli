@@ -464,7 +464,20 @@ fi
 if [ "$PROGRESS_ENABLED" = true ]; then
     if [ "$UPDATE_MODE" = true ]; then
         progress_complete "Update git hooks"
+        progress_start "Verify configuration"
         progress_complete "Verify configuration"
+
+        # Show progress summary and exit for UPDATE_MODE
+        progress_summary
+
+        echo ""
+        echo -e "${GREEN}=== Update Complete! ===${NC}"
+        echo ""
+        echo "Updated components:"
+        echo "  - Claude Code slash commands"
+        echo "  - Git hooks"
+        echo ""
+        exit 0
     else
         progress_complete "Install git hooks"
         progress_start "Configure .gitignore"
