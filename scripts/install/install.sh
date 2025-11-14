@@ -274,18 +274,18 @@ else
     RUN_CONFIG_AFTER=false
 fi
 
-echo ""
-echo -e "${GREEN}=== Installation Complete! ===${NC}"
-echo ""
-
 # Run config if requested
 if [ "$RUN_CONFIG_AFTER" = true ]; then
+    echo ""
     echo -e "${CYAN}Starting hub configuration...${NC}"
     echo ""
     "$INSTALL_DIR/ai-use-case" config reconfigure
     echo ""
 fi
 
+echo ""
+echo -e "${GREEN}=== Installation Complete! ===${NC}"
+echo ""
 echo -e "${YELLOW}Quick Start:${NC}"
 echo -e "  1. Reload your shell: ${CYAN}source ~/.bashrc${NC}"
 echo -e "  2. Navigate to a project: ${CYAN}cd /path/to/your-project${NC}"
