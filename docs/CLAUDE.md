@@ -767,7 +767,7 @@ See [docs/TRACING.md](TRACING.md) for complete setup and usage guide.
 ## Version History
 
 - **v3.6.0**: Distributed tracing system with OpenTelemetry, AI Toolkit integration, performance monitoring (unreleased)
-- **v3.5.0**: Backup cleanup utility, fixed duplicate slash commands from backup directories
+- **v3.5.0**: Fixed duplicate slash commands issue
 - **v3.4.3**: Force refresh slash commands during project updates
 - **v3.4.2**: Optimize CLAUDE.md token usage, split into WORKFLOW.md and COMMANDS.md
 - **v3.4.1**: Fix version references, add version update checklist

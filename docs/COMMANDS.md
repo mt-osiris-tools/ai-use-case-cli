@@ -26,7 +26,6 @@ ai-use-case --init              # Setup current project
 ai-use-case --init --update    # Update existing project installation
                                # - Refreshes Claude Code slash commands
                                # - Updates git hooks (pre-commit, post-commit)
-                               # - Creates backups before updating
                                # - Preserves existing documentation
 ```
 
