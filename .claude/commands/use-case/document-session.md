@@ -25,7 +25,7 @@ Before we start, here's the complete workflow you'll see:
 - [ ] Extract all relevant metrics and statistics
 
 **Phase 4: Information Extraction**
-- [ ] Calculate date with ISO 8601 week number
+- [ ] Calculate date with ISO 8601 week number for filename
 - [ ] Extract or generate appropriate ticket number
 - [ ] Determine complexity level from scope
 - [ ] Estimate time saved based on complexity
@@ -38,10 +38,10 @@ Before we start, here's the complete workflow you'll see:
 - [ ] Verify no TODO placeholders remain
 
 **Phase 6: Commit and Sync**
-- [ ] Add documentation file to git (if implementation session)
-- [ ] Create commit with proper attribution
-- [ ] Sync documentation to your hub
-- [ ] Confirm successful completion
+- [ ] Add documentation file to git (implementation sessions only)
+- [ ] Create commit with proper attribution (implementation sessions only)
+- [ ] Sync documentation to your hub (all session types)
+- [ ] Confirm successful completion (all session types)
 
 **Total time**: Usually 30-60 seconds after you select a session.
 
