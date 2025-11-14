@@ -766,7 +766,11 @@ See [docs/TRACING.md](TRACING.md) for complete setup and usage guide.
 
 ## Version History
 
-- **v3.6.0**: Distributed tracing system with OpenTelemetry, AI Toolkit integration, performance monitoring (unreleased)
+- **v3.9.0**: Real-time TodoWrite tracking for `/use-case:document-session`, development git hooks installer, removed backup process
+- **v3.8.0**: Command-specific progress tracking with visual indicators
+- **v3.7.1**: Self-update command, project update flag
+- **v3.7.0**: Reset command, tracing configuration fixes
+- **v3.6.0**: Distributed tracing system with OpenTelemetry, AI Toolkit integration, performance monitoring
 - **v3.5.0**: Fixed duplicate slash commands issue
 - **v3.4.3**: Force refresh slash commands during project updates
 - **v3.4.2**: Optimize CLAUDE.md token usage, split into WORKFLOW.md and COMMANDS.md

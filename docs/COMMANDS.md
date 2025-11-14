@@ -144,6 +144,7 @@ For AI-assisted documentation with automatic context capture:
                             # - Interactive session selection
                             # - Auto-generates complete documentation
                             # - NO placeholders
+                            # - v3.9.0+: Real-time TodoWrite progress tracking
 
 /use-case:setup-project      # Setup project (alternative to --init)
 /use-case:sync-usecases      # Sync to hub (alternative to sync)

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.9.0] - 2025-11-13
+
 ### Fixed
 
 - **README.md Footer Version**: Updated footer to correctly show v3.8.0 (was incorrectly showing v3.7.1)

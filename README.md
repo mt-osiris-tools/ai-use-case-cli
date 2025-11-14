@@ -1,7 +1,7 @@
 <div align="center">
     <img src="./media/ai_use_case_cli_banner.webp" alt="AI Use Case CLI - The Documenter" width="800"/>
     <h1>AI Use Case CLI</h1>
-    <h3><em><strong>v3.8.0</strong> - Document AI-assisted development workflows with ease.</em></h3>
+    <h3><em><strong>v3.9.0</strong> - Document AI-assisted development workflows with ease.</em></h3>
 </div>
 
 ---
@@ -83,7 +83,7 @@ cd ~/.local/share/ai-use-case-cli
    ```
    **v3.4.0+**: Interactively select which work to document (PRs, current session, or recent commits), then automatic generation captures context, git changes, and creates complete documentation.
 
-   **v3.9.0+** *(upcoming)*: Shows real-time progress through 8 visible steps (tracking 6 workflow phases) with todo list.
+   **v3.9.0+**: Shows real-time progress through 8 visible steps (tracking 6 workflow phases) with todo list.
 
 4. **Search and analyze**:
    ```bash
@@ -434,5 +434,5 @@ MIT License - see [LICENSE](./LICENSE) file for details
 
 ---
 
-**Version**: 3.8.0
+**Version**: 3.9.0
 **Last Updated**: 2025-11-13
