@@ -51,9 +51,15 @@ Before we start, here's the complete workflow you'll see:
 
 Help the user select which work session to document, then automatically generate comprehensive documentation by analyzing git history and conversation context.
 
-## 🚨 CRITICAL: Create Todo List First
+## 🚨 CRITICAL: Create Todo List FIRST - Before ANY Bash Commands
 
-**BEFORE starting any work**, use the TodoWrite tool to create a todo list that shows the complete workflow. This provides transparency and helps track progress.
+**IMMEDIATELY when this command runs**, use the TodoWrite tool to create the complete todo list. This must happen BEFORE:
+- Running any bash commands
+- Executing any git operations
+- Checking for PRs or commits
+- Any other detection work
+
+This provides transparency and lets the user see what will happen before any commands execute.
 
 **Context**: The workflow consists of **6 logical phases** (as shown in "📋 Documentation Workflow" above), but the TodoWrite list breaks down Phase 1 (Session Selection) into **3 visible progress steps** for more granular tracking. This results in **8 total TodoWrite items** that map to the 6-phase workflow structure.
 
@@ -125,11 +131,70 @@ Session types:
 
 ## Interactive Documentation Workflow
 
-### Step 0: Detect and Present Documentation Options
+### Step 0: Present Documentation Options (BEFORE Bash Commands)
 
-**CRITICAL**: Start by identifying what work can be documented, prioritizing actual implementation work over research sessions.
+**CRITICAL WORKFLOW ORDER**:
+1. **FIRST**: Create TodoWrite checklist (8 steps)
+2. **SECOND**: Present high-level options to user (WITHOUT running bash)
+3. **THIRD**: Based on user choice, run appropriate bash commands
+4. **FOURTH**: Show detailed options if needed
 
-#### 0.1: Detect Recent Undocumented Work
+#### 0.1: Present High-Level Choice (NO BASH COMMANDS YET)
+
+Use the AskUserQuestion tool to present initial options WITHOUT executing any bash commands:
+
+**Question**: "What would you like to document?"
+
+**Options**:
+1. **"Current conversation"**
+   - Description: "Document this AI session (research/exploration) - No git scanning needed"
+   - When to use: Current conversation is substantial and worth documenting
+
+2. **"Recent PRs and commits"**
+   - Description: "Scan git history for recent work (PRs, commits) - Will check last 24 hours"
+   - When to use: Want to document implementation work from recent PRs or commits
+
+3. **"Both - show me all options"**
+   - Description: "Scan git AND include current conversation - Comprehensive view"
+   - When to use: Want to see everything available to document
+
+**IMPORTANT**: This step uses AskUserQuestion with NO bash commands executed yet. Based on the user's selection:
+- If they choose "Current conversation": Skip to Step 0.2 (analyze conversation only, no bash)
+- If they choose "Recent PRs and commits": Proceed to Step 0.3 (run git detection bash commands)
+- If they choose "Both": Proceed to Step 0.2 then Step 0.3 (conversation + git)
+
+#### 0.2: Analyze Current Conversation (NO BASH NEEDED)
+
+Analyze the current Claude Code conversation to determine if it's substantial enough for documentation:
+
+**Conversation Analysis Criteria:**
+- Check conversation length (number of user messages and AI responses)
+- Identify if conversation involves:
+  - Technical research or exploration
+  - Architecture or design discussions
+  - Problem-solving or debugging approaches
+  - Evaluation of multiple options/approaches
+  - Learning about technologies or patterns
+  - Planning or discovery work
+- Determine conversation depth (simple Q&A vs. multi-round discussion)
+
+**Substantial Conversation Indicators:**
+- ✅ 5+ exchanges between user and AI
+- ✅ Discussion spans multiple topics or approaches
+- ✅ Iterative refinement of understanding
+- ✅ Evaluation of trade-offs or alternatives
+- ✅ Architectural or design decisions
+- ✅ Learning/discovery of new information
+
+**Not Substantial:**
+- ❌ Single question/answer exchange
+- ❌ Simple command executions
+- ❌ Trivial file reads or searches
+- ❌ Basic clarifications
+
+#### 0.3: Detect Recent Work (ONLY IF USER SELECTED TO SCAN GIT)
+
+**Run these bash commands ONLY if the user selected "Recent PRs and commits" or "Both" in Step 0.1.**
 
 Check for recent PRs and commits by the **current git user** that haven't been documented yet:
 
@@ -165,39 +230,19 @@ ls -1 .usecase/cases/ 2>/dev/null | grep -E '^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{
 > This distinction is by design: Claude Code users get a personalized, user-scoped view, while shell script users get a team-wide view.
 > If you need to see all work (not just your own), use the shell script directly.
 
-#### 0.2: Analyze Current Conversation
+#### 0.4: Build Options List (Based on User's Initial Choice)
 
-Analyze the current Claude Code conversation to determine if it's substantial enough for documentation:
+Create a prioritized list of documentation options based on what was requested:
 
-**Conversation Analysis Criteria:**
-- Check conversation length (number of user messages and AI responses)
-- Identify if conversation involves:
-  - Technical research or exploration
-  - Architecture or design discussions
-  - Problem-solving or debugging approaches
-  - Evaluation of multiple options/approaches
-  - Learning about technologies or patterns
-  - Planning or discovery work
-- Determine conversation depth (simple Q&A vs. multi-round discussion)
+**If user chose "Current conversation only"**:
+- Skip PRs and commits detection
+- Present only: "Current Research Session: [Topic]"
 
-**Substantial Conversation Indicators:**
-- ✅ 5+ exchanges between user and AI
-- ✅ Discussion spans multiple topics or approaches
-- ✅ Iterative refinement of understanding
-- ✅ Evaluation of trade-offs or alternatives
-- ✅ Architectural or design decisions
-- ✅ Learning/discovery of new information
+**If user chose "Recent PRs and commits"**:
+- List PRs and commits from Step 0.3
+- Optionally include current conversation if substantial
 
-**Not Substantial:**
-- ❌ Single question/answer exchange
-- ❌ Simple command executions
-- ❌ Trivial file reads or searches
-- ❌ Basic clarifications
-
-#### 0.3: Build Options List
-
-Create a prioritized list of documentation options:
-
+**If user chose "Both"**:
 1. **Recent PRs/Implementation Work** (Priority 1):
    - List each PR merged in the last 24 hours
    - Include PR number, title, and branch name
@@ -214,9 +259,11 @@ Create a prioritized list of documentation options:
    - Direct commits to main/current branch by current user
    - Check if already documented
 
-#### 0.4: Present Options to User
+#### 0.5: Present Detailed Options to User (Second AskUserQuestion)
 
-Use the `AskUserQuestion` tool to present options:
+**This step only applies if user chose "Recent PRs and commits" or "Both" in Step 0.1.**
+
+Use the `AskUserQuestion` tool to present detailed options:
 
 ```markdown
 **Question**: "Which work session would you like to document?"
@@ -231,7 +278,7 @@ Use the `AskUserQuestion` tool to present options:
    - Description: "Document the implementation work from this PR"
    - Status: ⚠️ Not yet documented
 
-3. **Current Research Session: [Topic Summary]**
+3. **Current Research Session: [Topic Summary]** (if user chose "Both")
    - Description: "Document research/exploration conversation (X exchanges, no commits)"
    - Status: 🔬 Research session (substantial conversation detected)
 
@@ -245,9 +292,9 @@ Use the `AskUserQuestion` tool to present options:
 - Clear labels like "PR #59: Enhance copilot instructions" or "Research: Authentication Approaches"
 - Descriptions that explain what will be documented
 - Visual indicators (⚠️/✅ for PRs, 🔬 for research sessions)
-- **ALWAYS include research session option if conversation is substantial**, even with no commits
+- **Include research session option if conversation is substantial AND user chose "Both"**
 
-#### 0.5: Process User Selection
+#### 0.6: Process User Selection
 
 Based on the user's selection:
 
@@ -482,22 +529,42 @@ bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
 
 ## Key Principles
 
-1. **Be Interactive First**: Always present options for what to document, prioritizing undocumented PRs and implementation work
-2. **Be Automatic After Selection**: Once user selects a session, generate documentation automatically without further questions
-3. **Be Complete**: Generate comprehensive documentation with all sections filled
-4. **Be Precise**: Use exact numbers from git (files changed, lines modified, commits)
-5. **Be Contextual**: Use conversation history to add qualitative insights
-6. **Be Professional**: Follow template structure, use proper formatting
-7. **Prioritize Implementation Over Research**: Real code changes and PRs should always be documented before research sessions
-8. **Filter by Current User**: Only show PRs and commits by the current git user - never show work by other team members
-9. **Detect Substantial Conversations**: Always analyze current conversation for research documentation potential, even without git commits
-10. **Include Research Sessions**: Show research/exploration conversations as documentation options when substantial (5+ exchanges, iterative discussions, technical decisions)
+1. **Show Checklist First**: ALWAYS create TodoWrite checklist before running any bash commands
+2. **Ask Before Scanning**: Present high-level options (current conversation vs git scan) BEFORE executing any git/bash commands
+3. **Be Interactive First**: Always present options for what to document, prioritizing undocumented PRs and implementation work
+4. **Be Automatic After Selection**: Once user selects a session, generate documentation automatically without further questions
+5. **Be Complete**: Generate comprehensive documentation with all sections filled
+6. **Be Precise**: Use exact numbers from git (files changed, lines modified, commits)
+7. **Be Contextual**: Use conversation history to add qualitative insights
+8. **Be Professional**: Follow template structure, use proper formatting
+9. **Prioritize Implementation Over Research**: Real code changes and PRs should always be documented before research sessions
+10. **Filter by Current User**: Only show PRs and commits by the current git user - never show work by other team members
+11. **Detect Substantial Conversations**: Always analyze current conversation for research documentation potential, even without git commits
+12. **Include Research Sessions**: Show research/exploration conversations as documentation options when substantial (5+ exchanges, iterative discussions, technical decisions)
 
 ## Example Workflow
 
-### Initial Presentation
+### Step 1: Initial Checklist (No Bash Yet)
 
 ```
+I'll help you document an AI session. Let me create a checklist first:
+
+[TodoWrite with 8 steps created]
+
+Now, what would you like to document?
+
+1. Current conversation - Document this AI session (no git scanning)
+2. Recent PRs and commits - Scan git history for recent work (last 24 hours)
+3. Both - Show me everything available
+
+[User selects option 2: "Recent PRs and commits"]
+```
+
+### Step 2: Scan Git (After User Choice)
+
+```
+[Now running bash commands to detect PRs and commits...]
+
 I found 5 undocumented work sessions from today:
 
 ⚠️ PR #59: Enhance copilot instructions (docs/enhance-copilot-instructions)
@@ -564,13 +631,15 @@ Available in hub at:
 
 ## Workflow Benefits
 
-**Why Interactive Selection Matters:**
-1. **Prevents Documentation Gaps**: Ensures all PRs, implementation work, AND research sessions get documented
-2. **User Control**: Developer chooses what's most important to document right now
-3. **Batch Documentation**: Can invoke multiple times to document several sessions sequentially
-4. **Context Awareness**: AI has full context of the selected session for better documentation quality
-5. **Audit Trail**: Clear mapping between PRs/conversations and their documentation
-6. **Captures Research Value**: Documents exploratory work and architectural decisions even without code changes
+**Why Checklist-First + Interactive Selection Matters:**
+1. **Transparency**: User sees complete workflow before any bash commands run
+2. **User Control**: Developer chooses what to scan (conversation only, git, or both) before permissions are requested
+3. **No Unnecessary Commands**: If documenting current conversation, git scanning is skipped entirely
+4. **Prevents Documentation Gaps**: Ensures all PRs, implementation work, AND research sessions get documented
+5. **Batch Documentation**: Can invoke multiple times to document several sessions sequentially
+6. **Context Awareness**: AI has full context of the selected session for better documentation quality
+7. **Audit Trail**: Clear mapping between PRs/conversations and their documentation
+8. **Captures Research Value**: Documents exploratory work and architectural decisions even without code changes
 
 ## When NOT to Use Manual Input
 
