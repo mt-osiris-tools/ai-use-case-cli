@@ -4,7 +4,7 @@
 #
 # Usage: ./scripts/install-dev-hooks.sh
 
-set -e
+set -euo pipefail
 
 # Colors
 GREEN='\033[0;32m'
@@ -49,8 +49,10 @@ if [ -f "$HOOK_FILE" ]; then
         cp "$HOOK_FILE" "$HOOK_FILE.backup"
         echo -e "${BLUE}Backed up existing hook to pre-commit.backup${NC}"
 
-        # Add version validation before the final exit
-        sed -i '/^exit 0$/i \
+        # Add version validation before the final exit (platform-compatible)
+        if [[ "$(uname)" == "Darwin" ]]; then
+            # macOS (BSD sed)
+            sed -i '' '/^exit 0$/i \
 # Version validation for ai-use-case-cli repository\
 if git diff --cached --name-only | grep -qE "(version\\.sh|README\\.md|CHANGELOG\\.md)"; then\
     echo "Validating version consistency..."\
@@ -64,6 +66,23 @@ if git diff --cached --name-only | grep -qE "(version\\.sh|README\\.md|CHANGELOG
     echo "✓ Version validation passed"\
 fi\
 ' "$HOOK_FILE"
+        else
+            # Linux (GNU sed)
+            sed -i '/^exit 0$/i \
+# Version validation for ai-use-case-cli repository\
+if git diff --cached --name-only | grep -qE "(version\\.sh|README\\.md|CHANGELOG\\.md)"; then\
+    echo "Validating version consistency..."\
+    if ! ./scripts/utils/validate-versions.sh; then\
+        echo ""\
+        echo "❌ Version validation failed!"\
+        echo "Fix version inconsistencies before committing."\
+        echo "Or run: ai-use-case bump-version [major|minor|patch]"\
+        exit 1\
+    fi\
+    echo "✓ Version validation passed"\
+fi\
+' "$HOOK_FILE"
+        fi
 
         echo -e "${GREEN}✓ Version validation added to existing hook${NC}"
     fi
