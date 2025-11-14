@@ -2,6 +2,8 @@
 
 **Purpose**: Ensure all version references are updated consistently across the codebase when releasing a new version.
 
+**⚠️ CRITICAL REMINDER**: The README.md footer is the most commonly forgotten location! It has TWO fields that must BOTH be updated: **Version** AND **Last Updated** date.
+
 ## Critical: Version Update Locations
 
 When bumping the version, **ALL** of these files MUST be updated. Missing even one can cause inconsistencies and confusion.
@@ -205,7 +207,28 @@ grep -r "3\.3\.0" --include="*.md" --include="*.sh" . | grep -v ".git" | grep -v
 
 ## Common Pitfalls
 
-### ❌ Mistake: Only updating `scripts/utils/version.sh`
+### ❌ Mistake #1: Forgetting README.md footer (MOST COMMON!)
+
+**Problem**: The README.md footer version and date are not updated during manual version bumps
+
+**Why it happens**:
+- Developers manually update version.sh and CHANGELOG.md
+- They forget README.md has TWO locations (header + footer)
+- The footer is at the very end of the file and easily overlooked
+
+**Impact**:
+- Users see mismatched versions
+- Documentation appears outdated
+- Version inconsistency in user-facing docs
+
+**Solution**:
+1. **ALWAYS use `ai-use-case bump-version` script** - it updates all locations automatically
+2. If manual update needed, run `./scripts/utils/validate-versions.sh` BEFORE committing
+3. Add pre-commit hook to automatically validate versions (see below)
+
+---
+
+### ❌ Mistake #2: Only updating `scripts/utils/version.sh`
 
 **Problem**: README still shows old version, confusing users
 
@@ -242,6 +265,55 @@ grep -r "3\.3\.0" --include="*.md" --include="*.sh" . | grep -v ".git" | grep -v
 **Problem**: Version mismatch between what's displayed and what's documented
 
 **Solution**: Always run `./ai-use-case --version` after updating
+
+---
+
+## Automated Pre-Commit Validation (RECOMMENDED)
+
+To prevent version inconsistencies from being committed, add this to your local pre-commit hook:
+
+### Setup Pre-Commit Version Check
+
+Add to `.git/hooks/pre-commit` in this repository:
+
+```bash
+#!/bin/bash
+# Version validation pre-commit hook
+# Prevents commits with inconsistent version references
+
+# Only run validation if version-related files are being committed
+if git diff --cached --name-only | grep -qE "(version\.sh|README\.md|CHANGELOG\.md)"; then
+    echo "Validating version consistency..."
+
+    # Run version validator
+    if ! ./scripts/utils/validate-versions.sh; then
+        echo ""
+        echo "❌ Version validation failed!"
+        echo "Fix version inconsistencies before committing."
+        echo "Or run: ai-use-case bump-version [major|minor|patch]"
+        exit 1
+    fi
+
+    echo "✓ Version validation passed"
+fi
+```
+
+**Benefits**:
+- Automatically catches version inconsistencies before commit
+- Only runs when version-related files are modified
+- Prevents broken commits from entering git history
+- Forces developers to use proper version management
+
+**Installation**:
+```bash
+# For ai-use-case-cli repository developers
+./scripts/install-dev-hooks.sh
+```
+
+This script will:
+- Install the version validation hook
+- Preserve any existing hooks
+- Make the hook executable automatically
 
 ---
 
