@@ -30,6 +30,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Provides estimated completion time (30-60 seconds)
   - Improves user understanding of what will happen
   - Makes automated workflow more transparent and predictable
+  - **Clarifications** (addressing PR #92 feedback):
+    - Phase 4: Clarified ISO 8601 week number is specifically for filename generation
+    - Phase 6: Explicitly labeled which steps apply to which session types (implementation vs research)
+    - Git commit steps only apply to implementation sessions
+    - Hub sync applies to all session types
 
 - **VERSION-UPDATE-CHECKLIST.md Enhancements**: Improved documentation to prevent version update mistakes
   - Added prominent warning at top about README.md footer being commonly forgotten
