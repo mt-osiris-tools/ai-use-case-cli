@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **README.md Footer Version**: Updated footer to correctly show v3.8.0 (was incorrectly showing v3.7.1)
+  - Fixed version mismatch between `scripts/utils/version.sh` and README.md footer
+  - Updated "Last Updated" date to 2025-11-13
+
+### Added
+
+- **Development Git Hooks Installer**: New `scripts/install-dev-hooks.sh` script for CLI repository developers
+  - Automatically installs version validation pre-commit hook
+  - Validates version consistency before allowing commits
+  - Prevents version.sh/README.md/CHANGELOG.md mismatches from entering git history
+  - Preserves existing hooks and creates backups
+  - Easy one-command installation: `./scripts/install-dev-hooks.sh`
+
+### Changed
+
+- **VERSION-UPDATE-CHECKLIST.md Enhancements**: Improved documentation to prevent version update mistakes
+  - Added prominent warning at top about README.md footer being commonly forgotten
+  - New "Mistake #1: Forgetting README.md footer" section with detailed explanation
+  - Added "Automated Pre-Commit Validation" section with setup instructions
+
+- **Cross-Platform Compatibility**: Documentation and patterns for POSIX compliance
+  - New `scripts/install-dev-hooks.sh` script uses `set -euo pipefail` for robust error handling
+  - Added platform detection for `sed -i` command (macOS/Linux compatibility)
+  - Added fallback logic for hooks without explicit `exit 0` statement
+  - New "Cross-Platform Compatibility" section in `docs/WORKFLOW.md` with guidelines
+  - Updated Pre-PR checklist to verify cross-platform compatibility
+  - Added reference examples from existing scripts (setup-project.sh, install-dev-hooks.sh)
+  - Clarified that README.md has TWO locations requiring updates (header + footer)
+  - Emphasized using `ai-use-case bump-version` script for automated updates
+
 ## [3.8.0] - 2025-11-13
 
 ### Added

@@ -441,5 +441,5 @@ MIT License - see [LICENSE](./LICENSE) file for details
 
 ---
 
-**Version**: 3.7.1
-**Last Updated**: 2025-11-11
+**Version**: 3.8.0
+**Last Updated**: 2025-11-13

@@ -49,6 +49,7 @@ Before creating any PR, verify ALL items:
 - [ ] **MANDATORY: Updated README.md** (non-negotiable if user-facing changes)
 - [ ] Updated version if adding features (scripts/utils/version.sh)
 - [ ] Tested changes locally
+- [ ] **Verified cross-platform compatibility** (if shell scripts modified)
 - [ ] Updated all related documentation (docs/*, CLAUDE.md, CONTRIBUTING.md)
 - [ ] Used conventional commit messages
 - [ ] Reviewed HUB-SYNC-CHECKLIST.md if applicable
@@ -185,6 +186,95 @@ EOF
 # Commit: "docs: improve installation guide"
 ```
 
+## Cross-Platform Compatibility
+
+**MANDATORY**: All shell scripts must work across macOS, Linux, and WSL environments. This is a fundamental requirement for the project.
+
+### Platform-Specific Considerations
+
+#### Error Handling
+
+Always use robust error handling in shell scripts:
+
+```bash
+# ✅ Correct
+set -euo pipefail
+
+# ❌ Incorrect
+set -e
+```
+
+**Flags:**
+
+- `-e`: Exit on error
+- `-u`: Exit if undefined variables are referenced
+- `-o pipefail`: Fail if any command in a pipeline fails (not just the last one)
+
+#### sed Command (In-Place Editing)
+
+BSD sed (macOS) and GNU sed (Linux) have different syntax for in-place editing:
+
+```bash
+# ✅ Correct - Platform detection
+if [[ "$(uname)" == "Darwin" ]]; then
+    # macOS (BSD sed)
+    sed -i '' 's/old/new/' file.txt
+else
+    # Linux (GNU sed)
+    sed -i 's/old/new/' file.txt
+fi
+
+# ❌ Incorrect - Linux-only
+sed -i 's/old/new/' file.txt
+```
+
+**Key differences:**
+
+- **macOS**: Requires empty string argument `''` after `-i`
+- **Linux**: Does NOT require argument after `-i`
+
+**Reference examples in codebase:**
+
+- `scripts/project/setup-project.sh:493-503` - Multiple sed operations with platform detection
+- `scripts/install-dev-hooks.sh:53-85` - Adding content to files with platform detection
+
+#### File Paths
+
+Always use forward slashes and handle spaces properly:
+
+```bash
+# ✅ Correct
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/subfolder"
+
+# ❌ Incorrect - Hardcoded separators
+cd $SCRIPT_DIR\subfolder
+```
+
+#### Testing Requirements
+
+Before submitting PRs, test on multiple platforms when possible:
+
+- **Linux**: Primary development environment
+- **macOS**: Test sed, file operations, path handling
+- **WSL**: Verify compatibility with Windows Subsystem for Linux
+
+### Common Patterns
+
+Refer to existing scripts for proven cross-platform patterns:
+
+1. **setup-project.sh** - Comprehensive example with sed operations
+2. **install-dev-hooks.sh** - Git hook installation with platform detection
+3. **Other utils scripts** - Various file operations and error handling
+
+### Pre-PR Validation
+
+- [ ] Script uses `set -euo pipefail`
+- [ ] sed operations include platform detection (if used)
+- [ ] File paths use proper quoting and forward slashes
+- [ ] Tested on Linux (minimum requirement)
+- [ ] Tested on macOS (if possible)
+
 ## File Naming Convention
 
 All use case documentation must follow:
@@ -218,6 +308,7 @@ Critical mistakes to avoid:
 - ❌ Forget version bump for new features
 - ❌ Use placeholders or TODOs in auto-generated docs
 - ❌ Skip HUB-SYNC-CHECKLIST.md review for sync-related changes
+- ❌ **Write platform-specific code** (use `set -euo pipefail` and platform detection for sed)
 
 ## Commit Message Format
 
