@@ -190,6 +190,8 @@ Use the AskUserQuestion tool to present initial options WITHOUT executing any ba
 
 #### 0.3: Analyze Current Conversation (NO BASH NEEDED)
 
+**Only run this step if user selected "Current conversation" or "Both" in Step 0.2.**
+
 Analyze the current Claude Code conversation to determine if it's substantial enough for documentation:
 
 **Conversation Analysis Criteria:**
@@ -216,6 +218,26 @@ Analyze the current Claude Code conversation to determine if it's substantial en
 - ❌ Simple command executions
 - ❌ Trivial file reads or searches
 - ❌ Basic clarifications
+
+**Edge Case Handling - User Selected "Current Conversation" but Not Substantial:**
+
+If the user explicitly chose "Current conversation" in Step 0.2, but analysis determines the conversation is not substantial:
+
+1. **Inform the user** with a clear message:
+   ```
+   "The current conversation appears to be brief (X exchanges) and may not have enough
+   content for comprehensive documentation. However, since you explicitly requested to
+   document it, I can proceed."
+   ```
+
+2. **Ask for confirmation** using AskUserQuestion:
+   - **Question**: "The conversation seems brief. How would you like to proceed?"
+   - **Options**:
+     - "Document it anyway" - Proceed with current conversation documentation
+     - "Scan git history instead" - Switch to git detection (go to Step 0.4)
+     - "Cancel" - Exit the documentation workflow
+
+3. **Respect user's decision** - If they choose to document anyway, proceed even though it's not substantial. The user knows their needs best.
 
 #### 0.4: Detect Recent Work (ONLY IF USER SELECTED TO SCAN GIT)
 
@@ -253,12 +275,15 @@ ls -1 .usecase/cases/ 2>/dev/null | grep -E '^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{
 Create a prioritized list of documentation options based on what was requested:
 
 **If user chose "Current conversation only"**:
-- Skip PRs and commits detection
-- Present only: "Current Research Session: [Topic]"
+- Skip PRs and commits detection entirely
+- Skip Step 0.6 (no AskUserQuestion needed since there's only one option)
+- Proceed directly to Step 0.7 with: "Current Research Session: [Topic]"
+- User already made their choice in Step 0.2
 
 **If user chose "Recent PRs and commits"**:
-- List PRs and commits from Step 0.3
-- Optionally include current conversation if substantial
+- List PRs and commits from Step 0.4
+- **DO NOT include current conversation** - user explicitly excluded it
+- Only show git-based options (PRs, commits)
 
 **If user chose "Both"**:
 1. **Recent PRs/Implementation Work** (Priority 1):
@@ -279,9 +304,16 @@ Create a prioritized list of documentation options based on what was requested:
 
 #### 0.6: Present Detailed Options to User (Second AskUserQuestion)
 
-**This step only applies if user chose "Recent PRs and commits" or "Both" in Step 0.2.**
+**IMPORTANT - When to run this step:**
+- **Run** if user chose "Recent PRs and commits" or "Both" in Step 0.2
+- **Skip** if user chose "Current conversation" (they already made their selection)
 
-Use the `AskUserQuestion` tool to present detailed options:
+**If Step 0.5 found only one option** (e.g., only one PR, or only current conversation):
+- Skip this AskUserQuestion step
+- Proceed directly to Step 0.7 with that single option
+- No need to ask user to "choose" when there's only one choice
+
+**If Step 0.5 found multiple options**, use the `AskUserQuestion` tool to present detailed options:
 
 ```markdown
 **Question**: "Which work session would you like to document?"
