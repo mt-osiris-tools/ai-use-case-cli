@@ -135,11 +135,36 @@ Session types:
 
 **CRITICAL WORKFLOW ORDER**:
 1. **FIRST**: Create TodoWrite checklist (8 steps)
-2. **SECOND**: Present high-level options to user (WITHOUT running bash)
-3. **THIRD**: Based on user choice, run appropriate bash commands
-4. **FOURTH**: Show detailed options if needed
+2. **SECOND**: Check git user credentials (lightweight, always needed)
+3. **THIRD**: Present high-level options to user
+4. **FOURTH**: Based on user choice, run git detection bash commands if needed
+5. **FIFTH**: Show detailed options if needed
 
-#### 0.1: Present High-Level Choice (NO BASH COMMANDS YET)
+#### 0.1: Check Git User Credentials (ALWAYS - Lightweight Check)
+
+**Run this immediately after creating TodoWrite checklist** - it's needed regardless of user's choice:
+
+```bash
+# Get current user's git email and GitHub username
+USER_EMAIL=$(git config user.email)
+GH_USERNAME=$(gh api user --jq '.login' 2>/dev/null)
+
+# Display user info
+echo "Git user: $USER_EMAIL"
+if [ -n "$GH_USERNAME" ]; then
+    echo "GitHub user: $GH_USERNAME"
+else
+    echo "GitHub CLI not configured (PR detection will be skipped)"
+fi
+```
+
+**Why this is always needed:**
+- Required for commit attribution in documentation
+- Needed to filter PRs/commits by current user (not teammates)
+- Lightweight operation (no history scanning)
+- User context is essential for all documentation paths
+
+#### 0.2: Present High-Level Choice
 
 Use the AskUserQuestion tool to present initial options WITHOUT executing any bash commands:
 
@@ -158,12 +183,12 @@ Use the AskUserQuestion tool to present initial options WITHOUT executing any ba
    - Description: "Scan git AND include current conversation - Comprehensive view"
    - When to use: Want to see everything available to document
 
-**IMPORTANT**: This step uses AskUserQuestion with NO bash commands executed yet. Based on the user's selection:
-- If they choose "Current conversation": Skip to Step 0.2 (analyze conversation only, no bash)
-- If they choose "Recent PRs and commits": Proceed to Step 0.3 (run git detection bash commands)
-- If they choose "Both": Proceed to Step 0.2 then Step 0.3 (conversation + git)
+**IMPORTANT**: This step uses AskUserQuestion. Based on the user's selection:
+- If they choose "Current conversation": Skip to Step 0.3 (analyze conversation only, no git history scan)
+- If they choose "Recent PRs and commits": Proceed to Step 0.4 (run git detection bash commands)
+- If they choose "Both": Proceed to Step 0.3 then Step 0.4 (conversation + git)
 
-#### 0.2: Analyze Current Conversation (NO BASH NEEDED)
+#### 0.3: Analyze Current Conversation (NO BASH NEEDED)
 
 Analyze the current Claude Code conversation to determine if it's substantial enough for documentation:
 
@@ -192,21 +217,14 @@ Analyze the current Claude Code conversation to determine if it's substantial en
 - ❌ Trivial file reads or searches
 - ❌ Basic clarifications
 
-#### 0.3: Detect Recent Work (ONLY IF USER SELECTED TO SCAN GIT)
+#### 0.4: Detect Recent Work (ONLY IF USER SELECTED TO SCAN GIT)
 
-**Run these bash commands ONLY if the user selected "Recent PRs and commits" or "Both" in Step 0.1.**
+**Run these bash commands ONLY if the user selected "Recent PRs and commits" or "Both" in Step 0.2.**
 
 Check for recent PRs and commits by the **current git user** that haven't been documented yet:
 
 ```bash
-# Get current user's git email and GitHub username
-USER_EMAIL=$(git config user.email)
-GH_USERNAME=$(gh api user --jq '.login' 2>/dev/null)
-
-# Validate user email
-if [ -z "$USER_EMAIL" ]; then
-    echo "Warning: Could not determine git user email"
-fi
+# Note: USER_EMAIL and GH_USERNAME were already obtained in Step 0.1
 
 # Get recent merged PRs by current user (last 24 hours) - only if GitHub CLI is configured
 if [ -n "$GH_USERNAME" ]; then
@@ -230,7 +248,7 @@ ls -1 .usecase/cases/ 2>/dev/null | grep -E '^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{
 > This distinction is by design: Claude Code users get a personalized, user-scoped view, while shell script users get a team-wide view.
 > If you need to see all work (not just your own), use the shell script directly.
 
-#### 0.4: Build Options List (Based on User's Initial Choice)
+#### 0.5: Build Options List (Based on User's Initial Choice)
 
 Create a prioritized list of documentation options based on what was requested:
 
@@ -259,9 +277,9 @@ Create a prioritized list of documentation options based on what was requested:
    - Direct commits to main/current branch by current user
    - Check if already documented
 
-#### 0.5: Present Detailed Options to User (Second AskUserQuestion)
+#### 0.6: Present Detailed Options to User (Second AskUserQuestion)
 
-**This step only applies if user chose "Recent PRs and commits" or "Both" in Step 0.1.**
+**This step only applies if user chose "Recent PRs and commits" or "Both" in Step 0.2.**
 
 Use the `AskUserQuestion` tool to present detailed options:
 
@@ -294,7 +312,7 @@ Use the `AskUserQuestion` tool to present detailed options:
 - Visual indicators (⚠️/✅ for PRs, 🔬 for research sessions)
 - **Include research session option if conversation is substantial AND user chose "Both"**
 
-#### 0.6: Process User Selection
+#### 0.7: Process User Selection
 
 Based on the user's selection:
 
@@ -544,12 +562,16 @@ bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
 
 ## Example Workflow
 
-### Step 1: Initial Checklist (No Bash Yet)
+### Step 1: Initial Checklist and User Check
 
 ```
 I'll help you document an AI session. Let me create a checklist first:
 
 [TodoWrite with 8 steps created]
+
+Checking git user credentials...
+Git user: you@example.com
+GitHub user: your-username
 
 Now, what would you like to document?
 
@@ -560,7 +582,7 @@ Now, what would you like to document?
 [User selects option 2: "Recent PRs and commits"]
 ```
 
-### Step 2: Scan Git (After User Choice)
+### Step 2: Scan Git History (After User Choice)
 
 ```
 [Now running bash commands to detect PRs and commits...]

@@ -11,10 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Document-Session Workflow UX**: Improved `/use-case:document-session` to show checklist and ask before running bash commands
   - **TodoWrite First**: Creates complete 8-step checklist IMMEDIATELY when command runs, before any bash execution
-  - **User Choice Before Bash**: Presents high-level options (current conversation, scan git, or both) BEFORE executing any git/bash commands
-  - **No Unnecessary Commands**: If user selects "Current conversation", git scanning is skipped entirely
+  - **Git User Check**: Always checks git user credentials (lightweight) - needed for all documentation paths
+  - **User Choice Before History Scan**: Presents high-level options (current conversation, scan git, or both) BEFORE executing any git history scanning
+  - **No Unnecessary Commands**: If user selects "Current conversation", git history scanning is skipped entirely
   - **Better Transparency**: User sees what will happen and controls what gets scanned before permissions are requested
-  - **Two-Stage Selection**: First asks what to scan, then (if needed) runs detection and shows detailed options
+  - **Two-Stage Selection**: First asks what to scan, then (if needed) runs history detection and shows detailed options
   - Addresses feedback that bash commands were running before user understood the workflow
 
 ## [3.9.0] - 2025-11-13
