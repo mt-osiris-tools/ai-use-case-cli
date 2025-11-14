@@ -2,6 +2,51 @@
 
 **IMPORTANT**: You are Claude Code, and you should **first ask the user which session to document**, then automatically generate documentation for the selected session. Do NOT run the interactive `document-ai-session.sh` script or ask the user to fill in details after selection.
 
+## 📋 Documentation Workflow - What Will Happen
+
+Before we start, here's the complete workflow you'll see:
+
+**Phase 1: Session Selection**
+- [ ] Get your git user email and detect recent work
+- [ ] Check for undocumented PRs merged in last 24 hours
+- [ ] Analyze current conversation for documentation value
+- [ ] Present prioritized options (PRs, research sessions, commits)
+- [ ] Wait for you to select which session to document
+
+**Phase 2: Environment Validation**
+- [ ] Check CLI version against latest from GitHub
+- [ ] Verify project setup (.usecase/cases/ directory exists)
+- [ ] Confirm git repository is properly configured
+
+**Phase 3: Session Analysis**
+- [ ] Determine session type (implementation vs research)
+- [ ] Analyze git history and commits (if implementation)
+- [ ] Analyze conversation context and insights (if research)
+- [ ] Extract all relevant metrics and statistics
+
+**Phase 4: Information Extraction**
+- [ ] Calculate date with ISO 8601 week number
+- [ ] Extract or generate appropriate ticket number
+- [ ] Determine complexity level from scope
+- [ ] Estimate time saved based on complexity
+- [ ] Extract objective and background from context
+
+**Phase 5: Documentation Generation**
+- [ ] Read the appropriate template (implementation or research)
+- [ ] Generate filename following naming convention
+- [ ] Create complete documentation with all sections filled
+- [ ] Verify no TODO placeholders remain
+
+**Phase 6: Commit and Sync**
+- [ ] Add documentation file to git (if implementation session)
+- [ ] Create commit with proper attribution
+- [ ] Sync documentation to your hub
+- [ ] Confirm successful completion
+
+**Total time**: Usually 30-60 seconds after you select a session.
+
+---
+
 ## Your Task
 
 Help the user select which work session to document, then automatically generate comprehensive documentation by analyzing git history and conversation context.
