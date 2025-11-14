@@ -85,6 +85,8 @@ cd ~/.local/share/ai-use-case-cli
 
    **v3.9.0+**: Shows real-time progress through 8 visible steps (tracking 6 workflow phases) with todo list.
 
+   **v3.10.0+**: Checklist appears first, checks git user (always), then asks what to scan (conversation/git/both) before running git history commands.
+
 4. **Search and analyze**:
    ```bash
    ai-use-case search "authentication"
@@ -158,7 +160,7 @@ The CLI provides flexible documentation storage options:
 ### Workflow
 
 1. **Setup**: Creates `.usecase/cases/` in your project + installs git hooks
-2. **Document**: `/use-case:document-session` presents options (PRs, current session, commits) → you select → automatic generation captures all details with real-time progress tracking
+2. **Document**: `/use-case:document-session` shows checklist → checks git user → asks what to scan → presents options → you select → automatic generation with real-time progress
 3. **Sync**: Git hooks automatically sync to hub (with git operations if configured)
 4. **Organize**: Hub organizes docs by project, date, and topic
 
