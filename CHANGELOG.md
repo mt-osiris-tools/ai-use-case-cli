@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Session Data Extraction JSON Generation**: Fixed critical JSON parsing errors in `extract-session-data.sh`
+  - **Fixed special character escaping**: Commit messages with special characters (curly quotes, etc.) now properly escaped using `jq --arg` instead of format strings
+  - **Fixed duplicate array bug**: Removed duplicate empty arrays caused by `pipefail` triggering fallback `|| echo "[]"` commands
+  - **Fixed compact JSON output**: All JSON arrays now output as compact single-line format to prevent heredoc formatting issues
+  - **Root cause**: `set -euo pipefail` caused grep commands to fail pipeline when no matches found, triggering both jq output AND fallback echo
+  - **Solution**: Use `(grep pattern || true)` to prevent pipeline failures + compact JSON output with `jq -sc`
+  - Affects: `/use-case:extract-session` command and `ai-use-case extract` functionality
 - **Installation Script**: Modernized `scripts/install/install.sh` to align with v3.2.0+ features
   - **Fixed install URL**: Corrected quick-install curl command path (was `/install.sh`, now `/scripts/install/install.sh`)
   - **Removed deprecated environment variables**: No longer sets `AI_USECASES_DIR` and `AI_USECASES_SYNC_SCRIPT` in shell profiles
