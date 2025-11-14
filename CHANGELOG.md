@@ -7,9 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.8.0] - 2025-11-13
+
+### Added
+
+- **Command-Specific Progress Tracking**: New visual progress tracking system for CLI commands
+  - **New Utility**: `scripts/utils/progress-tracker.sh` provides reusable progress tracking functions
+  - **Visual Indicators**:
+    - `[ ]` Pending tasks (gray)
+    - `[▸]` Tasks in progress (yellow)
+    - `[✓]` Completed tasks (green)
+    - `[~]` Skipped tasks (cyan)
+  - **Real-time Updates**: Shows current task status as commands execute
+  - **Duration Tracking**: Displays elapsed time for completed tasks
+  - **Progress Summary**: Final summary showing completed/skipped/incomplete tasks
+  - **Integrated Commands**:
+    - `sync-ai-use-cases.sh`: Tracks validation, sync, symlink creation, and git operations
+    - `setup-project.sh`: Tracks project setup steps (setup vs. update modes)
+  - **Non-intrusive Design**: Gracefully degrades if utility not available
+  - **User Benefits**:
+    - Clear visibility into what's happening during command execution
+    - Know what steps remain and what's been completed
+    - Better UX for long-running operations
+    - Easy to troubleshoot where commands might be stuck
+  - **Example Output**:
+    ```
+    [▸] Sync use case files...
+    [✓] Sync use case files (1s)
+    [✓] Create by-date symlinks
+    [~] Commit to hub repository (no changes)
+
+    === Summary ===
+    ✓ Completed: 5/6
+    ~ Skipped: 1/6
+    ```
+
 ### Fixed
 
-- **Extract Session Command**: Fixed SIGPIPE errors causing premature script termination
+- **Progress Tracker Arithmetic**: Fixed `set -e` compatibility issue with arithmetic expressions
+  - Changed `((var++))` to `var=$((var + 1))` to prevent exit code 1 when var is 0
+  - Prevents premature script termination in scripts using `set -e`
+  - Affects `progress_summary()` and `progress_percentage()` functions
+- **Extract Session Command**: Fixed SIGPIPE errors causing premature script termination (moved from Unreleased)
   - Prevented exit code 141 (SIGPIPE) by temporarily disabling pipefail around pipe operations with `head`
   - Fixed duration calculation pipes (lines 229-233)
   - Fixed markdown output generation by pre-capturing recent commits (lines 271-278, 363)

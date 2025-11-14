@@ -1,7 +1,7 @@
 <div align="center">
     <img src="./media/ai_use_case_cli_banner.webp" alt="AI Use Case CLI - The Documenter" width="800"/>
     <h1>AI Use Case CLI</h1>
-    <h3><em><strong>v3.7.1</strong> - Document AI-assisted development workflows with ease.</em></h3>
+    <h3><em><strong>v3.8.0</strong> - Document AI-assisted development workflows with ease.</em></h3>
 </div>
 
 ---
@@ -47,6 +47,7 @@ Documentation shouldn't be a burden—it should be a valuable asset that grows y
 - 🔬 **Research & implementation sessions** - Document both code changes and exploratory work
 - 📊 **Session data extraction** - Extract git history, token usage, and metrics for reporting (v3.4.0+)
 - 📊 **OpenTelemetry tracing** - Monitor CLI performance and usage with distributed tracing (v3.6.0+)
+- 📈 **Command progress tracking** - Visual real-time progress indicators for all commands (v3.8.0+)
 - 🔄 **Automatic syncing** - Git hooks sync docs to your chosen hub automatically
 - 🔧 **Flexible storage** - Choose between local-only or private git repository (v3.2.0+)
 - 🗂️ **Project registry** - Track and update all projects using the CLI (v3.1.0+)

@@ -41,6 +41,15 @@ if [ -f "$CONFIG_MANAGER" ]; then
     source "$CONFIG_MANAGER"
 fi
 
+# Source progress tracker
+PROGRESS_TRACKER="$SCRIPT_DIR/../utils/progress-tracker.sh"
+if [ -f "$PROGRESS_TRACKER" ]; then
+    source "$PROGRESS_TRACKER"
+    PROGRESS_ENABLED=true
+else
+    PROGRESS_ENABLED=false
+fi
+
 # Function to ensure hub repository exists
 ensure_hub_exists() {
     local hub_dir
@@ -133,9 +142,22 @@ echo "Source: $PROJECT_PATH"
 echo "Central: $CENTRAL_DIR"
 echo ""
 
+# Initialize progress tracking
+if [ "$PROGRESS_ENABLED" = true ]; then
+    progress_init \
+        "Validate use case directories" \
+        "Create project directory in hub" \
+        "Sync use case files" \
+        "Create by-date symlinks" \
+        "Create by-topic symlinks" \
+        "Commit to hub repository"
+fi
+
 # Find all use case files (support both new and old structure)
 # New structure: .usecase/cases
 # Old structure: docs/ai-use-cases (for backward compatibility)
+[ "$PROGRESS_ENABLED" = true ] && progress_start "Validate use case directories"
+
 NEW_STRUCTURE_DIR="$PROJECT_PATH/.usecase/cases"
 OLD_STRUCTURE_DIR="$PROJECT_PATH/docs/ai-use-cases"
 
@@ -150,12 +172,27 @@ fi
 if [ -z "$USE_CASE_DIRS" ]; then
     echo -e "${YELLOW}No use case directories found in $PROJECT_PATH${NC}"
     echo -e "${BLUE}Run 'ai-use-case --init' to set up use case documentation.${NC}"
+    if [ "$PROGRESS_ENABLED" = true ]; then
+        progress_skip "Validate use case directories" "no use case directories found"
+        progress_skip "Create project directory in hub" "skipped due to missing use case directories"
+        progress_skip "Sync use case files" "skipped due to missing use case directories"
+        progress_skip "Create by-date symlinks" "skipped due to missing use case directories"
+        progress_skip "Create by-topic symlinks" "skipped due to missing use case directories"
+        progress_skip "Commit to hub repository" "skipped due to missing use case directories"
+        progress_summary
+    fi
     exit 0
 fi
 
+[ "$PROGRESS_ENABLED" = true ] && progress_complete "Validate use case directories"
+
 # Create project directory in central location
+[ "$PROGRESS_ENABLED" = true ] && progress_start "Create project directory in hub"
 trace_operation "create_project_directory" "project=$PROJECT_NAME" "path=$BY_PROJECT_DIR/$PROJECT_NAME"
 mkdir -p "$BY_PROJECT_DIR/$PROJECT_NAME"
+[ "$PROGRESS_ENABLED" = true ] && progress_complete "Create project directory in hub"
+
+[ "$PROGRESS_ENABLED" = true ] && progress_start "Sync use case files"
 
 SYNC_COUNT=0
 NEW_COUNT=0
@@ -275,6 +312,11 @@ while IFS= read -r USE_CASE_DIR; do
 
 done <<< "$USE_CASE_DIRS"
 
+# Mark file sync and symlink creation as complete
+[ "$PROGRESS_ENABLED" = true ] && progress_complete "Sync use case files"
+[ "$PROGRESS_ENABLED" = true ] && progress_complete "Create by-date symlinks"
+[ "$PROGRESS_ENABLED" = true ] && progress_complete "Create by-topic symlinks"
+
 # Record sync completion metrics
 trace_hub_sync "sync_complete" $((NEW_COUNT + UPDATED_COUNT))
 trace_event "sync_summary" "project=$PROJECT_NAME" "total=$SYNC_COUNT" "new=$NEW_COUNT" "updated=$UPDATED_COUNT"
@@ -302,11 +344,13 @@ if [ $NEW_COUNT -gt 0 ] || [ $UPDATED_COUNT -gt 0 ]; then
 
     # Skip git operations for local mode
     if [ "$hub_mode" = "local" ]; then
+        [ "$PROGRESS_ENABLED" = true ] && progress_skip "Commit to hub repository" "local mode"
         echo ""
         echo -e "${GREEN}✓ Sync complete!${NC} (Local mode - no git operations)"
         echo -e "${BLUE}Note:${NC} Running in local-only mode. Files are stored locally without version control."
         echo "  To enable git sync, reconfigure: rm ~/.config/ai-use-case-cli/config.json && ai-use-case --init"
     else
+        [ "$PROGRESS_ENABLED" = true ] && progress_start "Commit to hub repository"
         echo ""
         echo -e "${BLUE}=== Committing changes to hub repository ===${NC}"
 
@@ -329,6 +373,7 @@ Synced at: $(date '+%Y-%m-%d %H:%M:%S')"
 
                 if git commit -m "$COMMIT_MSG" 2>/dev/null; then
                     echo -e "${GREEN}✓${NC} Changes committed to hub repository"
+                    [ "$PROGRESS_ENABLED" = true ] && progress_complete "Commit to hub repository"
 
                     # Push to remote if configured
                     if git remote get-url origin &>/dev/null; then
@@ -354,13 +399,24 @@ Synced at: $(date '+%Y-%m-%d %H:%M:%S')"
                     fi
                 else
                     echo -e "${RED}✗ Failed to commit changes${NC}"
+                    [ "$PROGRESS_ENABLED" = true ] && progress_skip "Commit to hub repository" "commit failed"
                 fi
             else
                 echo -e "${YELLOW}✓ No git changes to commit${NC} (files already in sync)"
+                [ "$PROGRESS_ENABLED" = true ] && progress_skip "Commit to hub repository" "no changes"
             fi
         else
             echo -e "${YELLOW}⚠ Note${NC}: Hub directory is not a git repository"
             echo "  To enable git sync, run: cd $CENTRAL_DIR && git init"
+            [ "$PROGRESS_ENABLED" = true ] && progress_skip "Commit to hub repository" "not a git repo"
         fi
     fi
+else
+    # No new or updated files, skip git operations
+    [ "$PROGRESS_ENABLED" = true ] && progress_skip "Commit to hub repository" "no changes"
+fi
+
+# Show progress summary at the end
+if [ "$PROGRESS_ENABLED" = true ]; then
+    progress_summary
 fi

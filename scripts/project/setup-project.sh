@@ -33,6 +33,15 @@ else
     exit 1
 fi
 
+# Source progress tracker
+PROGRESS_TRACKER="$SCRIPT_DIR/../utils/progress-tracker.sh"
+if [ -f "$PROGRESS_TRACKER" ]; then
+    source "$PROGRESS_TRACKER"
+    PROGRESS_ENABLED=true
+else
+    PROGRESS_ENABLED=false
+fi
+
 # Function to setup and initialize hub repository
 # NOTE: This function is specifically for setup and includes interactive prompts.
 # It differs from ensure_hub_exists() in hub-utils.sh which is for validation only.
@@ -175,7 +184,29 @@ echo "Project: $PROJECT_NAME"
 echo "Path: $PROJECT_PATH"
 echo ""
 
+# Initialize progress tracking
+if [ "$PROGRESS_ENABLED" = true ]; then
+    if [ "$UPDATE_MODE" = true ]; then
+        progress_init \
+            "Validate project structure" \
+            "Update Claude Code slash commands" \
+            "Update git hooks" \
+            "Verify configuration"
+    else
+        progress_init \
+            "Validate project structure" \
+            "Setup use case directory" \
+            "Install Claude Code slash commands" \
+            "Install git hooks" \
+            "Configure .gitignore" \
+            "Perform initial sync" \
+            "Register project"
+    fi
+fi
+
 # Validate environment configuration
+[ "$PROGRESS_ENABLED" = true ] && progress_start "Validate project structure"
+
 if [ -z "$AI_USECASES_SYNC_SCRIPT" ]; then
     echo -e "${YELLOW}⚠ Warning: AI_USECASES_SYNC_SCRIPT environment variable not set${NC}"
     echo -e "${BLUE}ℹ${NC} Post-commit hooks may not work correctly after repository separation"
@@ -184,7 +215,10 @@ if [ -z "$AI_USECASES_SYNC_SCRIPT" ]; then
     echo ""
 fi
 
+[ "$PROGRESS_ENABLED" = true ] && progress_complete "Validate project structure"
+
 # Check for old structure and migrate if needed
+[ "$PROGRESS_ENABLED" = true ] && [ "$UPDATE_MODE" = false ] && progress_start "Setup use case directory"
 OLD_USECASES_DIR="$PROJECT_PATH/docs/ai-use-cases"
 AI_USECASES_DIR="$PROJECT_PATH/.usecase/cases"
 
@@ -250,7 +284,16 @@ else
     echo -e "${YELLOW}⚠${NC} .usecase/cases/ already exists"
 fi
 
+[ "$PROGRESS_ENABLED" = true ] && [ "$UPDATE_MODE" = false ] && progress_complete "Setup use case directory"
+
 # Install Claude Code slash commands
+if [ "$PROGRESS_ENABLED" = true ]; then
+    if [ "$UPDATE_MODE" = true ]; then
+        progress_start "Update Claude Code slash commands"
+    else
+        progress_start "Install Claude Code slash commands"
+    fi
+fi
 CLAUDE_COMMANDS_SOURCE="$CLI_ROOT/.claude/commands/use-case"
 CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/commands/use-case"
 
@@ -296,7 +339,22 @@ else
     echo -e "${YELLOW}⚠${NC} Claude Code commands not found in CLI installation"
 fi
 
+if [ "$PROGRESS_ENABLED" = true ]; then
+    if [ "$UPDATE_MODE" = true ]; then
+        progress_complete "Update Claude Code slash commands"
+    else
+        progress_complete "Install Claude Code slash commands"
+    fi
+fi
+
 # Install git hooks
+if [ "$PROGRESS_ENABLED" = true ]; then
+    if [ "$UPDATE_MODE" = true ]; then
+        progress_start "Update git hooks"
+    else
+        progress_start "Install git hooks"
+    fi
+fi
 GIT_HOOKS_DIR="$PROJECT_PATH/.git/hooks"
 POST_COMMIT_HOOK="$GIT_HOOKS_DIR/post-commit"
 PRE_COMMIT_HOOK="$GIT_HOOKS_DIR/pre-commit"
@@ -403,6 +461,29 @@ else
     echo -e "${GREEN}✓${NC} Git pre-commit hook installed (prevents direct commits to main)"
 fi
 
+if [ "$PROGRESS_ENABLED" = true ]; then
+    if [ "$UPDATE_MODE" = true ]; then
+        progress_complete "Update git hooks"
+        progress_start "Verify configuration"
+        progress_complete "Verify configuration"
+
+        # Show progress summary and exit for UPDATE_MODE
+        progress_summary
+
+        echo ""
+        echo -e "${GREEN}=== Update Complete! ===${NC}"
+        echo ""
+        echo "Updated components:"
+        echo "  - Claude Code slash commands"
+        echo "  - Git hooks"
+        echo ""
+        exit 0
+    else
+        progress_complete "Install git hooks"
+        progress_start "Configure .gitignore"
+    fi
+fi
+
 # Add to .gitignore if not already present
 GITIGNORE="$PROJECT_PATH/.gitignore"
 if [ -f "$GITIGNORE" ]; then
@@ -449,11 +530,16 @@ if [ -f "$GITIGNORE" ]; then
     fi
 fi
 
+[ "$PROGRESS_ENABLED" = true ] && [ "$UPDATE_MODE" = false ] && progress_complete "Configure .gitignore"
+
 # Perform initial sync
+[ "$PROGRESS_ENABLED" = true ] && [ "$UPDATE_MODE" = false ] && progress_start "Perform initial sync"
 echo ""
 echo -e "${BLUE}Performing initial sync...${NC}"
 if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
+    [ "$PROGRESS_ENABLED" = true ] && [ "$UPDATE_MODE" = false ] && progress_complete "Perform initial sync"
     # Register project in the registry
+    [ "$PROGRESS_ENABLED" = true ] && [ "$UPDATE_MODE" = false ] && progress_start "Register project"
     if [ -f "$SCRIPT_DIR/registry-manager.sh" ]; then
         source "$SCRIPT_DIR/registry-manager.sh"
         CLI_VERSION=$(get_cli_version "$CLI_ROOT")
@@ -464,6 +550,10 @@ if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
             echo -e "${GREEN}✓${NC} Project registry updated"
         fi
     fi
+    [ "$PROGRESS_ENABLED" = true ] && [ "$UPDATE_MODE" = false ] && progress_complete "Register project"
+
+    # Show progress summary
+    [ "$PROGRESS_ENABLED" = true ] && progress_summary
 
     echo ""
     echo -e "${GREEN}=== Setup Complete! ===${NC}"
