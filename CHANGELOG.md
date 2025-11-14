@@ -33,28 +33,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Projects now maintain only the latest versions of slash commands and git hooks without backup directories
 
 - **Document-Session Workflow Transparency**: Added real-time TodoWrite tracking to `/use-case:document-session` command
-  - **Interactive Todo List**: Creates TodoWrite list at start showing all 8 phases
+  - **Interactive Todo List**: Creates TodoWrite list at start showing 8 visible progress steps (breaking down 6 logical workflow phases)
   - **Real-time Progress**: Updates todo status (pending → in_progress → completed) as work proceeds
   - **Full Transparency**: Users see exactly what's happening at each step
-  - **Phase Breakdown**:
-    1. Session Selection (detect PRs, commits, conversation)
-    2. Present Options (show prioritized documentation options)
-    3. Wait for Selection (user chooses which session to document)
-    4. Environment Validation (check CLI version and project setup)
-    5. Session Analysis (analyze git history and/or conversation)
-    6. Extract Information (gather metadata, complexity, time saved)
-    7. Generate Documentation (read template, create complete docs)
-    8. Commit and Sync (commit if implementation, sync to hub)
+  - **6 Logical Workflow Phases** (as documented in the command file):
+    1. **Session Selection**: Detect recent work, present options, wait for user selection *(broken into 3 visible steps for granular tracking)*
+    2. **Environment Validation**: Check CLI version and project setup
+    3. **Session Analysis**: Analyze git history and/or conversation
+    4. **Information Extraction**: Gather metadata, complexity, time saved
+    5. **Documentation Generation**: Read template, create complete docs
+    6. **Commit and Sync**: Commit if implementation, sync to hub
+  - **8 Visible TodoWrite Steps** (for user progress tracking):
+    - Step 1-3: Session Selection broken into (a) Detect, (b) Present, (c) Wait
+    - Step 4-8: Map 1:1 to remaining phases 2-6
   - **Benefits**:
     - Eliminates confusion about what the command is doing
     - Shows estimated time (30-60 seconds total)
     - Helps track progress through long-running operations
+    - More granular progress visibility during session selection
     - Makes automated workflow predictable and transparent
-  - **Previous Version** (still visible in markdown): Static workflow description with checkboxes
-    - Phase 4: Clarified ISO 8601 week number is specifically for filename generation
-    - Phase 6: Explicitly labeled which steps apply to which session types (implementation vs research)
-    - Git commit steps only apply to implementation sessions
-    - Hub sync applies to all session types
 
 - **VERSION-UPDATE-CHECKLIST.md Enhancements**: Improved documentation to prevent version update mistakes
   - Added prominent warning at top about README.md footer being commonly forgotten
