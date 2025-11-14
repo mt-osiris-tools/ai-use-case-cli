@@ -81,7 +81,7 @@ cd ~/.local/share/ai-use-case-cli
    ```
    /use-case:document-session
    ```
-   **v3.4.0+**: Interactively select which work to document (PRs, current session, or recent commits), then automatic generation captures context, git changes, and creates complete documentation.
+   **v3.4.0+**: Interactively select which work to document (PRs, current session, or recent commits), then automatic generation captures context, git changes, and creates complete documentation. Shows real-time progress through 8-phase workflow with todo list tracking.
 
 4. **Search and analyze**:
    ```bash
@@ -156,7 +156,7 @@ The CLI provides flexible documentation storage options:
 ### Workflow
 
 1. **Setup**: Creates `.usecase/cases/` in your project + installs git hooks
-2. **Document**: `/use-case:document-session` presents options (PRs, current session, commits) → you select → automatic generation captures all details
+2. **Document**: `/use-case:document-session` presents options (PRs, current session, commits) → you select → automatic generation captures all details with real-time progress tracking
 3. **Sync**: Git hooks automatically sync to hub (with git operations if configured)
 4. **Organize**: Hub organizes docs by project, date, and topic
 

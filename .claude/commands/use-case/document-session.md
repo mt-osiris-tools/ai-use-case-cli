@@ -51,6 +51,60 @@ Before we start, here's the complete workflow you'll see:
 
 Help the user select which work session to document, then automatically generate comprehensive documentation by analyzing git history and conversation context.
 
+## 🚨 CRITICAL: Create Todo List First
+
+**BEFORE starting any work**, use the TodoWrite tool to create a todo list that shows the complete workflow. This provides transparency and helps track progress.
+
+**Initial Todo List** (create this first with all items as "pending"):
+
+1. **Phase 1: Session Selection**
+   - content: "Detect recent work (PRs, commits, conversation)"
+   - activeForm: "Detecting recent work (PRs, commits, conversation)"
+
+2. **Phase 2: Present Options**
+   - content: "Present prioritized documentation options to user"
+   - activeForm: "Presenting prioritized documentation options to user"
+
+3. **Phase 3: Wait for Selection**
+   - content: "Wait for user to select which session to document"
+   - activeForm: "Waiting for user to select which session to document"
+
+4. **Phase 4: Environment Validation**
+   - content: "Check CLI version and verify project setup"
+   - activeForm: "Checking CLI version and verifying project setup"
+
+5. **Phase 5: Session Analysis**
+   - content: "Analyze git history and/or conversation context"
+   - activeForm: "Analyzing git history and/or conversation context"
+
+6. **Phase 6: Extract Information**
+   - content: "Extract metadata (date, ticket, complexity, time saved)"
+   - activeForm: "Extracting metadata (date, ticket, complexity, time saved)"
+
+7. **Phase 7: Generate Documentation**
+   - content: "Read template and generate complete documentation"
+   - activeForm: "Reading template and generating complete documentation"
+
+8. **Phase 8: Commit and Sync**
+   - content: "Commit documentation (if implementation) and sync to hub"
+   - activeForm: "Committing documentation (if implementation) and syncing to hub"
+
+**IMPORTANT**:
+- Mark each todo as "in_progress" when you start that phase
+- Mark as "completed" immediately when finished
+- Update the list in real-time as you work through the phases
+- This provides full visibility to the user about what's happening
+
+Example:
+```
+# When starting Phase 1
+TodoWrite: Mark "Phase 1: Session Selection" as in_progress
+
+# When Phase 1 completes
+TodoWrite: Mark "Phase 1: Session Selection" as completed
+TodoWrite: Mark "Phase 2: Present Options" as in_progress
+```
+
 ## Session Type Detection
 
 Session types:

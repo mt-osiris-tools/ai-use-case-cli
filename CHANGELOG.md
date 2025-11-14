@@ -32,13 +32,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated all documentation to remove backup-related references
   - Projects now maintain only the latest versions of slash commands and git hooks without backup directories
 
-- **Document-Session Workflow Transparency**: Added upfront todo list to `/use-case:document-session` command
-  - Shows complete 6-phase workflow before execution starts
-  - Displays all steps from session selection through commit and sync
-  - Provides estimated completion time (30-60 seconds)
-  - Improves user understanding of what will happen
-  - Makes automated workflow more transparent and predictable
-  - **Clarifications** (addressing PR #92 feedback):
+- **Document-Session Workflow Transparency**: Added real-time TodoWrite tracking to `/use-case:document-session` command
+  - **Interactive Todo List**: Creates TodoWrite list at start showing all 8 phases
+  - **Real-time Progress**: Updates todo status (pending → in_progress → completed) as work proceeds
+  - **Full Transparency**: Users see exactly what's happening at each step
+  - **Phase Breakdown**:
+    1. Session Selection (detect PRs, commits, conversation)
+    2. Present Options (show prioritized documentation options)
+    3. Wait for Selection (user chooses which session to document)
+    4. Environment Validation (check CLI version and project setup)
+    5. Session Analysis (analyze git history and/or conversation)
+    6. Extract Information (gather metadata, complexity, time saved)
+    7. Generate Documentation (read template, create complete docs)
+    8. Commit and Sync (commit if implementation, sync to hub)
+  - **Benefits**:
+    - Eliminates confusion about what the command is doing
+    - Shows estimated time (30-60 seconds total)
+    - Helps track progress through long-running operations
+    - Makes automated workflow predictable and transparent
+  - **Previous Version** (still visible in markdown): Static workflow description with checkboxes
     - Phase 4: Clarified ISO 8601 week number is specifically for filename generation
     - Phase 6: Explicitly labeled which steps apply to which session types (implementation vs research)
     - Git commit steps only apply to implementation sessions
