@@ -24,6 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Document-Session Workflow Transparency**: Added upfront todo list to `/use-case:document-session` command
+  - Shows complete 6-phase workflow before execution starts
+  - Displays all steps from session selection through commit and sync
+  - Provides estimated completion time (30-60 seconds)
+  - Improves user understanding of what will happen
+  - Makes automated workflow more transparent and predictable
+
 - **VERSION-UPDATE-CHECKLIST.md Enhancements**: Improved documentation to prevent version update mistakes
   - Added prominent warning at top about README.md footer being commonly forgotten
   - New "Mistake #1: Forgetting README.md footer" section with detailed explanation
