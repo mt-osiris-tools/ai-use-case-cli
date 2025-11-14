@@ -81,7 +81,9 @@ cd ~/.local/share/ai-use-case-cli
    ```
    /use-case:document-session
    ```
-   **v3.4.0+**: Interactively select which work to document (PRs, current session, or recent commits), then automatic generation captures context, git changes, and creates complete documentation. Shows real-time progress through 8-phase workflow with todo list tracking.
+   **v3.4.0+**: Interactively select which work to document (PRs, current session, or recent commits), then automatic generation captures context, git changes, and creates complete documentation.
+
+   **v3.9.0+** *(upcoming)*: Shows real-time progress through 8-phase workflow with todo list tracking.
 
 4. **Search and analyze**:
    ```bash
