@@ -24,12 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Removed Backup Process**: Eliminated backup creation during command updates to keep projects clean
-  - Removed backup creation logic from `scripts/project/update-project.sh`
+- **Removed Backup Process**: Eliminated all backup creation during updates to keep projects clean
+  - Removed backup creation logic for slash commands from `scripts/project/update-project.sh`
+  - Removed backup creation logic for git hooks from `scripts/project/setup-project.sh`
   - Deleted `scripts/utils/cleanup-backups.sh` utility script
-  - Removed `.claude/backups/` from `.gitignore`
-  - Updated documentation to remove all backup-related references
-  - Projects now maintain only the latest command versions without backup directories
+  - Removed `.claude/backups/` from CLI `.gitignore` and project `.gitignore` patterns
+  - Updated all documentation to remove backup-related references
+  - Projects now maintain only the latest versions of slash commands and git hooks without backup directories
 
 - **Document-Session Workflow Transparency**: Added upfront todo list to `/use-case:document-session` command
   - Shows complete 6-phase workflow before execution starts

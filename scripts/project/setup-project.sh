@@ -358,7 +358,6 @@ fi
 GIT_HOOKS_DIR="$PROJECT_PATH/.git/hooks"
 POST_COMMIT_HOOK="$GIT_HOOKS_DIR/post-commit"
 PRE_COMMIT_HOOK="$GIT_HOOKS_DIR/pre-commit"
-BACKUP_BASE_DIR="$PROJECT_PATH/.claude/backups"
 
 # Verify hook sources exist
 if [ ! -f "$POST_COMMIT_HOOK_SOURCE" ]; then
@@ -376,12 +375,6 @@ if [ -f "$POST_COMMIT_HOOK" ]; then
     # Check if our hook is already installed
     if grep -q "AI Use Cases" "$POST_COMMIT_HOOK"; then
         if [ "$UPDATE_MODE" = true ]; then
-            # Backup existing hook
-            mkdir -p "$BACKUP_BASE_DIR"
-            BACKUP_HOOK="$BACKUP_BASE_DIR/post-commit.backup.$(date +%Y%m%d%H%M%S)"
-            cp "$POST_COMMIT_HOOK" "$BACKUP_HOOK"
-            echo -e "${BLUE}ℹ${NC} Existing post-commit hook backed up to: .claude/backups/$(basename "$BACKUP_HOOK")"
-
             # Check if existing hook is identical to our source (no customizations)
             if cmp -s "$POST_COMMIT_HOOK" "$POST_COMMIT_HOOK_SOURCE"; then
                 # Safe to replace - hook contains only our code
@@ -391,20 +384,15 @@ if [ -f "$POST_COMMIT_HOOK" ]; then
             else
                 # Hook has customizations - do not overwrite
                 echo -e "${YELLOW}⚠${NC} Git post-commit hook contains customizations"
-                echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes (backup created)"
-                echo -e "${BLUE}ℹ${NC} To manually update: compare $BACKUP_HOOK with $POST_COMMIT_HOOK_SOURCE"
+                echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes"
+                echo -e "${BLUE}ℹ${NC} To manually update: compare your hook with $POST_COMMIT_HOOK_SOURCE"
             fi
         else
             echo -e "${YELLOW}⚠${NC} Git post-commit hook already installed (use --update to refresh)"
         fi
     else
-        # Backup existing hook
-        mkdir -p "$BACKUP_BASE_DIR"
-        BACKUP_HOOK="$BACKUP_BASE_DIR/post-commit.backup.$(date +%Y%m%d%H%M%S)"
-        cp "$POST_COMMIT_HOOK" "$BACKUP_HOOK"
-        echo -e "${YELLOW}⚠${NC} Existing post-commit hook backed up to: .claude/backups/$(basename "$BACKUP_HOOK")"
-
         # Append our hook to existing hook
+        echo -e "${BLUE}ℹ${NC} Existing post-commit hook detected - appending our hook"
         echo "" >> "$POST_COMMIT_HOOK"
         cat "$POST_COMMIT_HOOK_SOURCE" >> "$POST_COMMIT_HOOK"
         echo -e "${GREEN}✓${NC} Git post-commit hook appended to existing hook"
@@ -421,12 +409,6 @@ if [ -f "$PRE_COMMIT_HOOK" ]; then
     # Check if our hook is already installed
     if grep -q "Branch Protection" "$PRE_COMMIT_HOOK"; then
         if [ "$UPDATE_MODE" = true ]; then
-            # Backup existing hook
-            mkdir -p "$BACKUP_BASE_DIR"
-            BACKUP_HOOK="$BACKUP_BASE_DIR/pre-commit.backup.$(date +%Y%m%d%H%M%S)"
-            cp "$PRE_COMMIT_HOOK" "$BACKUP_HOOK"
-            echo -e "${BLUE}ℹ${NC} Existing pre-commit hook backed up to: .claude/backups/$(basename "$BACKUP_HOOK")"
-
             # Check if existing hook is identical to our source (no customizations)
             if cmp -s "$PRE_COMMIT_HOOK" "$PRE_COMMIT_HOOK_SOURCE"; then
                 # Safe to replace - hook contains only our code
@@ -436,20 +418,15 @@ if [ -f "$PRE_COMMIT_HOOK" ]; then
             else
                 # Hook has customizations - do not overwrite
                 echo -e "${YELLOW}⚠${NC} Git pre-commit hook contains customizations"
-                echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes (backup created)"
-                echo -e "${BLUE}ℹ${NC} To manually update: compare $BACKUP_HOOK with $PRE_COMMIT_HOOK_SOURCE"
+                echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes"
+                echo -e "${BLUE}ℹ${NC} To manually update: compare your hook with $PRE_COMMIT_HOOK_SOURCE"
             fi
         else
             echo -e "${YELLOW}⚠${NC} Git pre-commit hook already installed (use --update to refresh)"
         fi
     else
-        # Backup existing hook
-        mkdir -p "$BACKUP_BASE_DIR"
-        BACKUP_HOOK="$BACKUP_BASE_DIR/pre-commit.backup.$(date +%Y%m%d%H%M%S)"
-        cp "$PRE_COMMIT_HOOK" "$BACKUP_HOOK"
-        echo -e "${YELLOW}⚠${NC} Existing pre-commit hook backed up to: .claude/backups/$(basename "$BACKUP_HOOK")"
-
         # Append our hook to existing hook
+        echo -e "${BLUE}ℹ${NC} Existing pre-commit hook detected - appending our hook"
         echo "" >> "$PRE_COMMIT_HOOK"
         cat "$PRE_COMMIT_HOOK_SOURCE" >> "$PRE_COMMIT_HOOK"
         echo -e "${GREEN}✓${NC} Git pre-commit hook appended to existing hook"
@@ -509,24 +486,9 @@ if [ -f "$GITIGNORE" ]; then
         echo "" >> "$GITIGNORE"
         echo "# Use Case Documentation" >> "$GITIGNORE"
         echo ".usecase/cases/" >> "$GITIGNORE"
-        echo ".claude/backups/" >> "$GITIGNORE"
-        echo -e "${GREEN}✓${NC} Added .usecase/cases/ and .claude/backups/ to .gitignore"
+        echo -e "${GREEN}✓${NC} Added .usecase/cases/ to .gitignore"
     else
-        # Check if backups line exists
-        if ! grep -q "^\.claude/backups/" "$GITIGNORE"; then
-            # Find the Use Case Documentation section and add backups line after .usecase/cases/
-            if [[ "$(uname)" == "Darwin" ]]; then
-                # macOS (BSD sed)
-                sed -i '' '/^\.usecase\/cases\//a\
-.claude/backups/' "$GITIGNORE"
-            else
-                # Linux (GNU sed)
-                sed -i '/^\.usecase\/cases\//a .claude/backups/' "$GITIGNORE"
-            fi
-            echo -e "${GREEN}✓${NC} Added .claude/backups/ to .gitignore"
-        else
-            echo -e "${YELLOW}⚠${NC} .gitignore already configured"
-        fi
+        echo -e "${YELLOW}⚠${NC} .gitignore already configured"
     fi
 fi
 
