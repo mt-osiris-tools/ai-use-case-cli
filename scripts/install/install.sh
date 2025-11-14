@@ -2,12 +2,12 @@
 # AI Use Case CLI - Installation Script
 #
 # Quick install:
-#   curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/install/install.sh | bash
 #
 # Or manual:
 #   git clone https://github.com/mt-osiris-tools/ai-use-case-cli.git ~/.local/share/ai-use-case-cli
 #   cd ~/.local/share/ai-use-case-cli
-#   ./install.sh
+#   scripts/install/install.sh
 
 set -e
 
@@ -245,106 +245,83 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     fi
 fi
 
-# Setup documentation hub (optional)
+# Documentation Hub Configuration (v3.2.0+)
 echo ""
-echo -e "${YELLOW}Documentation Hub Setup:${NC}"
-echo "The CLI tools require a separate documentation hub repository."
-echo "Default location: ~/Documents/ai-use-case-hub"
+echo -e "${YELLOW}Documentation Hub Configuration:${NC}"
 echo ""
-read -p "Set up documentation hub now? (Y/n): " setup_hub
-setup_hub=${setup_hub:-y}
+echo "The CLI uses a flexible hub system (v3.2.0+) with two modes:"
+echo "  ${GREEN}1. Local Only${NC} (default) - No git, stored in ~/.local/share/ai-use-case-cli/hub/"
+echo "  ${GREEN}2. Private Git${NC} - Your own repository with full version control"
+echo ""
+echo -e "${CYAN}✓${NC} Default hub will be created automatically (local-only mode)"
+echo "  You can configure it later with: ${CYAN}ai-use-case config reconfigure${NC}"
+echo ""
+echo -e "${BLUE}Note:${NC} No environment variables needed! Hub is configured via:"
+echo "  ${CYAN}~/.config/ai-use-case-cli/config.json${NC}"
+echo ""
 
-if [[ "$setup_hub" =~ ^[Yy]$ ]]; then
-    HUB_DIR="$HOME/Documents/ai-use-case-hub"
+read -p "Would you like to configure hub mode now? (y/N): " config_now
+config_now=${config_now:-n}
 
-    if [ -d "$HUB_DIR" ]; then
-        echo -e "${GREEN}✓${NC} Hub already exists at $HUB_DIR"
-    else
-        echo -e "${CYAN}Cloning documentation hub...${NC}"
-        mkdir -p "$(dirname "$HUB_DIR")"
-        if git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git "$HUB_DIR"; then
-            echo -e "${GREEN}✓${NC} Hub repository cloned to $HUB_DIR"
-        else
-            echo -e "${YELLOW}Note: Hub repository not yet available publicly${NC}"
-            echo -e "Creating hub directory structure manually at $HUB_DIR"
-            mkdir -p "$HUB_DIR"/{by-project,by-date,by-topic}
-            echo -e "${GREEN}✓${NC} Hub directory created at $HUB_DIR"
-        fi
-    fi
-
-    # Add AI_USECASES_DIR to shell profile
-    SHELL_PROFILE=""
-    if [ -f "$HOME/.bashrc" ]; then
-        SHELL_PROFILE="$HOME/.bashrc"
-    elif [ -f "$HOME/.zshrc" ]; then
-        SHELL_PROFILE="$HOME/.zshrc"
-    fi
-
-    if [ -n "$SHELL_PROFILE" ]; then
-        if ! grep -q "AI_USECASES_DIR" "$SHELL_PROFILE"; then
-            echo '' >> "$SHELL_PROFILE"
-            echo '# AI Use Case Hub' >> "$SHELL_PROFILE"
-            echo "export AI_USECASES_DIR=\"$HUB_DIR\"" >> "$SHELL_PROFILE"
-            echo "export AI_USECASES_SYNC_SCRIPT=\"$INSTALL_DIR/scripts/core/sync-ai-use-cases.sh\"" >> "$SHELL_PROFILE"
-            echo -e "${GREEN}✓${NC} Added AI_USECASES_DIR and AI_USECASES_SYNC_SCRIPT to $SHELL_PROFILE"
-        else
-            echo -e "${YELLOW}AI_USECASES_DIR already in $SHELL_PROFILE${NC}"
-            # Check if sync script env var is also present
-            if ! grep -q "AI_USECASES_SYNC_SCRIPT" "$SHELL_PROFILE"; then
-                # Ensure section header exists before adding sync script
-                if ! grep -q "# AI Use Case Hub" "$SHELL_PROFILE"; then
-                    echo '' >> "$SHELL_PROFILE"
-                    echo '# AI Use Case Hub' >> "$SHELL_PROFILE"
-                fi
-                echo "export AI_USECASES_SYNC_SCRIPT=\"$INSTALL_DIR/scripts/core/sync-ai-use-cases.sh\"" >> "$SHELL_PROFILE"
-                echo -e "${GREEN}✓${NC} Added AI_USECASES_SYNC_SCRIPT to $SHELL_PROFILE"
-            fi
-        fi
-    else
-        echo -e "${YELLOW}⚠ No .bashrc or .zshrc found${NC}"
-        echo -e "${BLUE}ℹ${NC} Add these to your shell profile manually:"
-        echo -e "${CYAN}export AI_USECASES_DIR=\"$HUB_DIR\"${NC}"
-        echo -e "${CYAN}export AI_USECASES_SYNC_SCRIPT=\"$INSTALL_DIR/scripts/core/sync-ai-use-cases.sh\"${NC}"
-    fi
+if [[ "$config_now" =~ ^[Yy]$ ]]; then
+    echo ""
+    echo -e "${CYAN}Hub configuration will run after installation completes.${NC}"
+    echo "The CLI will guide you through the setup process."
+    RUN_CONFIG_AFTER=true
 else
-    echo -e "${YELLOW}Skipped hub setup.${NC} You can set it up later with:"
-    echo -e "  ${CYAN}git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git ~/Documents/ai-use-case-hub${NC}"
-    echo -e "  ${CYAN}export AI_USECASES_DIR=\"\$HOME/Documents/ai-use-case-hub\"${NC}"
-    echo -e "  ${CYAN}export AI_USECASES_SYNC_SCRIPT=\"$INSTALL_DIR/scripts/core/sync-ai-use-cases.sh\"${NC}"
+    echo -e "${GREEN}✓${NC} Hub will use default local-only mode"
+    echo "  Configure later with: ${CYAN}ai-use-case config reconfigure${NC}"
+    RUN_CONFIG_AFTER=false
 fi
 
 echo ""
 echo -e "${GREEN}=== Installation Complete! ===${NC}"
 echo ""
+
+# Run config if requested
+if [ "$RUN_CONFIG_AFTER" = true ]; then
+    echo -e "${CYAN}Starting hub configuration...${NC}"
+    echo ""
+    "$INSTALL_DIR/ai-use-case" config reconfigure
+    echo ""
+fi
+
 echo -e "${YELLOW}Quick Start:${NC}"
 echo -e "  1. Reload your shell: ${CYAN}source ~/.bashrc${NC}"
 echo -e "  2. Navigate to a project: ${CYAN}cd /path/to/your-project${NC}"
 echo -e "  3. Setup the project: ${CYAN}ai-use-case --init${NC}"
-echo -e "  4. Document AI sessions:"
-echo -e "     Via Claude Code (recommended): ${CYAN}/use-case:document-session${NC}"
-echo -e "     Via CLI: ${CYAN}ai-use-case document${NC} (redirects to Claude Code)"
+echo -e "  4. Document AI sessions (Claude Code): ${CYAN}/use-case:document-session${NC}"
 echo ""
-echo -e "${YELLOW}Available Commands:${NC}"
-printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case --init" "Setup current project"
-printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case document" "Document AI session (redirects to Claude Code)"
-printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case sync" "Sync use cases to hub"
-printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case search <term>" "Search use cases"
-printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case list" "List all projects"
-printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case stats" "View statistics"
-printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case view" "View hub in file explorer"
-printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case push" "Push hub changes to remote"
-printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case publish-confluence" "Publish to Confluence"
-printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case uninstall" "Uninstall the CLI"
-printf "  ${GREEN}%-35s${NC} %s\n" "ai-use-case --help" "Show detailed help"
+echo -e "${YELLOW}Core Commands:${NC}"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case --init" "Setup current project"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case config show" "Show hub configuration"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case config reconfigure" "Change hub mode (local/git)"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case sync" "Sync use cases to hub"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case search <term>" "Search use cases"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case list" "List all registered projects"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case check-updates" "Check for outdated projects"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case stats" "View statistics"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case extract [hours] [format]" "Extract session data"
 echo ""
-echo -e "${YELLOW}Claude Code Integration:${NC}"
-echo -e "  For AI-assisted documentation:"
-printf "  ${CYAN}%-35s${NC} %s\n" "/use-case:document-session" "Document AI session (automatic)"
-printf "  ${CYAN}%-35s${NC} %s\n" "/use-case:setup-project" "Setup project (alternative)"
-printf "  ${CYAN}%-35s${NC} %s\n" "/use-case:quick-start" "Quick start guide"
+echo -e "${YELLOW}Advanced Commands:${NC}"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case tracing init" "Initialize tracing (v3.6.0+)"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case tracing configure" "Configure tracing server"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case tracing status" "View tracing status"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case view" "View hub in file explorer"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case push" "Push hub changes (git mode)"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case publish-confluence" "Publish to Confluence"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case uninstall" "Uninstall the CLI"
+echo ""
+echo -e "${YELLOW}Claude Code Integration (Recommended):${NC}"
+printf "  ${CYAN}%-40s${NC} %s\n" "/use-case:document-session" "Document AI session (automatic)"
+printf "  ${CYAN}%-40s${NC} %s\n" "/use-case:setup-project" "Setup project"
+printf "  ${CYAN}%-40s${NC} %s\n" "/use-case:sync-usecases" "Sync to hub"
+printf "  ${CYAN}%-40s${NC} %s\n" "/use-case:list-projects" "List projects"
+printf "  ${CYAN}%-40s${NC} %s\n" "/use-case:check-updates" "Check for updates"
 echo ""
 echo -e "${YELLOW}Next Steps:${NC}"
-echo -e "  Run ${CYAN}ai-use-case --help${NC} for full usage guide"
-echo -e "  Read ${CYAN}$INSTALL_DIR/README.md${NC} for detailed documentation"
+echo -e "  • Run ${CYAN}ai-use-case --help${NC} for full usage guide"
+echo -e "  • Read ${CYAN}$INSTALL_DIR/README.md${NC} for detailed documentation"
+echo -e "  • Configure hub: ${CYAN}ai-use-case config show${NC}"
 echo ""
 echo -e "${BLUE}Happy documenting! 🎉${NC}"

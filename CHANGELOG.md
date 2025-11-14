@@ -7,16 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
+### Fixed
 
-- **Document-Session Workflow UX**: Improved `/use-case:document-session` to show checklist and ask before running bash commands
-  - **TodoWrite First**: Creates complete 8-step checklist IMMEDIATELY when command runs, before any bash execution
-  - **Git User Check**: Always checks git user credentials (lightweight) - needed for all documentation paths
-  - **User Choice Before History Scan**: Presents high-level options (current conversation, scan git, or both) BEFORE executing any git history scanning
-  - **No Unnecessary Commands**: If user selects "Current conversation", git history scanning is skipped entirely
-  - **Better Transparency**: User sees what will happen and controls what gets scanned before permissions are requested
-  - **Two-Stage Selection**: First asks what to scan, then (if needed) runs history detection and shows detailed options
-  - Addresses feedback that bash commands were running before user understood the workflow
+- **Installation Script**: Modernized `scripts/install/install.sh` to align with v3.2.0+ features
+  - **Fixed install URL**: Corrected quick-install curl command path (was `/install.sh`, now `/scripts/install/install.sh`)
+  - **Removed deprecated environment variables**: No longer sets `AI_USECASES_DIR` and `AI_USECASES_SYNC_SCRIPT` in shell profiles
+  - **Uses modern config system**: Hub configuration now uses `ai-use-case config reconfigure` (v3.2.0+) instead of manual setup
+  - **Default local-only mode**: Installer explains local-only hub mode is default, with optional git mode
+  - **Added tracing commands**: Installation completion now lists tracing commands (v3.6.0+)
+  - **Optional config runner**: Asks if user wants to configure hub during installation, runs config automatically if requested
+  - **Updated command list**: Added all modern commands (config, check-updates, extract, tracing)
+  - **Claude Code slash commands**: Lists recommended slash commands in completion message
 
 ## [3.9.0] - 2025-11-13
 
