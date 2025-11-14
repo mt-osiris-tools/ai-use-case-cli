@@ -7,9 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.9.0] - 2025-11-13
+
 ### Fixed
 
-- **README.md Footer Version**: Updated footer to correctly show v3.8.0 (was incorrectly showing v3.7.1)
+- **README.md Footer Version**: Fixed version mismatch (was showing v3.7.1, now correctly shows v3.9.0)
+  - During development, discovered footer was out of sync with actual version
   - Fixed version mismatch between `scripts/utils/version.sh` and README.md footer
   - Updated "Last Updated" date to 2025-11-13
 
@@ -32,17 +35,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated all documentation to remove backup-related references
   - Projects now maintain only the latest versions of slash commands and git hooks without backup directories
 
-- **Document-Session Workflow Transparency**: Added upfront todo list to `/use-case:document-session` command
-  - Shows complete 6-phase workflow before execution starts
-  - Displays all steps from session selection through commit and sync
-  - Provides estimated completion time (30-60 seconds)
-  - Improves user understanding of what will happen
-  - Makes automated workflow more transparent and predictable
-  - **Clarifications** (addressing PR #92 feedback):
-    - Phase 4: Clarified ISO 8601 week number is specifically for filename generation
-    - Phase 6: Explicitly labeled which steps apply to which session types (implementation vs research)
-    - Git commit steps only apply to implementation sessions
-    - Hub sync applies to all session types
+- **Document-Session Workflow Transparency**: Added real-time TodoWrite tracking to `/use-case:document-session` command
+  - **Interactive Todo List**: Creates TodoWrite list at start showing 8 visible progress steps (breaking down 6 logical workflow phases)
+  - **Real-time Progress**: Updates todo status (pending → in_progress → completed) as work proceeds
+  - **Full Transparency**: Users see exactly what's happening at each step
+  - **6 Logical Workflow Phases** (as documented in the command file):
+    1. **Session Selection**: Detect recent work, present options, wait for user selection *(broken into 3 visible steps for granular tracking)*
+    2. **Environment Validation**: Check CLI version and project setup
+    3. **Session Analysis**: Analyze git history and/or conversation
+    4. **Information Extraction**: Gather metadata, complexity, time saved
+    5. **Documentation Generation**: Read template, create complete docs
+    6. **Commit and Sync**: Commit if implementation, sync to hub
+  - **8 Visible TodoWrite Steps** (for user progress tracking):
+    - Step 1-3: Session Selection broken into (a) Detect, (b) Present, (c) Wait
+    - Step 4-8: Map 1:1 to remaining phases 2-6
+  - **Benefits**:
+    - Eliminates confusion about what the command is doing
+    - Shows estimated time (30-60 seconds total)
+    - Helps track progress through long-running operations
+    - More granular progress visibility during session selection
+    - Makes automated workflow predictable and transparent
 
 - **VERSION-UPDATE-CHECKLIST.md Enhancements**: Improved documentation to prevent version update mistakes
   - Added prominent warning at top about README.md footer being commonly forgotten

@@ -1,7 +1,7 @@
 <div align="center">
     <img src="./media/ai_use_case_cli_banner.webp" alt="AI Use Case CLI - The Documenter" width="800"/>
     <h1>AI Use Case CLI</h1>
-    <h3><em><strong>v3.8.0</strong> - Document AI-assisted development workflows with ease.</em></h3>
+    <h3><em><strong>v3.9.0</strong> - Document AI-assisted development workflows with ease.</em></h3>
 </div>
 
 ---
@@ -83,6 +83,8 @@ cd ~/.local/share/ai-use-case-cli
    ```
    **v3.4.0+**: Interactively select which work to document (PRs, current session, or recent commits), then automatic generation captures context, git changes, and creates complete documentation.
 
+   **v3.9.0+**: Shows real-time progress through 8 visible steps (tracking 6 workflow phases) with todo list.
+
 4. **Search and analyze**:
    ```bash
    ai-use-case search "authentication"
@@ -156,7 +158,7 @@ The CLI provides flexible documentation storage options:
 ### Workflow
 
 1. **Setup**: Creates `.usecase/cases/` in your project + installs git hooks
-2. **Document**: `/use-case:document-session` presents options (PRs, current session, commits) → you select → automatic generation captures all details
+2. **Document**: `/use-case:document-session` presents options (PRs, current session, commits) → you select → automatic generation captures all details with real-time progress tracking
 3. **Sync**: Git hooks automatically sync to hub (with git operations if configured)
 4. **Organize**: Hub organizes docs by project, date, and topic
 
@@ -432,5 +434,5 @@ MIT License - see [LICENSE](./LICENSE) file for details
 
 ---
 
-**Version**: 3.8.0
+**Version**: 3.9.0
 **Last Updated**: 2025-11-13

@@ -18,7 +18,7 @@
 # 4. Commit with message: "chore: bump version to X.Y.Z"
 
 # Current CLI version
-export CLI_VERSION="3.8.0"
+export CLI_VERSION="3.9.0"
 
 # Version history (for reference)
 # 3.8.0 - 2025-11-13 - Command-specific progress tracking

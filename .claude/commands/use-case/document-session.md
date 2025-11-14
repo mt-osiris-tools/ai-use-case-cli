@@ -51,6 +51,62 @@ Before we start, here's the complete workflow you'll see:
 
 Help the user select which work session to document, then automatically generate comprehensive documentation by analyzing git history and conversation context.
 
+## 🚨 CRITICAL: Create Todo List First
+
+**BEFORE starting any work**, use the TodoWrite tool to create a todo list that shows the complete workflow. This provides transparency and helps track progress.
+
+**Context**: The workflow consists of **6 logical phases** (as shown in "📋 Documentation Workflow" above), but the TodoWrite list breaks down Phase 1 (Session Selection) into **3 visible progress steps** for more granular tracking. This results in **8 total TodoWrite items** that map to the 6-phase workflow structure.
+
+**Initial Todo List** (create this first with all items as "pending"):
+
+1. **Step 1: Detect Recent Work** *(Phase 1a - Session Selection)*
+   - content: "Detect recent work (PRs, commits, conversation)"
+   - activeForm: "Detecting recent work (PRs, commits, conversation)"
+
+2. **Step 2: Present Options** *(Phase 1b - Session Selection)*
+   - content: "Present prioritized documentation options to user"
+   - activeForm: "Presenting prioritized documentation options to user"
+
+3. **Step 3: Wait for Selection** *(Phase 1c - Session Selection)*
+   - content: "Wait for user to select which session to document"
+   - activeForm: "Waiting for user to select which session to document"
+
+4. **Step 4: Environment Validation** *(Phase 2)*
+   - content: "Check CLI version and verify project setup"
+   - activeForm: "Checking CLI version and verifying project setup"
+
+5. **Step 5: Session Analysis** *(Phase 3)*
+   - content: "Analyze git history and/or conversation context"
+   - activeForm: "Analyzing git history and/or conversation context"
+
+6. **Step 6: Extract Information** *(Phase 4)*
+   - content: "Extract metadata (date, ticket, complexity, time saved)"
+   - activeForm: "Extracting metadata (date, ticket, complexity, time saved)"
+
+7. **Step 7: Generate Documentation** *(Phase 5)*
+   - content: "Read template and generate complete documentation"
+   - activeForm: "Reading template and generating complete documentation"
+
+8. **Step 8: Commit and Sync** *(Phase 6)*
+   - content: "Commit documentation (if implementation) and sync to hub"
+   - activeForm: "Committing documentation (if implementation) and syncing to hub"
+
+**IMPORTANT**:
+- Mark each todo as "in_progress" when you start that step
+- Mark as "completed" immediately when finished
+- Update the list in real-time as you work through the steps
+- This provides full visibility to the user about what's happening
+
+Example:
+```
+# When starting Step 1
+TodoWrite: Mark "Step 1: Detect Recent Work" as in_progress
+
+# When Step 1 completes
+TodoWrite: Mark "Step 1: Detect Recent Work" as completed
+TodoWrite: Mark "Step 2: Present Options" as in_progress
+```
+
 ## Session Type Detection
 
 Session types:
