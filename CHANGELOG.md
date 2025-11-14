@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **README.md Footer Version**: Updated footer to correctly show v3.8.0 (was incorrectly showing v3.7.1)
+- **README.md Footer Version**: Fixed version mismatch (was showing v3.7.1, now correctly shows v3.9.0)
+  - During development, discovered footer was out of sync with actual version
   - Fixed version mismatch between `scripts/utils/version.sh` and README.md footer
   - Updated "Last Updated" date to 2025-11-13
 
