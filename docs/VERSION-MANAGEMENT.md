@@ -212,7 +212,7 @@ Shows:
 ### Example: Adding a New Feature (Minor)
 
 1. Current version: `2.3.0`
-2. Added new `backup` command
+2. Added new `export` command
 3. New version: `2.4.0`
 4. Update both files
 5. Commit: `chore: Bump version to 2.4.0`

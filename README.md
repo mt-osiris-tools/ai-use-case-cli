@@ -109,7 +109,6 @@ Use **either** standalone CLI or Claude Code slash commands—whatever fits your
 | List projects | `ai-use-case list` | `/use-case:list-projects` |
 | Check for updates | `ai-use-case check-updates` | `/use-case:check-updates` |
 | Update project | `ai-use-case update-project <path>` | `/use-case:update-project` |
-| Cleanup backups | `ai-use-case cleanup-backups [path]` | |
 | Reset configuration | `ai-use-case reset [options]` | |
 | Publish to Confluence | `ai-use-case publish-confluence` | `/use-case:publish-confluence` |
 | View hub | `ai-use-case view` | |
@@ -260,11 +259,6 @@ ai-use-case update-project /path/to/project
 
 # Refresh project installation (slash commands, git hooks)
 ai-use-case --init --update
-
-# Remove backup directories from a project
-ai-use-case cleanup-backups /path/to/project
-# Or cleanup current directory
-ai-use-case cleanup-backups
 ```
 
 Registry location: `~/.local/share/ai-use-case-cli/projects-registry.json`
@@ -277,15 +271,12 @@ When you update the CLI to a newer version, you may want to refresh your existin
 - Update Claude Code slash commands to newer versions
 - Update git hooks (pre-commit and post-commit) with latest changes
 - Preserve your existing `.usecase/cases/` directory and documentation
-- Create timestamped backups of hooks before updating
 
 **When to use:**
 - After updating the CLI (`git pull` in `~/.local/share/ai-use-case-cli`)
 - When new slash commands are added to the CLI
 - When git hooks receive bug fixes or improvements
 - If setup warnings suggest using `--update` to refresh components
-
-**Note**: During updates, the CLI automatically backs up old slash commands and git hooks to `.claude/backups/`. The update process keeps only the 3 most recent backups. Use `cleanup-backups` to manually remove all backup directories.
 
 ## Examples
 

@@ -67,7 +67,6 @@ ${YELLOW}COMMANDS${NC}
   ${GREEN}view${NC}                      Open hub directory in file explorer
   ${GREEN}push${NC}                      Push hub changes to remote repository
   ${GREEN}publish-confluence${NC}        Publish use case to Confluence
-  ${GREEN}cleanup-backups [path]${NC}    Remove backup files from project
   ${GREEN}tracing [subcommand]${NC}      Manage tracing configuration
   ${GREEN}reset [options]${NC}           Reset CLI configuration and data
   ${GREEN}update [options]${NC}          Update CLI to latest version
@@ -104,7 +103,6 @@ ${YELLOW}PROJECT REGISTRY (v3.1.0+)${NC}
   ${GREEN}list-projects${NC}             List registered projects with versions
   ${GREEN}check-updates${NC}             Check which projects need CLI updates
   ${GREEN}update-project <path>${NC}     Update project to latest CLI version
-  ${GREEN}cleanup-backups [path]${NC}    Remove backup files from project
 
 ${YELLOW}ENVIRONMENT${NC}
   AI_USECASES_DIR      Hub directory (default: ~/Documents/ai-use-case-hub)
@@ -301,18 +299,6 @@ case "${1:-}" in
         else
             trace_event "error" "command=update-project" "error=script_not_found" "script=update-project.sh"
             echo -e "${RED}Error: update-project.sh not found${NC}"
-            exit 1
-        fi
-        ;;
-    cleanup-backups)
-        trace_event "command_start" "command=cleanup-backups" "args=$*"
-        if [ -f "$SCRIPT_DIR/scripts/utils/cleanup-backups.sh" ]; then
-            # Pass all arguments after the command to the script
-            shift
-            trace_run "cleanup-backups" bash "$SCRIPT_DIR/scripts/utils/cleanup-backups.sh" "$@"
-        else
-            trace_event "error" "command=cleanup-backups" "error=script_not_found" "script=cleanup-backups.sh"
-            echo -e "${RED}Error: cleanup-backups.sh not found${NC}"
             exit 1
         fi
         ;;
