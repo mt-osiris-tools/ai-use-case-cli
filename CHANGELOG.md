@@ -29,15 +29,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - New "Mistake #1: Forgetting README.md footer" section with detailed explanation
   - Added "Automated Pre-Commit Validation" section with setup instructions
 
-- **Cross-Platform Compatibility**: Enhanced `scripts/install-dev-hooks.sh` and documentation for POSIX compliance
-  - Updated `set -e` to `set -euo pipefail` for robust error handling
+- **Cross-Platform Compatibility**: Documentation and patterns for POSIX compliance
+  - New `scripts/install-dev-hooks.sh` script uses `set -euo pipefail` for robust error handling
   - Added platform detection for `sed -i` command (macOS/Linux compatibility)
+  - Added fallback logic for hooks without explicit `exit 0` statement
   - New "Cross-Platform Compatibility" section in `docs/WORKFLOW.md` with guidelines
   - Updated Pre-PR checklist to verify cross-platform compatibility
   - Added reference examples from existing scripts (setup-project.sh, install-dev-hooks.sh)
   - Clarified that README.md has TWO locations requiring updates (header + footer)
   - Emphasized using `ai-use-case bump-version` script for automated updates
-  - Documented the new `install-dev-hooks.sh` script
 
 ## [3.8.0] - 2025-11-13
 

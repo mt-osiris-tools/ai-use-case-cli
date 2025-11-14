@@ -49,10 +49,13 @@ if [ -f "$HOOK_FILE" ]; then
         cp "$HOOK_FILE" "$HOOK_FILE.backup"
         echo -e "${BLUE}Backed up existing hook to pre-commit.backup${NC}"
 
-        # Add version validation before the final exit (platform-compatible)
-        if [[ "$(uname)" == "Darwin" ]]; then
-            # macOS (BSD sed)
-            sed -i '' '/^exit 0$/i \
+        # Add version validation (platform-compatible with fallback)
+        # Check if hook ends with 'exit 0' to determine insertion strategy
+        if grep -q '^exit 0$' "$HOOK_FILE"; then
+            # Insert before 'exit 0' (platform-compatible)
+            if [[ "$(uname)" == "Darwin" ]]; then
+                # macOS (BSD sed)
+                sed -i '' '/^exit 0$/i \
 # Version validation for ai-use-case-cli repository\
 if git diff --cached --name-only | grep -qE "(version\\.sh|README\\.md|CHANGELOG\\.md)"; then\
     echo "Validating version consistency..."\
@@ -66,22 +69,40 @@ if git diff --cached --name-only | grep -qE "(version\\.sh|README\\.md|CHANGELOG
     echo "✓ Version validation passed"\
 fi\
 ' "$HOOK_FILE"
+            else
+                # Linux (GNU sed)
+                sed -i '/^exit 0$/i \
+# Version validation for ai-use-case-cli repository\
+if git diff --cached --name-only | grep -qE "(version\\.sh|README\\.md|CHANGELOG\\.md)"; then\
+    echo "Validating version consistency..."\
+    if ! ./scripts/utils/validate-versions.sh; then\
+        echo ""\
+        echo "❌ Version validation failed!"\
+        echo "Fix version inconsistencies before committing."\
+        echo "Or run: ai-use-case bump-version [major|minor|patch]"\
+        exit 1\
+    fi\
+    echo "✓ Version validation passed"\
+fi\
+' "$HOOK_FILE"
+            fi
         else
-            # Linux (GNU sed)
-            sed -i '/^exit 0$/i \
-# Version validation for ai-use-case-cli repository\
-if git diff --cached --name-only | grep -qE "(version\\.sh|README\\.md|CHANGELOG\\.md)"; then\
-    echo "Validating version consistency..."\
-    if ! ./scripts/utils/validate-versions.sh; then\
-        echo ""\
-        echo "❌ Version validation failed!"\
-        echo "Fix version inconsistencies before committing."\
-        echo "Or run: ai-use-case bump-version [major|minor|patch]"\
-        exit 1\
-    fi\
-    echo "✓ Version validation passed"\
-fi\
-' "$HOOK_FILE"
+            # No 'exit 0' found, append to end of file
+            cat >> "$HOOK_FILE" << 'EOF'
+
+# Version validation for ai-use-case-cli repository
+if git diff --cached --name-only | grep -qE "(version\.sh|README\.md|CHANGELOG\.md)"; then
+    echo "Validating version consistency..."
+    if ! ./scripts/utils/validate-versions.sh; then
+        echo ""
+        echo "❌ Version validation failed!"
+        echo "Fix version inconsistencies before committing."
+        echo "Or run: ai-use-case bump-version [major|minor|patch]"
+        exit 1
+    fi
+    echo "✓ Version validation passed"
+fi
+EOF
         fi
 
         echo -e "${GREEN}✓ Version validation added to existing hook${NC}"
