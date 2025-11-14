@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Documentation**: Updated README banner image to new design (`ai_use_case_cli_documentator_04.webp`)
+
 ### Fixed
 
 - **Installation Script**: Modernized `scripts/install/install.sh` to align with v3.2.0+ features
