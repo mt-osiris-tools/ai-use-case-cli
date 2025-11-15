@@ -182,9 +182,25 @@ SINCE_DATE=$(date -d "${TIME_WINDOW} hours ago" '+%Y-%m-%d %H:%M:%S' 2>/dev/null
 TOTAL_COMMITS=$(git log --since="${SINCE_DATE}" --oneline | wc -l)
 
 # Extract commit data as JSON array
+# Use null-character as field delimiter and jq --arg for safe JSON construction
+# This prevents special characters in commit messages from breaking JSON syntax
+# Output as compact JSON to avoid heredoc formatting issues
 COMMITS_JSON="[]"
 if [ "$TOTAL_COMMITS" -gt 0 ]; then
-    COMMITS_JSON=$(git log --since="${SINCE_DATE}" --pretty=format:'{"hash":"%h","fullHash":"%H","message":"%s","author":"%an","email":"%ae","timestamp":"%ai","relative":"%ar"}' | jq -s '.')
+    COMMITS_JSON=$(git log --since="${SINCE_DATE}" --format='%H%x00%h%x00%s%x00%an%x00%ae%x00%ai%x00%ar' | \
+        while IFS= read -r line; do
+            # Split each line by null characters into fields
+            IFS=$'\x00' read -r full_hash hash message author email timestamp relative <<< "$line"
+            jq -nc \
+                --arg hash "$hash" \
+                --arg fullHash "$full_hash" \
+                --arg message "$message" \
+                --arg author "$author" \
+                --arg email "$email" \
+                --arg timestamp "$timestamp" \
+                --arg relative "$relative" \
+                '{hash: $hash, fullHash: $fullHash, message: $message, author: $author, email: $email, timestamp: $timestamp, relative: $relative}'
+        done | jq -sc '.')
 fi
 
 # Get detailed stats for each commit
@@ -213,16 +229,21 @@ if [ "$TOTAL_COMMITS" -gt 0 ]; then
 fi
 
 # Get list of modified files
+# Output as compact JSON to avoid heredoc formatting issues
 if [ "$TOTAL_COMMITS" -gt 0 ]; then
-    MODIFIED_FILES=$(git diff --name-only HEAD~${TOTAL_COMMITS}..HEAD 2>/dev/null | jq -R . | jq -s . || echo "[]")
+    MODIFIED_FILES=$(git diff --name-only HEAD~${TOTAL_COMMITS}..HEAD 2>/dev/null | jq -Rsc 'split("\n") | map(select(length > 0))')
 else
     MODIFIED_FILES="[]"
 fi
 
 # Get uncommitted changes
-UNCOMMITTED_MODIFIED=$(git status --short | grep '^ M' | awk '{print $2}' | jq -R . | jq -s . || echo "[]")
-UNCOMMITTED_NEW=$(git status --short | grep '^??' | awk '{print $2}' | jq -R . | jq -s . || echo "[]")
-UNCOMMITTED_DELETED=$(git status --short | grep '^ D' | awk '{print $2}' | jq -R . | jq -s . || echo "[]")
+# Output as compact JSON (single line) to avoid heredoc formatting issues
+# Use || true to prevent grep from failing the pipeline when no matches found
+# Call git status once and reuse the output for efficiency
+GIT_STATUS_SHORT="$(git status --short)"
+UNCOMMITTED_MODIFIED=$(echo "$GIT_STATUS_SHORT" | (grep '^ M' || true) | awk '{print $2}' | jq -Rsc 'split("\n") | map(select(length > 0))')
+UNCOMMITTED_NEW=$(echo "$GIT_STATUS_SHORT" | (grep '^??' || true) | awk '{print $2}' | jq -Rsc 'split("\n") | map(select(length > 0))')
+UNCOMMITTED_DELETED=$(echo "$GIT_STATUS_SHORT" | (grep '^ D' || true) | awk '{print $2}' | jq -Rsc 'split("\n") | map(select(length > 0))')
 
 # Calculate session duration
 if [ "$TOTAL_COMMITS" -gt 0 ]; then
