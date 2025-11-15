@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Script Permissions**: Made `scripts/utils/progress-tracker.sh` and `scripts/utils/version.sh` executable
+  - Fixed missing execute permissions on utility scripts
+  - Ensures scripts can be run directly without explicit bash invocation
 - **Installation Script**: Modernized `scripts/install/install.sh` to align with v3.2.0+ features
   - **Fixed install URL**: Corrected quick-install curl command path (was `/install.sh`, now `/scripts/install/install.sh`)
   - **Removed deprecated environment variables**: No longer sets `AI_USECASES_DIR` and `AI_USECASES_SYNC_SCRIPT` in shell profiles
