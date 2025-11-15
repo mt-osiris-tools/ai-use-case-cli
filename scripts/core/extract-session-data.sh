@@ -182,14 +182,15 @@ SINCE_DATE=$(date -d "${TIME_WINDOW} hours ago" '+%Y-%m-%d %H:%M:%S' 2>/dev/null
 TOTAL_COMMITS=$(git log --since="${SINCE_DATE}" --oneline | wc -l)
 
 # Extract commit data as JSON array
-# Use null-character delimiter for parsing to handle special characters in commit messages
+# Use null-character as field delimiter and jq --arg for safe JSON construction
+# This prevents special characters in commit messages from breaking JSON syntax
 # Output as compact JSON to avoid heredoc formatting issues
 COMMITS_JSON="[]"
 if [ "$TOTAL_COMMITS" -gt 0 ]; then
-    COMMITS_JSON=$(git log --since="${SINCE_DATE}" --format='%H%x00%h%x00%s%x00%an%x00%ae%x00%ai%x00%ar%x00' | \
-        while IFS= read -r -d $'\0' line; do
-            # Split the line into fields using null delimiter
-            IFS=$'\x00' read -r full_hash hash message author email timestamp relative _ <<< "$line"
+    COMMITS_JSON=$(git log --since="${SINCE_DATE}" --format='%H%x00%h%x00%s%x00%an%x00%ae%x00%ai%x00%ar' | \
+        while IFS= read -r line; do
+            # Split each line by null characters into fields
+            IFS=$'\x00' read -r full_hash hash message author email timestamp relative <<< "$line"
             jq -nc \
                 --arg hash "$hash" \
                 --arg fullHash "$full_hash" \

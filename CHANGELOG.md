@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Fixed special character escaping**: Commit messages with special characters (curly quotes, etc.) now properly escaped using `jq --arg` instead of format strings
   - **Fixed duplicate array bug**: Removed duplicate empty arrays caused by `pipefail` triggering fallback `|| echo "[]"` commands
   - **Fixed compact JSON output**: All JSON arrays now output as compact single-line format to prevent heredoc formatting issues
-  - **Improved delimiter robustness**: Changed from pipe (`|`) to null character (`\x00`) delimiter for git log parsing to handle pipe characters in commit messages
+  - **Improved delimiter robustness**: Changed from direct JSON format strings to null character (`\x00`) delimiter for git log parsing to handle special characters in commit messages
   - **Optimized jq processing**: Simplified double jq piping to single invocation using `jq -Rsc 'split("\n") | map(select(length > 0))'` for better performance
   - **Reduced git subprocess calls**: Now calls `git status --short` once and reuses output, reducing from 3 subprocess invocations to 1
   - **Root cause**: `set -euo pipefail` caused grep commands to fail pipeline when no matches found, triggering both jq output AND fallback echo
