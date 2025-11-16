@@ -37,7 +37,7 @@ All templates support the following placeholders that will be replaced with actu
 > - Both templates handle missing placeholders gracefully with default values
 
 ### Page Metadata
-- `{{PAGE_TITLE}}` - Full page title (e.g., "Week 45 | LSFB-123: Feature Implementation")
+- `{{PAGE_TITLE}}` - Full page title including week number (e.g., "Week 45 | LSFB-123: Feature Implementation")
 - `{{PAGE_EMOJI}}` - Emoji indicator (default: 🎯)
 - `{{PAGE_DESCRIPTION}}` - Brief description of the use case
 - `{{WEEK_NUMBER}}` - Week number (e.g., "Week 45")
@@ -88,6 +88,19 @@ All templates support the following placeholders that will be replaced with actu
 - `{{ATTACHMENTS}}` - Use with `{{#if ATTACHMENTS}}...{{/if}}`
 
 ## Usage Examples
+
+### Week Number in Title
+When processing a file named `2025-W45-11-08_DEMO-123_implement-feature.md`:
+1. The processor extracts week "W45" from the filename
+2. Converts it to "Week 45" for display
+3. Generates PAGE_TITLE as "Week 45 | DEMO-123: Implement Feature"
+4. Both templates display this in `<title>` tag and main `<h1>` heading
+
+**Result in HTML:**
+```html
+<title>Week 45 | DEMO-123: Implement Feature</title>
+<h1>🎯 Week 45 | DEMO-123: Implement Feature</h1>
+```
 
 ### Basic Replacement
 ```javascript
