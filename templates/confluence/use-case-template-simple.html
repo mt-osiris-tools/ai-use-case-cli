@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{PAGE_TITLE}}</title>
+</head>
+<body>
+    <!-- Confluence Storage Format Compatible Template -->
+    <!-- This simplified version focuses on content structure over visual styling -->
+
+    <!-- Page Title -->
+    <h1>{{PAGE_EMOJI}} {{PAGE_TITLE}}</h1>
+
+    <!-- Metadata Table -->
+    <ac:structured-macro ac:name="info" ac:schema-version="1">
+        <ac:rich-text-body>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Week</th>
+                        <td>{{WEEK_NUMBER}}</td>
+                        <th>Date</th>
+                        <td>{{DATE}}</td>
+                    </tr>
+                    <tr>
+                        <th>Ticket</th>
+                        <td><a href="{{TICKET_URL}}">{{TICKET_ID}}</a></td>
+                        <th>Status</th>
+                        <td>
+                            <ac:structured-macro ac:name="status" ac:schema-version="1">
+                                <ac:parameter ac:name="colour">{{STATUS_COLOR}}</ac:parameter>
+                                <ac:parameter ac:name="title">{{STATUS}}</ac:parameter>
+                            </ac:structured-macro>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Project</th>
+                        <td>{{PROJECT_NAME}}</td>
+                        <th>Author</th>
+                        <td>{{AUTHOR}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </ac:rich-text-body>
+    </ac:structured-macro>
+
+    <!-- Table of Contents -->
+    <ac:structured-macro ac:name="toc" ac:schema-version="1">
+        <ac:parameter ac:name="maxLevel">3</ac:parameter>
+    </ac:structured-macro>
+
+    <!-- Executive Summary Panel -->
+    <ac:structured-macro ac:name="panel" ac:schema-version="1">
+        <ac:parameter ac:name="bgColor">#EAE6FF</ac:parameter>
+        <ac:parameter ac:name="titleBGColor">#8777D9</ac:parameter>
+        <ac:parameter ac:name="title">Executive Summary</ac:parameter>
+        <ac:rich-text-body>
+            <p>{{EXECUTIVE_SUMMARY}}</p>
+        </ac:rich-text-body>
+    </ac:structured-macro>
+
+    <!-- Main Content Sections -->
+    <h2>Context &amp; Objective</h2>
+    {{CONTEXT_CONTENT}}
+
+    <h2>AI Tools Used</h2>
+    <ac:structured-macro ac:name="panel" ac:schema-version="1">
+        <ac:rich-text-body>
+            <ul>
+                {{AI_TOOLS_LIST}}
+            </ul>
+        </ac:rich-text-body>
+    </ac:structured-macro>
+
+    <h2>Implementation</h2>
+    {{IMPLEMENTATION_CONTENT}}
+
+    <!-- Code Block Example -->
+    {{#if CODE_EXAMPLES}}
+    <h2>Code Examples</h2>
+    <ac:structured-macro ac:name="code" ac:schema-version="1">
+        <ac:parameter ac:name="language">{{CODE_LANGUAGE}}</ac:parameter>
+        <ac:parameter ac:name="theme">Midnight</ac:parameter>
+        <ac:parameter ac:name="linenumbers">true</ac:parameter>
+        <ac:plain-text-body><![CDATA[{{CODE_EXAMPLES}}]]></ac:plain-text-body>
+    </ac:structured-macro>
+    {{/if}}
+
+    <!-- Challenges Table -->
+    <h2>Challenges &amp; Solutions</h2>
+    <table>
+        <thead>
+            <tr>
+                <th scope="col">Challenge</th>
+                <th scope="col">Solution</th>
+                <th scope="col">AI Contribution</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{CHALLENGES_TABLE_ROWS}}
+        </tbody>
+    </table>
+
+    <!-- Key Learnings -->
+    <h2>Key Learnings</h2>
+    <ac:structured-macro ac:name="note" ac:schema-version="1">
+        <ac:rich-text-body>
+            <ul>
+                {{KEY_LEARNINGS_LIST}}
+            </ul>
+        </ac:rich-text-body>
+    </ac:structured-macro>
+
+    <!-- Effective Prompts -->
+    <h2>Effective Prompts &amp; Techniques</h2>
+    <ac:structured-macro ac:name="expand" ac:schema-version="1">
+        <ac:parameter ac:name="title">View Prompts Used</ac:parameter>
+        <ac:rich-text-body>
+            {{PROMPTS_CONTENT}}
+        </ac:rich-text-body>
+    </ac:structured-macro>
+
+    <!-- Metrics -->
+    <h2>Metrics &amp; Impact</h2>
+    <ac:structured-macro ac:name="panel" ac:schema-version="1">
+        <ac:parameter ac:name="borderStyle">solid</ac:parameter>
+        <ac:rich-text-body>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><strong>Time Saved:</strong></td>
+                        <td>{{TIME_SAVED}}</td>
+                        <td><strong>Lines Generated:</strong></td>
+                        <td>{{LINES_OF_CODE}}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AI Iterations:</strong></td>
+                        <td>{{ITERATIONS}}</td>
+                        <td><strong>Success Rate:</strong></td>
+                        <td>{{SUCCESS_RATE}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </ac:rich-text-body>
+    </ac:structured-macro>
+
+    <!-- Related Links -->
+    <h2>Related Resources</h2>
+    <ul>
+        {{RELATED_RESOURCES}}
+    </ul>
+
+    <!-- Labels/Tags -->
+    <ac:structured-macro ac:name="contentbylabel" ac:schema-version="3">
+        <ac:parameter ac:name="labels">{{CONFLUENCE_LABELS}}</ac:parameter>
+    </ac:structured-macro>
+
+    <!-- Attachments Section -->
+    {{#if ATTACHMENTS}}
+    <h2>Attachments</h2>
+    <ac:structured-macro ac:name="attachments" ac:schema-version="1" />
+    {{/if}}
+
+    <!-- Original Markdown (Collapsed) -->
+    <ac:structured-macro ac:name="expand" ac:schema-version="1">
+        <ac:parameter ac:name="title">View Original Markdown</ac:parameter>
+        <ac:rich-text-body>
+            <ac:structured-macro ac:name="code" ac:schema-version="1">
+                <ac:parameter ac:name="language">markdown</ac:parameter>
+                <ac:plain-text-body><![CDATA[{{ORIGINAL_MARKDOWN}}]]></ac:plain-text-body>
+            </ac:structured-macro>
+        </ac:rich-text-body>
+    </ac:structured-macro>
+
+    <!-- Footer Information -->
+    <hr />
+    <p style="font-size: 0.9em; color: #666;">
+        <em>Generated by AI Use Case CLI v{{CLI_VERSION}} | Template: Simple Confluence v1.0 | {{LAST_UPDATED}}</em>
+    </p>
+</body>
+</html>

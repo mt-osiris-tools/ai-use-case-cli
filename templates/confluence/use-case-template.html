@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{PAGE_TITLE}}</title>
+    <style>
+        /* Confluence-compatible inline styles */
+        .use-case-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .metadata-item {
+            background: #f7fafc;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 3px solid #4299e1;
+        }
+        .section-header {
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+            margin: 25px 0 15px 0;
+        }
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+        }
+        .tag {
+            display: inline-block;
+            background: #edf2f7;
+            color: #4a5568;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            margin: 2px;
+        }
+        .summary-box {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .learning-points {
+            background: #fef5e7;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .tool-badge {
+            background: #5e72e4;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        .status-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85em;
+        }
+        .status-completed {
+            background: #c6f6d5;
+            color: #1a472a; /* Darker for better contrast (WCAG AA) */
+        }
+        .status-in-progress {
+            background: #fed7d7;
+            color: #6b1f1f; /* Darker for better contrast (WCAG AA) */
+        }
+        .timeline-item {
+            border-left: 2px solid #cbd5e0;
+            padding-left: 20px;
+            margin-left: 10px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -7px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            background: #4299e1;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Header with Gradient Background -->
+    <div class="use-case-header">
+        <h1 style="margin: 0; font-size: 24px;">{{PAGE_EMOJI}} {{PAGE_TITLE}}</h1>
+        <p style="margin: 10px 0 0 0; opacity: 0.95;">{{PAGE_DESCRIPTION}}</p>
+    </div>
+
+    <!-- Metadata Section -->
+    <div class="metadata-grid">
+        <div class="metadata-item">
+            <strong style="color: #718096; font-size: 0.85em;">Week</strong>
+            <div style="font-size: 1.1em; margin-top: 4px;">{{WEEK_NUMBER}}</div>
+        </div>
+        <div class="metadata-item">
+            <strong style="color: #718096; font-size: 0.85em;">Date</strong>
+            <div style="font-size: 1.1em; margin-top: 4px;">{{DATE}}</div>
+        </div>
+        <div class="metadata-item">
+            <strong style="color: #718096; font-size: 0.85em;">Ticket</strong>
+            <div style="font-size: 1.1em; margin-top: 4px;">
+                <a href="{{TICKET_URL}}" style="color: #4299e1; text-decoration: none;">{{TICKET_ID}}</a>
+            </div>
+        </div>
+        <div class="metadata-item">
+            <strong style="color: #718096; font-size: 0.85em;">Status</strong>
+            <div style="margin-top: 4px;">
+                <span class="status-indicator status-{{STATUS_CLASS}}" role="status" aria-label="Status">{{STATUS}}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Executive Summary -->
+    <div class="summary-box">
+        <h2 style="margin-top: 0; color: #22543d; font-size: 18px;">📋 Executive Summary</h2>
+        <p>{{EXECUTIVE_SUMMARY}}</p>
+    </div>
+
+    <!-- Context Section -->
+    <h2 class="section-header">🎯 Context & Objective</h2>
+    <div style="background: #f7fafc; padding: 15px; border-radius: 6px;">
+        {{CONTEXT_CONTENT}}
+    </div>
+
+    <!-- AI Tools Used -->
+    <h2 class="section-header">🤖 AI Tools & Models</h2>
+    <div class="tools-grid">
+        {{AI_TOOLS_BADGES}}
+        <!-- Example badges:
+        <div class="tool-badge">Claude 3.5</div>
+        <div class="tool-badge">GPT-4</div>
+        <div class="tool-badge">GitHub Copilot</div>
+        -->
+    </div>
+
+    <!-- Implementation Details -->
+    <h2 class="section-header">💻 Implementation Details</h2>
+    <div style="padding: 10px 0;">
+        {{IMPLEMENTATION_CONTENT}}
+    </div>
+
+    <!-- Code Examples (if applicable) -->
+    {{#if CODE_EXAMPLES}}
+    <h2 class="section-header">📝 Code Examples</h2>
+    <div class="code-block">
+        <pre>{{CODE_EXAMPLES}}</pre>
+    </div>
+    {{/if}}
+
+    <!-- Challenges & Solutions -->
+    <h2 class="section-header">🔧 Challenges & Solutions</h2>
+    <table role="table" aria-label="Challenges and Solutions" style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+        <thead>
+            <tr style="background: #edf2f7;">
+                <th scope="col" style="padding: 10px; text-align: left; border: 1px solid #e2e8f0;">Challenge</th>
+                <th scope="col" style="padding: 10px; text-align: left; border: 1px solid #e2e8f0;">Solution</th>
+                <th scope="col" style="padding: 10px; text-align: left; border: 1px solid #e2e8f0;">AI Assistance</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{CHALLENGES_TABLE_ROWS}}
+            <!-- Example row:
+            <tr>
+                <td style="padding: 10px; border: 1px solid #e2e8f0;">Complex regex pattern</td>
+                <td style="padding: 10px; border: 1px solid #e2e8f0;">Used AI to generate and explain pattern</td>
+                <td style="padding: 10px; border: 1px solid #e2e8f0;">Claude provided regex with detailed breakdown</td>
+            </tr>
+            -->
+        </tbody>
+    </table>
+
+    <!-- Key Learnings -->
+    <div class="learning-points">
+        <h2 style="margin-top: 0; color: #d68910; font-size: 18px;">💡 Key Learnings</h2>
+        <ul style="margin: 10px 0;">
+            {{KEY_LEARNINGS_LIST}}
+            <!-- Example items:
+            <li>AI excels at generating boilerplate code</li>
+            <li>Always review generated regex patterns</li>
+            -->
+        </ul>
+    </div>
+
+    <!-- Timeline (Optional) -->
+    {{#if TIMELINE_ITEMS}}
+    <h2 class="section-header">📅 Development Timeline</h2>
+    <div style="margin: 20px 0;">
+        {{TIMELINE_ITEMS}}
+        <!-- Example timeline items:
+        <div class="timeline-item">
+            <strong>Day 1:</strong> Initial research and planning
+        </div>
+        <div class="timeline-item">
+            <strong>Day 2:</strong> Implementation with AI assistance
+        </div>
+        -->
+    </div>
+    {{/if}}
+
+    <!-- Prompts & Techniques -->
+    <h2 class="section-header">✨ Effective Prompts & Techniques</h2>
+    <div style="background: #faf5ff; border: 1px solid #d6bcfa; padding: 15px; border-radius: 6px;">
+        {{PROMPTS_CONTENT}}
+    </div>
+
+    <!-- Metrics & Impact -->
+    <h2 class="section-header">📊 Metrics & Impact</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <div style="background: #e6fffa; padding: 15px; border-radius: 6px; text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; color: #234e52;">{{TIME_SAVED}}</div>
+            <div style="color: #2c7a7b; font-size: 0.9em;">Time Saved</div>
+        </div>
+        <div style="background: #f0fff4; padding: 15px; border-radius: 6px; text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; color: #22543d;">{{LINES_OF_CODE}}</div>
+            <div style="color: #276749; font-size: 0.9em;">Lines Generated</div>
+        </div>
+        <div style="background: #fef5e7; padding: 15px; border-radius: 6px; text-align: center;">
+            <div style="font-size: 24px; font-weight: bold; color: #7d4f07;">{{ITERATIONS}}</div>
+            <div style="color: #975a16; font-size: 0.9em;">AI Iterations</div>
+        </div>
+    </div>
+
+    <!-- Related Resources -->
+    <h2 class="section-header">🔗 Related Resources</h2>
+    <ul style="list-style-type: none; padding: 0;">
+        {{RELATED_RESOURCES}}
+        <!-- Example resources:
+        <li style="margin: 8px 0;">
+            📄 <a href="link" style="color: #4299e1;">Related Documentation</a>
+        </li>
+        <li style="margin: 8px 0;">
+            🔗 <a href="link" style="color: #4299e1;">GitHub PR #123</a>
+        </li>
+        -->
+    </ul>
+
+    <!-- Tags -->
+    <h2 class="section-header">🏷️ Tags</h2>
+    <div style="margin: 15px 0;">
+        {{TAGS_LIST}}
+        <!-- Example tags:
+        <span class="tag">Python</span>
+        <span class="tag">Machine Learning</span>
+        <span class="tag">Code Generation</span>
+        -->
+    </div>
+
+    <!-- Footer -->
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #718096; font-size: 0.9em;">
+        <p style="margin: 5px 0;">
+            <strong>Generated by:</strong> AI Use Case CLI v{{CLI_VERSION}}<br>
+            <strong>Template:</strong> Confluence Use Case Template v1.0<br>
+            <strong>Last Updated:</strong> {{LAST_UPDATED}}
+        </p>
+    </div>
+
+    <!-- Original Markdown Content (Hidden, for reference) -->
+    <div style="display: none;">
+        <!-- Original markdown content preserved for future reference -->
+        <pre>{{ORIGINAL_MARKDOWN}}</pre>
+    </div>
+</body>
+</html>
