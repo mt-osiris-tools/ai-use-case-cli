@@ -18,9 +18,11 @@
 # 4. Commit with message: "chore: bump version to X.Y.Z"
 
 # Current CLI version
-export CLI_VERSION="3.9.0"
+export CLI_VERSION="3.9.1"
 
 # Version history (for reference)
+# 3.9.1 - 2025-11-15 - Fix JSON parsing and script permissions
+# 3.9.0 - 2025-11-13 - Development git hooks installer
 # 3.8.0 - 2025-11-13 - Command-specific progress tracking
 # 3.7.1 - 2025-11-10 - Fix extract-session-data SIGPIPE handling
 # 3.7.0 - 2025-11-10 - Reset command and critical tracing fixes
