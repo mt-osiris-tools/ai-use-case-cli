@@ -86,8 +86,9 @@ extract_filename_metadata() {
         export DATE="$YEAR-$MONTH-$DAY"
 
         # Convert slug to title (replace hyphens with spaces, capitalize)
+        # Use awk for portability across BSD/GNU sed
         local title
-        title=$(echo "$SLUG" | tr '-' ' ' | sed 's/\b\(.\)/\u\1/g')
+        title=$(echo "$SLUG" | tr '-' ' ' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))}1')
         export DESCRIPTION="$title"
 
         return 0
@@ -163,7 +164,14 @@ generate_defaults() {
     export TIMELINE_ITEMS="${TIMELINE_ITEMS:-}"  # Empty by default for conditional sections
 
     # System info
-    export CLI_VERSION="${CLI_VERSION:-3.9.1}"
+    # Source version from central location
+    SCRIPT_BASE_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+    if [ -f "$SCRIPT_BASE_DIR/scripts/utils/version.sh" ]; then
+        source "$SCRIPT_BASE_DIR/scripts/utils/version.sh"
+        export CLI_VERSION="${VERSION}"
+    else
+        export CLI_VERSION="${CLI_VERSION:-unknown}"
+    fi
     export LAST_UPDATED="${LAST_UPDATED:-$(date +'%Y-%m-%d %H:%M:%S')}"
     export CODE_LANGUAGE="${CODE_LANGUAGE:-bash}"
 }
@@ -225,16 +233,33 @@ process_template() {
     template_content="${template_content//\{\{CLI_VERSION\}\}/$CLI_VERSION}"
     template_content="${template_content//\{\{LAST_UPDATED\}\}/$LAST_UPDATED}"
 
-    # Original markdown (escape for HTML)
+    # Original markdown (escape for HTML with proper handling of all special characters)
     local escaped_markdown
-    escaped_markdown=$(echo "$ORIGINAL_MARKDOWN" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+    escaped_markdown=$(printf '%s\n' "$ORIGINAL_MARKDOWN" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g; s/"/\&quot;/g; s/'\''/\&#39;/g')
     template_content="${template_content//\{\{ORIGINAL_MARKDOWN\}\}/$escaped_markdown}"
 
-    # Handle conditional sections (simple implementation)
-    # Remove {{#if}} blocks where variable is empty
-    template_content=$(echo "$template_content" | sed '/{{#if CODE_EXAMPLES}}/,/{{\/if}}/d' 2>/dev/null || echo "$template_content")
-    template_content=$(echo "$template_content" | sed '/{{#if TIMELINE_ITEMS}}/,/{{\/if}}/d' 2>/dev/null || echo "$template_content")
-    template_content=$(echo "$template_content" | sed '/{{#if ATTACHMENTS}}/,/{{\/if}}/d' 2>/dev/null || echo "$template_content")
+    # Handle conditional sections properly
+    # Remove {{#if}} blocks only if variable is empty; otherwise, remove just the markers
+    if [[ -z "$CODE_EXAMPLES" ]]; then
+        template_content=$(echo "$template_content" | sed '/{{#if CODE_EXAMPLES}}/,/{{\/if}}/d' 2>/dev/null || echo "$template_content")
+    else
+        template_content="${template_content//\{\{#if CODE_EXAMPLES\}\}/}"
+        template_content="${template_content//\{\{\/if\}\}/}"
+    fi
+
+    if [[ -z "$TIMELINE_ITEMS" ]]; then
+        template_content=$(echo "$template_content" | sed '/{{#if TIMELINE_ITEMS}}/,/{{\/if}}/d' 2>/dev/null || echo "$template_content")
+    else
+        template_content="${template_content//\{\{#if TIMELINE_ITEMS\}\}/}"
+        template_content="${template_content//\{\{\/if\}\}/}"
+    fi
+
+    if [[ -z "$ATTACHMENTS" ]]; then
+        template_content=$(echo "$template_content" | sed '/{{#if ATTACHMENTS}}/,/{{\/if}}/d' 2>/dev/null || echo "$template_content")
+    else
+        template_content="${template_content//\{\{#if ATTACHMENTS\}\}/}"
+        template_content="${template_content//\{\{\/if\}\}/}"
+    fi
 
     # Output
     if [[ "$output" == "-" ]]; then
@@ -257,10 +282,16 @@ main() {
     while [[ $# -gt 0 ]]; do
         case $1 in
             -t|--template)
+                if [[ -z "${2:-}" ]] || [[ "$2" == -* ]]; then
+                    error "Option --template requires an argument"
+                fi
                 template_file="$2"
                 shift 2
                 ;;
             -o|--output)
+                if [[ -z "${2:-}" ]] || [[ "$2" == -* ]]; then
+                    error "Option --output requires an argument"
+                fi
                 output_file="$2"
                 shift 2
                 ;;
@@ -269,6 +300,9 @@ main() {
                 shift
                 ;;
             -m|--metadata)
+                if [[ -z "${2:-}" ]] || [[ "$2" == -* ]]; then
+                    error "Option --metadata requires an argument"
+                fi
                 metadata_file="$2"
                 shift 2
                 ;;
@@ -313,9 +347,14 @@ main() {
     # Load additional metadata if provided
     if [[ -n "$metadata_file" ]] && [[ -f "$metadata_file" ]]; then
         info "Loading metadata from: $metadata_file"
-        # Source JSON metadata (basic implementation)
-        # In production, use jq or proper JSON parser
-        source "$metadata_file" 2>/dev/null || true
+        # Parse JSON metadata safely using jq
+        if command -v jq >/dev/null 2>&1; then
+            while IFS='=' read -r key value; do
+                [[ -n "$key" ]] && export "$key=$value"
+            done < <(jq -r 'to_entries|map("\(.key)=\(.value|tostring)")|.[]' "$metadata_file" 2>/dev/null || true)
+        else
+            error "jq is required to parse JSON metadata files. Install with: apt-get install jq (Debian/Ubuntu) or brew install jq (macOS)"
+        fi
     fi
 
     # Generate defaults for missing values

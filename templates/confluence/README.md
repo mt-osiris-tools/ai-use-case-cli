@@ -91,6 +91,13 @@ All templates support the following placeholders that will be replaced with actu
 
 ### Week Number in Title
 When processing a file named `2025-W45-11-08_DEMO-123_implement-feature.md`:
+
+> **Format Note:** The filename follows `YYYY-Www-MM-DD_TICKET-XXX_description.md` where:
+> - `YYYY` = Year (2025)
+> - `Www` = Week number (W45 = week 45)
+> - `MM-DD` = Calendar date (11-08 = November 8th)
+> - The `MM-DD` represents the actual calendar date that falls within the specified week
+
 1. The processor extracts week "W45" from the filename
 2. Converts it to "Week 45" for display
 3. Generates PAGE_TITLE as "Week 45 | DEMO-123: Implement Feature"
@@ -102,24 +109,33 @@ When processing a file named `2025-W45-11-08_DEMO-123_implement-feature.md`:
 <h1>🎯 Week 45 | DEMO-123: Implement Feature</h1>
 ```
 
-### Basic Replacement
-```javascript
-const template = fs.readFileSync('use-case-template.html', 'utf8');
-const html = template
-  .replace('{{PAGE_TITLE}}', 'Week 45 | LSFB-123: Feature Implementation')
-  .replace('{{WEEK_NUMBER}}', 'Week 45')
-  .replace('{{DATE}}', '2025-11-09')
-  .replace('{{TICKET_ID}}', 'LSFB-123');
+### Basic Command Line Usage
+```bash
+# Using the process-template.sh script (recommended)
+./process-template.sh 2025-W45-11-08_LSFB-123_feature-implementation.md > output.html
+
+# With the rich template
+./process-template.sh --rich 2025-W45-11-08_LSFB-123_feature-implementation.md > output.html
+
+# Save to specific file
+./process-template.sh -o confluence.html 2025-W45-11-08_LSFB-123_feature-implementation.md
 ```
 
 ### Conditional Sections
-Templates support conditional rendering using Handlebars-style syntax:
+Templates support conditional rendering using Handlebars-style syntax. The processor will:
+- Remove the entire `{{#if}}` block (including markers and content) if the variable is empty
+- Remove only the conditional markers (`{{#if}}` and `{{/if}}`) if the variable has content, keeping the content
+
 ```html
 {{#if CODE_EXAMPLES}}
 <h2>Code Examples</h2>
 <pre>{{CODE_EXAMPLES}}</pre>
 {{/if}}
 ```
+
+**Behavior:**
+- If `CODE_EXAMPLES` is empty → entire block is removed
+- If `CODE_EXAMPLES` has content → markers removed, content and heading remain
 
 ### Table Rows Example
 For `{{CHALLENGES_TABLE_ROWS}}`:

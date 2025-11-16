@@ -83,11 +83,11 @@
         }
         .status-completed {
             background: #c6f6d5;
-            color: #22543d;
+            color: #1a472a; /* Darker for better contrast (WCAG AA) */
         }
         .status-in-progress {
             background: #fed7d7;
-            color: #742a2a;
+            color: #6b1f1f; /* Darker for better contrast (WCAG AA) */
         }
         .timeline-item {
             border-left: 2px solid #cbd5e0;
@@ -134,7 +134,7 @@
         <div class="metadata-item">
             <strong style="color: #718096; font-size: 0.85em;">Status</strong>
             <div style="margin-top: 4px;">
-                <span class="status-indicator status-{{STATUS_CLASS}}">{{STATUS}}</span>
+                <span class="status-indicator status-{{STATUS_CLASS}}" role="status" aria-label="Status">{{STATUS}}</span>
             </div>
         </div>
     </div>
@@ -178,12 +178,12 @@
 
     <!-- Challenges & Solutions -->
     <h2 class="section-header">🔧 Challenges & Solutions</h2>
-    <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
+    <table role="table" aria-label="Challenges and Solutions" style="width: 100%; border-collapse: collapse; margin: 15px 0;">
         <thead>
             <tr style="background: #edf2f7;">
-                <th style="padding: 10px; text-align: left; border: 1px solid #e2e8f0;">Challenge</th>
-                <th style="padding: 10px; text-align: left; border: 1px solid #e2e8f0;">Solution</th>
-                <th style="padding: 10px; text-align: left; border: 1px solid #e2e8f0;">AI Assistance</th>
+                <th scope="col" style="padding: 10px; text-align: left; border: 1px solid #e2e8f0;">Challenge</th>
+                <th scope="col" style="padding: 10px; text-align: left; border: 1px solid #e2e8f0;">Solution</th>
+                <th scope="col" style="padding: 10px; text-align: left; border: 1px solid #e2e8f0;">AI Assistance</th>
             </tr>
         </thead>
         <tbody>
