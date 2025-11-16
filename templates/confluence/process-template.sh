@@ -159,9 +159,11 @@ generate_defaults() {
     export RELATED_RESOURCES="${RELATED_RESOURCES:-<li>📄 Original markdown documentation</li>}"
     export TAGS_LIST="${TAGS_LIST:-<span class=\"tag\">ai-assisted</span><span class=\"tag\">development</span>}"
     export CONFLUENCE_LABELS="${CONFLUENCE_LABELS:-ai-use-case,development}"
+    export PROMPTS_CONTENT="${PROMPTS_CONTENT:-<p>Effective prompts and techniques used in this session.</p>}"
+    export TIMELINE_ITEMS="${TIMELINE_ITEMS:-}"  # Empty by default for conditional sections
 
     # System info
-    export CLI_VERSION="${CLI_VERSION:-3.9.0}"
+    export CLI_VERSION="${CLI_VERSION:-3.9.1}"
     export LAST_UPDATED="${LAST_UPDATED:-$(date +'%Y-%m-%d %H:%M:%S')}"
     export CODE_LANGUAGE="${CODE_LANGUAGE:-bash}"
 }
@@ -211,6 +213,10 @@ process_template() {
     template_content="${template_content//\{\{LINES_OF_CODE\}\}/$LINES_OF_CODE}"
     template_content="${template_content//\{\{ITERATIONS\}\}/$ITERATIONS}"
     template_content="${template_content//\{\{SUCCESS_RATE\}\}/$SUCCESS_RATE}"
+
+    # Prompts and Timeline
+    template_content="${template_content//\{\{PROMPTS_CONTENT\}\}/$PROMPTS_CONTENT}"
+    template_content="${template_content//\{\{TIMELINE_ITEMS\}\}/$TIMELINE_ITEMS}"
 
     # Resources and meta
     template_content="${template_content//\{\{RELATED_RESOURCES\}\}/$RELATED_RESOURCES}"

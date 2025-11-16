@@ -29,7 +29,12 @@ A simplified template using Confluence's native macros and storage format. More 
 
 ## Template Placeholders
 
-All templates support the following placeholders that will be replaced with actual content:
+All templates support the following placeholders that will be replaced with actual content.
+
+> **Note:** While most placeholders are common to both templates, some are template-specific:
+> - **Rich Template Only:** Uses `{{STATUS_CLASS}}` for CSS styling and `{{AI_TOOLS_BADGES}}` for visual badges
+> - **Simple Template Only:** Uses `{{STATUS_COLOR}}` for Confluence macros, `{{PROJECT_NAME}}`, `{{AUTHOR}}`, `{{AI_TOOLS_LIST}}`, `{{SUCCESS_RATE}}`, and `{{ATTACHMENTS}}`
+> - Both templates handle missing placeholders gracefully with default values
 
 ### Page Metadata
 - `{{PAGE_TITLE}}` - Full page title (e.g., "Week 45 | LSFB-123: Feature Implementation")
