@@ -529,6 +529,51 @@ OUTPUT_TOKENS=${OUTPUT_TOKENS:-""}
 read -p "Estimated cost in USD (e.g., 0.25 or leave blank): " ESTIMATED_COST
 ESTIMATED_COST=${ESTIMATED_COST:-""}
 
+# Claude Agents Usage (new section)
+echo ""
+echo -e "${CYAN}Claude Agents Usage:${NC}"
+read -p "Were any Claude agents used during this session? (y/N): " AGENTS_USED
+AGENTS_USED=${AGENTS_USED:-n}
+
+if [[ "$AGENTS_USED" =~ ^[Yy]$ ]]; then
+    echo ""
+    echo "Which agents were used? (comma-separated)"
+    echo "  Options: Explore, Plan, general-purpose, code-reviewer, other"
+    read -p "  Agents: " AGENTS_LIST
+
+    # Initialize arrays for storing agent data
+    declare -a AGENT_NAMES
+    declare -a AGENT_COUNTS
+    declare -a AGENT_PURPOSES
+    declare -a AGENT_VALUES
+
+    # Parse comma-separated list
+    IFS=',' read -ra AGENT_ARRAY <<< "$AGENTS_LIST"
+
+    # Collect details for each agent
+    for i in "${!AGENT_ARRAY[@]}"; do
+        agent=$(echo "${AGENT_ARRAY[$i]}" | xargs) # trim whitespace
+
+        # Capitalize first letter for consistency
+        agent="$(tr '[:lower:]' '[:upper:]' <<< ${agent:0:1})${agent:1}"
+
+        echo ""
+        echo -e "${BLUE}Details for: $agent${NC}"
+
+        read -p "  Number of invocations: " agent_count
+        agent_count=${agent_count:-1}
+
+        read -p "  Purpose (what was it used for?): " agent_purpose
+        read -p "  Key outcome or value: " agent_value
+
+        # Store in arrays
+        AGENT_NAMES[$i]="$agent"
+        AGENT_COUNTS[$i]="$agent_count"
+        AGENT_PURPOSES[$i]="$agent_purpose"
+        AGENT_VALUES[$i]="$agent_value"
+    done
+fi
+
 # TL;DR
 echo ""
 echo -e "${CYAN}TL;DR Section:${NC}"
@@ -669,6 +714,48 @@ EOF
 EOF
 }
 
+# Helper function to generate Claude Agents section
+generate_agents_section() {
+    # Only generate section if agents were used
+    if [[ "$AGENTS_USED" =~ ^[Yy]$ ]] && [ ${#AGENT_NAMES[@]} -gt 0 ]; then
+        cat <<EOF
+
+### Claude Agents Used
+
+EOF
+        # Generate entry for each agent
+        for i in "${!AGENT_NAMES[@]}"; do
+            local agent_name="${AGENT_NAMES[$i]}"
+            local count="${AGENT_COUNTS[$i]}"
+            local purpose="${AGENT_PURPOSES[$i]}"
+            local value="${AGENT_VALUES[$i]}"
+
+            # Handle singular/plural
+            local invocations="invocation"
+            [ "$count" -gt 1 ] && invocations="invocations"
+
+            cat <<EOF
+- **${agent_name} Agent:** ${count} ${invocations}
+  - **Purpose:** ${purpose}
+  - **Value:** ${value}
+
+EOF
+        done
+
+        # Generate summary
+        local total_invocations=0
+        for count in "${AGENT_COUNTS[@]}"; do
+            total_invocations=$((total_invocations + count))
+        done
+
+        cat <<EOF
+**Agent Effectiveness Summary:**
+- Total agent invocations: ${total_invocations}
+- Most valuable agent: [Determine from usage patterns]
+EOF
+    fi
+}
+
 # Helper function to generate common footer
 generate_footer() {
     cat <<EOF
@@ -704,6 +791,7 @@ if [ "$SESSION_TYPE" = "research" ]; then
 
 EOF
         generate_token_metrics "research"
+        generate_agents_section
         cat <<EOF
 
 ### Research Efficiency
@@ -865,6 +953,7 @@ else
 
 EOF
         generate_token_metrics "implementation"
+        generate_agents_section
         cat <<EOF
 
 ---
