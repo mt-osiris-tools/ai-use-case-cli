@@ -541,6 +541,15 @@ if [[ "$AGENTS_USED" =~ ^[Yy]$ ]]; then
     echo "  Options: Explore, Plan, general-purpose, code-reviewer, other"
     read -p "  Agents: " AGENTS_LIST
 
+    # Validate that agent list is not empty
+    if [ -z "$AGENTS_LIST" ]; then
+        echo "  No agents specified, skipping agent documentation"
+        AGENTS_USED=n
+    fi
+fi
+
+# Only collect agent details if agents were specified
+if [[ "$AGENTS_USED" =~ ^[Yy]$ ]]; then
     # Initialize arrays for storing agent data
     declare -a AGENT_NAMES
     declare -a AGENT_COUNTS
@@ -551,11 +560,16 @@ if [[ "$AGENTS_USED" =~ ^[Yy]$ ]]; then
     IFS=',' read -ra AGENT_ARRAY <<< "$AGENTS_LIST"
 
     # Collect details for each agent
+    local agent_index=0
     for i in "${!AGENT_ARRAY[@]}"; do
         agent=$(echo "${AGENT_ARRAY[$i]}" | xargs) # trim whitespace
 
-        # Capitalize first letter for consistency
-        agent="$(tr '[:lower:]' '[:upper:]' <<< ${agent:0:1})${agent:1}"
+        # Skip empty agent names
+        [ -z "$agent" ] && continue
+
+        # Capitalize each word and hyphen-separated segment for consistency
+        # This handles "general-purpose" -> "General-Purpose"
+        agent="$(echo "$agent" | awk -F'-' '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) tolower(substr($i,2)) } print $0 }' OFS='-')"
 
         echo ""
         echo -e "${BLUE}Details for: $agent${NC}"
@@ -563,14 +577,21 @@ if [[ "$AGENTS_USED" =~ ^[Yy]$ ]]; then
         read -p "  Number of invocations: " agent_count
         agent_count=${agent_count:-1}
 
+        # Validate numeric input
+        if ! [[ "$agent_count" =~ ^[0-9]+$ ]]; then
+            echo -e "  ${YELLOW}Warning: Invalid number, using default of 1${NC}"
+            agent_count=1
+        fi
+
         read -p "  Purpose (what was it used for?): " agent_purpose
         read -p "  Key outcome or value: " agent_value
 
-        # Store in arrays
-        AGENT_NAMES[$i]="$agent"
-        AGENT_COUNTS[$i]="$agent_count"
-        AGENT_PURPOSES[$i]="$agent_purpose"
-        AGENT_VALUES[$i]="$agent_value"
+        # Store in arrays using sequential index
+        AGENT_NAMES[$agent_index]="$agent"
+        AGENT_COUNTS[$agent_index]="$agent_count"
+        AGENT_PURPOSES[$agent_index]="$agent_purpose"
+        AGENT_VALUES[$agent_index]="$agent_value"
+        agent_index=$((agent_index + 1))
     done
 fi
 
@@ -744,14 +765,42 @@ EOF
 
         # Generate summary
         local total_invocations=0
-        for count in "${AGENT_COUNTS[@]}"; do
-            total_invocations=$((total_invocations + count))
+        local max_count=0
+        local most_valuable_agent=""
+        local most_valuable_index=0
+
+        for i in "${!AGENT_COUNTS[@]}"; do
+            local count="${AGENT_COUNTS[$i]}"
+
+            # Validate numeric before adding
+            if [[ "$count" =~ ^[0-9]+$ ]]; then
+                total_invocations=$((total_invocations + count))
+
+                # Track agent with highest invocation count
+                if [ "$count" -gt "$max_count" ]; then
+                    max_count=$count
+                    most_valuable_agent="${AGENT_NAMES[$i]}"
+                    most_valuable_index=$i
+                fi
+            else
+                echo -e "${YELLOW}Warning:${NC} Agent invocation count '$count' is not a valid number and will be ignored." >&2
+            fi
         done
+
+        # Determine most valuable agent description
+        local valuable_description=""
+        if [ -n "$most_valuable_agent" ]; then
+            valuable_description="$most_valuable_agent - most frequently used ($max_count invocations)"
+        elif [ ${#AGENT_NAMES[@]} -eq 1 ]; then
+            valuable_description="${AGENT_NAMES[0]} - only agent used"
+        else
+            valuable_description="Multiple agents used equally"
+        fi
 
         cat <<EOF
 **Agent Effectiveness Summary:**
 - Total agent invocations: ${total_invocations}
-- Most valuable agent: [Determine from usage patterns]
+- Most valuable agent: ${valuable_description}
 EOF
     fi
 }
