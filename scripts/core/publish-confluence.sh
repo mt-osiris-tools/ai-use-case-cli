@@ -163,17 +163,17 @@ extract_title() {
     local filename=$(basename "$MARKDOWN_FILE" .md)
 
     # Pattern: YYYY-Www-MM-DD_TICKET-XXX_description-slug
-    if [[ $filename =~ ^[0-9]{4}-(W[0-9]{2})-[0-9]{2}-[0-9]{2}_([A-Z]+-[0-9]+)_(.+)$ ]]; then
-        local week="${BASH_REMATCH[1]}"  # W45
-        local ticket="${BASH_REMATCH[2]}"  # LSFB-63590
-        local slug="${BASH_REMATCH[3]}"  # description-slug
+    if [[ $filename =~ ^([0-9]{4})-(W[0-9]{2})-[0-9]{2}-[0-9]{2}_([A-Z]+-[0-9]+)_(.+)$ ]]; then
+        local year="${BASH_REMATCH[1]}"  # 2025
+        local week="${BASH_REMATCH[2]}"  # W45
+        local ticket="${BASH_REMATCH[3]}"  # FEATURE-001
+        local slug="${BASH_REMATCH[4]}"  # description-slug
 
         # Convert slug to title case
         local title=$(echo "$slug" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
 
-        # Format: 🎯 Week 45 | TICKET-ID: Title
-        local week_number="${week#W}"  # Remove W prefix: 45
-        echo "🎯 Week ${week_number} | ${ticket}: ${title}"
+        # Format: 🎯 2025 W45 | TICKET-ID: Title
+        echo "🎯 ${year} ${week} | ${ticket}: ${title}"
     else
         # Fallback: just use filename with underscores converted to spaces
         echo "$filename" | sed 's/_/ /g'

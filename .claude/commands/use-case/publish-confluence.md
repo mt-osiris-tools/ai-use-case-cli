@@ -43,10 +43,10 @@ Use regex to extract:
 Read the markdown file and determine the page title:
 
 **Title extraction from filename** (e.g., `2025-W42-10-16_PROJ-123_implement-auth.md`):
-1. Remove date prefix: `2025-W42-10-16_`
+1. Extract year and week: `2025` and `W42`
 2. Extract ticket: `PROJ-123`
 3. Convert slug to title: `implement-auth` → `Implement Auth`
-4. Format: `PROJ-123: Implement Auth`
+4. Format: `🎯 2025 W42 | PROJ-123: Implement Auth`
 
 **Alternative**: User can provide custom title via `--title` parameter.
 
@@ -138,8 +138,8 @@ Display results to the user:
 ```
 ✅ Successfully published to Confluence!
 
-Page Title: PROJ-123: Implement Auth
-Page URL: https://mycompany.atlassian.net/wiki/spaces/DOCS/pages/987654321/PROJ-123+Implement+Auth
+Page Title: 🎯 2025 W42 | PROJ-123: Implement Auth
+Page URL: https://mycompany.atlassian.net/wiki/spaces/DOCS/pages/987654321/2025+W42+PROJ-123+Implement+Auth
 
 Parent Page: AI Use Cases Documentation
 Space: DOCS
@@ -234,7 +234,7 @@ When `--dry-run` is specified, show what would be published without actually doi
 
 Source File: .usecase/cases/2025-W42-10-16_PROJ-123_implement-auth.md
 File Size: 15.3 KB
-Page Title: PROJ-123: Implement Auth
+Page Title: 🎯 2025 W42 | PROJ-123: Implement Auth
 
 Target:
 - Parent Page ID: 123456789
@@ -244,7 +244,7 @@ Target:
 
 Content Preview:
 ================================================================================
-# PROJ-123: Implement Auth
+# 🎯 2025 W42 | PROJ-123: Implement Auth
 
 ## Metadata
 - Date: 2025-W42-10-16

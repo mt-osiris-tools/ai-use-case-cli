@@ -82,7 +82,7 @@ extract_filename_metadata() {
         export SLUG="${BASH_REMATCH[6]}"
 
         # Format values
-        export WEEK_NUMBER="Week ${WEEK#W}"
+        export WEEK_NUMBER="${YEAR} ${WEEK}"
         export DATE="$YEAR-$MONTH-$DAY"
 
         # Convert slug to title (replace hyphens with spaces, capitalize)
@@ -132,7 +132,7 @@ extract_markdown_sections() {
 generate_defaults() {
     # Page metadata defaults
     export PAGE_EMOJI="${PAGE_EMOJI:-🎯}"
-    export PAGE_TITLE="${PAGE_TITLE:-$WEEK_NUMBER | $TICKET_ID: $DESCRIPTION}"
+    export PAGE_TITLE="${PAGE_TITLE:-🎯 $WEEK_NUMBER | $TICKET_ID: $DESCRIPTION}"
     export PAGE_DESCRIPTION="${PAGE_DESCRIPTION:-AI-assisted development use case documentation}"
     export STATUS="${STATUS:-Completed}"
     export STATUS_COLOR="${STATUS_COLOR:-Green}"
