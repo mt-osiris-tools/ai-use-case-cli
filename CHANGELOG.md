@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.10.0] - 2025-12-01
+
 ### Added
 
 - **Claude Agent Usage Tracking**: Track and document usage of Claude specialized agents in AI session documentation
