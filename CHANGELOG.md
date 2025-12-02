@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Claude Agent Usage Tracking**: Track and document usage of Claude specialized agents in AI session documentation
+  - **New template section**: Added "Claude Agents Used" section to both `TEMPLATE.md` and `TEMPLATE-RESEARCH.md`
+  - **Interactive mode support**: Added prompts in `document-ai-session.sh` for manual agent documentation
+    - Prompts for agent usage (y/N), agent list (comma-separated), and details per agent
+    - Collects invocation counts, purposes, and value/impact for each agent
+    - Supports multiple agents: Explore, Plan, general-purpose, code-reviewer, and custom agents
+  - **Automatic detection**: Added detection instructions in `/use-case:document-session` slash command
+    - Guides Claude Code to detect Task tool invocations with subagent_type
+    - Extracts agent types, counts, purposes, and outcomes from conversation history
+    - Includes heuristics for inferring agent effectiveness and value
+  - **Documentation generation**: Auto-generates agent section with effectiveness summary
+    - Shows invocation counts per agent type
+    - Documents purpose, key findings, and impact for each agent
+    - Calculates total invocations and identifies most valuable agent
+  - **Feature planning structure**: Created standardized feature planning workflow in `docs/features/`
+    - New `FEATURE-TEMPLATE/` with reusable templates (plan, requirements, checklist)
+    - Example implementation in `claude-agents-tracking/` folder
+    - Comprehensive `README.md` and `QUICKSTART.md` guides for future features
+  - Enables tracking of which AI capabilities were leveraged during sessions
+  - Helps identify valuable agents and replicate successful workflows
+  - Part of FEATURE-001 implementation
+
 ## [3.9.1] - 2025-11-15
 
 ### Fixed
