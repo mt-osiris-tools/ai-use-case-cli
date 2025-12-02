@@ -71,6 +71,28 @@ Used by: Claude Code slash command (/use-case:document-session)
 - **Time per Major Insight:** ~X minutes average
 - **Cost per Insight:** ~$X.XX / insight
 
+### Claude Agents Used
+
+- **Explore Agent:** X invocations
+  - **Purpose:** Codebase exploration, finding patterns, understanding architecture
+  - **Key Findings:** [What the agent discovered or helped with]
+  - **Value:** [Impact on research - saved time, provided insights, etc.]
+
+- **Plan Agent:** X invocations
+  - **Purpose:** Architecture planning, implementation strategy design
+  - **Output:** [What plans or strategies were generated]
+  - **Value:** [How it helped the research process]
+
+- **General-Purpose Agent:** X invocations
+  - **Purpose:** [Specific research tasks handled]
+  - **Outcome:** [What was accomplished]
+  - **Value:** [Contribution to research success]
+
+**Agent Effectiveness Summary:**
+- Total agent invocations: X
+- Most valuable agent: [Agent name and why]
+- Time saved by agents: ~X hours (optional)
+
 ---
 
 ## 🔍 Research Context
