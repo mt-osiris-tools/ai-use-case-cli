@@ -491,6 +491,56 @@ Skip git commands if no commits exist.
 - **Final Decision**: Recommended approach and rationale
 - **Complexity**: Assess from conversation depth (Low: simple Q&A, Medium: multiple approaches, High: architectural decisions)
 
+**Claude Agents Usage Detection (All Sessions):**
+
+Analyze the conversation history to detect if any specialized Claude agents were used via the Task tool:
+
+**Detection Method:**
+1. Search conversation for all Task tool invocations with subagent_type parameters
+2. Extract the agent type (subagent_type value)
+3. Extract the prompt to understand purpose/context
+4. Count invocations per agent type
+5. Infer outcomes from conversation following agent execution
+
+**Agent Types to Detect:**
+- **Explore**: Codebase exploration and search agent
+- **Plan**: Architecture/implementation planning agent
+- **general-purpose**: Complex multi-step task agent
+- **code-reviewer**: Code review and quality agent
+- **Custom agents**: Any other subagent types used
+
+**Information to Extract for Each Agent:**
+- Agent type (from subagent_type parameter)
+- Invocation count (how many times used)
+- Purpose (from prompt parameter, summarized if long)
+- Key findings/output (what the agent produced or discovered)
+- Value/impact (estimated from complexity and user feedback)
+
+**Outcome Inference Heuristics:**
+- Look for user acknowledgment ("great", "thanks", "that works")
+- Check if agent's output led to successful task completion
+- Note if subsequent conversation built on agent's findings
+- Identify time-saving indicators ("saved time", "would have taken hours")
+- Observe if user requested clarification or accepted results
+
+**If No Agents Detected:**
+- Omit the "Claude Agents Used" section from documentation
+- This is normal - many sessions don't use specialized agents
+
+**Example: When Explore agent is detected, populate section like:**
+```markdown
+### Claude Agents Used
+
+- **Explore Agent:** 2 invocations
+  - **Purpose:** Codebase exploration, finding authentication patterns
+  - **Key Findings:** Located 8 auth-related files across 3 directories
+  - **Value:** Saved ~30 minutes of manual file searching
+
+**Agent Effectiveness Summary:**
+- Total agent invocations: 2
+- Most valuable agent: Explore - quickly mapped complex codebase structure
+```
+
 ### Step 6: Read the Template
 
 **IMPORTANT**: Before generating documentation, read the appropriate template from the CLI installation directory.

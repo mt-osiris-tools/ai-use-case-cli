@@ -529,6 +529,72 @@ OUTPUT_TOKENS=${OUTPUT_TOKENS:-""}
 read -p "Estimated cost in USD (e.g., 0.25 or leave blank): " ESTIMATED_COST
 ESTIMATED_COST=${ESTIMATED_COST:-""}
 
+# Claude Agents Usage (new section)
+echo ""
+echo -e "${CYAN}Claude Agents Usage:${NC}"
+read -p "Were any Claude agents used during this session? (y/N): " AGENTS_USED
+AGENTS_USED=${AGENTS_USED:-n}
+
+if [[ "$AGENTS_USED" =~ ^[Yy]$ ]]; then
+    echo ""
+    echo "Which agents were used? (comma-separated)"
+    echo "  Options: Explore, Plan, general-purpose, code-reviewer, other"
+    read -p "  Agents: " AGENTS_LIST
+
+    # Validate that agent list is not empty
+    if [ -z "$AGENTS_LIST" ]; then
+        echo "  No agents specified, skipping agent documentation"
+        AGENTS_USED=n
+    fi
+fi
+
+# Only collect agent details if agents were specified
+if [[ "$AGENTS_USED" =~ ^[Yy]$ ]]; then
+    # Initialize arrays for storing agent data
+    declare -a AGENT_NAMES
+    declare -a AGENT_COUNTS
+    declare -a AGENT_PURPOSES
+    declare -a AGENT_VALUES
+
+    # Parse comma-separated list
+    IFS=',' read -ra AGENT_ARRAY <<< "$AGENTS_LIST"
+
+    # Collect details for each agent
+    local agent_index=0
+    for i in "${!AGENT_ARRAY[@]}"; do
+        agent=$(echo "${AGENT_ARRAY[$i]}" | xargs) # trim whitespace
+
+        # Skip empty agent names
+        [ -z "$agent" ] && continue
+
+        # Capitalize each word and hyphen-separated segment for consistency
+        # This handles "general-purpose" -> "General-Purpose"
+        agent="$(echo "$agent" | awk -F'-' '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) tolower(substr($i,2)) } print $0 }' OFS='-')"
+
+        echo ""
+        echo -e "${BLUE}Details for: $agent${NC}"
+
+        read -p "  Number of invocations: " agent_count
+        agent_count=${agent_count:-1}
+
+        # Validate numeric input
+        if ! [[ "$agent_count" =~ ^[0-9]+$ ]]; then
+            echo -e "  ${YELLOW}Warning: Invalid number, using default of 1${NC}"
+            agent_count=1
+        fi
+
+        read -p "  Purpose (what was it used for?): " agent_purpose
+        read -p "  Key outcome or value: " agent_value
+
+        # Store in arrays using sequential index
+        AGENT_NAMES[$agent_index]="$agent"
+        AGENT_COUNTS[$agent_index]="$agent_count"
+        AGENT_PURPOSES[$agent_index]="$agent_purpose"
+        AGENT_VALUES[$agent_index]="$agent_value"
+        agent_index=$((agent_index + 1))
+    done
+fi
+
 # TL;DR
 echo ""
 echo -e "${CYAN}TL;DR Section:${NC}"
@@ -669,6 +735,76 @@ EOF
 EOF
 }
 
+# Helper function to generate Claude Agents section
+generate_agents_section() {
+    # Only generate section if agents were used
+    if [[ "$AGENTS_USED" =~ ^[Yy]$ ]] && [ ${#AGENT_NAMES[@]} -gt 0 ]; then
+        cat <<EOF
+
+### Claude Agents Used
+
+EOF
+        # Generate entry for each agent
+        for i in "${!AGENT_NAMES[@]}"; do
+            local agent_name="${AGENT_NAMES[$i]}"
+            local count="${AGENT_COUNTS[$i]}"
+            local purpose="${AGENT_PURPOSES[$i]}"
+            local value="${AGENT_VALUES[$i]}"
+
+            # Handle singular/plural
+            local invocations="invocation"
+            [ "$count" -gt 1 ] && invocations="invocations"
+
+            cat <<EOF
+- **${agent_name} Agent:** ${count} ${invocations}
+  - **Purpose:** ${purpose}
+  - **Value:** ${value}
+
+EOF
+        done
+
+        # Generate summary
+        local total_invocations=0
+        local max_count=0
+        local most_valuable_agent=""
+        local most_valuable_index=0
+
+        for i in "${!AGENT_COUNTS[@]}"; do
+            local count="${AGENT_COUNTS[$i]}"
+
+            # Validate numeric before adding
+            if [[ "$count" =~ ^[0-9]+$ ]]; then
+                total_invocations=$((total_invocations + count))
+
+                # Track agent with highest invocation count
+                if [ "$count" -gt "$max_count" ]; then
+                    max_count=$count
+                    most_valuable_agent="${AGENT_NAMES[$i]}"
+                    most_valuable_index=$i
+                fi
+            else
+                echo -e "${YELLOW}Warning:${NC} Agent invocation count '$count' is not a valid number and will be ignored." >&2
+            fi
+        done
+
+        # Determine most valuable agent description
+        local valuable_description=""
+        if [ -n "$most_valuable_agent" ]; then
+            valuable_description="$most_valuable_agent - most frequently used ($max_count invocations)"
+        elif [ ${#AGENT_NAMES[@]} -eq 1 ]; then
+            valuable_description="${AGENT_NAMES[0]} - only agent used"
+        else
+            valuable_description="Multiple agents used equally"
+        fi
+
+        cat <<EOF
+**Agent Effectiveness Summary:**
+- Total agent invocations: ${total_invocations}
+- Most valuable agent: ${valuable_description}
+EOF
+    fi
+}
+
 # Helper function to generate common footer
 generate_footer() {
     cat <<EOF
@@ -704,6 +840,7 @@ if [ "$SESSION_TYPE" = "research" ]; then
 
 EOF
         generate_token_metrics "research"
+        generate_agents_section
         cat <<EOF
 
 ### Research Efficiency
@@ -865,6 +1002,7 @@ else
 
 EOF
         generate_token_metrics "implementation"
+        generate_agents_section
         cat <<EOF
 
 ---

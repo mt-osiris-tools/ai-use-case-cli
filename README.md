@@ -45,6 +45,7 @@ Documentation shouldn't be a burden—it should be a valuable asset that grows y
 - 🎯 **Hybrid interface** - Use standalone CLI commands or Claude Code slash commands
 - 🚀 **AI-assisted documentation** - Automatic context capture with Claude Code integration
 - 🔬 **Research & implementation sessions** - Document both code changes and exploratory work
+- 🤖 **Claude agent tracking** - Automatically track and document usage of specialized agents (Explore, Plan, etc.)
 - 📊 **Session data extraction** - Extract git history, token usage, and metrics for reporting (v3.4.0+)
 - 📊 **OpenTelemetry tracing** - Monitor CLI performance and usage with distributed tracing (v3.6.0+)
 - 📈 **Command progress tracking** - Visual real-time progress indicators for all commands (v3.8.0+)

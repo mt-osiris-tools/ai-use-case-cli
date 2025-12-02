@@ -71,6 +71,28 @@ command-2
 command-3
 ```
 
+### Claude Agents Used
+
+- **Explore Agent:** X invocations
+  - **Purpose:** Codebase exploration, finding patterns, understanding architecture
+  - **Key Findings:** [What the agent discovered or helped with]
+  - **Value:** [Impact on session - saved time, provided insights, etc.]
+
+- **Plan Agent:** X invocations
+  - **Purpose:** Architecture planning, implementation strategy design
+  - **Output:** [What plans or strategies were generated]
+  - **Value:** [How it helped the implementation]
+
+- **General-Purpose Agent:** X invocations
+  - **Purpose:** [Specific multi-step tasks handled]
+  - **Outcome:** [What was accomplished]
+  - **Value:** [Contribution to session success]
+
+**Agent Effectiveness Summary:**
+- Total agent invocations: X
+- Most valuable agent: [Agent name and why]
+- Time saved by agents: ~X hours (optional)
+
 ---
 
 ## 💬 Key User Queries (Optional)
