@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **C4 Architecture Diagrams**: Added comprehensive architecture diagrams using PlantUML and C4 model
+  - **System Context Diagram**: Shows AI Use Case CLI system interactions with users and external systems
+  - **Container Diagram**: Details internal containers (CLI Dispatcher, Core Scripts, Project Management, etc.)
+  - **Component Diagram**: Deep dive into Core Scripts container components
+  - **Deployment Diagram**: Physical deployment layout on developer workstation
+  - Located in `docs/diagrams/` with detailed README for viewing options
+  - Supports multiple rendering methods: Online viewer, VS Code extension, CLI, Docker
+  - Visualizes system boundaries, data flows, and integration points (Git, GitHub, Confluence, OpenTelemetry)
+
 ### Fixed
 
 - **Confluence Title Format**: Include year in Confluence page titles

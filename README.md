@@ -150,6 +150,8 @@ Examples: Evaluating architectures, comparing solutions, understanding codebases
 
 ### Architecture
 
+> 📊 **[View Architecture Diagrams](docs/diagrams/)** - C4 model diagrams showing system context, containers, components, and deployment
+
 The CLI provides flexible documentation storage options:
 
 - **CLI Tools** (this repo): Scripts for documenting and managing use cases
