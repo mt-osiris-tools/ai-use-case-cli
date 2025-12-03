@@ -240,6 +240,11 @@ ai-use-case tracing disable
 ### Environment Variables
 
 ```bash
+# Override CLI installation directory (for custom installations)
+export AI_USECASES_CLI_ROOT="$HOME/.local/share/ai-use-case-cli"  # Default
+# Or use a custom path:
+# export AI_USECASES_CLI_ROOT="$HOME/custom/path/ai-use-case-cli"
+
 # Override hub location (works with both modes)
 export AI_USECASES_DIR="$HOME/.local/share/ai-use-case-cli/hub"  # Default for local mode
 # Or use a custom path:

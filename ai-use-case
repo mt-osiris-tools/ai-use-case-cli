@@ -111,6 +111,7 @@ ${YELLOW}PROJECT REGISTRY (v3.1.0+)${NC}
 
 ${YELLOW}ENVIRONMENT${NC}
   AI_USECASES_DIR      Hub directory (default: ~/Documents/ai-use-case-hub)
+  AI_USECASES_CLI_ROOT CLI installation directory (default: ~/.local/share/ai-use-case-cli)
 
 ${YELLOW}MORE INFO${NC}
   GitHub: ${CYAN}https://github.com/mt-osiris-tools/ai-use-case-cli${NC}

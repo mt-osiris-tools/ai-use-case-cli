@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Refactored Slash Commands to Remove Hardcoded Paths**: Replaced all hardcoded CLI installation paths with portable solutions
+  - Updated 9 slash command files (46+ command references) to use `ai-use-case` wrapper commands
+  - Replaced direct script calls (e.g., `bash ~/.local/share/ai-use-case-cli/scripts/...`) with wrapper equivalents
+  - Introduced `AI_USECASES_CLI_ROOT` environment variable for custom installation paths
+  - Template access now uses `${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}` pattern
+  - Improves portability across different installation locations and deployment methods
+  - Maintains backward compatibility with default installation path
+  - Updated documentation in README.md and ai-use-case help output
+
 ### Added
 
 - **C4 Architecture Diagrams**: Added comprehensive architecture diagrams using PlantUML and C4 model
