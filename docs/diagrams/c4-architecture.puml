@@ -1,0 +1,207 @@
+@startuml AI Use Case CLI - C4 Context Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+title System Context Diagram for AI Use Case CLI
+
+Person(developer, "Developer", "Uses AI tools (Claude Code) to build software and wants to document AI sessions")
+
+System(ai_use_case_cli, "AI Use Case CLI", "CLI tool for documenting, organizing, and syncing AI-assisted development sessions")
+
+System_Ext(claude_code, "Claude Code", "AI-powered IDE extension that executes slash commands and automates workflows")
+System_Ext(git, "Git", "Version control system for project code and hub documentation")
+System_Ext(github, "GitHub", "Hosts repositories, provides PR detection and version checking via API")
+System_Ext(confluence, "Atlassian Confluence", "Documentation platform for publishing use cases via MCP")
+System_Ext(opentelemetry, "OpenTelemetry Collector", "Distributed tracing backend for performance monitoring")
+
+Rel(developer, ai_use_case_cli, "Documents AI sessions, searches use cases", "CLI commands")
+Rel(developer, claude_code, "Uses for development", "IDE")
+
+Rel(claude_code, ai_use_case_cli, "Executes via slash commands", "/use-case:* commands")
+Rel(ai_use_case_cli, git, "Reads history, commits docs", "git CLI")
+Rel(ai_use_case_cli, github, "Detects PRs, checks versions", "GitHub API / gh CLI")
+Rel(ai_use_case_cli, confluence, "Publishes documentation", "Atlassian MCP")
+Rel(ai_use_case_cli, opentelemetry, "Sends traces", "OTLP")
+
+Rel(developer, git, "Commits code changes", "git commands")
+
+@enduml
+
+@startuml AI Use Case CLI - C4 Container Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_TOP_DOWN()
+LAYOUT_WITH_LEGEND()
+
+title Container Diagram for AI Use Case CLI
+
+Person(developer, "Developer", "Documents AI sessions and manages projects")
+
+System_Boundary(ai_use_case_system, "AI Use Case CLI System") {
+    Container(cli_dispatcher, "CLI Dispatcher", "Bash", "Main entry point that routes commands to appropriate scripts")
+
+    Container(core_scripts, "Core Scripts", "Bash", "Document creation, hub sync, Confluence publishing, session extraction")
+
+    Container(project_mgmt, "Project Management", "Bash", "Project setup, registry management, version checking, updates")
+
+    Container(search_analytics, "Search & Analytics", "Bash", "Full-text search, statistics, usage insights")
+
+    Container(config_utils, "Configuration & Utilities", "Bash", "Hub config, version management, tracing, validation")
+
+    Container(claude_integration, "Claude Code Integration", "Markdown", "Slash command definitions for AI-assisted automation")
+
+    Container(git_hooks, "Git Hooks", "Bash", "Pre-commit (branch protection) and post-commit (auto-sync)")
+
+    ContainerDb(config_db, "Configuration", "JSON", "Hub mode (local/git), tracing config, project registry")
+
+    ContainerDb(hub_storage, "Documentation Hub", "File System", "Organized by project, date, and topic with symlink views")
+
+    ContainerDb(project_storage, "Project Use Cases", "Markdown Files", ".usecase/cases/ directory in each project")
+}
+
+System_Ext(claude_code, "Claude Code", "AI IDE extension")
+System_Ext(git, "Git", "Version control")
+System_Ext(github, "GitHub", "Repository hosting")
+System_Ext(confluence, "Confluence", "Documentation platform")
+System_Ext(opentelemetry, "OpenTelemetry", "Tracing backend")
+
+Rel(developer, cli_dispatcher, "Executes commands", "CLI")
+Rel(developer, claude_code, "Uses for development", "IDE")
+
+Rel(claude_code, claude_integration, "Reads command definitions", "File read")
+Rel(claude_integration, cli_dispatcher, "Invokes commands", "Shell execution")
+
+Rel(cli_dispatcher, core_scripts, "Routes to", "Function call")
+Rel(cli_dispatcher, project_mgmt, "Routes to", "Function call")
+Rel(cli_dispatcher, search_analytics, "Routes to", "Function call")
+Rel(cli_dispatcher, config_utils, "Routes to", "Function call")
+
+Rel(core_scripts, project_storage, "Creates/reads docs", "File I/O")
+Rel(core_scripts, hub_storage, "Syncs docs", "File I/O")
+Rel(core_scripts, confluence, "Publishes pages", "MCP/REST API")
+Rel(core_scripts, git, "Commits, analyzes history", "git CLI")
+
+Rel(project_mgmt, config_db, "Reads/writes registry", "JSON")
+Rel(project_mgmt, git_hooks, "Installs hooks", "File copy")
+Rel(project_mgmt, project_storage, "Creates structure", "mkdir")
+
+Rel(search_analytics, hub_storage, "Searches docs", "grep/find")
+
+Rel(config_utils, config_db, "Manages config", "JSON")
+Rel(config_utils, opentelemetry, "Sends traces", "OTLP")
+
+Rel(git_hooks, core_scripts, "Triggers sync", "Shell execution")
+
+Rel_Back(git, git_hooks, "Triggers on commit", "Hook execution")
+Rel(git_hooks, hub_storage, "Commits synced docs", "git CLI")
+
+Rel(core_scripts, github, "Detects PRs, checks versions", "GitHub API")
+
+@enduml
+
+@startuml AI Use Case CLI - C4 Component Diagram (Core Scripts)
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Component Diagram for Core Scripts Container
+
+Container_Boundary(core_boundary, "Core Scripts Container") {
+    Component(document_session, "document-ai-session.sh", "Bash", "Interactive AI session documentation with template generation")
+
+    Component(sync_usecases, "sync-ai-use-cases.sh", "Bash", "Syncs documentation from projects to hub with symlink organization")
+
+    Component(publish_confluence, "publish-confluence.sh", "Bash", "Publishes markdown docs to Confluence as child pages")
+
+    Component(extract_session, "extract-session-data.sh", "Bash", "Extracts metrics and metadata from documented sessions")
+}
+
+Container_Ext(project_storage, "Project Use Cases", "Markdown Files")
+ContainerDb_Ext(hub_storage, "Documentation Hub", "File System")
+System_Ext(git, "Git", "Version control")
+System_Ext(confluence, "Confluence", "Documentation platform")
+Container_Ext(config_utils, "Configuration & Utilities", "Bash")
+
+Rel(document_session, project_storage, "Creates docs", "File write")
+Rel(document_session, git, "Analyzes history", "git log")
+Rel(document_session, config_utils, "Gets version, validates setup", "Source/call")
+
+Rel(sync_usecases, project_storage, "Reads new docs", "File read")
+Rel(sync_usecases, hub_storage, "Copies docs, creates symlinks", "cp/ln -s")
+Rel(sync_usecases, git, "Commits to hub repo", "git add/commit/push")
+Rel(sync_usecases, config_utils, "Gets hub path", "Source")
+
+Rel(publish_confluence, project_storage, "Reads markdown", "File read")
+Rel(publish_confluence, confluence, "Creates pages", "MCP API")
+Rel(publish_confluence, config_utils, "Validates setup", "Source")
+
+Rel(extract_session, project_storage, "Reads metadata", "grep/awk")
+Rel(extract_session, config_utils, "Uses utilities", "Source")
+
+@enduml
+
+@startuml AI Use Case CLI - Deployment Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Deployment Diagram for AI Use Case CLI
+
+Deployment_Node(dev_machine, "Developer Workstation", "Linux/macOS/WSL") {
+    Deployment_Node(project_workspace, "Project Directory", "/path/to/project") {
+        Container(project_repo, "Project Repository", "Git", "Contains .usecase/cases/ with documented sessions")
+        Container(git_hooks_deployed, "Git Hooks", "Bash", "Pre-commit and post-commit hooks")
+    }
+
+    Deployment_Node(user_bin, "User Binary Directory", "~/.local/bin or /usr/local/bin") {
+        Container(cli_executable, "ai-use-case CLI", "Bash", "Main executable and all scripts")
+    }
+
+    Deployment_Node(user_config, "User Configuration", "~/.config/ai-use-case-cli") {
+        ContainerDb(config_files, "Configuration Files", "JSON", "config.json, tracing.json")
+    }
+
+    Deployment_Node(user_data, "User Data", "~/.local/share/ai-use-case-cli") {
+        ContainerDb(project_registry, "Project Registry", "JSON", "projects-registry.json")
+        ContainerDb(local_hub, "Local Hub (Optional)", "File System", "Used when hub_mode=local")
+    }
+
+    Deployment_Node(hub_location, "Documentation Hub", "Configurable path") {
+        ContainerDb(hub_repo, "Hub Repository", "Git (Optional)", "by-project/, by-date/, by-topic/ directories")
+    }
+
+    Deployment_Node(ide, "IDE", "VS Code or Terminal") {
+        Container(claude_code_ext, "Claude Code Extension", "TypeScript", "Executes slash commands")
+    }
+}
+
+Deployment_Node(github_cloud, "GitHub", "Cloud") {
+    Container(remote_repos, "Remote Repositories", "Git", "Project repos and hub repo")
+}
+
+Deployment_Node(atlassian_cloud, "Atlassian Cloud", "SaaS") {
+    Container(confluence_instance, "Confluence Instance", "Web App", "Published documentation pages")
+}
+
+Deployment_Node(observability, "Observability Backend", "Cloud/Self-hosted") {
+    Container(otlp_collector, "OTLP Collector", "OpenTelemetry", "Receives traces from CLI")
+}
+
+Rel(cli_executable, config_files, "Reads config", "File I/O")
+Rel(cli_executable, project_registry, "Reads/writes registry", "File I/O")
+Rel(cli_executable, project_repo, "Creates/reads docs", "File I/O")
+Rel(cli_executable, hub_repo, "Syncs docs", "File I/O")
+Rel(cli_executable, local_hub, "Syncs docs (local mode)", "File I/O")
+
+Rel(git_hooks_deployed, cli_executable, "Invokes sync", "Shell exec")
+Rel(claude_code_ext, cli_executable, "Executes commands", "Shell exec")
+
+Rel(hub_repo, remote_repos, "Pushes changes", "git push")
+Rel(project_repo, remote_repos, "Pushes changes", "git push")
+
+Rel(cli_executable, confluence_instance, "Publishes pages", "HTTPS/MCP")
+Rel(cli_executable, otlp_collector, "Sends traces", "OTLP/gRPC")
+Rel(cli_executable, remote_repos, "Checks versions, detects PRs", "GitHub API")
+
+@enduml

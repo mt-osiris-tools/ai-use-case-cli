@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **C4 Architecture Diagrams**: Added comprehensive architecture diagrams using PlantUML and C4 model
+  - **System Context Diagram**: Shows AI Use Case CLI system interactions with users and external systems
+  - **Container Diagram**: Details internal containers (CLI Dispatcher, Core Scripts, Project Management, etc.)
+  - **Component Diagram**: Deep dive into Core Scripts container components
+  - **Deployment Diagram**: Physical deployment layout on developer workstation
+  - Located in `docs/diagrams/` with detailed README for viewing options
+  - Supports multiple rendering methods: Online viewer, VS Code extension, CLI, Docker
+  - Visualizes system boundaries, data flows, and integration points (Git, GitHub, Confluence, OpenTelemetry)
+- **Document Session Sequence Diagram**: Added PlantUML sequence diagram for `/use-case:document-session` workflow
+  - Shows complete workflow from user invocation to hub sync
+  - Visualizes interactions: Claude Code → CLI → Git → GitHub → File System → Hub
+  - Includes version checking, session detection, git analysis, documentation generation, and sync phases
+  - Highlights key features: interactive session selection, parallel git analysis, automatic commit/sync
+  - Supports both implementation and research session workflows
+  - Located at `docs/diagrams/document-session-sequence.puml`
 - **Feature Development Workflow in CLAUDE.md**: Added structured feature planning process guidance
   - Critical reminder: Always use `docs/features/` process when user requests new features
   - When to use: Multi-file features, new architecture, medium/high complexity, >1 day work
@@ -20,6 +35,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **check-updates Command Output Issues**: Fixed color rendering and improved command guidance
+  - Fixed ANSI color codes not rendering: replaced `cat <<EOF` with `echo -e` statements in help text
+  - Removed misleading numbered list format from "Next steps" section to avoid confusion with interactive menus
+  - Updated all command references to use `ai-use-case` command instead of invalid relative script paths
+  - Improved clarity with proper section headers and working examples
+  - Users can now copy-paste commands directly without "command not found" errors
 - **Confluence Title Format**: Include year in Confluence page titles
   - Updated `/publish-confluence` slash command to format titles as `🎯 2025 W## | TICKET-ID: Title`
   - Fixed `publish-confluence.sh` to capture and include year in title extraction
