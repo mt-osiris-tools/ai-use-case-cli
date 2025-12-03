@@ -137,8 +137,8 @@ while IFS= read -r project_json; do
 
         echo -e "${CYAN}$outdated_count. $name${NC}"
         echo "   Path: $path"
-        echo "   Current version: ${RED}$version${NC}"
-        echo "   Latest version: ${GREEN}$CLI_VERSION${NC}"
+        echo -e "   Current version: ${RED}$version${NC}"
+        echo -e "   Latest version: ${GREEN}$CLI_VERSION${NC}"
         echo "   Last updated: $(date -d "$updated" +"%Y-%m-%d %H:%M" 2>/dev/null || echo "$updated")"
         echo ""
     fi
