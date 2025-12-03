@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **C4 Architecture Diagrams**: Added comprehensive architecture diagrams using PlantUML and C4 model
+  - **System Context Diagram**: Shows AI Use Case CLI system interactions with users and external systems
+  - **Container Diagram**: Details internal containers (CLI Dispatcher, Core Scripts, Project Management, etc.)
+  - **Component Diagram**: Deep dive into Core Scripts container components
+  - **Deployment Diagram**: Physical deployment layout on developer workstation
+  - Located in `docs/diagrams/` with detailed README for viewing options
+  - Supports multiple rendering methods: Online viewer, VS Code extension, CLI, Docker
+  - Visualizes system boundaries, data flows, and integration points (Git, GitHub, Confluence, OpenTelemetry)
+- **Document Session Sequence Diagram**: Added PlantUML sequence diagram for `/use-case:document-session` workflow
+  - Shows complete workflow from user invocation to hub sync
+  - Visualizes interactions: Claude Code → CLI → Git → GitHub → File System → Hub
+  - Includes version checking, session detection, git analysis, documentation generation, and sync phases
+  - Highlights key features: interactive session selection, parallel git analysis, automatic commit/sync
+  - Supports both implementation and research session workflows
+  - Located at `docs/diagrams/document-session-sequence.puml`
+
 ### Fixed
 
 - **check-updates Command Output Issues**: Fixed color rendering and improved command guidance
