@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Template-Based Documentation Generation**: Refactored `document-ai-session.sh` to read and populate template files instead of using inline heredoc
+  - Removed ~370 lines of heredoc documentation generation
+  - Now reads `docs/TEMPLATE.md` and `docs/TEMPLATE-RESEARCH.md` as single source of truth
+  - Uses sed for placeholder replacement with collected user input
+  - Ensures consistency with Claude Code slash command `/use-case:document-session`
+  - Prevents template/script divergence and reduces maintenance burden
+  - Template files remain the authoritative source for documentation structure
+
 ### Added
 
 - **C4 Architecture Diagrams**: Added comprehensive architecture diagrams using PlantUML and C4 model

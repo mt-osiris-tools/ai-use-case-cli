@@ -652,11 +652,6 @@ else
     GIT_DIFF=$(git show --stat HEAD 2>/dev/null || echo "No diff available")
 fi
 
-# Helper function to escape special characters for sed
-escape_for_sed() {
-    echo "$1" | sed -e 's/[\/&]/\\&/g' -e 's/$/\\/' | tr -d '\n' | sed 's/\\$//'
-}
-
 # Helper function to generate Claude Agents section content
 generate_agents_content() {
     local output=""
@@ -698,6 +693,8 @@ generate_agents_content() {
                     max_count=$count
                     most_valuable_agent="${AGENT_NAMES[$i]}"
                 fi
+            else
+                echo -e "${YELLOW}Warning:${NC} Agent invocation count '$count' is not a valid number and will be ignored." >&2
             fi
         done
 
