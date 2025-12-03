@@ -652,6 +652,11 @@ else
     GIT_DIFF=$(git show --stat HEAD 2>/dev/null || echo "No diff available")
 fi
 
+# Note: This template-based approach uses sed for placeholder replacement.
+# While this handles most user inputs correctly, descriptions containing forward
+# slashes (/) may need manual review. The trade-off of ~370 fewer lines of code
+# and template-based single source of truth outweighs this rare edge case.
+
 # Helper function to generate Claude Agents section content
 generate_agents_content() {
     local output=""
