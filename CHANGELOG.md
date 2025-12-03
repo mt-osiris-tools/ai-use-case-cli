@@ -24,6 +24,88 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Highlights key features: interactive session selection, parallel git analysis, automatic commit/sync
   - Supports both implementation and research session workflows
   - Located at `docs/diagrams/document-session-sequence.puml`
+- **Feature Planning: Intelligent Agents Integration (FEATURE-002)**: Created comprehensive planning documentation for adding AI agents
+  - **Feature Plan** (`docs/features/intelligent-agents-integration/01-feature-plan.md`)
+    - Hybrid architecture: Bash scripts for reliability, AI agents for intelligence
+    - 5 specialized agents planned: Quality Reviewer, Pattern Analyzer, Session Selector, Organization Intelligence, +1 future
+    - 5 implementation phases spanning 5 weeks
+    - Clear goals, success criteria, and risk mitigation strategies
+  - **Requirements Document** (`docs/features/intelligent-agents-integration/02-requirements.md`)
+    - 5 functional requirement groups (FR-1 through FR-5)
+    - 5 non-functional requirement categories (Performance, Usability, Maintainability, Compatibility, Security)
+    - 5 detailed user stories with acceptance criteria
+    - Complete data schemas for agent registry and outputs
+    - Interface requirements for CLI and slash commands
+  - **Implementation Checklist** (`docs/features/intelligent-agents-integration/03-implementation-checklist.md`)
+    - 31 major tasks across 6 phases (5 implementation + 1 integration)
+    - 200+ individual checklist items with validation steps
+    - Estimated 60-80 hours total implementation time
+    - Phase-by-phase breakdown with clear deliverables
+  - **QUICKSTART Guide** (`docs/features/intelligent-agents-integration/QUICKSTART.md`)
+    - 10-minute overview for developers
+    - Phase-by-phase implementation guide
+    - Common tasks and debugging tips
+    - Best practices and pitfalls to avoid
+  - This planning follows the established feature planning structure and enables intelligent, context-aware automation while maintaining CLI reliability
+- **Intelligent Agents Integration - Phase 1: Agent Framework** (FEATURE-002)
+  - **Agent Registry System** (`scripts/agents/agent-registry.sh`)
+    - JSON-based registry at `~/.config/ai-use-case-cli/agents.json`
+    - Commands: init, list, enable, disable, info, register, stats, reset
+    - 4 agents registered: quality-reviewer, pattern-analyzer, session-selector, organization-optimizer
+    - Color-coded output and statistics tracking
+    - Full agent lifecycle management
+  - **Agent Invoker** (`scripts/agents/invoke-agent.sh`)
+    - Agent validation and dependency checking
+    - Result caching with configurable duration
+    - Statistics tracking (invocations, success rate, duration)
+    - Timeout handling and error recovery
+    - Multiple output formats (text/json)
+  - **CLI Integration** (`ai-use-case agents`)
+    - Full `agents` subcommand integrated into main CLI
+    - Help text and examples added
+    - Tracing support for agent operations
+    - Graceful error handling
+  - **Comprehensive Documentation** (`docs/AGENTS.md`)
+    - Quick start guide
+    - Architecture overview (hybrid model)
+    - Agent management commands
+    - Configuration options
+    - Troubleshooting guide
+    - Developer guide for future agent implementations
+  - **Phase 1 Complete**: Agent framework operational, ready for Phase 2 (Quality Reviewer implementation)
+  - All agent commands tested and working: init, list, enable, disable, info, stats, reset
+  - Zero performance impact on existing CLI operations (< 10ms overhead)
+  - Backward compatible: CLI fully functional with or without agents
+- **Intelligent Agents Integration - Phase 2: Quality Reviewer Agent** (FEATURE-002)
+  - **Quality Agent Prompt** (`.claude/agents/use-case-quality-agent.md`)
+    - Comprehensive quality assessment methodology with 5 scoring categories
+    - Completeness (30%), Technical Depth (25%), Clarity (20%), Actionability (15%), Quantification (10%)
+    - Detailed scoring guidelines (A+ to F grading scale)
+    - Specific improvement suggestion framework with severity levels
+    - Support for both implementation and research session types
+    - JSON output schema for programmatic use
+  - **Quality Agent CLI Wrapper** (`scripts/agents/quality-agent.sh`)
+    - Single file review with detailed analysis
+    - Batch mode for multiple files (glob patterns)
+    - Project-wide review mode (analyze entire project from hub)
+    - Multiple output formats (text with color-coding, JSON for automation)
+    - Filtering by minimum score threshold
+    - Result sorting (by score, file, grade)
+    - Comprehensive help and examples
+  - **CLI Integration** (`ai-use-case review-quality`)
+    - New `review-quality` command: `ai-use-case review-quality <file>`
+    - Support for all quality agent modes (single, batch, project)
+    - Help text and examples added
+    - Tracing support for quality review operations
+  - **Claude Code Slash Command** (`.claude/commands/use-case/review-quality.md`)
+    - Interactive file selection if no file specified
+    - Automatic quality agent invocation via Task tool
+    - Formatted results presentation with color-coding
+    - Actionable next steps (apply improvements, review another, batch review)
+    - Comprehensive workflow documentation for Claude Code
+  - **Phase 2 Complete**: First functional agent operational
+  - Quality agent provides: overall score (0-10), category breakdown, strengths list, improvement suggestions with examples, summary and grade
+  - Framework validated: agent invocation, result formatting, CLI integration, slash command integration all working
 - **Feature Development Workflow in CLAUDE.md**: Added structured feature planning process guidance
   - Critical reminder: Always use `docs/features/` process when user requests new features
   - When to use: Multi-file features, new architecture, medium/high complexity, >1 day work

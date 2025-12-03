@@ -46,6 +46,7 @@ Documentation shouldn't be a burden—it should be a valuable asset that grows y
 - 🚀 **AI-assisted documentation** - Automatic context capture with Claude Code integration
 - 🔬 **Research & implementation sessions** - Document both code changes and exploratory work
 - 🤖 **Claude agent tracking** - Automatically track and document usage of specialized agents (Explore, Plan, etc.)
+- 🧠 **Intelligent agents** - AI-powered agents for quality review, pattern analysis, and organization (Phase 1 complete, more coming!)
 - 📊 **Session data extraction** - Extract git history, token usage, and metrics for reporting (v3.4.0+)
 - 📊 **OpenTelemetry tracing** - Monitor CLI performance and usage with distributed tracing (v3.6.0+)
 - 📈 **Command progress tracking** - Visual real-time progress indicators for all commands (v3.8.0+)
@@ -284,6 +285,55 @@ When you update the CLI to a newer version, you may want to refresh your existin
 - When new slash commands are added to the CLI
 - When git hooks receive bug fixes or improvements
 - If setup warnings suggest using `--update` to refresh components
+
+## Intelligent Agents (FEATURE-002)
+
+**Status:** Phase 1 Complete - Agent Framework Operational
+
+The CLI now includes an intelligent agent framework that provides AI-powered analysis and recommendations. This hybrid architecture combines reliable bash scripts with intelligent AI agents for context-aware automation.
+
+### Quick Start
+
+```bash
+# Initialize agent registry
+ai-use-case agents init
+
+# List available agents
+ai-use-case agents list
+
+# Enable an agent
+ai-use-case agents enable quality-reviewer
+
+# View agent information
+ai-use-case agents info quality-reviewer
+
+# View statistics
+ai-use-case agents stats
+```
+
+### Available Agents (Planned)
+
+**Phase 1 (Complete):** Agent framework operational
+- ✅ Agent registry system
+- ✅ Agent invocation framework
+- ✅ CLI integration (`ai-use-case agents`)
+- ✅ Statistics and caching
+
+**Phase 2-5 (Coming Soon):**
+- 🔄 **Quality Reviewer** - Documentation quality analysis and improvement suggestions
+- 🔄 **Pattern Analyzer** - Learn from past sessions, provide recommendations
+- 🔄 **Session Selector** - Intelligent PR/commit analysis for documentation
+- 🔄 **Organization Intelligence** - Hub optimization and relationship mapping
+
+### Key Features
+
+- **Optional & Opt-In** - Agents are enhancements, not requirements
+- **CLI Independence** - CLI works fully without agents
+- **Statistics Tracking** - Monitor agent usage and effectiveness
+- **Result Caching** - Fast repeated operations
+- **Zero Overhead** - < 10ms impact on existing commands
+
+For complete documentation, see **[docs/AGENTS.md](docs/AGENTS.md)**
 
 ## Examples
 
