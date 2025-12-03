@@ -1211,8 +1211,13 @@ if [[ "$COMMIT_DOC" =~ ^[Yy]$ ]]; then
     git commit -m "docs: AI session ${SESSION_DATE} - ${TICKET} - ${AI_TOOL}"
     echo -e "${GREEN}✓ Documentation committed${NC}"
 
-    # Auto-sync will be triggered by post-commit hook
-    echo -e "${BLUE}📤 Post-commit hook will sync to central repository${NC}"
+    # Explicit sync (matches slash command behavior)
+    echo -e "${BLUE}📤 Syncing to hub...${NC}"
+    if bash "$SYNC_SCRIPT" "$PROJECT_PATH"; then
+        echo -e "${GREEN}✓ Documentation synced to hub${NC}"
+    else
+        echo -e "${YELLOW}⚠ Warning: Sync failed (documentation is committed locally)${NC}"
+    fi
 else
     echo -e "${YELLOW}Documentation saved but not committed${NC}"
     echo "To commit later: git add $OUTPUT_FILE && git commit -m 'docs: AI session'"

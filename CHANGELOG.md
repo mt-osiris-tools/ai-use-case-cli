@@ -117,6 +117,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Unified Sync Behavior**: Shell script now explicitly calls sync script after commit
+  - Updated `document-ai-session.sh` to call `sync-ai-use-cases.sh` explicitly after commit
+  - Matches behavior of Claude Code slash command for consistency
+  - Ensures reliable sync even if post-commit hook is not configured
+  - Provides clear success/failure feedback to users
+  - Resolves inconsistency between manual and automatic documentation modes
 - **check-updates Command Output Issues**: Fixed color rendering and improved command guidance
   - Fixed ANSI color codes not rendering: replaced `cat <<EOF` with `echo -e` statements in help text
   - Removed misleading numbered list format from "Next steps" section to avoid confusion with interactive menus
