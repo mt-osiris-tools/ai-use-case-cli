@@ -323,10 +323,32 @@ check_rest_api_auth() {
 }
 
 # Convert basic markdown to Confluence storage format
+# NOTE: This is a simplified converter suitable for basic markdown.
+# 
+# Supported:
+#   - Headers (h1-h6)
+#   - Bold and italic (simple cases)
+#   - Links
+#   - Basic paragraphs
+#
+# NOT supported (will be rendered as-is or may break):
+#   - Code blocks (will appear as plain text)
+#   - Tables (will not render as tables)
+#   - Images (will not be embedded)
+#   - Nested formatting (e.g., **bold _italic_**)
+#   - Lists (bullets/numbered)
+#   - Blockquotes
+#   - Literal asterisks or special characters
+#
+# For documents with complex formatting, consider:
+#   1. Using a proper markdown-to-confluence converter
+#   2. Manual formatting in Confluence after publishing
+#   3. Using Confluence's built-in markdown import
+#
 convert_markdown_to_confluence() {
     local markdown_content="$1"
     
-    # Basic conversion (this is simplified - production would use a proper converter)
+    # Basic conversion - handles simple markdown only
     # Convert headers
     local html_content
     html_content=$(echo "$markdown_content" | sed -E '
@@ -338,18 +360,17 @@ convert_markdown_to_confluence() {
         s/^###### (.+)$/<h6>\1<\/h6>/g
     ')
     
-    # Convert bold and italic
+    # Convert bold and italic (simple cases only - no nested formatting)
+    # Note: This will not handle complex cases like **bold _italic_** correctly
     html_content=$(echo "$html_content" | sed -E '
         s/\*\*([^*]+)\*\*/<strong>\1<\/strong>/g
         s/\*([^*]+)\*/<em>\1<\/em>/g
     ')
     
     # Convert links
-    html_content=$(echo "$html_content" | sed -E '
-        s/\[([^\]]+)\]\(([^)]+)\)/<a href="\2">\1<\/a>/g
-    ')
+    html_content=$(echo "$html_content" | sed -E 's/\[([^]]+)\]\(([^)]+)\)/<a href="\2">\1<\/a>/g')
     
-    # Wrap in paragraphs
+    # Wrap in paragraphs (skip headers and empty lines)
     html_content=$(echo "$html_content" | sed -E '
         /^<[hH][1-6]>/!{
             /^$/!{
@@ -382,7 +403,7 @@ publish_via_rest_api() {
         --arg parentId "$parent_id" \
         --arg spaceKey "$space_key" \
         '{
-            spaceId: $spaceKey,
+            spaceKey: $spaceKey,
             status: "current",
             title: $title,
             parentId: $parentId,
@@ -392,11 +413,14 @@ publish_via_rest_api() {
             }
         }')
     
-    # Make API request
+    # Make API request with Basic authentication (email:token base64-encoded)
+    local auth_header
+    auth_header=$(echo -n "$USER_EMAIL:$API_TOKEN" | base64)
+    
     local response
     response=$(curl -s -w "\n%{http_code}" \
         -X POST \
-        -H "Authorization: Bearer $API_TOKEN" \
+        -H "Authorization: Basic $auth_header" \
         -H "Content-Type: application/json" \
         -H "Accept: application/json" \
         -d "$json_payload" \
