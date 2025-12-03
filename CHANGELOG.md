@@ -117,6 +117,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Duplicate Session Type Prompt**: Removed duplicate session type prompt in `document-ai-session.sh`
+  - Fixed confusing user experience where session type (implementation vs research) was prompted twice
+  - Removed first prompt (previously at lines 314-333) that appeared before data collection
+  - Kept single prompt in the interactive prompts section (lines 347-366) where it logically belongs
+  - Users now select session type only once during documentation workflow
+  - Fixes issue where selections could be inconsistent if user chose different options for duplicate prompts
 - **check-updates Command Output Issues**: Fixed color rendering and improved command guidance
   - Fixed ANSI color codes not rendering: replaced `cat <<EOF` with `echo -e` statements in help text
   - Removed misleading numbered list format from "Next steps" section to avoid confusion with interactive menus

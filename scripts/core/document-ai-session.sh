@@ -311,27 +311,6 @@ elif [ ! -d "$AI_USECASES_DIR" ] && [ -d "$OLD_USECASES_DIR" ]; then
     exit 1
 fi
 
-# Prompt for session type (implementation or research)
-echo -e "${CYAN}Select session type:${NC}"
-echo "  1) Implementation (code changes, commits)"
-echo "  2) Research (exploration, no code changes)"
-echo ""
-read -p "Enter choice [1-2] (default: 1): " SESSION_TYPE_CHOICE
-
-case "$SESSION_TYPE_CHOICE" in
-    2)
-        SESSION_TYPE="research"
-        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE-RESEARCH.md"
-        echo -e "${GREEN}✓${NC} Using research session template"
-        ;;
-    *)
-        SESSION_TYPE="implementation"
-        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE.md"
-        echo -e "${GREEN}✓${NC} Using implementation session template"
-        ;;
-esac
-echo ""
-
 # Collect session data
 echo -e "${CYAN}Collecting session data...${NC}"
 echo ""
