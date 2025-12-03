@@ -10,7 +10,7 @@ Display all projects that are using the AI Use Case CLI, showing both hub inform
 
 Run the list-projects script:
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/project/list-projects.sh
+ai-use-case list-projects
 ```
 
 ## Available Options
@@ -18,19 +18,19 @@ bash ~/.local/share/ai-use-case-cli/scripts/project/list-projects.sh
 ### Show All Information (Default)
 Shows both hub projects and registry information:
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/project/list-projects.sh
+ai-use-case list-projects
 ```
 
 ### Registry Only
 Show only registered projects with version details:
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/project/list-projects.sh --registry-only
+ai-use-case list-projects --registry-only
 ```
 
 ### Hub Only
 Show only projects in the hub with use case counts:
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/project/list-projects.sh --hub-only
+ai-use-case list-projects --hub-only
 ```
 
 ## Information Displayed
@@ -52,7 +52,7 @@ After viewing the projects, you can offer to:
 
 1. **Check for updates** if outdated projects are shown:
    ```bash
-   bash ~/.local/share/ai-use-case-cli/scripts/project/check-updates.sh
+   ai-use-case check-updates
    ```
 
 2. **View use cases** for a specific project:
@@ -62,12 +62,12 @@ After viewing the projects, you can offer to:
 
 3. **Update a project** to the latest version:
    ```bash
-   bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh /path/to/project
+   ai-use-case update-project /path/to/project
    ```
 
 4. **Search use cases** across all projects:
    ```bash
-   bash ~/.local/share/ai-use-case-cli/scripts/search/search-use-cases.sh <term>
+   ai-use-case search <term>
    ```
 
 ## Interaction Flow

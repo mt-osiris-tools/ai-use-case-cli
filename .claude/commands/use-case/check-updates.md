@@ -10,7 +10,7 @@ Check all registered projects and report which ones are running outdated version
 
 Run the check-updates script:
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/project/check-updates.sh
+ai-use-case check-updates
 ```
 
 ## Available Options
@@ -18,19 +18,19 @@ bash ~/.local/share/ai-use-case-cli/scripts/project/check-updates.sh
 ### Default (Pretty Output)
 Shows detailed information about outdated projects:
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/project/check-updates.sh
+ai-use-case check-updates
 ```
 
 ### JSON Output
 For programmatic processing:
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/project/check-updates.sh --json
+ai-use-case check-updates --json
 ```
 
 ### Paths Only
 Get only project paths (useful for scripting):
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/project/check-updates.sh --paths-only
+ai-use-case check-updates --paths-only
 ```
 
 ## Information Displayed
@@ -52,19 +52,19 @@ After checking for updates, offer to:
 
 ### 1. Update a Single Project
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh /path/to/project
+ai-use-case update-project /path/to/project
 ```
 
 ### 2. Update All Outdated Projects
 ```bash
-for p in $(bash ~/.local/share/ai-use-case-cli/scripts/project/check-updates.sh --paths-only); do
-  bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh "$p"
+for p in $(ai-use-case check-updates --paths-only); do
+  ai-use-case update-project "$p"
 done
 ```
 
 ### 3. View Project Details
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/project/list-projects.sh --registry-only
+ai-use-case list-projects --registry-only
 ```
 
 ## Interaction Flow

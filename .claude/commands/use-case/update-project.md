@@ -10,26 +10,26 @@ Update a specific project's CLI installation to the latest version, ensuring all
 
 Run the update-project script with the project path:
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh /path/to/project
+ai-use-case update-project /path/to/project
 ```
 
 ## Usage
 
 ### Update Current Directory
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh .
+ai-use-case update-project .
 ```
 
 ### Update Specific Project
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh /full/path/to/project
+ai-use-case update-project /full/path/to/project
 ```
 
 ### Update Multiple Projects
 ```bash
 # Update all outdated projects
-for p in $(bash ~/.local/share/ai-use-case-cli/scripts/project/check-updates.sh --paths-only); do
-  bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh "$p"
+for p in $(ai-use-case check-updates --paths-only); do
+  ai-use-case update-project "$p"
 done
 ```
 
@@ -90,26 +90,26 @@ If the script reports an error:
 ```
 User: "Update this project"
 Assistant: "I'll update the current project to the latest CLI version."
-[Runs: bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh .]
+[Runs: ai-use-case update-project .]
 ```
 
 **Updating specific project:**
 ```
 User: "Update my-app to the latest version"
 Assistant: "I'll update the my-app project. Let me find the registered path first."
-[Runs: bash ~/.local/share/ai-use-case-cli/scripts/project/list-projects.sh --registry-only]
+[Runs: ai-use-case list-projects --registry-only]
 [Finds path: /home/user/Projects/my-app]
-[Runs: bash ~/.local/share/ai-use-case-cli/scripts/project/update-project.sh /home/user/Projects/my-app]
+[Runs: ai-use-case update-project /home/user/Projects/my-app]
 ```
 
 **Multiple projects:**
 ```
 User: "Update all my projects"
 Assistant: "I'll check which projects need updates and update them all."
-[Runs: bash ~/.local/share/ai-use-case-cli/scripts/project/check-updates.sh]
+[Runs: ai-use-case check-updates]
 [Shows list of outdated projects]
 [Asks: "Update all X projects? This will run the setup script for each."]
-[If yes, runs update-project.sh for each path]
+[If yes, runs update-project for each path]
 ```
 
 ## Safety Checks
@@ -127,7 +127,7 @@ After successfully updating, suggest:
 
 1. **Verify the update**:
    ```bash
-   bash ~/.local/share/ai-use-case-cli/scripts/project/list-projects.sh --registry-only
+   ai-use-case list-projects --registry-only
    ```
 
 2. **Test in Claude Code**:

@@ -61,7 +61,7 @@ OUTPUT_FILE="/tmp/session-data-${SESSION_DATE}.json"
 Execute the extraction script with robust error handling:
 ```bash
 # Run extraction
-bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . <hours> json \
+ai-use-case extract <hours> json \
   --token-input <INPUT_TOKENS> \
   --token-output <OUTPUT_TOKENS> \
   --context-total <CONTEXT_SIZE> \
@@ -211,7 +211,7 @@ SESSION_DATE=$(date +%Y-%m-%d)
 OUTPUT_FILE="/tmp/session-data-${SESSION_DATE}.json"
 
 # Step 2: Run extraction
-bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . 8 json \
+ai-use-case extract 8 json \
   --token-input 95000 \
   --token-output 9687 \
   --context-total 1000000 \
@@ -238,7 +238,7 @@ fi
 
 ```bash
 # Direct output to stdout (no file)
-bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . 8 json \
+ai-use-case extract 8 json \
   --token-input 95000 \
   --token-output 9687 \
   --context-total 1000000 \
@@ -253,7 +253,7 @@ SESSION_DATE=$(date +%Y-%m-%d)
 OUTPUT_FILE="/tmp/session-report-${SESSION_DATE}.md"
 
 # Generate markdown
-bash ~/.local/share/ai-use-case-cli/scripts/core/extract-session-data.sh . 8 markdown \
+ai-use-case extract 8 markdown \
   --token-input 95000 \
   --token-output 9687 \
   --context-total 1000000 \

@@ -370,8 +370,8 @@ Based on the user's selection:
 
 Before starting documentation, verify the CLI is up-to-date:
 ```bash
-# Check current version (portable, works on macOS and Linux)
-bash ~/.local/share/ai-use-case-cli/ai-use-case --version 2>&1 | grep -o 'version [0-9.]*' | cut -d' ' -f2
+# Check current version
+ai-use-case --version 2>&1 | grep -o 'version [0-9.]*' | cut -d' ' -f2
 
 # Get latest version from GitHub (single source of truth)
 curl -s https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/utils/version.sh | grep '^export CLI_VERSION=' | head -1 | cut -d'"' -f2
@@ -379,7 +379,7 @@ curl -s https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/s
 
 **If versions differ:**
 - Warn the user that an update is available
-- Recommend updating: `cd ~/.local/share/ai-use-case-cli && git pull`
+- Recommend updating: `ai-use-case update`
 - Ask if they want to continue with current version or update first
 - If they choose to update, instruct them to re-run the command after updating
 
@@ -395,7 +395,7 @@ git rev-parse --show-toplevel
 ls -la .usecase/cases/ 2>/dev/null || echo "Not set up"
 ```
 
-If not set up, offer to run: `bash ~/.local/share/ai-use-case-cli/setup-project.sh`
+If not set up, offer to run: `ai-use-case --init`
 
 ### Step 3: Determine Session Type
 
@@ -545,23 +545,23 @@ Analyze the conversation history to detect if any specialized Claude agents were
 
 **IMPORTANT**: Before generating documentation, read the appropriate template from the CLI installation directory.
 
-The CLI installation includes the complete repository structure, including the docs/ directory with templates. During installation, the repository is cloned to a user-scoped directory (by default `~/.local/share/ai-use-case-cli/`).
+The CLI installation includes the complete repository structure, including the docs/ directory with templates. The path is configurable via the `AI_USECASES_CLI_ROOT` environment variable, with a fallback to the default installation location.
 
 **Path Reference Pattern:**
-- **Slash commands** (this file): Use absolute path `~/.local/share/ai-use-case-cli/docs/TEMPLATE.md` since Claude Code runs in the user's project directory
-- **Bash scripts**: Use `$SCRIPT_DIR/docs/TEMPLATE.md` variable for flexibility across installation methods
+- **Slash commands** (this file): Use `${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}` to support custom installation paths
+- **Bash scripts**: Use `$SCRIPT_DIR` variable which is resolved at runtime
 
 **For Implementation Sessions:**
 ```bash
-cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE.md
+cat "${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE.md"
 ```
 
 **For Research Sessions:**
 ```bash
-cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE-RESEARCH.md
+cat "${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE-RESEARCH.md"
 ```
 
-**Note**: Use the Read tool with the full path shown above. The hardcoded path is necessary because this slash command runs in the user's project directory, not the CLI installation directory. The `$SCRIPT_DIR` variable pattern is only available in bash scripts.
+**Note**: The environment variable `AI_USECASES_CLI_ROOT` allows users to install the CLI in custom locations. If not set, it defaults to `~/.local/share/ai-use-case-cli`.
 
 Use the Read tool to read the template file from this path. This is your source of truth for:
 - All sections that must be included
@@ -624,7 +624,7 @@ Create documentation file but DO NOT commit (since there are no code changes):
 
 **Then sync to central hub (both session types):**
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
+ai-use-case sync
 ```
 
 ## Key Principles
