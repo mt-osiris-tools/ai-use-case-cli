@@ -117,6 +117,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Commit Message Format**: Aligned commit message format with AI tool attribution for consistency and transparency
+  - Shell script (`document-ai-session.sh`) now uses multi-line commit format matching Claude Code slash command
+  - Dynamic AI attribution footer based on tool selection (Claude Code, Copilot, or both)
+  - Includes proper `Co-Authored-By` lines for AI tool attribution
+  - Commit message now includes: session date, ticket, brief description, TL;DR summary, and attribution footer
+  - Prepares for future GitHub Copilot support with tool-agnostic attribution format
 - **check-updates Command Output Issues**: Fixed color rendering and improved command guidance
   - Fixed ANSI color codes not rendering: replaced `cat <<EOF` with `echo -e` statements in help text
   - Removed misleading numbered list format from "Next steps" section to avoid confusion with interactive menus

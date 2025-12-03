@@ -1207,8 +1207,40 @@ read -p "Commit this documentation? (Y/n): " COMMIT_DOC
 COMMIT_DOC=${COMMIT_DOC:-y}
 
 if [[ "$COMMIT_DOC" =~ ^[Yy]$ ]]; then
+    # Build AI attribution footer based on tool selection
+    AI_ATTRIBUTION=""
+    case "$AI_TOOL" in
+        *"Claude Code"*"Copilot"*|*"Copilot"*"Claude Code"*)
+            # Both tools
+            AI_ATTRIBUTION="🤖 Generated with [Claude Code](https://claude.com/claude-code) + [GitHub Copilot](https://github.com/features/copilot)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+Co-Authored-By: GitHub Copilot <noreply@github.com>"
+            ;;
+        *"Claude Code"*)
+            AI_ATTRIBUTION="🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+            ;;
+        *"Copilot"*)
+            AI_ATTRIBUTION="🤖 Generated with [GitHub Copilot](https://github.com/features/copilot)
+
+Co-Authored-By: GitHub Copilot <noreply@github.com>"
+            ;;
+        *)
+            AI_ATTRIBUTION="🤖 Generated with AI assistance"
+            ;;
+    esac
+
     git add "$OUTPUT_FILE"
-    git commit -m "docs: AI session ${SESSION_DATE} - ${TICKET} - ${AI_TOOL}"
+    git commit -m "$(cat <<EOF
+docs: AI session ${SESSION_DATE} - ${TICKET} - ${BRIEF_DESC}
+
+${TLDR_WHAT}
+
+${AI_ATTRIBUTION}
+EOF
+)"
     echo -e "${GREEN}✓ Documentation committed${NC}"
 
     # Auto-sync will be triggered by post-commit hook
