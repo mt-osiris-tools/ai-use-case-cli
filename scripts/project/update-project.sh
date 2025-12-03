@@ -189,10 +189,12 @@ AI_COMMANDS_DIR="$PROJECT_PATH/.ai-tools/commands/use-case"
 CLI_COMMANDS_SOURCE="$CLI_ROOT/.ai-tools/commands/use-case"
 
 # Remove old directory structure if it exists
+# Note: .claude directory contains only CLI-provided slash command templates,
+# not user data, so it's safe to remove and will be replaced with fresh templates
 if [ -d "$LEGACY_COMMANDS_DIR" ]; then
     echo -e "${CYAN}Removing old .claude directory structure...${NC}"
     rm -rf "$PROJECT_PATH/.claude"
-    echo -e "${GREEN}✓${NC} Old .claude directory removed"
+    echo -e "${GREEN}✓${NC} Old .claude directory removed (will be replaced with .ai-tools)"
 fi
 
 if [ -d "$AI_COMMANDS_DIR" ]; then
