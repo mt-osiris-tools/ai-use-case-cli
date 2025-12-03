@@ -24,6 +24,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Highlights key features: interactive session selection, parallel git analysis, automatic commit/sync
   - Supports both implementation and research session workflows
   - Located at `docs/diagrams/document-session-sequence.puml`
+- **Feature Planning: Intelligent Agents Integration (FEATURE-002)**: Created comprehensive planning documentation for adding AI agents
+  - **Feature Plan** (`docs/features/intelligent-agents-integration/01-feature-plan.md`)
+    - Hybrid architecture: Bash scripts for reliability, AI agents for intelligence
+    - 5 specialized agents planned: Quality Reviewer, Pattern Analyzer, Session Selector, Organization Intelligence, +1 future
+    - 5 implementation phases spanning 5 weeks
+    - Clear goals, success criteria, and risk mitigation strategies
+  - **Requirements Document** (`docs/features/intelligent-agents-integration/02-requirements.md`)
+    - 5 functional requirement groups (FR-1 through FR-5)
+    - 5 non-functional requirement categories (Performance, Usability, Maintainability, Compatibility, Security)
+    - 5 detailed user stories with acceptance criteria
+    - Complete data schemas for agent registry and outputs
+    - Interface requirements for CLI and slash commands
+  - **Implementation Checklist** (`docs/features/intelligent-agents-integration/03-implementation-checklist.md`)
+    - 31 major tasks across 6 phases (5 implementation + 1 integration)
+    - 200+ individual checklist items with validation steps
+    - Estimated 60-80 hours total implementation time
+    - Phase-by-phase breakdown with clear deliverables
+  - **QUICKSTART Guide** (`docs/features/intelligent-agents-integration/QUICKSTART.md`)
+    - 10-minute overview for developers
+    - Phase-by-phase implementation guide
+    - Common tasks and debugging tips
+    - Best practices and pitfalls to avoid
+  - This planning follows the established feature planning structure and enables intelligent, context-aware automation while maintaining CLI reliability
 
 ### Fixed
 
