@@ -290,12 +290,14 @@ case "${1:-}" in
         if [ -z "${2:-}" ]; then
             trace_event "error" "command=update-project" "error=missing_argument" "required=project_path"
             echo -e "${RED}Error: Project path required${NC}"
-            echo "Usage: ai-use-case update-project <path>"
+            echo "Usage: ai-use-case update-project [options] <path>"
             exit 1
         fi
-        trace_event "command_start" "command=update-project" "project_path=$2"
+        trace_event "command_start" "command=update-project" "args=$*"
         if [ -f "$SCRIPT_DIR/scripts/project/update-project.sh" ]; then
-            trace_run "update-project" bash "$SCRIPT_DIR/scripts/project/update-project.sh" "$2"
+            # Pass through all remaining arguments (e.g., -y, --yes, and path)
+            shift
+            trace_run "update-project" bash "$SCRIPT_DIR/scripts/project/update-project.sh" "$@"
         else
             trace_event "error" "command=update-project" "error=script_not_found" "script=update-project.sh"
             echo -e "${RED}Error: update-project.sh not found${NC}"
