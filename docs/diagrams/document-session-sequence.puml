@@ -18,9 +18,9 @@ activate Claude
 Claude -> CLI: ai-use-case version
 activate CLI
 CLI -> Git: Get current version
-Git --> CLI: v3.9.0
+Git --> CLI: v3.10.0
 CLI -> GitHub: Check latest version
-GitHub --> CLI: v3.9.0
+GitHub --> CLI: v3.10.0
 CLI --> Claude: Version up-to-date
 deactivate CLI
 
@@ -59,7 +59,7 @@ deactivate Git
 == Session Information Extraction ==
 Claude -> Claude: Extract from:\n- PR title & description\n- Commit messages\n- Code changes\n- Conversation context
 
-Claude -> Claude: Auto-populate fields:\n- Date: 2025-12-02\n- Ticket: FEAT-123\n- Description: "Add feature X"\n- Complexity: Medium\n- Time saved: 2-3 hours
+Claude -> Claude: Auto-populate fields:\n- Date: YYYY-MM-DD\n- Ticket: FEAT-123\n- Description: "Add feature X"\n- Complexity: Medium\n- Time saved: 2-3 hours
 
 == Documentation Generation ==
 Claude -> FS: Read template\n(TEMPLATE.md or TEMPLATE-RESEARCH.md)
