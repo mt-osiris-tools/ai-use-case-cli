@@ -286,8 +286,8 @@ ESTIMATED_INTERACTIONS=$((TOTAL_COMMITS + (TOTAL_FILES / 3) + 5))
 # Get current timestamp
 EXTRACTED_AT=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
 
-# Detect AI tool (default to Claude Code if in Claude Code context)
-AI_TOOL="Claude Code (Sonnet 4.5)"
+# Detect AI tool (default to generic if not specified)
+AI_TOOL="AI-Assisted Development"
 
 # Pre-capture recent commits for markdown (avoid SIGPIPE in heredoc)
 if [ "$TOTAL_COMMITS" -gt 0 ]; then
@@ -340,7 +340,7 @@ if [ "$OUTPUT_FORMAT" = "json" ]; then
     "contextTokens": $CONTEXT_TOTAL,
     "cacheHits": $CACHE_HITS,
     "estimatedCostUSD": "$ESTIMATED_COST",
-    "note": "Token data can be provided via --token-* flags or captured automatically from Claude Code"
+    "note": "Token data can be provided via --token-* flags or captured automatically from AI coding tools"
   },
   "calculatedMetrics": {
     "estimatedInteractions": $ESTIMATED_INTERACTIONS,
@@ -404,7 +404,7 @@ $RECENT_COMMITS
 - **Cache Hits:** $CACHE_HITS
 - **Estimated Cost:** \$$ESTIMATED_COST USD
 
-> **Note:** Token data provided via --token-* flags or captured from Claude Code
+> **Note:** Token data provided via --token-* flags or captured from AI coding tools
 
 ---
 

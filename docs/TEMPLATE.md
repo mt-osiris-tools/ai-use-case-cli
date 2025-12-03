@@ -2,15 +2,15 @@
 TEMPLATE.md - Implementation Session Documentation Template
 This is the single source of truth for implementation session documentation structure.
 Location: ai-use-case-cli/docs/TEMPLATE.md
-Used by: Claude Code slash command (/use-case:document-session)
+Used by: AI coding assistant slash commands (/use-case:document-session)
 -->
 
-# 🎯 Claude Code: [Brief Descriptive Title]
+# 🎯 AI-Assisted: [Brief Descriptive Title]
 
 **Date:** YYYY-MM-DD (Week XX of YYYY)
 **Repository/Project:** project-name
 **Ticket:** [TICKET-XXXXX](https://your-jira-or-github/browse/TICKET-XXXXX)
-**Agent Used:** Claude Code (Sonnet 4.5) / GitHub Copilot / Other
+**AI Tool Used:** GitHub Copilot / Claude Code / OpenAI Codex / Other
 **Complexity:** Low / Medium / High
 **Time Saved:** ~X hours vs manual approach
 **Session Duration:** X hours YY minutes
@@ -71,7 +71,9 @@ command-2
 command-3
 ```
 
-### Claude Agents Used
+### AI Agents Used
+
+*(Note: Specialized agents from Claude, Copilot, or other AI tools)*
 
 - **Explore Agent:** X invocations
   - **Purpose:** Codebase exploration, finding patterns, understanding architecture

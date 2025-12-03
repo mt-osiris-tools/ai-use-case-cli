@@ -478,19 +478,23 @@ echo ""
 echo "AI Tool Used:"
 echo "1) Claude Code (Sonnet 4.5)"
 echo "2) GitHub Copilot"
-echo "3) Claude Code + GitHub Copilot"
-echo "4) Other"
-read -p "Select (1-4) [1]: " AI_TOOL_CHOICE
-AI_TOOL_CHOICE=${AI_TOOL_CHOICE:-1}
+echo "3) OpenAI Codex / ChatGPT"
+echo "4) Combination (specify)"
+echo "5) Other"
+read -p "Select (1-5) [2]: " AI_TOOL_CHOICE
+AI_TOOL_CHOICE=${AI_TOOL_CHOICE:-2}
 
 case $AI_TOOL_CHOICE in
     1) AI_TOOL="Claude Code (Sonnet 4.5)" ;;
     2) AI_TOOL="GitHub Copilot" ;;
-    3) AI_TOOL="Claude Code (Sonnet 4.5) + GitHub Copilot" ;;
+    3) AI_TOOL="OpenAI Codex / ChatGPT" ;;
     4)
+        read -p "Specify combination (e.g., Claude + Copilot): " AI_TOOL
+        ;;
+    5)
         read -p "Specify AI tool: " AI_TOOL
         ;;
-    *) AI_TOOL="Claude Code (Sonnet 4.5)" ;;
+    *) AI_TOOL="GitHub Copilot" ;;
 esac
 
 # Complexity
@@ -529,16 +533,17 @@ OUTPUT_TOKENS=${OUTPUT_TOKENS:-""}
 read -p "Estimated cost in USD (e.g., 0.25 or leave blank): " ESTIMATED_COST
 ESTIMATED_COST=${ESTIMATED_COST:-""}
 
-# Claude Agents Usage (new section)
+# AI Agents Usage (specialized agents from any AI tool)
 echo ""
-echo -e "${CYAN}Claude Agents Usage:${NC}"
-read -p "Were any Claude agents used during this session? (y/N): " AGENTS_USED
+echo -e "${CYAN}AI Agents Usage:${NC}"
+echo "Note: This includes specialized agents from Claude, Copilot, or other AI tools"
+read -p "Were any specialized AI agents used during this session? (y/N): " AGENTS_USED
 AGENTS_USED=${AGENTS_USED:-n}
 
 if [[ "$AGENTS_USED" =~ ^[Yy]$ ]]; then
     echo ""
     echo "Which agents were used? (comma-separated)"
-    echo "  Options: Explore, Plan, general-purpose, code-reviewer, other"
+    echo "  Examples: Explore, Plan, Code-reviewer, Test-generator, Documentation-writer, etc."
     read -p "  Agents: " AGENTS_LIST
 
     # Validate that agent list is not empty
@@ -735,13 +740,13 @@ EOF
 EOF
 }
 
-# Helper function to generate Claude Agents section
+# Helper function to generate AI Agents section
 generate_agents_section() {
     # Only generate section if agents were used
     if [[ "$AGENTS_USED" =~ ^[Yy]$ ]] && [ ${#AGENT_NAMES[@]} -gt 0 ]; then
         cat <<EOF
 
-### Claude Agents Used
+### AI Agents Used
 
 EOF
         # Generate entry for each agent
