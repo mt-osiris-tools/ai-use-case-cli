@@ -45,6 +45,72 @@ See **[docs/WORKFLOW.md](docs/WORKFLOW.md)** for complete workflow guide.
 - [ ] Tested changes locally
 - [ ] Updated all related documentation
 
+## 🎯 Feature Development Workflow
+
+**CRITICAL**: When the user says "let's create a new feature" or "let's add [complex feature]", **ALWAYS follow the `docs/features/` process**.
+
+### When to Use Feature Planning Process
+
+Use the structured feature planning workflow when:
+- ✅ Feature will touch multiple files or components
+- ✅ Feature requires new architecture or patterns
+- ✅ Feature has multiple implementation approaches
+- ✅ Feature complexity is Medium or High
+- ✅ Feature will take more than 1 day to implement
+
+Skip for:
+- ❌ Simple bug fixes (1-2 files, clear solution)
+- ❌ Documentation-only changes
+- ❌ Minor refactoring
+
+### Quick Start: New Feature
+
+```bash
+# 1. Create feature directory
+mkdir -p docs/features/[feature-name]
+
+# 2. Copy templates
+cp docs/features/FEATURE-TEMPLATE/*.md docs/features/[feature-name]/
+
+# 3. Rename files
+cd docs/features/[feature-name]
+mv 01-feature-plan.md [feature-name].md
+mv 02-requirements.md [feature-name]-requirements.md
+mv 03-implementation-checklist.md [feature-name]-checklist.md
+
+# 4. Start planning
+# Fill in: Feature Plan → Requirements → Implementation Checklist
+```
+
+### Three Core Documents Required
+
+1. **Feature Plan** (`[feature-name].md`)
+   - Overview, problem statement, goals
+   - Proposed solution and architecture
+   - Implementation phases
+   - Risks and mitigations
+
+2. **Requirements** (`[feature-name]-requirements.md`)
+   - Functional and non-functional requirements
+   - User stories and acceptance criteria
+   - Data and interface requirements
+   - Constraints and open questions
+
+3. **Implementation Checklist** (`[feature-name]-checklist.md`)
+   - Phase-by-phase task breakdown
+   - Each task: priority, time estimate, steps, verification
+   - Progress tracking and decision log
+
+### Feature Planning Benefits
+
+- ✅ **Thorough planning** before implementation
+- ✅ **Clear requirements** that can be validated
+- ✅ **Step-by-step guidance** via detailed checklists
+- ✅ **Documentation** of design decisions
+- ✅ **Knowledge transfer** for maintainers
+
+**Full guide**: [docs/features/README.md](docs/features/README.md)
+
 ## Quick Command Reference
 
 **Full reference:** [docs/COMMANDS.md](docs/COMMANDS.md)
