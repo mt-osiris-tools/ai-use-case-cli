@@ -439,6 +439,6 @@ ls -la /tmp
 
 ## See Also
 
-- [Command Reference](COMMANDS.md) - Full CLI command reference
-- [Claude Code Integration](CLAUDE.md) - Slash commands documentation
+- [Command Reference](./COMMANDS.md) - Full CLI command reference
+- [Claude Code Integration](./CLAUDE.md) - Slash commands documentation
 - Main repository: https://github.com/mt-osiris-tools/ai-use-case-cli
