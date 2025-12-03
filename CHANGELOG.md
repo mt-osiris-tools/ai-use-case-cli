@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Extract Session Slash Command Simplification**: Refactored `/use-case:extract-session` command for better maintainability
+  - Reduced from 393 lines to 200 lines (49% reduction)
+  - Moved detailed documentation to `docs/EXTRACT-SESSION-REFERENCE.md`
+  - Kept essential workflow (Steps 1-6) and core functionality
+  - Extracted detailed exit code handling, cost calculations, JSON structure, and command substitution best practices to reference doc
+  - Added link to reference documentation for advanced details
+  - Improved consistency with other slash commands (sync-usecases: 49 lines, list-projects: 90 lines, check-updates: 115 lines)
+  - Reduced token overhead for AI processing while maintaining full functionality
+
 ### Added
 
 - **C4 Architecture Diagrams**: Added comprehensive architecture diagrams using PlantUML and C4 model
