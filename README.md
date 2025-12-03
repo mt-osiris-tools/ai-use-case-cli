@@ -42,10 +42,10 @@ Documentation shouldn't be a burden—it should be a valuable asset that grows y
 
 ## Features
 
-- 🎯 **Hybrid interface** - Use standalone CLI commands or Claude Code slash commands
-- 🚀 **AI-assisted documentation** - Automatic context capture with Claude Code integration
+- 🎯 **Hybrid interface** - Use standalone CLI commands or AI assistant slash commands
+- 🚀 **AI-assisted documentation** - Automatic context capture with GitHub Copilot, Claude Code, and other AI tools
 - 🔬 **Research & implementation sessions** - Document both code changes and exploratory work
-- 🤖 **Claude agent tracking** - Automatically track and document usage of specialized agents (Explore, Plan, etc.)
+- 🤖 **AI agent tracking** - Automatically track and document usage of specialized agents from any AI tool
 - 🧠 **Intelligent agents** - AI-powered agents for quality review, pattern analysis, and organization (Phase 1 complete, more coming!)
 - 📊 **Session data extraction** - Extract git history, token usage, and metrics for reporting (v3.4.0+)
 - 📊 **OpenTelemetry tracing** - Monitor CLI performance and usage with distributed tracing (v3.6.0+)
@@ -77,9 +77,9 @@ cd ~/.local/share/ai-use-case-cli
    ai-use-case --init
    ```
 
-2. **Work on your code with AI assistance**
+2. **Work on your code with AI assistance** (GitHub Copilot, Claude Code, or other AI tools)
 
-3. **Document your session** (in Claude Code):
+3. **Document your session** (in your AI coding assistant):
    ```
    /use-case:document-session
    ```

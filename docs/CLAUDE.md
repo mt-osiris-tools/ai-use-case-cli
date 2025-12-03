@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.com/code) when working with code in this repository.
+This file provides guidance to AI coding assistants (Claude Code, GitHub Copilot, etc.) when working with code in this repository.
 
 ## Repository Purpose
 
@@ -109,9 +109,9 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
   - Can be invoked from GitHub Copilot chat: `@workspace document my AI session`
   - Wraps the document-ai-session.sh script
 
-### Claude Code Integration
+### AI Assistant Integration
 
-- **`.claude/commands/use-case/`**: Slash commands for Claude Code
+- **`.ai-tools/commands/use-case/`**: Slash commands for AI coding assistants
   - `/use-case:quick-start` - Get started guide
   - `/use-case:setup-project` - Setup a project
   - `/use-case:document-session` - Document an AI session (AUTOMATIC MODE)
@@ -119,20 +119,20 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
   - `/use-case:search-usecases` - Search use cases
   - `/use-case:publish-confluence` - Publish to Confluence
 
-## For Claude Code: Automatic Documentation
+## For AI Assistants: Automatic Documentation
 
-**IMPORTANT**: When the `/use-case:document-session` slash command is invoked in Claude Code, documentation should be **automatically generated** based on git history and conversation context. Do NOT run the interactive `document-ai-session.sh` script.
+**IMPORTANT**: When the `/use-case:document-session` slash command is invoked in an AI coding assistant, documentation should be **automatically generated** based on git history and conversation context. Do NOT run the interactive `document-ai-session.sh` script.
 
 ### Automatic vs Interactive Mode
 
 The documentation system supports two modes:
 
-**Automatic Mode (Claude Code):**
-- Triggered by `/use-case/document-session` command in Claude Code
-- Claude analyzes git history + conversation context
+**Automatic Mode (AI Assistants):**
+- Triggered by `/use-case/document-session` command in AI coding assistants
+- AI analyzes git history + conversation context
 - Zero user prompts required
 - Generates complete documentation with all sections filled
-- Best for AI-assisted sessions where Claude has full context
+- Best for AI-assisted sessions where the assistant has full context
 - Supports both implementation and research sessions
 
 **Interactive Mode (Manual Shell):**
@@ -170,7 +170,7 @@ The system now supports two types of AI sessions:
 
 ### Automatic Documentation Workflow
 
-When `/use-case:document-session` is invoked in Claude Code:
+When `/use-case:document-session` is invoked in an AI coding assistant:
 
 1. **Check CLI Version**: Verify the CLI is up-to-date before starting
    - Compare current version with latest from GitHub
