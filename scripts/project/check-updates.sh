@@ -50,7 +50,7 @@ if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
     echo "  project against the current CLI version and reports which projects"
     echo "  need updates."
     echo ""
-    echo "  Use this before running update-project.sh to update specific projects."
+    echo "  Use this before running 'ai-use-case update-project' to update specific projects."
     echo ""
     exit 0
 fi
