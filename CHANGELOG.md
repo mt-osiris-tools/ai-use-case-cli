@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **check-updates Command Output Issues**: Fixed color rendering and improved command guidance
+  - Fixed ANSI color codes not rendering: replaced `cat <<EOF` with `echo -e` statements in help text
+  - Removed misleading numbered list format from "Next steps" section to avoid confusion with interactive menus
+  - Updated all command references to use `ai-use-case` command instead of invalid relative script paths
+  - Improved clarity with proper section headers and working examples
+  - Users can now copy-paste commands directly without "command not found" errors
 - **Confluence Title Format**: Include year in Confluence page titles
   - Updated `/publish-confluence` slash command to format titles as `🎯 2025 W## | TICKET-ID: Title`
   - Fixed `publish-confluence.sh` to capture and include year in title extraction

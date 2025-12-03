@@ -28,32 +28,30 @@ source "$SCRIPT_DIR/registry-manager.sh"
 
 # Show help
 if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-    cat <<EOF
-${BLUE}AI Use Case CLI - Check for Updates${NC}
-
-Checks which registered projects need updates to the latest CLI version.
-
-${YELLOW}Usage:${NC}
-  $0 [options]
-
-${YELLOW}Options:${NC}
-  -h, --help     Show this help message
-  --json         Output in JSON format
-  --paths-only   Output only project paths (one per line)
-
-${YELLOW}Examples:${NC}
-  $0                 # Check for outdated projects
-  $0 --json          # Output in JSON format
-  $0 --paths-only    # Output only paths for scripting
-
-${YELLOW}Description:${NC}
-  This command compares the CLI version installed in each registered
-  project against the current CLI version and reports which projects
-  need updates.
-
-  Use this before running update-project.sh to update specific projects.
-
-EOF
+    echo -e "${BLUE}AI Use Case CLI - Check for Updates${NC}"
+    echo ""
+    echo "Checks which registered projects need updates to the latest CLI version."
+    echo ""
+    echo -e "${YELLOW}Usage:${NC}"
+    echo "  $0 [options]"
+    echo ""
+    echo -e "${YELLOW}Options:${NC}"
+    echo "  -h, --help     Show this help message"
+    echo "  --json         Output in JSON format"
+    echo "  --paths-only   Output only project paths (one per line)"
+    echo ""
+    echo -e "${YELLOW}Examples:${NC}"
+    echo "  $0                 # Check for outdated projects"
+    echo "  $0 --json          # Output in JSON format"
+    echo "  $0 --paths-only    # Output only paths for scripting"
+    echo ""
+    echo -e "${YELLOW}Description:${NC}"
+    echo "  This command compares the CLI version installed in each registered"
+    echo "  project against the current CLI version and reports which projects"
+    echo "  need updates."
+    echo ""
+    echo "  Use this before running 'ai-use-case update-project' to update specific projects."
+    echo ""
     exit 0
 fi
 
@@ -69,7 +67,7 @@ total=$(jq -r '.projects | length' "$REGISTRY_FILE")
 if [ "$total" -eq 0 ]; then
     echo -e "${YELLOW}No projects registered yet${NC}"
     echo ""
-    echo "Register projects using: ./setup-project.sh <path>"
+    echo -e "Register projects by running ${CYAN}ai-use-case --init${NC} from within each project directory"
     exit 0
 fi
 
@@ -139,8 +137,8 @@ while IFS= read -r project_json; do
 
         echo -e "${CYAN}$outdated_count. $name${NC}"
         echo "   Path: $path"
-        echo "   Current version: ${RED}$version${NC}"
-        echo "   Latest version: ${GREEN}$CLI_VERSION${NC}"
+        echo -e "   Current version: ${RED}$version${NC}"
+        echo -e "   Latest version: ${GREEN}$CLI_VERSION${NC}"
         echo "   Last updated: $(date -d "$updated" +"%Y-%m-%d %H:%M" 2>/dev/null || echo "$updated")"
         echo ""
     fi
@@ -150,7 +148,14 @@ echo -e "${BLUE}=== Summary ===${NC}"
 echo "Total projects: $total"
 echo -e "Outdated: ${YELLOW}$outdated_count${NC}"
 echo ""
-echo -e "${YELLOW}Next steps:${NC}"
-echo "  1. Review the outdated projects above"
-echo "  2. Update a specific project: ${CYAN}./update-project.sh <path>${NC}"
-echo "  3. Or update all: ${CYAN}for p in \$(./check-updates.sh --paths-only); do ./update-project.sh \"\$p\"; done${NC}"
+echo -e "${BLUE}=== Next Steps ===${NC}"
+echo ""
+echo "To update a specific project:"
+echo -e "  ${CYAN}ai-use-case update-project <path>${NC}"
+echo ""
+echo "To update all outdated projects:"
+echo -e "  ${CYAN}for p in \$(ai-use-case check-updates --paths-only); do ai-use-case update-project -y \"\$p\"; done${NC}"
+echo ""
+echo "Examples:"
+echo -e "  ${CYAN}ai-use-case update-project /home/user/projects/my-project${NC}"
+echo -e "  ${CYAN}ai-use-case update-project -y ~/Documents/my-app${NC}"
