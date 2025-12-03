@@ -106,6 +106,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Phase 2 Complete**: First functional agent operational
   - Quality agent provides: overall score (0-10), category breakdown, strengths list, improvement suggestions with examples, summary and grade
   - Framework validated: agent invocation, result formatting, CLI integration, slash command integration all working
+- **Feature Development Workflow in CLAUDE.md**: Added structured feature planning process guidance
+  - Critical reminder: Always use `docs/features/` process when user requests new features
+  - When to use: Multi-file features, new architecture, medium/high complexity, >1 day work
+  - Quick start guide: Create directory, copy templates, rename files
+  - Three core documents: Feature Plan, Requirements, Implementation Checklist
+  - Benefits: Thorough planning, clear requirements, step-by-step guidance, knowledge transfer
+  - Links to full guide at `docs/features/README.md`
+  - Ensures Claude Code follows structured approach for complex features
 
 ### Fixed
 

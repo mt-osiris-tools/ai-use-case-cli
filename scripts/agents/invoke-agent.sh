@@ -2,7 +2,7 @@
 # AI Use Case CLI - Agent Invoker
 # Invokes specialized AI agents via Claude Code Task tool
 
-set -e
+set -euo pipefail
 
 # Color definitions
 RED=$'\033[0;31m'
@@ -106,6 +106,13 @@ get_timeout() {
     echo "$timeout"
 }
 
+# Sanitize agent ID for safe file path usage
+sanitize_agent_id() {
+    local agent_id="$1"
+    # Only allow alphanumeric, underscore, hyphen, and dot
+    echo "$agent_id" | sed 's/[^a-zA-Z0-9._-]/_/g'
+}
+
 # Check cache
 check_cache() {
     local agent_id="$1"
@@ -120,7 +127,17 @@ check_cache() {
     # Create cache directory if it doesn't exist
     mkdir -p "$CACHE_DIR"
 
-    local cache_file="$CACHE_DIR/${agent_id}_${cache_key}.json"
+    # Sanitize agent_id to prevent path traversal
+    local safe_id=$(sanitize_agent_id "$agent_id")
+    local cache_file="$CACHE_DIR/${safe_id}_${cache_key}.json"
+
+    # Validate the resolved path is within CACHE_DIR
+    local cache_dir_real=$(cd "$CACHE_DIR" && pwd -P)
+    local cache_file_real=$(realpath -m "$cache_file")
+    if [[ "$cache_file_real" != "$cache_dir_real"/* ]]; then
+        echo -e "${RED}Error: Invalid cache path${NC}" >&2
+        return 1
+    fi
 
     if [ ! -f "$cache_file" ]; then
         return 1
@@ -148,7 +165,19 @@ save_cache() {
 
     mkdir -p "$CACHE_DIR"
 
-    local cache_file="$CACHE_DIR/${agent_id}_${cache_key}.json"
+    # Sanitize agent_id to prevent path traversal
+    local safe_id=$(sanitize_agent_id "$agent_id")
+    local cache_file="$CACHE_DIR/${safe_id}_${cache_key}.json"
+
+    # Validate the resolved path is within CACHE_DIR
+    local cache_dir_real=$(cd "$CACHE_DIR" && pwd -P)
+    local cache_file_real=$(realpath -m "$cache_file")
+    if [[ "$cache_file_real" != "$cache_dir_real"/* ]]; then
+        echo -e "${RED}Error: Invalid cache path${NC}" >&2
+        return 1
+    fi
+
+    # Save to cache
     echo "$result" > "$cache_file"
 }
 
@@ -320,17 +349,34 @@ invoke_agent() {
         timeout=$(get_timeout)
     fi
 
-    # Build context
-    local full_context=$(jq -n \
-        --arg file "$file_path" \
-        --arg project "$project_name" \
-        --argjson base "$context_json" \
-        '$base + {file: $file, project: $project}')
+    # Build context with all params in a single jq invocation for efficiency
+    local full_context
+    # Check if params array has elements (safe for set -u)
+    local params_count=0
+    if [ -n "${params[*]+x}" ]; then
+        params_count="${#params[@]}"
+    fi
 
-    # Add params to context
-    for key in "${!params[@]}"; do
-        full_context=$(echo "$full_context" | jq --arg k "$key" --arg v "${params[$key]}" '. + {($k): $v}')
-    done
+    if [ "$params_count" -gt 0 ]; then
+        # Build jq args for all params
+        local jq_args="--arg file \"$file_path\" --arg project \"$project_name\" --argjson base \"$context_json\""
+        local jq_obj_parts="\$base + {file: \$file, project: \$project"
+
+        for key in "${!params[@]}"; do
+            jq_args="$jq_args --arg param_$key \"${params[$key]}\""
+            jq_obj_parts="$jq_obj_parts, $key: \$param_$key"
+        done
+        jq_obj_parts="$jq_obj_parts}"
+
+        full_context=$(eval "jq -n $jq_args '$jq_obj_parts'")
+    else
+        # No params, simpler invocation
+        full_context=$(jq -n \
+            --arg file "$file_path" \
+            --arg project "$project_name" \
+            --argjson base "$context_json" \
+            '$base + {file: $file, project: $project}')
+    fi
 
     # Generate cache key
     local cache_key=$(echo "$full_context" | md5sum | cut -d' ' -f1)

@@ -2,7 +2,7 @@
 # AI Use Case CLI - Agent Registry Manager
 # Manages the agent registry for intelligent agents integration
 
-set -e
+set -euo pipefail
 
 # Color definitions
 RED=$'\033[0;31m'
@@ -125,6 +125,9 @@ list_agents() {
     # Read and display agents
     local count=0
     while IFS= read -r agent; do
+        # Skip empty lines
+        [ -z "$agent" ] && continue
+
         local id=$(echo "$agent" | jq -r '.id')
         local name=$(echo "$agent" | jq -r '.name')
         local description=$(echo "$agent" | jq -r '.description')
@@ -145,8 +148,8 @@ list_agents() {
         echo -e "   ${CYAN}Invocations:${NC} $invocations"
         echo ""
 
-        ((count++))
-    done < <(jq -c "$jq_filter" "$REGISTRY_FILE" 2>/dev/null || echo "")
+        ((count++)) || true
+    done < <(jq -c "$jq_filter" "$REGISTRY_FILE" 2>/dev/null || true)
 
     if [ $count -eq 0 ]; then
         echo -e "${YELLOW}No agents found matching filter${NC}"
@@ -154,6 +157,8 @@ list_agents() {
         echo -e "${CYAN}═══════════════════════════════════════════════${NC}"
         echo -e "${GREEN}Total: $count agent(s)${NC}"
     fi
+
+    return 0
 }
 
 # Enable agent
@@ -374,7 +379,7 @@ EOF
 show_stats() {
     ensure_registry
 
-    local agent_id="$1"
+    local agent_id="${1:-}"
 
     if [ -n "$agent_id" ]; then
         # Show stats for specific agent
