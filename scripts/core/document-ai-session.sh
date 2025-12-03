@@ -321,12 +321,12 @@ read -p "Enter choice [1-2] (default: 1): " SESSION_TYPE_CHOICE
 case "$SESSION_TYPE_CHOICE" in
     2)
         SESSION_TYPE="research"
-        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE-RESEARCH.md"
+        TEMPLATE_FILE="$SCRIPT_DIR/../../docs/TEMPLATE-RESEARCH.md"
         echo -e "${GREEN}✓${NC} Using research session template"
         ;;
     *)
         SESSION_TYPE="implementation"
-        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE.md"
+        TEMPLATE_FILE="$SCRIPT_DIR/../../docs/TEMPLATE.md"
         echo -e "${GREEN}✓${NC} Using implementation session template"
         ;;
 esac
@@ -374,15 +374,15 @@ SESSION_TYPE_CHOICE=${SESSION_TYPE_CHOICE:-1}
 case $SESSION_TYPE_CHOICE in
     1)
         SESSION_TYPE="implementation"
-        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE.md"
+        TEMPLATE_FILE="$SCRIPT_DIR/../../docs/TEMPLATE.md"
         ;;
     2)
         SESSION_TYPE="research"
-        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE-RESEARCH.md"
+        TEMPLATE_FILE="$SCRIPT_DIR/../../docs/TEMPLATE-RESEARCH.md"
         ;;
     *)
         SESSION_TYPE="implementation"
-        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE.md"
+        TEMPLATE_FILE="$SCRIPT_DIR/../../docs/TEMPLATE.md"
         ;;
 esac
 
