@@ -1,0 +1,154 @@
+@startuml Document Session Workflow - Sequence Diagram
+
+title /use-case:document-session Workflow (v3.4.0+)
+
+actor Developer
+participant "Claude Code" as Claude
+participant "CLI Dispatcher" as CLI
+participant "document-ai-session.sh" as DocScript
+participant "Git" as Git
+participant "GitHub API" as GitHub
+participant "File System" as FS
+participant "sync-ai-use-cases.sh" as Sync
+participant "Hub Repository" as Hub
+
+== Version Check ==
+Developer -> Claude: /use-case:document-session
+activate Claude
+Claude -> CLI: ai-use-case version
+activate CLI
+CLI -> Git: Get current version
+Git --> CLI: v3.9.0
+CLI -> GitHub: Check latest version
+GitHub --> CLI: v3.9.0
+CLI --> Claude: Version up-to-date
+deactivate CLI
+
+== Session Detection (v3.4.0+) ==
+Claude -> GitHub: gh pr list --state merged --limit 10
+activate GitHub
+GitHub --> Claude: List of recent PRs
+deactivate GitHub
+
+Claude -> Git: git log --since="7 days ago"
+activate Git
+Git --> Claude: Recent commits
+deactivate Git
+
+Claude -> FS: Check .usecase/cases/ for existing docs
+activate FS
+FS --> Claude: List of documented sessions
+deactivate FS
+
+== Interactive Session Selection ==
+Claude -> Developer: Present options:\n1. PR #123: "Add feature X"\n2. Current conversation\n3. Commit abc123: "Fix bug Y"
+Developer -> Claude: Select option 1 (PR #123)
+
+== Git History Analysis (Parallel) ==
+Claude -> Git: git log --since="PR merge time"
+activate Git
+Claude -> Git: git show --stat HEAD
+Claude -> Git: git diff PR_BASE..PR_HEAD
+Claude -> Git: git status --short
+Git --> Claude: Commit history
+Git --> Claude: File statistics
+Git --> Claude: Code changes
+Git --> Claude: Working tree status
+deactivate Git
+
+== Session Information Extraction ==
+Claude -> Claude: Extract from:\n- PR title & description\n- Commit messages\n- Code changes\n- Conversation context
+
+Claude -> Claude: Auto-populate fields:\n- Date: 2025-12-02\n- Ticket: FEAT-123\n- Description: "Add feature X"\n- Complexity: Medium\n- Time saved: 2-3 hours
+
+== Documentation Generation ==
+Claude -> FS: Read template\n(TEMPLATE.md or TEMPLATE-RESEARCH.md)
+activate FS
+FS --> Claude: Template content
+deactivate FS
+
+Claude -> Claude: Generate complete documentation:\n- TL;DR\n- Objective & Background\n- Technical Details\n- Results & Metrics\n- Lessons Learned
+
+== Save Documentation ==
+Claude -> FS: Write documentation to\n.usecase/cases/YYYY-Www-MM-DD_TICKET_description.md
+activate FS
+FS --> Claude: File created
+deactivate FS
+
+== Git Commit ==
+Claude -> Git: git add .usecase/cases/[file].md
+activate Git
+Git --> Claude: Staged
+deactivate Git
+
+Claude -> Git: git commit -m "docs: AI session YYYY-MM-DD - TICKET - Description\n\n🤖 Generated with Claude Code\nCo-Authored-By: Claude <noreply@anthropic.com>"
+activate Git
+Git --> Claude: Commit created
+deactivate Git
+
+== Hub Sync ==
+Claude -> CLI: ai-use-case sync
+activate CLI
+CLI -> DocScript: Execute sync
+activate DocScript
+
+DocScript -> FS: Read .usecase/cases/ files
+activate FS
+FS --> DocScript: Documentation files
+deactivate FS
+
+DocScript -> Sync: Invoke sync script
+activate Sync
+
+Sync -> Hub: Copy files to by-project/[project]/
+activate Hub
+Hub --> Sync: Files copied
+deactivate Hub
+
+Sync -> Hub: Create symlinks in by-date/YYYY/MM/
+activate Hub
+Hub --> Sync: Symlinks created
+deactivate Hub
+
+Sync -> Hub: Create symlinks in by-topic/[topic]/
+activate Hub
+Hub --> Sync: Symlinks created
+deactivate Hub
+
+Sync -> Git: git add by-project/
+activate Git
+Git --> Sync: Staged
+deactivate Git
+
+Sync -> Git: git commit -m "sync: Add session docs"
+activate Git
+Git --> Sync: Commit created
+deactivate Git
+
+Sync -> Git: git push
+activate Git
+Git --> Sync: Pushed to remote
+deactivate Git
+
+Sync --> DocScript: Sync complete
+deactivate Sync
+DocScript --> CLI: Success
+deactivate DocScript
+CLI --> Claude: Documentation synced
+deactivate CLI
+
+== Completion ==
+Claude -> Developer: ✅ Documentation generated and synced:\n- File: .usecase/cases/[file].md\n- Hub: Synced to by-project/, by-date/, by-topic/\n- Git: Committed and pushed
+deactivate Claude
+
+note over Developer, Hub
+**Key Features:**
+• Automatic version checking
+• Interactive session selection (PRs, commits, conversation)
+• Parallel git analysis for performance
+• Complete documentation (no placeholders)
+• Automatic commit and sync to hub
+• Support for both implementation and research sessions
+end note
+
+@enduml

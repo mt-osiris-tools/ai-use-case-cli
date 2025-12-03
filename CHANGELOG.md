@@ -17,6 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Located in `docs/diagrams/` with detailed README for viewing options
   - Supports multiple rendering methods: Online viewer, VS Code extension, CLI, Docker
   - Visualizes system boundaries, data flows, and integration points (Git, GitHub, Confluence, OpenTelemetry)
+- **Document Session Sequence Diagram**: Added PlantUML sequence diagram for `/use-case:document-session` workflow
+  - Shows complete workflow from user invocation to hub sync
+  - Visualizes interactions: Claude Code → CLI → Git → GitHub → File System → Hub
+  - Includes version checking, session detection, git analysis, documentation generation, and sync phases
+  - Highlights key features: interactive session selection, parallel git analysis, automatic commit/sync
+  - Supports both implementation and research session workflows
+  - Located at `docs/diagrams/document-session-sequence.puml`
 
 ### Fixed
 
