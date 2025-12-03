@@ -67,6 +67,7 @@ ${YELLOW}COMMANDS${NC}
   ${GREEN}view${NC}                      Open hub directory in file explorer
   ${GREEN}push${NC}                      Push hub changes to remote repository
   ${GREEN}publish-confluence${NC}        Publish use case to Confluence
+  ${GREEN}agents <subcommand>${NC}       Manage AI agents (list, enable, disable, info)
   ${GREEN}tracing [subcommand]${NC}      Manage tracing configuration
   ${GREEN}reset [options]${NC}           Reset CLI configuration and data
   ${GREEN}update [options]${NC}          Update CLI to latest version
@@ -98,6 +99,8 @@ ${YELLOW}EXAMPLES${NC}
   ai-use-case list                # List all projects
   ai-use-case stats               # View statistics
   ai-use-case extract 8 json      # Extract last 8 hours as JSON
+  ai-use-case agents list         # List available agents
+  ai-use-case agents enable quality-reviewer  # Enable an agent
 
 ${YELLOW}PROJECT REGISTRY (v3.1.0+)${NC}
   ${GREEN}list-projects${NC}             List registered projects with versions
@@ -301,6 +304,19 @@ case "${1:-}" in
         else
             trace_event "error" "command=update-project" "error=script_not_found" "script=update-project.sh"
             echo -e "${RED}Error: update-project.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    agents)
+        trace_event "command_start" "command=agents" "subcommand=${2:-list}"
+        if [ -f "$SCRIPT_DIR/scripts/agents/agent-registry.sh" ]; then
+            # Pass all arguments to agent-registry.sh
+            shift
+            trace_run "agents" bash "$SCRIPT_DIR/scripts/agents/agent-registry.sh" "$@"
+        else
+            trace_event "error" "command=agents" "error=script_not_found" "script=agent-registry.sh"
+            echo -e "${RED}Error: agent-registry.sh not found${NC}"
+            echo -e "${YELLOW}Agents feature may not be installed${NC}"
             exit 1
         fi
         ;;

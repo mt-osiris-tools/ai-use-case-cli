@@ -1,0 +1,126 @@
+{
+  "_comment": "AI Use Case CLI - Agent Registry",
+  "_description": "This file tracks available AI agents and their configuration",
+  "_location": "~/.config/ai-use-case-cli/agents.json",
+  "_version": "1.0.0",
+  "agents": [
+    {
+      "id": "quality-reviewer",
+      "name": "Documentation Quality Agent",
+      "description": "Reviews documentation quality and provides improvement suggestions",
+      "subagent_type": "use-case-quality-agent",
+      "enabled": false,
+      "version": "1.0.0",
+      "capabilities": [
+        "quality-analysis",
+        "completeness-check",
+        "style-review",
+        "improvement-suggestions"
+      ],
+      "dependencies": [
+        "claude-code"
+      ],
+      "statistics": {
+        "invocations": 0,
+        "successes": 0,
+        "failures": 0,
+        "last_invoked": null,
+        "last_success": null,
+        "last_failure": null,
+        "success_rate": 0.0,
+        "avg_duration_seconds": 0.0
+      }
+    },
+    {
+      "id": "pattern-analyzer",
+      "name": "Project Pattern Agent",
+      "description": "Analyzes documentation patterns across projects and provides recommendations",
+      "subagent_type": "use-case-pattern-agent",
+      "enabled": false,
+      "version": "1.0.0",
+      "capabilities": [
+        "pattern-detection",
+        "project-classification",
+        "recommendation-generation",
+        "trend-analysis"
+      ],
+      "dependencies": [
+        "claude-code"
+      ],
+      "statistics": {
+        "invocations": 0,
+        "successes": 0,
+        "failures": 0,
+        "last_invoked": null,
+        "last_success": null,
+        "last_failure": null,
+        "success_rate": 0.0,
+        "avg_duration_seconds": 0.0
+      }
+    },
+    {
+      "id": "session-selector",
+      "name": "Session Selector Agent",
+      "description": "Intelligently analyzes and prioritizes sessions for documentation",
+      "subagent_type": "use-case-session-selector-agent",
+      "enabled": false,
+      "version": "1.0.0",
+      "capabilities": [
+        "pr-analysis",
+        "commit-grouping",
+        "priority-scoring",
+        "context-extraction"
+      ],
+      "dependencies": [
+        "claude-code",
+        "git"
+      ],
+      "statistics": {
+        "invocations": 0,
+        "successes": 0,
+        "failures": 0,
+        "last_invoked": null,
+        "last_success": null,
+        "last_failure": null,
+        "success_rate": 0.0,
+        "avg_duration_seconds": 0.0
+      }
+    },
+    {
+      "id": "organization-optimizer",
+      "name": "Organization Intelligence Agent",
+      "description": "Analyzes hub organization and suggests improvements",
+      "subagent_type": "use-case-organization-agent",
+      "enabled": false,
+      "version": "1.0.0",
+      "capabilities": [
+        "topic-analysis",
+        "relationship-mapping",
+        "tag-suggestion",
+        "search-optimization"
+      ],
+      "dependencies": [
+        "claude-code"
+      ],
+      "statistics": {
+        "invocations": 0,
+        "successes": 0,
+        "failures": 0,
+        "last_invoked": null,
+        "last_success": null,
+        "last_failure": null,
+        "success_rate": 0.0,
+        "avg_duration_seconds": 0.0
+      }
+    }
+  ],
+  "config": {
+    "auto_update": true,
+    "cache_results": true,
+    "cache_duration": 3600,
+    "cache_directory": "~/.cache/ai-use-case-cli/agents",
+    "default_timeout": 120,
+    "max_parallel_agents": 1,
+    "log_level": "info"
+  }
+}
