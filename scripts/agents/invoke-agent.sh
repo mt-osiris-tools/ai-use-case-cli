@@ -307,6 +307,14 @@ invoke_agent() {
                 local key_value="$2"
                 local key="${key_value%%=*}"
                 local value="${key_value#*=}"
+
+                # Validate key contains only safe characters (alphanumeric, underscore, hyphen)
+                if [[ ! "$key" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+                    echo -e "${RED}Error: Parameter key '$key' contains unsafe characters${NC}" >&2
+                    echo -e "${CYAN}Only alphanumeric, underscore, and hyphen allowed${NC}" >&2
+                    exit 1
+                fi
+
                 params["$key"]="$value"
                 shift 2
                 ;;
