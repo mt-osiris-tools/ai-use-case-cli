@@ -1207,8 +1207,36 @@ read -p "Commit this documentation? (Y/n): " COMMIT_DOC
 COMMIT_DOC=${COMMIT_DOC:-y}
 
 if [[ "$COMMIT_DOC" =~ ^[Yy]$ ]]; then
+    # Build AI attribution footer based on tool selection
+    # Check for both tools using separate conditions for robustness
+    AI_ATTRIBUTION=""
+    if [[ "$AI_TOOL" == *"Claude Code"* ]] && [[ "$AI_TOOL" == *"Copilot"* ]]; then
+        # Both tools
+        AI_ATTRIBUTION="🤖 Generated with [Claude Code](https://claude.com/claude-code) + [GitHub Copilot](https://github.com/features/copilot)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+Co-Authored-By: GitHub Copilot <noreply@github.com>"
+    elif [[ "$AI_TOOL" == *"Claude Code"* ]]; then
+        AI_ATTRIBUTION="🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+    elif [[ "$AI_TOOL" == *"Copilot"* ]]; then
+        AI_ATTRIBUTION="🤖 Generated with [GitHub Copilot](https://github.com/features/copilot)
+
+Co-Authored-By: GitHub Copilot <noreply@github.com>"
+    else
+        AI_ATTRIBUTION="🤖 Generated with AI assistance"
+    fi
+
     git add "$OUTPUT_FILE"
-    git commit -m "docs: AI session ${SESSION_DATE} - ${TICKET} - ${AI_TOOL}"
+    # Use git commit -F - for safer handling of multi-line messages with special characters
+    git commit -F - <<EOF
+docs: AI session ${SESSION_DATE} - ${TICKET} - ${BRIEF_DESC}
+
+${TLDR_WHAT}
+
+${AI_ATTRIBUTION}
+EOF
     echo -e "${GREEN}✓ Documentation committed${NC}"
 
     # Auto-sync will be triggered by post-commit hook
