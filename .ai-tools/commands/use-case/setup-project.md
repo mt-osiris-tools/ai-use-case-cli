@@ -47,6 +47,35 @@ Configure the current project to automatically sync AI use case documentation to
 - `.gitignore` patterns for draft files
 - README in the ai-use-cases directory
 
+## Update Mode
+
+If the project is already set up and you want to refresh the installation (update Claude Code slash commands and git hooks):
+
+```bash
+bash ~/.local/share/ai-use-case-cli/setup-project.sh --update .
+```
+
+### What Gets Updated
+
+- Claude Code slash commands (refreshed from CLI installation)
+- Git hooks (post-commit, pre-commit)
+
+### What Stays the Same
+
+- Existing use case documents
+- Project registry entry
+- .usecase/cases/ directory structure
+- .gitignore configuration
+
+### When to Use
+
+- After upgrading the CLI to a new version
+- To get latest slash command improvements
+- To fix corrupted or outdated hooks
+- When slash commands aren't working correctly
+
+**Note**: For managed updates with version tracking, consider using the `/use-case:update-project` command instead, which internally calls `setup-project.sh --update` and updates the project registry.
+
 ## Next Steps
 
 Suggest the user:
