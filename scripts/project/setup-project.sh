@@ -286,30 +286,30 @@ fi
 
 [ "$PROGRESS_ENABLED" = true ] && [ "$UPDATE_MODE" = false ] && progress_complete "Setup use case directory"
 
-# Install Claude Code slash commands
+# Install AI tool slash commands (Claude Code, GitHub Copilot, etc.)
 if [ "$PROGRESS_ENABLED" = true ]; then
     if [ "$UPDATE_MODE" = true ]; then
-        progress_start "Update Claude Code slash commands"
+        progress_start "Update AI tool slash commands"
     else
-        progress_start "Install Claude Code slash commands"
+        progress_start "Install AI tool slash commands"
     fi
 fi
-CLAUDE_COMMANDS_SOURCE="$CLI_ROOT/.claude/commands/use-case"
-CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/commands/use-case"
+AI_COMMANDS_SOURCE="$CLI_ROOT/.ai-tools/commands/use-case"
+AI_COMMANDS_DIR="$PROJECT_PATH/.ai-tools/commands/use-case"
 
-if [ -d "$CLAUDE_COMMANDS_SOURCE" ]; then
-    if [ ! -d "$CLAUDE_COMMANDS_DIR" ]; then
-        mkdir -p "$CLAUDE_COMMANDS_DIR"
-        echo -e "${GREEN}✓${NC} Created: .claude/commands/use-case/"
+if [ -d "$AI_COMMANDS_SOURCE" ]; then
+    if [ ! -d "$AI_COMMANDS_DIR" ]; then
+        mkdir -p "$AI_COMMANDS_DIR"
+        echo -e "${GREEN}✓${NC} Created: .ai-tools/commands/use-case/"
     fi
 
     # Copy all command files from use-case directory
     COMMANDS_COPIED=0
     COMMANDS_UPDATED=0
-    for cmd_file in "$CLAUDE_COMMANDS_SOURCE"/*.md; do
+    for cmd_file in "$AI_COMMANDS_SOURCE"/*.md; do
         if [ -f "$cmd_file" ]; then
             cmd_name=$(basename "$cmd_file")
-            target_file="$CLAUDE_COMMANDS_DIR/$cmd_name"
+            target_file="$AI_COMMANDS_DIR/$cmd_name"
 
             # Skip if source and target are the same file (self-setup scenario)
             if [ "$cmd_file" -ef "$target_file" ]; then
@@ -327,23 +327,23 @@ if [ -d "$CLAUDE_COMMANDS_SOURCE" ]; then
     done
 
     if [ $COMMANDS_COPIED -gt 0 ]; then
-        echo -e "${GREEN}✓${NC} Installed $COMMANDS_COPIED Claude Code slash command(s)"
+        echo -e "${GREEN}✓${NC} Installed $COMMANDS_COPIED AI tool slash command(s)"
     fi
     if [ $COMMANDS_UPDATED -gt 0 ]; then
-        echo -e "${GREEN}✓${NC} Updated $COMMANDS_UPDATED Claude Code slash command(s)"
+        echo -e "${GREEN}✓${NC} Updated $COMMANDS_UPDATED AI tool slash command(s)"
     fi
     if [ $COMMANDS_COPIED -eq 0 ] && [ $COMMANDS_UPDATED -eq 0 ]; then
-        echo -e "${YELLOW}⚠${NC} Claude Code slash commands already installed (use --update to refresh)"
+        echo -e "${YELLOW}⚠${NC} AI tool slash commands already installed (use --update to refresh)"
     fi
 else
-    echo -e "${YELLOW}⚠${NC} Claude Code commands not found in CLI installation"
+    echo -e "${YELLOW}⚠${NC} AI tool commands not found in CLI installation"
 fi
 
 if [ "$PROGRESS_ENABLED" = true ]; then
     if [ "$UPDATE_MODE" = true ]; then
-        progress_complete "Update Claude Code slash commands"
+        progress_complete "Update AI tool slash commands"
     else
-        progress_complete "Install Claude Code slash commands"
+        progress_complete "Install AI tool slash commands"
     fi
 fi
 
@@ -530,8 +530,8 @@ if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
     echo "  ai-use-case sync          # Manual sync"
     echo "  ai-use-case search <term> # Search use cases"
     echo ""
-    if [ -d "$CLAUDE_COMMANDS_DIR" ]; then
-        echo "Claude Code slash commands:"
+    if [ -d "$AI_COMMANDS_DIR" ]; then
+        echo "AI tool slash commands (Claude Code, GitHub Copilot, etc.):"
         echo "  /use-case:document-session    # Document AI session automatically"
         echo "  /use-case:setup-project       # Setup another project"
         echo "  /use-case:sync-usecases       # Sync to hub"

@@ -16,6 +16,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Ensures consistency with Claude Code slash command `/use-case:document-session`
   - Prevents template/script divergence and reduces maintenance burden
   - Template files remain the authoritative source for documentation structure
+- **AI Tool Agnostic Refactoring**: Made codebase support multiple AI coding assistants, not just Claude Code
+  - **Directory Structure**: Renamed `.claude/` to `.ai-tools/` to reflect support for multiple AI tools
+  - **Templates**: Updated TEMPLATE.md and TEMPLATE-RESEARCH.md
+    - Changed title from "🎯 Claude Code:" to "🎯 AI-Assisted:" (implementation) / "🔬 AI Research:" (research)
+    - Renamed "Agent Used" to "AI Tool Used" with support for GitHub Copilot, Claude Code, OpenAI Codex, etc.
+    - Updated "Claude Agents Used" section to "AI Agents Used" to support agents from any AI tool
+  - **Scripts**: Updated document-ai-session.sh and extract-session-data.sh
+    - Changed default AI tool from "Claude Code (Sonnet 4.5)" to "GitHub Copilot"
+    - Added OpenAI Codex / ChatGPT as an option
+    - Generalized agent tracking prompts to "AI agents" instead of "Claude agents"
+  - **Slash Commands**: Updated document-session.md to be tool-agnostic
+    - Generalized references to support any AI coding assistant
+    - Made commit attribution optional and tool-specific
+  - **Documentation**: Updated README.md, CLAUDE.md, and docs/CLAUDE.md
+    - Updated references to mention multiple AI tools (GitHub Copilot, Claude Code, OpenAI Codex, etc.)
+    - Changed "Claude Code slash commands" to "AI assistant slash commands"
+    - Updated file structure diagrams to show `.ai-tools/` directory
+  - **Migration**: update-project.sh now removes old `.claude/` directory structure automatically
 
 ### Added
 

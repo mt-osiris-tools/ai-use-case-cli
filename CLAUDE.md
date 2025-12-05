@@ -1,6 +1,6 @@
-# AI Use Case CLI - Claude Code Guide
+# AI Use Case CLI - AI Assistant Guide
 
-**Quick reference for AI assistants.** For detailed guides, see:
+**Quick reference for AI coding assistants (Claude Code, GitHub Copilot, etc.).** For detailed guides, see:
 - **[docs/WORKFLOW.md](docs/WORKFLOW.md)** - Branch workflow, version management, PR checklist
 - **[docs/COMMANDS.md](docs/COMMANDS.md)** - Complete command reference
 - **[docs/CLAUDE.md](docs/CLAUDE.md)** - Comprehensive guide
@@ -131,7 +131,7 @@ ai-use-case list-projects       # List registered projects
 ai-use-case check-updates       # Check for outdated projects
 ```
 
-### Claude Code Slash Commands
+### AI Assistant Slash Commands
 
 ```
 /use-case:document-session   # Document AI session (v3.4.0+ interactive)
@@ -151,7 +151,7 @@ ai-use-case check-updates       # Check for outdated projects
 │   ├── search/                    # search-use-cases.sh, stats-use-cases.sh
 │   ├── hub/                       # view-hub.sh, push-hub.sh
 │   └── utils/                     # version.sh, config-manager.sh
-├── .claude/commands/use-case/     # Slash commands
+├── .ai-tools/commands/use-case/   # Slash commands for AI assistants
 └── docs/                          # Documentation
     ├── WORKFLOW.md                # Workflow guide (NEW)
     ├── COMMANDS.md                # Command reference (NEW)
@@ -193,7 +193,7 @@ See **[docs/COMMANDS.md](docs/COMMANDS.md#hub-configuration-v320)** for details.
 - User controls priority
 - Complete automation
 
-See **[docs/WORKFLOW.md](docs/WORKFLOW.md#automatic-documentation-claude-code)** for complete workflow.
+See **[docs/WORKFLOW.md](docs/WORKFLOW.md#automatic-documentation)** for complete workflow.
 
 ## File Naming Convention
 

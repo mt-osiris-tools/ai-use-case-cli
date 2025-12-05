@@ -1,6 +1,6 @@
 # Document AI Session - Interactive Selection with Automatic Generation
 
-**IMPORTANT**: You are Claude Code, and you should **first ask the user which session to document**, then automatically generate documentation for the selected session. Do NOT run the interactive `document-ai-session.sh` script or ask the user to fill in details after selection.
+**IMPORTANT**: You are an AI coding assistant, and you should **first ask the user which session to document**, then automatically generate documentation for the selected session. Do NOT run the interactive `document-ai-session.sh` script or ask the user to fill in details after selection.
 
 ## 📋 Documentation Workflow - What Will Happen
 
@@ -265,9 +265,9 @@ ls -1 .usecase/cases/ 2>/dev/null | grep -E '^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{
 **IMPORTANT**: Only show work (PRs and commits) by the current git user. Do not show work by other team members.
 
 > **Design Note:**
-> This user filtering applies specifically to the Claude Code `/use-case:document-session` command.
+> This user filtering applies specifically to AI coding assistant `/use-case:document-session` commands.
 > The related shell script (`scripts/core/document-ai-session.sh`) intentionally shows all recent work (unfiltered), so shell users see the full history.
-> This distinction is by design: Claude Code users get a personalized, user-scoped view, while shell script users get a team-wide view.
+> This distinction is by design: AI assistant users get a personalized, user-scoped view, while shell script users get a team-wide view.
 > If you need to see all work (not just your own), use the shell script directly.
 
 #### 0.5: Build Options List (Based on User's Initial Choice)
@@ -472,7 +472,7 @@ Skip git commands if no commits exist.
 - **Date**: Use today's date in YYYY-Www-MM-DD format (calculate ISO 8601 week number)
 - **Ticket/Issue**: Extract from commit messages (e.g., HUB-001, PROJ-1234) or infer logical next number
 - **Brief description**: Summarize main work from commit messages and conversation
-- **AI Tool Used**: "Claude Code (Sonnet 4.5)"
+- **AI Tool Used**: Detect from context (GitHub Copilot, Claude Code, OpenAI Codex, etc.)
 - **Complexity**: Assess from scope (Low: 1-3 files, Medium: 4-10 files, High: 10+ files or architectural)
 - **Time saved**: Estimate based on complexity (Low: 0.5-1h, Medium: 1-3h, High: 3-8h)
 - **TL;DR - What**: Summarize from conversation context what was accomplished
@@ -491,28 +491,29 @@ Skip git commands if no commits exist.
 - **Final Decision**: Recommended approach and rationale
 - **Complexity**: Assess from conversation depth (Low: simple Q&A, Medium: multiple approaches, High: architectural decisions)
 
-**Claude Agents Usage Detection (All Sessions):**
+**AI Agents Usage Detection (All Sessions):**
 
-Analyze the conversation history to detect if any specialized Claude agents were used via the Task tool:
+Analyze the conversation history to detect if any specialized AI agents were used (from Claude, Copilot, or other tools):
 
 **Detection Method:**
-1. Search conversation for all Task tool invocations with subagent_type parameters
-2. Extract the agent type (subagent_type value)
-3. Extract the prompt to understand purpose/context
+1. Search conversation for specialized agent invocations (Task tool, subagent calls, etc.)
+2. Extract the agent type and capabilities
+3. Extract the purpose/context from the invocation
 4. Count invocations per agent type
 5. Infer outcomes from conversation following agent execution
 
-**Agent Types to Detect:**
-- **Explore**: Codebase exploration and search agent
-- **Plan**: Architecture/implementation planning agent
-- **general-purpose**: Complex multi-step task agent
-- **code-reviewer**: Code review and quality agent
-- **Custom agents**: Any other subagent types used
+**Common Agent Types to Detect:**
+- **Explore**: Codebase exploration and search agents
+- **Plan**: Architecture/implementation planning agents
+- **Code-reviewer**: Code review and quality agents
+- **Test-generator**: Test creation agents
+- **Documentation-writer**: Documentation generation agents
+- **Custom agents**: Any other specialized agents used
 
 **Information to Extract for Each Agent:**
-- Agent type (from subagent_type parameter)
+- Agent type and source (Claude, Copilot, custom, etc.)
 - Invocation count (how many times used)
-- Purpose (from prompt parameter, summarized if long)
+- Purpose (summarized if long)
 - Key findings/output (what the agent produced or discovered)
 - Value/impact (estimated from complexity and user feedback)
 
@@ -524,14 +525,14 @@ Analyze the conversation history to detect if any specialized Claude agents were
 - Observe if user requested clarification or accepted results
 
 **If No Agents Detected:**
-- Omit the "Claude Agents Used" section from documentation
+- Omit the "AI Agents Used" section from documentation
 - This is normal - many sessions don't use specialized agents
 
 **Example: When Explore agent is detected, populate section like:**
 ```markdown
-### Claude Agents Used
+### AI Agents Used
 
-- **Explore Agent:** 2 invocations
+- **Explore Agent (Claude):** 2 invocations
   - **Purpose:** Codebase exploration, finding authentication patterns
   - **Key Findings:** Located 8 auth-related files across 3 directories
   - **Value:** Saved ~30 minutes of manual file searching
@@ -610,10 +611,14 @@ git commit -m "docs: AI session YYYY-Www-MM-DD - TICKET-XXX - Brief description
 
 [Additional details about what was documented...]
 
-🤖 Generated with [Claude Code](https://claude.com/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>"
+🤖 AI-Assisted Documentation"
 ```
+
+**Optional Co-Authored-By Attribution:**
+If you want to credit the specific AI tool used, you can add attribution like:
+- Claude Code: `Co-Authored-By: Claude <noreply@anthropic.com>`
+- GitHub Copilot: `Co-Authored-By: GitHub Copilot <noreply@github.com>`
+- Other tools: Use appropriate attribution format
 
 **For Research Sessions:**
 Create documentation file but DO NOT commit (since there are no code changes):
