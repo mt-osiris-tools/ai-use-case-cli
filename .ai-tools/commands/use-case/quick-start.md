@@ -21,7 +21,7 @@ curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/mai
 ```
 
 The installer will:
-- Clone CLI tools to `~/.local/share/ai-use-case-cli`
+- Clone CLI tools (default: `~/.local/share/ai-use-case-cli`, customizable via `AI_USECASES_CLI_ROOT`)
 - Create symlink at `~/.local/bin/ai-use-case`
 - Add `~/.local/bin` to PATH if needed
 - Optionally set up the documentation hub
@@ -149,7 +149,7 @@ Or re-run the installer and answer 'Y' to set up the hub.
 
 ### VS Code extension not working
 
-- Install extension: `code --install-extension ~/.local/share/ai-use-case-cli/vscode-extension`
+- Install extension: `code --install-extension "${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/vscode-extension"`
 - Check Settings → AI Session Documentor
 - Ensure CLI is in PATH
 - Reload VS Code window

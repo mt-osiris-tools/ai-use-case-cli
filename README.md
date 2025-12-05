@@ -240,6 +240,11 @@ ai-use-case tracing disable
 ### Environment Variables
 
 ```bash
+# Override CLI installation directory (for custom installations)
+export AI_USECASES_CLI_ROOT="$HOME/.local/share/ai-use-case-cli"  # Default
+# Or use a custom path:
+# export AI_USECASES_CLI_ROOT="$HOME/custom/path/ai-use-case-cli"
+
 # Override hub location (works with both modes)
 export AI_USECASES_DIR="$HOME/.local/share/ai-use-case-cli/hub"  # Default for local mode
 # Or use a custom path:
@@ -430,14 +435,17 @@ ai-use-case --version
 Update to latest:
 
 ```bash
-# Recommended: Re-run install script (handles updates automatically)
+# Recommended: Use built-in update command
+ai-use-case update
+
+# OR: Re-run install script (handles updates automatically)
 curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/install/install.sh | bash
 
-# OR: Manual update
-cd ~/.local/share/ai-use-case-cli && git pull
+# OR: Manual update (if CLI installed at default location)
+cd "${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}" && git pull
 ```
 
-The installer automatically handles local modifications (like permission changes) during updates.
+The `ai-use-case update` command automatically handles updates and local modifications, then optionally updates all registered projects.
 
 ## Migration from v2.x
 

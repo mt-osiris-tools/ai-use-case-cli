@@ -22,7 +22,7 @@ Configure the current project to automatically sync AI use case documentation to
 
 3. Run the setup script:
    ```bash
-   bash ~/.local/share/ai-use-case-cli/setup-project.sh .
+   ai-use-case --init
    ```
 
 4. Verify the setup:
