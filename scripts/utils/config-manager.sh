@@ -609,9 +609,31 @@ configure_confluence() {
     local api_token
     read -sp "API Token (input hidden): " api_token
     echo ""
+
+    # Trim leading/trailing whitespace
+    api_token="$(echo -n "$api_token" | xargs)"
+
     if [ -z "$api_token" ]; then
         echo -e "${RED}Error: API token is required${NC}" >&2
         return 1
+    fi
+
+    # Check minimum length (Atlassian tokens are typically 24+ chars)
+    if [ "${#api_token}" -lt 24 ]; then
+        echo -e "${YELLOW}Warning: API token is unusually short (${#api_token} characters). Atlassian tokens are typically 24+ characters.${NC}"
+        read -p "Continue anyway? (y/N): " -r short_confirm
+        if [[ ! "$short_confirm" =~ ^[Yy]$ ]]; then
+            return 1
+        fi
+    fi
+
+    # Warn if token contains spaces (likely a password or copy-paste error)
+    if [[ "$api_token" =~ [[:space:]] ]]; then
+        echo -e "${YELLOW}Warning: API token contains whitespace. This may indicate a copy-paste error or a password, not an API token.${NC}"
+        read -p "Continue anyway? (y/N): " -r space_confirm
+        if [[ ! "$space_confirm" =~ ^[Yy]$ ]]; then
+            return 1
+        fi
     fi
     
     echo ""

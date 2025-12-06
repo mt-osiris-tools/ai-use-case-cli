@@ -189,10 +189,41 @@ AI_COMMANDS_DIR="$PROJECT_PATH/.ai-tools/commands/use-case"
 CLI_COMMANDS_SOURCE="$CLI_ROOT/.ai-tools/commands/use-case"
 
 # Remove old directory structure if it exists
-# Note: .claude directory contains only CLI-provided slash command templates,
-# not user data, so it's safe to remove and will be replaced with fresh templates
+# Note: .claude directory is intended to contain only CLI-provided slash command templates,
+# but users may have added custom files. Check for non-standard files before removal.
 if [ -d "$LEGACY_COMMANDS_DIR" ]; then
-    echo -e "${CYAN}Removing old .claude directory structure...${NC}"
+    echo -e "${CYAN}Checking .claude directory for custom files...${NC}"
+
+    # Define expected files (slash command templates in commands/use-case/*.md)
+    EXPECTED_FILES_PATTERN="commands/use-case/*.md"
+
+    # Find all files in .claude
+    ALL_FILES=$(find "$PROJECT_PATH/.claude" -type f 2>/dev/null)
+
+    # Check for unexpected files
+    CUSTOM_FILES_FOUND=false
+    while IFS= read -r file; do
+        # Get relative path from .claude directory
+        REL_PATH="${file#$PROJECT_PATH/.claude/}"
+
+        # Check if file matches expected pattern
+        if [[ ! "$REL_PATH" =~ ^commands/use-case/.*\.md$ ]]; then
+            if [ "$CUSTOM_FILES_FOUND" = false ]; then
+                echo -e "${YELLOW}⚠  Detected custom/non-standard files in .claude:${NC}"
+                CUSTOM_FILES_FOUND=true
+            fi
+            echo -e "  - $REL_PATH"
+        fi
+    done <<< "$ALL_FILES"
+
+    if [ "$CUSTOM_FILES_FOUND" = true ]; then
+        # Create a timestamped backup
+        BACKUP_NAME=".claude-backup-$(date +%Y%m%d-%H%M%S)"
+        cp -a "$PROJECT_PATH/.claude" "$PROJECT_PATH/$BACKUP_NAME"
+        echo -e "${YELLOW}⚠  Backup of .claude created at $BACKUP_NAME${NC}"
+        echo -e "${YELLOW}⚠  Proceeding to remove .claude directory...${NC}"
+    fi
+
     rm -rf "$PROJECT_PATH/.claude"
     echo -e "${GREEN}✓${NC} Old .claude directory removed (will be replaced with .ai-tools)"
 fi

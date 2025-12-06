@@ -34,6 +34,9 @@ NC='\033[0m'
 # Get script directory early for version checking
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Determine CLI root directory (respects AI_USECASES_CLI_ROOT environment variable)
+CLI_ROOT="${AI_USECASES_CLI_ROOT:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
+
 # Get CLI version from version.sh (single source of truth)
 get_cli_version() {
     local version_file="$SCRIPT_DIR/../utils/version.sh"
@@ -353,15 +356,15 @@ SESSION_TYPE_CHOICE=${SESSION_TYPE_CHOICE:-1}
 case $SESSION_TYPE_CHOICE in
     1)
         SESSION_TYPE="implementation"
-        TEMPLATE_FILE="$SCRIPT_DIR/../../docs/TEMPLATE.md"
+        TEMPLATE_FILE="$CLI_ROOT/docs/TEMPLATE.md"
         ;;
     2)
         SESSION_TYPE="research"
-        TEMPLATE_FILE="$SCRIPT_DIR/../../docs/TEMPLATE-RESEARCH.md"
+        TEMPLATE_FILE="$CLI_ROOT/docs/TEMPLATE-RESEARCH.md"
         ;;
     *)
         SESSION_TYPE="implementation"
-        TEMPLATE_FILE="$SCRIPT_DIR/../../docs/TEMPLATE.md"
+        TEMPLATE_FILE="$CLI_ROOT/docs/TEMPLATE.md"
         ;;
 esac
 
@@ -748,34 +751,34 @@ if [ "$SESSION_TYPE" = "research" ]; then
     sed "s/\*\*Result:\*\* \[1-2 sentences: What insights, decisions, or recommendations emerged?\]/**Result:** ${TLDR_RESULT}/" | \
     sed "s/\*\*Time:\*\* \[X minutes (AI-assisted research) vs Y hours manual research\]/**Time:** ${TIME_SPENT} (AI-assisted) vs ${TIME_SAVED} hours manual research/" | \
     # AI Metrics section
-    sed "s/- \*\*Total Interactions:\*\* X back-and-forth exchanges between user and AI/- **Total Interactions:** ${TOTAL_INTERACTIONS} back-and-forth exchanges between user and AI/" | \
-    sed "s/- \*\*User Prompts:\*\* X total queries\/questions from user/- **User Prompts:** ${USER_PROMPTS} total queries\/questions from user/" | \
-    sed "s/- \*\*AI Responses:\*\* X total responses from AI/- **AI Responses:** ~${USER_PROMPTS} total responses from AI/" | \
-    sed "s/- \*\*Total Tokens Used:\*\* X,XXX tokens/- **Total Tokens Used:** ${TOTAL_TOKENS:-[Track in your AI tool]} tokens/" | \
-    sed "s/- \*\*Estimated Cost:\*\* ~\$X.XX (based on model pricing)/- **Estimated Cost:** ~\$${ESTIMATED_COST:-[Calculate based on tokens]} (based on model pricing)/" | \
-    sed "s/- \*\*Model Used:\*\* Claude Sonnet 4.5 \/ GPT-4 \/ Other/- **Model Used:** ${AI_TOOL}/" | \
-    sed "s/- \*\*Questions Resolved:\*\* \[Number\] through iterative refinement/- **Questions Resolved:** ${QUERY_ITERATIONS}+ through iterative refinement/" | \
-    # Research Context section  
-    sed "s/\*\*Initial Query:\*\* \[Your original question or problem statement\]/**Initial Query:** ${INITIAL_QUERY}/" | \
-    sed "s/\*\*Objective:\*\* \[What were you trying to understand or decide?\]/**Objective:** ${OBJECTIVE}/" | \
-    sed "s/\*\*Background:\*\* \[Why was this research needed? What triggered it?\]/**Background:** ${BACKGROUND}/" | \
-    sed "s/\*\*Query Refinement:\*\* \[Number\] iterations to reach optimal clarity/**Query Refinement:** ${QUERY_ITERATIONS} iterations to reach optimal clarity/" | \
+    sed "s|- \*\*Total Interactions:\*\* X back-and-forth exchanges between user and AI|- **Total Interactions:** ${TOTAL_INTERACTIONS} back-and-forth exchanges between user and AI|" | \
+    sed "s|- \*\*User Prompts:\*\* X total queries/questions from user|- **User Prompts:** ${USER_PROMPTS} total queries/questions from user|" | \
+    sed "s|- \*\*AI Responses:\*\* X total responses from AI|- **AI Responses:** ~${USER_PROMPTS} total responses from AI|" | \
+    sed "s|- \*\*Total Tokens Used:\*\* X,XXX tokens|- **Total Tokens Used:** ${TOTAL_TOKENS:-[Track in your AI tool]} tokens|" | \
+    sed "s|- \*\*Estimated Cost:\*\* ~\$X.XX (based on model pricing)|- **Estimated Cost:** ~\$${ESTIMATED_COST:-[Calculate based on tokens]} (based on model pricing)|" | \
+    sed "s|- \*\*Model Used:\*\* Claude Sonnet 4.5 / GPT-4 / Other|- **Model Used:** ${AI_TOOL}|" | \
+    sed "s|- \*\*Questions Resolved:\*\* \[Number\] through iterative refinement|- **Questions Resolved:** ${QUERY_ITERATIONS}+ through iterative refinement|" | \
+    # Research Context section
+    sed "s|\*\*Initial Query:\*\* \[Your original question or problem statement\]|**Initial Query:** ${INITIAL_QUERY}|" | \
+    sed "s|\*\*Objective:\*\* \[What were you trying to understand or decide?\]|**Objective:** ${OBJECTIVE}|" | \
+    sed "s|\*\*Background:\*\* \[Why was this research needed? What triggered it?\]|**Background:** ${BACKGROUND}|" | \
+    sed "s|\*\*Query Refinement:\*\* \[Number\] iterations to reach optimal clarity|**Query Refinement:** ${QUERY_ITERATIONS} iterations to reach optimal clarity|" | \
     # Query Evolution section - first iteration
-    sed "0,/- \*\*Query:\*\* \[Your first question to the AI\]/s//- **Query:** ${INITIAL_QUERY}/" | \
+    sed "0,|- \*\*Query:\*\* \[Your first question to the AI\]|s||- **Query:** ${INITIAL_QUERY}|" | \
     # Key Insights section
-    sed "0,/\[Comma-separated list of main insights for quick reference\]/s//${KEY_INSIGHTS}/" | \
+    sed "0,|\[Comma-separated list of main insights for quick reference\]|s||${KEY_INSIGHTS}|" | \
     # Approaches Evaluated section
-    sed "0,/\[Comma-separated list of approaches considered\]/s//${APPROACHES_EVALUATED}/" | \
+    sed "0,|\[Comma-separated list of approaches considered\]|s||${APPROACHES_EVALUATED}|" | \
     # Final Decision section
-    sed "s/\*\*Decision:\*\* \[Chosen approach or answer to your research question\]/**Decision:** ${FINAL_DECISION}/" | \
+    sed "s|\*\*Decision:\*\* \[Chosen approach or answer to your research question\]|**Decision:** ${FINAL_DECISION}|" | \
     # Research Impact section
-    sed "s/- \*\*Time Efficiency:\*\* \[X\]x faster than manual research (\[Y\] hours saved)/- **Time Efficiency:** ${TIME_SAVED}x faster than manual research (${TIME_SAVED} hours saved)/" | \
-    sed "s/- ✅ \*\*Accelerated Planning:\*\* \[X\] hours saved in research phase/- ✅ **Accelerated Planning:** ${TIME_SAVED} hours saved in research phase/" | \
+    sed "s|- \*\*Time Efficiency:\*\* \[X\]x faster than manual research (\[Y\] hours saved)|- **Time Efficiency:** ${TIME_SAVED}x faster than manual research (${TIME_SAVED} hours saved)|" | \
+    sed "s|- ✅ \*\*Accelerated Planning:\*\* \[X\] hours saved in research phase|- ✅ **Accelerated Planning:** ${TIME_SAVED} hours saved in research phase|" | \
     # Resources section
-    sed "s/\*\*AI Tool Used:\*\* \[Specific AI tool and model\]/**AI Tool Used:** ${AI_TOOL}/" | \
+    sed "s|\*\*AI Tool Used:\*\* \[Specific AI tool and model\]|**AI Tool Used:** ${AI_TOOL}|" | \
     # Footer section
-    sed "s/\*\*Created:\*\* YYYY-MM-DD/**Created:** ${SESSION_DATE}/" | \
-    sed "s/\*\*Last Updated:\*\* YYYY-MM-DD/**Last Updated:** ${SESSION_DATE}/" \
+    sed "s|\*\*Created:\*\* YYYY-MM-DD|**Created:** ${SESSION_DATE}|" | \
+    sed "s|\*\*Last Updated:\*\* YYYY-MM-DD|**Last Updated:** ${SESSION_DATE}|" \
     > "$OUTPUT_FILE"
     
     # Now replace the Claude Agents section if agents were used
@@ -784,9 +787,9 @@ if [ "$SESSION_TYPE" = "research" ]; then
         TEMP_AGENTS_FILE=$(mktemp)
         echo "$AGENTS_CONTENT" > "$TEMP_AGENTS_FILE"
         
-        # Use awk to replace the entire Claude Agents section
+        # Use awk to replace the entire AI Agents section
         awk '
-        /^### Claude Agents Used$/ {
+        /^### AI Agents Used$/ {
             print
             # Skip until we find the Agent Effectiveness Summary end
             while (getline > 0) {
@@ -822,42 +825,42 @@ else
     # Replace placeholders with actual values
     echo "$TEMPLATE_CONTENT" | \
     # Header section
-    sed "s/# 🎯 Claude Code: \[Brief Descriptive Title\]/# 🎯 ${AI_TOOL}: ${BRIEF_DESC}/" | \
-    sed "s/\*\*Date:\*\* YYYY-MM-DD (Week XX of YYYY)/**Date:** ${SESSION_DATE}/" | \
-    sed "s/\*\*Repository\/Project:\*\* project-name/**Repository\/Project:** ${PROJECT_NAME}/" | \
-    sed "s/\[TICKET-XXXXX\](https:\/\/your-jira-or-github\/browse\/TICKET-XXXXX)/[${TICKET}](https:\/\/your-jira-or-github\/browse\/${TICKET})/" | \
-    sed "s/\*\*Agent Used:\*\* Claude Code (Sonnet 4.5) \/ GitHub Copilot \/ Other/**Agent Used:** ${AI_TOOL}/" | \
-    sed "s/\*\*Complexity:\*\* Low \/ Medium \/ High/**Complexity:** ${COMPLEXITY}/" | \
-    sed "s/\*\*Time Saved:\*\* ~X hours vs manual approach/**Time Saved:** ~${TIME_SAVED} hours vs manual approach/" | \
-    sed "s/\*\*Session Duration:\*\* X hours YY minutes/**Session Duration:** ${TIME_SPENT}/" | \
+    sed "s|# 🎯 Claude Code: \[Brief Descriptive Title\]|# 🎯 ${AI_TOOL}: ${BRIEF_DESC}|" | \
+    sed "s|\*\*Date:\*\* YYYY-MM-DD (Week XX of YYYY)|**Date:** ${SESSION_DATE}|" | \
+    sed "s|\*\*Repository/Project:\*\* project-name|**Repository/Project:** ${PROJECT_NAME}|" | \
+    sed "s|\[TICKET-XXXXX\](https://your-jira-or-github/browse/TICKET-XXXXX)|[${TICKET}](https://your-jira-or-github/browse/${TICKET})|" | \
+    sed "s|\*\*Agent Used:\*\* Claude Code (Sonnet 4.5) / GitHub Copilot / Other|**Agent Used:** ${AI_TOOL}|" | \
+    sed "s|\*\*Complexity:\*\* Low / Medium / High|**Complexity:** ${COMPLEXITY}|" | \
+    sed "s|\*\*Time Saved:\*\* ~X hours vs manual approach|**Time Saved:** ~${TIME_SAVED} hours vs manual approach|" | \
+    sed "s|\*\*Session Duration:\*\* X hours YY minutes|**Session Duration:** ${TIME_SPENT}|" | \
     # TL;DR section
-    sed "s/\*\*What:\*\* \[1-2 sentences: What did the AI help you accomplish?\]/**What:** ${TLDR_WHAT}/" | \
-    sed "s/\*\*Result:\*\* \[1-2 sentences: What was the outcome? Files changed, features added, etc.\]/**Result:** ${TLDR_RESULT}/" | \
-    sed "s/\*\*Time:\*\* \[X minutes (AI-assisted) vs Y hours manual approach\]/**Time:** ${TIME_SPENT} (AI-assisted) vs ${TIME_SAVED} hours manual approach/" | \
+    sed "s|\*\*What:\*\* \[1-2 sentences: What did the AI help you accomplish?\]|**What:** ${TLDR_WHAT}|" | \
+    sed "s|\*\*Result:\*\* \[1-2 sentences: What was the outcome? Files changed, features added, etc.\]|**Result:** ${TLDR_RESULT}|" | \
+    sed "s|\*\*Time:\*\* \[X minutes (AI-assisted) vs Y hours manual approach\]|**Time:** ${TIME_SPENT} (AI-assisted) vs ${TIME_SAVED} hours manual approach|" | \
     # AI Metrics section
-    sed "s/- \*\*Total Interactions:\*\* X back-and-forth exchanges between user and AI/- **Total Interactions:** ${TOTAL_INTERACTIONS} back-and-forth exchanges between user and AI/" | \
-    sed "s/- \*\*User Prompts:\*\* X total prompts\/messages from user/- **User Prompts:** ${USER_PROMPTS} total prompts\/messages from user/" | \
-    sed "s/- \*\*AI Responses:\*\* X total responses from AI/- **AI Responses:** ~${USER_PROMPTS} total responses from AI/" | \
-    sed "s/- \*\*Total Tokens Used:\*\* X,XXX tokens/- **Total Tokens Used:** ${TOTAL_TOKENS:-[Track in your AI tool]} tokens/" | \
-    sed "s/- \*\*Estimated Cost:\*\* ~\$X.XX (based on model pricing)/- **Estimated Cost:** ~\$${ESTIMATED_COST:-[Calculate based on tokens]} (based on model pricing)/" | \
-    sed "s/- \*\*Model Used:\*\* Claude Sonnet 4.5 \/ GPT-4 \/ Other/- **Model Used:** ${AI_TOOL}/" | \
+    sed "s|- \*\*Total Interactions:\*\* X back-and-forth exchanges between user and AI|- **Total Interactions:** ${TOTAL_INTERACTIONS} back-and-forth exchanges between user and AI|" | \
+    sed "s|- \*\*User Prompts:\*\* X total prompts/messages from user|- **User Prompts:** ${USER_PROMPTS} total prompts/messages from user|" | \
+    sed "s|- \*\*AI Responses:\*\* X total responses from AI|- **AI Responses:** ~${USER_PROMPTS} total responses from AI|" | \
+    sed "s|- \*\*Total Tokens Used:\*\* X,XXX tokens|- **Total Tokens Used:** ${TOTAL_TOKENS:-[Track in your AI tool]} tokens|" | \
+    sed "s|- \*\*Estimated Cost:\*\* ~\$X.XX (based on model pricing)|- **Estimated Cost:** ~\$${ESTIMATED_COST:-[Calculate based on tokens]} (based on model pricing)|" | \
+    sed "s|- \*\*Model Used:\*\* Claude Sonnet 4.5 / GPT-4 / Other|- **Model Used:** ${AI_TOOL}|" | \
     # Business Context section
-    sed "s/\*\*Objective:\*\* \[What business problem were you solving?\]/**Objective:** ${OBJECTIVE}/" | \
-    sed "s/\*\*Background:\*\* \[Why was this work needed? What problem exists without it?\]/**Background:** ${BACKGROUND}/" | \
+    sed "s|\*\*Objective:\*\* \[What business problem were you solving?\]|**Objective:** ${OBJECTIVE}|" | \
+    sed "s|\*\*Background:\*\* \[Why was this work needed? What problem exists without it?\]|**Background:** ${BACKGROUND}|" | \
     # Technical Details section
-    sed "s/- \*\*Primary AI Tool:\*\* \[Claude Code \/ Copilot \/ etc.\]/- **Primary AI Tool:** ${AI_TOOL}/" | \
-    sed "s/- \*\*Branch:\*\* \`branch-name\`/- **Branch:** \`${BRANCH}\`/" | \
+    sed "s|- \*\*Primary AI Tool:\*\* \[Claude Code / Copilot / etc.\]|- **Primary AI Tool:** ${AI_TOOL}|" | \
+    sed "s|- \*\*Branch:\*\* \`branch-name\`|- **Branch:** \`${BRANCH}\`|" | \
     # Results section
-    sed "s/- \*\*Files Modified:\*\* X files/- **Files Modified:** ${FILES_COUNT} files/" | \
-    sed "s/- \*\*Commits Created:\*\* Z/- **Commits Created:** ${RECENT_COMMITS}/" | \
+    sed "s|- \*\*Files Modified:\*\* X files|- **Files Modified:** ${FILES_COUNT} files|" | \
+    sed "s|- \*\*Commits Created:\*\* Z|- **Commits Created:** ${RECENT_COMMITS}|" | \
     # Success Metrics table
-    sed "s/| Time to complete | <X hours | Y minutes | ✅ Met \/ ❌ Missed |/| Time to complete | <${TIME_SAVED} hours | ${TIME_SPENT} | ✅ Met |/" | \
+    sed "s|| Time to complete | <X hours | Y minutes | ✅ Met / ❌ Missed || Time to complete | <${TIME_SAVED} hours | ${TIME_SPENT} | ✅ Met |" | \
     # Related Resources section - first occurrence
-    sed "0,/- \*\*Repository:\*\* \[Repo name\]/s//- **Repository:** ${PROJECT_NAME}/" | \
-    sed "0,/- \*\*Branch:\*\* \`branch-name\`/s//- **Branch:** \`${BRANCH}\`/" | \
+    sed "0,|- \*\*Repository:\*\* \[Repo name\]|s||- **Repository:** ${PROJECT_NAME}|" | \
+    sed "0,|- \*\*Branch:\*\* \`branch-name\`|s||- **Branch:** \`${BRANCH}\`|" | \
     # Footer section
-    sed "s/\*\*Created:\*\* YYYY-MM-DD/**Created:** ${SESSION_DATE}/" | \
-    sed "s/\*\*Last Updated:\*\* YYYY-MM-DD/**Last Updated:** ${SESSION_DATE}/" \
+    sed "s|\*\*Created:\*\* YYYY-MM-DD|**Created:** ${SESSION_DATE}|" | \
+    sed "s|\*\*Last Updated:\*\* YYYY-MM-DD|**Last Updated:** ${SESSION_DATE}|" \
     > "$OUTPUT_FILE"
     
     # Now add files changed and git diff sections using awk
@@ -886,9 +889,9 @@ else
         TEMP_AGENTS_FILE=$(mktemp)
         echo "$AGENTS_CONTENT" > "$TEMP_AGENTS_FILE"
         
-        # Use awk to replace the entire Claude Agents section
+        # Use awk to replace the entire AI Agents section
         awk '
-        /^### Claude Agents Used$/ {
+        /^### AI Agents Used$/ {
             print
             # Skip until we find the Agent Effectiveness Summary end
             while (getline > 0) {

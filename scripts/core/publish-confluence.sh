@@ -399,7 +399,7 @@ publish_via_rest_api() {
     local json_payload
     json_payload=$(jq -n \
         --arg title "$title" \
-        --arg content "$confluence_content" \
+        --arg confluenceContent "$confluence_content" \
         --arg parentId "$parent_id" \
         --arg spaceKey "$space_key" \
         '{
@@ -409,7 +409,7 @@ publish_via_rest_api() {
             parentId: $parentId,
             body: {
                 representation: "storage",
-                value: $content
+                value: $confluenceContent
             }
         }')
     
