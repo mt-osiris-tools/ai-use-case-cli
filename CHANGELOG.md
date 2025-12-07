@@ -53,6 +53,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Documentation Reorganization - Agent-Specific Structure**: Reorganized documentation into agent-specific directories
+  - **New structure**: Created `docs/agents/` with subdirectories for `claude/`, `copilot/`, and `framework/`
+  - **Moved files**:
+    - `CLAUDE.md` → `docs/agents/claude/README.md` (Quick reference)
+    - `docs/CLAUDE.md` → `docs/agents/claude/GUIDE.md` (Comprehensive guide)
+    - `COPILOT.md` → `docs/agents/copilot/README.md`
+    - `docs/AGENTS.md` → `docs/agents/framework/README.md`
+  - **Created overview**: `docs/agents/README.md` provides index of all agent documentation
+  - **Updated references**: All documentation now points to new locations (README.md, CONTRIBUTING.md, docs/WORKFLOW.md)
+  - **Benefits**: Clearer organization, easier to add new agents (Cursor, Windsurf), separates usage from implementation
+  - **Rationale**: Scalable structure for supporting multiple AI coding assistants
+
 - **Quick Start Documentation Enhanced**: Updated all quick start sections to reflect symlink architecture and recent features
   - **README.md**: Updated step 1 to explain what `ai-use-case --init` creates (including `.claude/commands/` symlink)
   - **docs/CLAUDE.md**: Added symlink creation and slash command copying to setup-project.sh description
