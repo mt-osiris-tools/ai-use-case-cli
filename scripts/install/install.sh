@@ -44,7 +44,9 @@ get_installed_version() {
 REMOTE_VERSION=$(get_remote_version)
 INSTALLED_VERSION=$(get_installed_version)
 
-cat <<EOF
+# Function to print the banner (can be called multiple times to refresh)
+print_banner() {
+    cat <<EOF
 ${CYAN}
  █████╗ ██╗    ██╗   ██╗███████╗███████╗     ██████╗ █████╗ ███████╗███████╗
 ██╔══██╗██║    ██║   ██║██╔════╝██╔════╝    ██╔════╝██╔══██╗██╔════╝██╔════╝
@@ -58,18 +60,25 @@ ${GREEN}        ═════════════════════�
 
 EOF
 
-# Display version info
-if [ -n "$REMOTE_VERSION" ]; then
-    if [ -n "$INSTALLED_VERSION" ]; then
-        echo -e "${YELLOW}        Installing version: ${GREEN}v$REMOTE_VERSION${NC} ${YELLOW}(current: ${CYAN}v$INSTALLED_VERSION${YELLOW})${NC}"
+    # Display version info
+    if [ -n "$REMOTE_VERSION" ]; then
+        if [ -n "$INSTALLED_VERSION" ]; then
+            echo -e "${YELLOW}        Installing version: ${GREEN}v$REMOTE_VERSION${NC} ${YELLOW}(current: ${CYAN}v$INSTALLED_VERSION${YELLOW})${NC}"
+        else
+            echo -e "${YELLOW}        Installing version: ${GREEN}v$REMOTE_VERSION${NC}"
+        fi
     else
-        echo -e "${YELLOW}        Installing version: ${GREEN}v$REMOTE_VERSION${NC}"
+        echo -e "${YELLOW}        AI Use Case CLI - Installation${NC}"
     fi
+
     echo ""
-else
-    echo -e "${YELLOW}        AI Use Case CLI - Installation proceeding (version unavailable)${NC}"
+    echo -e "${BLUE}════════════════════════════════════════════════════════════════════${NC}"
     echo ""
-fi
+}
+
+# Clear screen and print banner at top
+clear
+print_banner
 
 # Determine install directory
 if [ -f "ai-use-case" ] && [ -d ".git" ]; then
@@ -196,7 +205,9 @@ else
     fi
 fi
 
-echo ""
+# Refresh banner after git operations
+clear
+print_banner
 echo -e "${BLUE}=== Installation ===${NC}"
 echo "Install directory: $INSTALL_DIR"
 echo ""
@@ -283,7 +294,9 @@ if [ "$RUN_CONFIG_AFTER" = true ]; then
     echo ""
 fi
 
-echo ""
+# Clear and show banner again with completion message
+clear
+print_banner
 echo -e "${GREEN}=== Installation Complete! ===${NC}"
 echo ""
 echo -e "${YELLOW}Quick Start:${NC}"
