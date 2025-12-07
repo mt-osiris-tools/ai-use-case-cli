@@ -33,13 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Located at `docs/diagrams/AI Use Case CLI - C4 Component Diagram (Agent Framework).svg`
   - Part of comprehensive architecture documentation
 
-- **Agent Framework Component Diagram**: Added new C4 Component Diagram for Agent Framework
-  - Shows internal components: agent-registry.sh, invoke-agent.sh, quality-agent.sh, and agent prompts
-  - Visualizes agent lifecycle management, invocation flow, and integration points
-  - Includes notes on key features (caching, statistics, timeout handling) and registry management
-  - Located at `docs/diagrams/AI Use Case CLI - C4 Component Diagram (Agent Framework).svg`
-  - Part of comprehensive architecture documentation
-
 ### Changed
 
 - **Update Script Preserves Custom Commands**: Fixed `update-project.sh` to work with new subdirectory symlink structure

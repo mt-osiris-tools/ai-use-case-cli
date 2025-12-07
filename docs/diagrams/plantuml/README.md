@@ -102,6 +102,8 @@ Visit: https://www.plantuml.com/plantuml/uml/
 - **Light Green (#98FB98)**: Search operations
 - **Light Steel Blue (#B0C4DE)**: Confluence operations
 - **Plum (#DDA0DD)**: Agent operations
+- **Khaki (#F0E68C)**: Config operations
+- **Moccasin (#FFE4B5)**: Update operations
 
 ### Annotations
 
