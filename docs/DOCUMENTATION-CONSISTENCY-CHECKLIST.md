@@ -303,7 +303,8 @@ BROKEN_LINKS=0
 # Find all markdown files
 find docs -name "*.md" -type f | while read -r file; do
     # Extract relative links: [text](path.md)
-    grep -oP '\[.*?\]\(\K[^)]+(?=\))' "$file" 2>/dev/null | while read -r link; do
+    # Using portable grep + sed instead of grep -oP for macOS compatibility
+    grep -o '\[.*\]([^)]*)' "$file" 2>/dev/null | sed 's/.*(\([^)]*\)).*/\1/' | while read -r link; do
         # Skip external URLs
         if [[ "$link" =~ ^https?:// ]]; then
             continue
@@ -347,7 +348,8 @@ MISSING_FILES=0
 
 # Common file path patterns in documentation
 # Look for: `.claude/path`, `scripts/path`, ` /path/to/file `
-find docs -name "*.md" -type f -exec grep -oP '\`[./][\w/.-]+\`' {} \; | \
+# Using portable grep -oE instead of grep -oP for macOS compatibility
+find docs -name "*.md" -type f -exec grep -oE '`[./][^`]+`' {} \; | \
     sort -u | while read -r path; do
     # Remove backticks
     clean_path=$(echo "$path" | tr -d '`')
@@ -405,9 +407,15 @@ echo "✅ Template consistency check complete"
 
 **4. Integration Script** (`scripts/utils/validate-docs.sh`)
 
+**Note**: This example shows the master script calling individual validators. In practice, you would either:
+- Create separate validator scripts (`validate-docs-links.sh`, `validate-docs-paths.sh`, `validate-docs-templates.sh`)
+- Or implement all validation logic within this single script using internal functions
+
 ```bash
 #!/usr/bin/env bash
 # Master documentation validation script
+# This example assumes separate validator scripts exist, or that you'll implement
+# the validation logic as internal functions within this script
 
 set -euo pipefail
 
@@ -493,7 +501,7 @@ exit $EXIT_CODE
 
 ## Integration with PR Workflow
 
-Add to your pre-PR checklist (in root CLAUDE.md or WORKFLOW.md):
+Add to your pre-PR checklist (in docs/agents/claude/README.md or WORKFLOW.md):
 
 ```markdown
 ### Documentation Checklist
