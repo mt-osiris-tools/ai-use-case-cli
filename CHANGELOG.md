@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Updated `setup-project.sh`**: Lines 346-380 now create `.claude/commands/` as regular directory with only `use-case/` symlinked
   - **Automatic migration**: Detects old full-directory symlink and automatically migrates to new structure (lines 346-358)
   - **Migration process**: Removes old symlink, creates directory, adds subdirectory symlink - fully automated
+  - **Updated `update-project.sh`**: Lines 191-231 now preserve custom commands during project updates
+    - Detects old vs new structure intelligently
+    - Removes only `use-case/` symlink for refresh
+    - Preserves all custom command directories
+    - Shows which custom commands are preserved
   - **User benefit**: Users can now safely add custom commands to `.claude/commands/other-commands/` without conflicts
   - **Updated documentation**: README.md, CLAUDE.md, and docs/CLAUDE.md reflect new subdirectory symlink approach
   - **Updated .gitignore**: Added `.claude/commands/` to prevent tracking generated symlinks in CLI repo
