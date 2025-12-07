@@ -23,16 +23,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **New behavior**: Preserves `.claude/commands/` directory and custom commands, only updates `use-case/` symlink
   - **Handles migration**: Automatically migrates projects from old full-directory symlink to new structure
   - **Custom command detection**: Reports number of custom commands found and confirms preservation
-  - **Safe backup**: Creates timestamped backup if `use-case/` is unexpectedly a directory instead of symlink
   - **User benefit**: Custom commands in `.claude/commands/` are now preserved across CLI updates
 
 - **Claude Code Symlink Strategy - Subdirectory Level**: Changed from full-directory to subdirectory-level symlink to preserve custom commands
   - **Previous approach**: `.claude/commands/` → `../.ai-tools/commands` (replaced entire directory, lost custom commands)
   - **New approach**: `.claude/commands/use-case/` → `../../.ai-tools/commands/use-case` (preserves custom commands)
-  - **Updated `setup-project.sh`**: Lines 346-380 now create `.claude/commands/` as regular directory with only `use-case/` symlinked
+  - **Updated `setup-project.sh`**: Lines 339-381 now create `.claude/commands/` as regular directory with only `use-case/` symlinked
   - **Automatic migration**: Detects old full-directory symlink and automatically migrates to new structure (lines 346-358)
   - **Migration process**: Removes old symlink, creates directory, adds subdirectory symlink - fully automated
-  - **Updated `update-project.sh`**: Lines 191-231 now preserve custom commands during project updates
+  - **Updated `update-project.sh`**: Lines 191-229 now preserve custom commands during project updates
     - Detects old vs new structure intelligently
     - Removes only `use-case/` symlink for refresh
     - Preserves all custom command directories
@@ -50,8 +49,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Commit and PR workflow guidelines
   - Explicit guidance to use `echo -e` for ANSI color codes
   - Helps AI assistants (GitHub Copilot, Claude Code, etc.) understand repo patterns and contribute effectively
-
-### Changed
 
 - **Documentation Reorganization - Agent-Specific Structure**: Reorganized documentation into agent-specific directories
   - **New structure**: Created `docs/agents/` with subdirectories for `claude/`, `copilot/`, and `framework/`
