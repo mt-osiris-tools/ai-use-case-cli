@@ -1,6 +1,6 @@
 # Document AI Session - Interactive Selection with Automatic Generation
 
-**IMPORTANT**: You are Claude Code, and you should **first ask the user which session to document**, then automatically generate documentation for the selected session. Do NOT run the interactive `document-ai-session.sh` script or ask the user to fill in details after selection.
+**IMPORTANT**: You are an AI coding assistant, and you should **first ask the user which session to document**, then automatically generate documentation for the selected session. Do NOT run the interactive `document-ai-session.sh` script or ask the user to fill in details after selection.
 
 ## 📋 Documentation Workflow - What Will Happen
 
@@ -265,9 +265,9 @@ ls -1 .usecase/cases/ 2>/dev/null | grep -E '^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{
 **IMPORTANT**: Only show work (PRs and commits) by the current git user. Do not show work by other team members.
 
 > **Design Note:**
-> This user filtering applies specifically to the Claude Code `/use-case:document-session` command.
+> This user filtering applies specifically to AI coding assistant `/use-case:document-session` commands.
 > The related shell script (`scripts/core/document-ai-session.sh`) intentionally shows all recent work (unfiltered), so shell users see the full history.
-> This distinction is by design: Claude Code users get a personalized, user-scoped view, while shell script users get a team-wide view.
+> This distinction is by design: AI assistant users get a personalized, user-scoped view, while shell script users get a team-wide view.
 > If you need to see all work (not just your own), use the shell script directly.
 
 #### 0.5: Build Options List (Based on User's Initial Choice)
@@ -370,8 +370,8 @@ Based on the user's selection:
 
 Before starting documentation, verify the CLI is up-to-date:
 ```bash
-# Check current version (portable, works on macOS and Linux)
-bash ~/.local/share/ai-use-case-cli/ai-use-case --version 2>&1 | grep -o 'version [0-9.]*' | cut -d' ' -f2
+# Check current version
+ai-use-case --version 2>&1 | grep -o 'version [0-9.]*' | cut -d' ' -f2
 
 # Get latest version from GitHub (single source of truth)
 curl -s https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/utils/version.sh | grep '^export CLI_VERSION=' | head -1 | cut -d'"' -f2
@@ -379,7 +379,7 @@ curl -s https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/s
 
 **If versions differ:**
 - Warn the user that an update is available
-- Recommend updating: `cd ~/.local/share/ai-use-case-cli && git pull`
+- Recommend updating: `ai-use-case update`
 - Ask if they want to continue with current version or update first
 - If they choose to update, instruct them to re-run the command after updating
 
@@ -395,7 +395,7 @@ git rev-parse --show-toplevel
 ls -la .usecase/cases/ 2>/dev/null || echo "Not set up"
 ```
 
-If not set up, offer to run: `bash ~/.local/share/ai-use-case-cli/setup-project.sh`
+If not set up, offer to run: `ai-use-case --init`
 
 ### Step 3: Determine Session Type
 
@@ -472,7 +472,7 @@ Skip git commands if no commits exist.
 - **Date**: Use today's date in YYYY-Www-MM-DD format (calculate ISO 8601 week number)
 - **Ticket/Issue**: Extract from commit messages (e.g., HUB-001, PROJ-1234) or infer logical next number
 - **Brief description**: Summarize main work from commit messages and conversation
-- **AI Tool Used**: "Claude Code (Sonnet 4.5)"
+- **AI Tool Used**: Detect from context (GitHub Copilot, Claude Code, OpenAI Codex, etc.)
 - **Complexity**: Assess from scope (Low: 1-3 files, Medium: 4-10 files, High: 10+ files or architectural)
 - **Time saved**: Estimate based on complexity (Low: 0.5-1h, Medium: 1-3h, High: 3-8h)
 - **TL;DR - What**: Summarize from conversation context what was accomplished
@@ -491,28 +491,29 @@ Skip git commands if no commits exist.
 - **Final Decision**: Recommended approach and rationale
 - **Complexity**: Assess from conversation depth (Low: simple Q&A, Medium: multiple approaches, High: architectural decisions)
 
-**Claude Agents Usage Detection (All Sessions):**
+**AI Agents Usage Detection (All Sessions):**
 
-Analyze the conversation history to detect if any specialized Claude agents were used via the Task tool:
+Analyze the conversation history to detect if any specialized AI agents were used (from Claude, Copilot, or other tools):
 
 **Detection Method:**
-1. Search conversation for all Task tool invocations with subagent_type parameters
-2. Extract the agent type (subagent_type value)
-3. Extract the prompt to understand purpose/context
+1. Search conversation for specialized agent invocations (Task tool, subagent calls, etc.)
+2. Extract the agent type and capabilities
+3. Extract the purpose/context from the invocation
 4. Count invocations per agent type
 5. Infer outcomes from conversation following agent execution
 
-**Agent Types to Detect:**
-- **Explore**: Codebase exploration and search agent
-- **Plan**: Architecture/implementation planning agent
-- **general-purpose**: Complex multi-step task agent
-- **code-reviewer**: Code review and quality agent
-- **Custom agents**: Any other subagent types used
+**Common Agent Types to Detect:**
+- **Explore**: Codebase exploration and search agents
+- **Plan**: Architecture/implementation planning agents
+- **Code-reviewer**: Code review and quality agents
+- **Test-generator**: Test creation agents
+- **Documentation-writer**: Documentation generation agents
+- **Custom agents**: Any other specialized agents used
 
 **Information to Extract for Each Agent:**
-- Agent type (from subagent_type parameter)
+- Agent type and source (Claude, Copilot, custom, etc.)
 - Invocation count (how many times used)
-- Purpose (from prompt parameter, summarized if long)
+- Purpose (summarized if long)
 - Key findings/output (what the agent produced or discovered)
 - Value/impact (estimated from complexity and user feedback)
 
@@ -524,14 +525,14 @@ Analyze the conversation history to detect if any specialized Claude agents were
 - Observe if user requested clarification or accepted results
 
 **If No Agents Detected:**
-- Omit the "Claude Agents Used" section from documentation
+- Omit the "AI Agents Used" section from documentation
 - This is normal - many sessions don't use specialized agents
 
 **Example: When Explore agent is detected, populate section like:**
 ```markdown
-### Claude Agents Used
+### AI Agents Used
 
-- **Explore Agent:** 2 invocations
+- **Explore Agent (Claude):** 2 invocations
   - **Purpose:** Codebase exploration, finding authentication patterns
   - **Key Findings:** Located 8 auth-related files across 3 directories
   - **Value:** Saved ~30 minutes of manual file searching
@@ -545,23 +546,23 @@ Analyze the conversation history to detect if any specialized Claude agents were
 
 **IMPORTANT**: Before generating documentation, read the appropriate template from the CLI installation directory.
 
-The CLI installation includes the complete repository structure, including the docs/ directory with templates. During installation, the repository is cloned to a user-scoped directory (by default `~/.local/share/ai-use-case-cli/`).
+The CLI installation includes the complete repository structure, including the docs/ directory with templates. The path is configurable via the `AI_USECASES_CLI_ROOT` environment variable, with a fallback to the default installation location.
 
 **Path Reference Pattern:**
-- **Slash commands** (this file): Use absolute path `~/.local/share/ai-use-case-cli/docs/TEMPLATE.md` since Claude Code runs in the user's project directory
-- **Bash scripts**: Use `$SCRIPT_DIR/docs/TEMPLATE.md` variable for flexibility across installation methods
+- **Slash commands** (this file): Use `${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}` to support custom installation paths
+- **Bash scripts**: Use `$SCRIPT_DIR` variable which is resolved at runtime
 
 **For Implementation Sessions:**
 ```bash
-cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE.md
+cat "${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE.md"
 ```
 
 **For Research Sessions:**
 ```bash
-cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE-RESEARCH.md
+cat "${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE-RESEARCH.md"
 ```
 
-**Note**: Use the Read tool with the full path shown above. The hardcoded path is necessary because this slash command runs in the user's project directory, not the CLI installation directory. The `$SCRIPT_DIR` variable pattern is only available in bash scripts.
+**Note**: The environment variable `AI_USECASES_CLI_ROOT` allows users to install the CLI in custom locations. If not set, it defaults to `~/.local/share/ai-use-case-cli`.
 
 Use the Read tool to read the template file from this path. This is your source of truth for:
 - All sections that must be included
@@ -610,10 +611,14 @@ git commit -m "docs: AI session YYYY-Www-MM-DD - TICKET-XXX - Brief description
 
 [Additional details about what was documented...]
 
-🤖 Generated with [Claude Code](https://claude.com/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>"
+🤖 AI-Assisted Documentation"
 ```
+
+**Optional Co-Authored-By Attribution:**
+If you want to credit the specific AI tool used, you can add attribution like:
+- Claude Code: `Co-Authored-By: Claude <noreply@anthropic.com>`
+- GitHub Copilot: `Co-Authored-By: GitHub Copilot <noreply@github.com>`
+- Other tools: Use appropriate attribution format
 
 **For Research Sessions:**
 Create documentation file but DO NOT commit (since there are no code changes):
@@ -624,7 +629,7 @@ Create documentation file but DO NOT commit (since there are no code changes):
 
 **Then sync to central hub (both session types):**
 ```bash
-bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
+ai-use-case sync
 ```
 
 ## Key Principles

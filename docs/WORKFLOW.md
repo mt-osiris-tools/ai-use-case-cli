@@ -63,7 +63,7 @@ Every code change MUST trigger a documentation review. At minimum:
 
 PRs without proper documentation updates will be rejected.
 
-## Automatic Documentation (Claude Code)
+## Automatic Documentation (AI Assistants)
 
 **v3.4.0+: Interactive session selection with automatic generation**
 
@@ -123,7 +123,7 @@ bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
 - Can invoke multiple times to document several sessions
 - Clear audit trail between PRs and their documentation
 
-See [CLAUDE.md](../CLAUDE.md) and [.claude/commands/use-case/document-session.md](../.claude/commands/use-case/document-session.md) for complete workflow.
+See [CLAUDE.md](../CLAUDE.md) and [.ai-tools/commands/use-case/document-session.md](../.ai-tools/commands/use-case/document-session.md) for complete workflow.
 
 ## Common Development Patterns
 
@@ -148,9 +148,7 @@ git commit -m "feat: add new command
 
 Implements X functionality that does Y.
 
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>"
+🤖 AI-Assisted Development"
 
 # 5. Push and create PR
 git push -u origin feature/new-command
@@ -164,7 +162,7 @@ gh pr create --title "feat: Add new command" --body "$(cat <<'EOF'
 - [ ] Test new command
 - [ ] Verify version output
 
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
+🤖 AI-Assisted Development
 EOF
 )"
 ```
@@ -319,9 +317,9 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 
 <body>
 
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
+🤖 AI-Assisted Development
 
-Co-Authored-By: Claude <noreply@anthropic.com>
+[Optional: Co-Authored-By for specific AI tool]
 ```
 
 **Types:**

@@ -34,6 +34,9 @@ NC='\033[0m'
 # Get script directory early for version checking
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Determine CLI root directory (respects AI_USECASES_CLI_ROOT environment variable)
+CLI_ROOT="${AI_USECASES_CLI_ROOT:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
+
 # Get CLI version from version.sh (single source of truth)
 get_cli_version() {
     local version_file="$SCRIPT_DIR/../utils/version.sh"
@@ -311,27 +314,6 @@ elif [ ! -d "$AI_USECASES_DIR" ] && [ -d "$OLD_USECASES_DIR" ]; then
     exit 1
 fi
 
-# Prompt for session type (implementation or research)
-echo -e "${CYAN}Select session type:${NC}"
-echo "  1) Implementation (code changes, commits)"
-echo "  2) Research (exploration, no code changes)"
-echo ""
-read -p "Enter choice [1-2] (default: 1): " SESSION_TYPE_CHOICE
-
-case "$SESSION_TYPE_CHOICE" in
-    2)
-        SESSION_TYPE="research"
-        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE-RESEARCH.md"
-        echo -e "${GREEN}✓${NC} Using research session template"
-        ;;
-    *)
-        SESSION_TYPE="implementation"
-        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE.md"
-        echo -e "${GREEN}✓${NC} Using implementation session template"
-        ;;
-esac
-echo ""
-
 # Collect session data
 echo -e "${CYAN}Collecting session data...${NC}"
 echo ""
@@ -374,15 +356,15 @@ SESSION_TYPE_CHOICE=${SESSION_TYPE_CHOICE:-1}
 case $SESSION_TYPE_CHOICE in
     1)
         SESSION_TYPE="implementation"
-        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE.md"
+        TEMPLATE_FILE="$CLI_ROOT/docs/TEMPLATE.md"
         ;;
     2)
         SESSION_TYPE="research"
-        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE-RESEARCH.md"
+        TEMPLATE_FILE="$CLI_ROOT/docs/TEMPLATE-RESEARCH.md"
         ;;
     *)
         SESSION_TYPE="implementation"
-        TEMPLATE_FILE="$SCRIPT_DIR/docs/TEMPLATE.md"
+        TEMPLATE_FILE="$CLI_ROOT/docs/TEMPLATE.md"
         ;;
 esac
 
@@ -478,19 +460,23 @@ echo ""
 echo "AI Tool Used:"
 echo "1) Claude Code (Sonnet 4.5)"
 echo "2) GitHub Copilot"
-echo "3) Claude Code + GitHub Copilot"
-echo "4) Other"
-read -p "Select (1-4) [1]: " AI_TOOL_CHOICE
-AI_TOOL_CHOICE=${AI_TOOL_CHOICE:-1}
+echo "3) OpenAI Codex / ChatGPT"
+echo "4) Combination (specify)"
+echo "5) Other"
+read -p "Select (1-5) [2]: " AI_TOOL_CHOICE
+AI_TOOL_CHOICE=${AI_TOOL_CHOICE:-2}
 
 case $AI_TOOL_CHOICE in
     1) AI_TOOL="Claude Code (Sonnet 4.5)" ;;
     2) AI_TOOL="GitHub Copilot" ;;
-    3) AI_TOOL="Claude Code (Sonnet 4.5) + GitHub Copilot" ;;
+    3) AI_TOOL="OpenAI Codex / ChatGPT" ;;
     4)
+        read -p "Specify combination (e.g., Claude + Copilot): " AI_TOOL
+        ;;
+    5)
         read -p "Specify AI tool: " AI_TOOL
         ;;
-    *) AI_TOOL="Claude Code (Sonnet 4.5)" ;;
+    *) AI_TOOL="GitHub Copilot" ;;
 esac
 
 # Complexity
@@ -529,16 +515,17 @@ OUTPUT_TOKENS=${OUTPUT_TOKENS:-""}
 read -p "Estimated cost in USD (e.g., 0.25 or leave blank): " ESTIMATED_COST
 ESTIMATED_COST=${ESTIMATED_COST:-""}
 
-# Claude Agents Usage (new section)
+# AI Agents Usage (specialized agents from any AI tool)
 echo ""
-echo -e "${CYAN}Claude Agents Usage:${NC}"
-read -p "Were any Claude agents used during this session? (y/N): " AGENTS_USED
+echo -e "${CYAN}AI Agents Usage:${NC}"
+echo "Note: This includes specialized agents from Claude, Copilot, or other AI tools"
+read -p "Were any specialized AI agents used during this session? (y/N): " AGENTS_USED
 AGENTS_USED=${AGENTS_USED:-n}
 
 if [[ "$AGENTS_USED" =~ ^[Yy]$ ]]; then
     echo ""
     echo "Which agents were used? (comma-separated)"
-    echo "  Options: Explore, Plan, general-purpose, code-reviewer, other"
+    echo "  Examples: Explore, Plan, Code-reviewer, Test-generator, Documentation-writer, etc."
     read -p "  Agents: " AGENTS_LIST
 
     # Validate that agent list is not empty
@@ -652,98 +639,17 @@ else
     GIT_DIFF=$(git show --stat HEAD 2>/dev/null || echo "No diff available")
 fi
 
-# Helper function to generate common header
-generate_header() {
-    local icon=$1
-    local session_type_label=$2
-    local time_context=$3
+# Note: This template-based approach uses sed for placeholder replacement.
+# While this handles most user inputs correctly, descriptions containing forward
+# slashes (/) may need manual review. The trade-off of ~370 fewer lines of code
+# and template-based single source of truth outweighs this rare edge case.
 
-    cat <<EOF
-# ${icon} ${AI_TOOL}: ${BRIEF_DESC}
+# Helper function to generate Claude Agents section content
+generate_agents_content() {
+    local output=""
 
-**Date:** ${SESSION_DATE}
-**Repository/Project:** ${PROJECT_NAME}
-**Ticket:** [${TICKET}](https://your-jira-or-github/browse/${TICKET})
-${session_type_label}**Agent Used:** ${AI_TOOL}
-**Complexity:** ${COMPLEXITY}
-**Time Saved:** ~${TIME_SAVED} hours vs ${time_context}
-
----
-
-## 📄 TL;DR
-
-**What:** ${TLDR_WHAT}
-
-**Result:** ${TLDR_RESULT}
-
-**Time:** ${TIME_SPENT} (AI-assisted) vs ${TIME_SAVED} hours ${time_context}
-EOF
-}
-
-# Helper function to generate token metrics section
-generate_token_metrics() {
-    local context_type=$1  # "research" or "implementation"
-
-    cat <<EOF
-### Token Usage Summary
-EOF
-    if [ -n "$TOTAL_TOKENS" ]; then
-        cat <<EOF
-- **Total Tokens Used:** ${TOTAL_TOKENS} tokens
-EOF
-    else
-        cat <<EOF
-- **Total Tokens Used:** [Track in your AI tool] tokens
-EOF
-    fi
-    if [ -n "$INPUT_TOKENS" ] && [ -n "$OUTPUT_TOKENS" ]; then
-        if [ "$context_type" = "research" ]; then
-            cat <<EOF
-  - **Input Tokens:** ${INPUT_TOKENS} (questions, context, follow-ups)
-  - **Output Tokens:** ${OUTPUT_TOKENS} (AI explanations, comparisons, recommendations)
-EOF
-        else
-            cat <<EOF
-  - **Input Tokens:** ${INPUT_TOKENS} (prompt, context, code read)
-  - **Output Tokens:** ${OUTPUT_TOKENS} (AI responses, code generated)
-EOF
-        fi
-    else
-        if [ "$context_type" = "research" ]; then
-            cat <<EOF
-  - **Input Tokens:** [Track in your AI tool] (questions, context, follow-ups)
-  - **Output Tokens:** [Track in your AI tool] (AI explanations, comparisons, recommendations)
-EOF
-        else
-            cat <<EOF
-  - **Input Tokens:** [Track in your AI tool] (prompt, context, code read)
-  - **Output Tokens:** [Track in your AI tool] (AI responses, code generated)
-EOF
-        fi
-    fi
-    if [ -n "$ESTIMATED_COST" ]; then
-        cat <<EOF
-- **Estimated Cost:** ~\$${ESTIMATED_COST} (based on model pricing)
-EOF
-    else
-        cat <<EOF
-- **Estimated Cost:** ~\$[Calculate based on tokens] (based on model pricing)
-EOF
-    fi
-    cat <<EOF
-- **Model Used:** ${AI_TOOL}
-EOF
-}
-
-# Helper function to generate Claude Agents section
-generate_agents_section() {
     # Only generate section if agents were used
     if [[ "$AGENTS_USED" =~ ^[Yy]$ ]] && [ ${#AGENT_NAMES[@]} -gt 0 ]; then
-        cat <<EOF
-
-### Claude Agents Used
-
-EOF
         # Generate entry for each agent
         for i in "${!AGENT_NAMES[@]}"; do
             local agent_name="${AGENT_NAMES[$i]}"
@@ -755,19 +661,17 @@ EOF
             local invocations="invocation"
             [ "$count" -gt 1 ] && invocations="invocations"
 
-            cat <<EOF
+            output+="
 - **${agent_name} Agent:** ${count} ${invocations}
   - **Purpose:** ${purpose}
   - **Value:** ${value}
-
-EOF
+"
         done
 
         # Generate summary
         local total_invocations=0
         local max_count=0
         local most_valuable_agent=""
-        local most_valuable_index=0
 
         for i in "${!AGENT_COUNTS[@]}"; do
             local count="${AGENT_COUNTS[$i]}"
@@ -780,7 +684,6 @@ EOF
                 if [ "$count" -gt "$max_count" ]; then
                     max_count=$count
                     most_valuable_agent="${AGENT_NAMES[$i]}"
-                    most_valuable_index=$i
                 fi
             else
                 echo -e "${YELLOW}Warning:${NC} Agent invocation count '$count' is not a valid number and will be ignored." >&2
@@ -797,398 +700,217 @@ EOF
             valuable_description="Multiple agents used equally"
         fi
 
-        cat <<EOF
+        output+="
 **Agent Effectiveness Summary:**
 - Total agent invocations: ${total_invocations}
-- Most valuable agent: ${valuable_description}
-EOF
+- Most valuable agent: ${valuable_description}"
+    else
+        # Placeholder content when no agents used
+        output="
+- **Explore Agent:** X invocations
+  - **Purpose:** Codebase exploration, finding patterns, understanding architecture
+  - **Key Findings:** [What the agent discovered or helped with]
+  - **Value:** [Impact on session - saved time, provided insights, etc.]
+
+**Agent Effectiveness Summary:**
+- Total agent invocations: X
+- Most valuable agent: [Agent name and why]"
     fi
+    
+    echo "$output"
 }
 
-# Helper function to generate common footer
-generate_footer() {
-    cat <<EOF
-
----
-
-**Created:** ${SESSION_DATE}
-**Last Updated:** ${SESSION_DATE}
-**Author:** [Your name]
-**Review Status:** Draft
-
-<!-- TODO: Fill in bracketed sections above -->
-EOF
-}
-
-# Generate documentation based on session type
+# Generate documentation based on session type by reading and populating templates
 if [ "$SESSION_TYPE" = "research" ]; then
-    # Generate research session template
-    {
-        generate_header "🔬" "**Session Type:** Research & Exploration\n" "manual research"
-        cat <<EOF
-
-**Key Success:** Iterative query refinement led to actionable insights
-
----
-
-## 🤖 AI Interaction Metrics
-
-### Research Engagement
-- **Total Interactions:** ${TOTAL_INTERACTIONS} back-and-forth exchanges between user and AI
-- **User Prompts:** ${USER_PROMPTS} total queries/questions from user
-- **AI Responses:** ~${USER_PROMPTS} total responses from AI
-
-EOF
-        generate_token_metrics "research"
-        generate_agents_section
-        cat <<EOF
-
-### Research Efficiency
-- **Questions Resolved:** ${QUERY_ITERATIONS}+ through iterative refinement
-- **Decision Confidence:** High/Medium/Low
-
----
-
-## 🔍 Research Context
-
-**Initial Query:** ${INITIAL_QUERY}
-
-**Objective:** ${OBJECTIVE}
-
-**Background:** ${BACKGROUND}
-
-**Domain:** [Technical area: Architecture, API Design, Database, Testing, etc.]
-
-**Query Refinement:** ${QUERY_ITERATIONS} iterations to reach optimal clarity
-
----
-
-## 🔄 Query Evolution & Exploration Process
-
-### Iteration 1: Initial Query
-- **Query:** ${INITIAL_QUERY}
-- **AI Response:** [Summary of initial response]
-- **Gaps Identified:** [What was missing or unclear]
-
-### Iteration 2-${QUERY_ITERATIONS}: Refinement
-- **Refined Query:** [How the query evolved]
-- **AI Response:** [Summary of improved response]
-- **Insights Gained:** [New understanding]
-
-[Continue documenting query iterations...]
-
----
-
-## 💡 Key Insights Discovered
-
-${KEY_INSIGHTS}
-
-**Detailed Insights:**
-
-1. **[Insight 1]:** [Explanation and implications]
-
-2. **[Insight 2]:** [Explanation and implications]
-
-3. **[Insight 3]:** [Explanation and implications]
-
----
-
-## 🎯 Approaches Evaluated
-
-${APPROACHES_EVALUATED}
-
-**Evaluation Details:**
-
-### Approach 1: [Name]
-- **Pros:** [Advantages]
-- **Cons:** [Disadvantages]
-- **Best for:** [Use cases]
-
-### Approach 2: [Name]
-- **Pros:** [Advantages]
-- **Cons:** [Disadvantages]
-- **Best for:** [Use cases]
-
-[Continue for all approaches...]
-
----
-
-## ✅ Final Decision & Recommendation
-
-**Decision:** ${FINAL_DECISION}
-
-**Rationale:**
-- [Reason 1 for this choice]
-- [Reason 2 for this choice]
-- [Reason 3 for this choice]
-
-**Implementation Guidance:**
-- [Step 1 to implement this decision]
-- [Step 2 to implement this decision]
-- [Step 3 to implement this decision]
-
-**Risks & Mitigations:**
-- **Risk 1:** [Description] → **Mitigation:** [How to address]
-- **Risk 2:** [Description] → **Mitigation:** [How to address]
-
----
-
-## 📊 Research Impact
-
-### Knowledge Gained
-- **Questions Answered:** ${QUERY_ITERATIONS}+ through iterative refinement
-- **Approaches Evaluated:** [Number] distinct approaches
-- **Decision Confidence:** High/Medium/Low
-- **Time Efficiency:** ${TIME_SAVED}x faster than manual research
-
-### Business Value
-- ✅ **Reduced Decision Risk:** Clear evaluation of trade-offs
-- ✅ **Accelerated Planning:** ${TIME_SAVED} hours saved in research phase
-- ✅ **Knowledge Transfer:** Documented insights for team
-
-### Future Applications
-- [Where else can these insights be applied?]
-- [What patterns emerged that are reusable?]
-
----
-
-## 📚 Resources & References
-
-- **AI Tool Used:** ${AI_TOOL}
-- **Related Documentation:** [Links to relevant docs]
-- **Similar Patterns:** [Links to related use cases]
-- **Follow-up Actions:** [What needs to be done next]
-
----
-
-## 🔄 Replicability Framework
-
-### This research approach is replicable for:
-
-- ✅ [Similar research question 1]
-- ✅ [Similar research question 2]
-- ✅ [Similar research question 3]
-- ❌ Not suitable for [Research types that won't work]
-
-### Best Practices for Similar Research Sessions:
-
-1. **Start Broad:** Begin with open-ended questions
-2. **Iterate Deliberately:** Refine queries based on gaps
-3. **Document Insights:** Capture learnings in real-time
-4. **Evaluate Alternatives:** Consider multiple approaches
-5. **Quantify Impact:** Track time saved and value added
-EOF
-        generate_footer
-    } > "$OUTPUT_FILE"
+    # Read the research template
+    if [ ! -f "$TEMPLATE_FILE" ]; then
+        echo -e "${RED}Error: Template file not found: $TEMPLATE_FILE${NC}"
+        exit 1
+    fi
+    
+    TEMPLATE_CONTENT=$(cat "$TEMPLATE_FILE")
+    
+    # Prepare agent content
+    AGENTS_CONTENT=$(generate_agents_content)
+    
+    # Replace placeholders with actual values
+    # Use temporary file for safer multi-line replacements
+    echo "$TEMPLATE_CONTENT" | \
+    # Header section
+    sed "s/# 🔬 Claude Code: \[Research Topic\/Question\]/# 🔬 ${AI_TOOL}: ${BRIEF_DESC}/" | \
+    sed "s/\*\*Date:\*\* YYYY-MM-DD (Week XX of YYYY)/**Date:** ${SESSION_DATE}/" | \
+    sed "s/\*\*Repository\/Project:\*\* project-name/**Repository\/Project:** ${PROJECT_NAME}/" | \
+    sed "s/\[RESEARCH-XXX\](https:\/\/your-jira-or-github\/browse\/RESEARCH-XXX)/[${TICKET}](https:\/\/your-jira-or-github\/browse\/${TICKET})/" | \
+    sed "s/\*\*Agent Used:\*\* Claude Code (Sonnet 4.5) \/ GitHub Copilot \/ Other/**Agent Used:** ${AI_TOOL}/" | \
+    sed "s/\*\*Complexity:\*\* Low \/ Medium \/ High/**Complexity:** ${COMPLEXITY}/" | \
+    sed "s/\*\*Time Saved:\*\* ~X hours vs manual research/**Time Saved:** ~${TIME_SAVED} hours vs manual research/" | \
+    sed "s/\*\*Session Duration:\*\* X hours YY minutes/**Session Duration:** ${TIME_SPENT}/" | \
+    sed "s/\*\*Query Iterations:\*\* X iterations to optimal solution/**Query Iterations:** ${QUERY_ITERATIONS} iterations to optimal solution/" | \
+    # TL;DR section
+    sed "s/\*\*What:\*\* \[1-2 sentences: What research question or problem were you exploring?\]/**What:** ${TLDR_WHAT}/" | \
+    sed "s/\*\*Result:\*\* \[1-2 sentences: What insights, decisions, or recommendations emerged?\]/**Result:** ${TLDR_RESULT}/" | \
+    sed "s/\*\*Time:\*\* \[X minutes (AI-assisted research) vs Y hours manual research\]/**Time:** ${TIME_SPENT} (AI-assisted) vs ${TIME_SAVED} hours manual research/" | \
+    # AI Metrics section
+    sed "s|- \*\*Total Interactions:\*\* X back-and-forth exchanges between user and AI|- **Total Interactions:** ${TOTAL_INTERACTIONS} back-and-forth exchanges between user and AI|" | \
+    sed "s|- \*\*User Prompts:\*\* X total queries/questions from user|- **User Prompts:** ${USER_PROMPTS} total queries/questions from user|" | \
+    sed "s|- \*\*AI Responses:\*\* X total responses from AI|- **AI Responses:** ~${USER_PROMPTS} total responses from AI|" | \
+    sed "s|- \*\*Total Tokens Used:\*\* X,XXX tokens|- **Total Tokens Used:** ${TOTAL_TOKENS:-[Track in your AI tool]} tokens|" | \
+    sed "s|- \*\*Estimated Cost:\*\* ~\$X.XX (based on model pricing)|- **Estimated Cost:** ~\$${ESTIMATED_COST:-[Calculate based on tokens]} (based on model pricing)|" | \
+    sed "s|- \*\*Model Used:\*\* Claude Sonnet 4.5 / GPT-4 / Other|- **Model Used:** ${AI_TOOL}|" | \
+    sed "s|- \*\*Questions Resolved:\*\* \[Number\] through iterative refinement|- **Questions Resolved:** ${QUERY_ITERATIONS}+ through iterative refinement|" | \
+    # Research Context section
+    sed "s|\*\*Initial Query:\*\* \[Your original question or problem statement\]|**Initial Query:** ${INITIAL_QUERY}|" | \
+    sed "s|\*\*Objective:\*\* \[What were you trying to understand or decide?\]|**Objective:** ${OBJECTIVE}|" | \
+    sed "s|\*\*Background:\*\* \[Why was this research needed? What triggered it?\]|**Background:** ${BACKGROUND}|" | \
+    sed "s|\*\*Query Refinement:\*\* \[Number\] iterations to reach optimal clarity|**Query Refinement:** ${QUERY_ITERATIONS} iterations to reach optimal clarity|" | \
+    # Query Evolution section - first iteration
+    sed "0,|- \*\*Query:\*\* \[Your first question to the AI\]|s||- **Query:** ${INITIAL_QUERY}|" | \
+    # Key Insights section
+    sed "0,|\[Comma-separated list of main insights for quick reference\]|s||${KEY_INSIGHTS}|" | \
+    # Approaches Evaluated section
+    sed "0,|\[Comma-separated list of approaches considered\]|s||${APPROACHES_EVALUATED}|" | \
+    # Final Decision section
+    sed "s|\*\*Decision:\*\* \[Chosen approach or answer to your research question\]|**Decision:** ${FINAL_DECISION}|" | \
+    # Research Impact section
+    sed "s|- \*\*Time Efficiency:\*\* \[X\]x faster than manual research (\[Y\] hours saved)|- **Time Efficiency:** ${TIME_SAVED}x faster than manual research (${TIME_SAVED} hours saved)|" | \
+    sed "s|- ✅ \*\*Accelerated Planning:\*\* \[X\] hours saved in research phase|- ✅ **Accelerated Planning:** ${TIME_SAVED} hours saved in research phase|" | \
+    # Resources section
+    sed "s|\*\*AI Tool Used:\*\* \[Specific AI tool and model\]|**AI Tool Used:** ${AI_TOOL}|" | \
+    # Footer section
+    sed "s|\*\*Created:\*\* YYYY-MM-DD|**Created:** ${SESSION_DATE}|" | \
+    sed "s|\*\*Last Updated:\*\* YYYY-MM-DD|**Last Updated:** ${SESSION_DATE}|" \
+    > "$OUTPUT_FILE"
+    
+    # Now replace the Claude Agents section if agents were used
+    if [[ "$AGENTS_USED" =~ ^[Yy]$ ]] && [ ${#AGENT_NAMES[@]} -gt 0 ]; then
+        # Create a temporary file with the agents content
+        TEMP_AGENTS_FILE=$(mktemp)
+        echo "$AGENTS_CONTENT" > "$TEMP_AGENTS_FILE"
+        
+        # Use awk to replace the entire AI Agents section
+        awk '
+        /^### AI Agents Used$/ {
+            print
+            # Skip until we find the Agent Effectiveness Summary end
+            while (getline > 0) {
+                if (/^- \*\*Time saved by agents:/ || /^---$/) {
+                    print
+                    break
+                }
+            }
+            # Insert our custom agents content
+            while ((getline line < "'"$TEMP_AGENTS_FILE"'") > 0) {
+                print line
+            }
+            next
+        }
+        { print }
+        ' "$OUTPUT_FILE" > "$OUTPUT_FILE.tmp" && mv "$OUTPUT_FILE.tmp" "$OUTPUT_FILE"
+        
+        rm -f "$TEMP_AGENTS_FILE"
+    fi
 
 else
-    # Generate implementation session template
-    {
-        generate_header "🎯" "" "manual approach"
-        cat <<EOF
-
-**Cost:** ~[tokens/cost] for complete workflow
-
-**Key Success:** [What made this particularly successful?]
-
----
-
-## 🤖 AI Interaction Metrics
-
-### Engagement Level
-- **Total Interactions:** ${TOTAL_INTERACTIONS} back-and-forth exchanges between user and AI
-- **User Prompts:** ${USER_PROMPTS} total prompts/messages from user
-- **AI Responses:** ~${USER_PROMPTS} total responses from AI
-
-EOF
-        generate_token_metrics "implementation"
-        generate_agents_section
-        cat <<EOF
-
----
-
-## 🏢 Business Context
-
-**Objective:** ${OBJECTIVE}
-
-**Domain:** [Technical area: Frontend, Backend, Infrastructure, Testing, etc.]
-
-**Requestor:** [Who requested this? Team, stakeholder, technical debt initiative]
-
-**Background:** ${BACKGROUND}
-
-**Expected Benefits:**
-- [Benefit 1]
-- [Benefit 2]
-- [Benefit 3]
-
----
-
-## 🔄 Workflow Steps
-
-### 1. **[Step Name]**
-- [What you did]
-- [Tools/commands used]
-- **Time:** X minutes
-
-### 2. **[Step Name]**
-- [What you did]
-- [Tools/commands used]
-- **Time:** X minutes
-
-[Continue for all major steps...]
-
----
-
-## 🛠️ Technical Details
-
-### Tools & Technologies Used
-- **Primary AI Tool:** ${AI_TOOL}
-- **Version Control:** Git
-- **Branch:** ${BRANCH}
-- **Other Tools:** [Any other relevant tools]
-
-### Session Statistics
-
-**Files Changed (${FILES_COUNT}):**
-${CHANGED_FILES}
-
-**Git Changes:**
-\`\`\`
-${GIT_DIFF}
-\`\`\`
-
-### Code Patterns Used
-
-\`\`\`[language]
-// Example of key pattern or approach used
-[code snippet]
-\`\`\`
-
-### Key Technical Insights
-
-1. **[Insight 1]:** [What you learned]
-
-2. **[Insight 2]:** [What worked well]
-
-3. **[Insight 3]:** [What to watch out for]
-
----
-
-## 📊 Results & Impact
-
-### Quantitative Results
-- **${FILES_COUNT} files** modified
-- **${RECENT_COMMITS} commits** in last 24 hours
-- **[Y tests]** passing
-- **0 regressions** introduced
-
-### Business Impact
-- ✅ **[Impact 1]:** [Description]
-- ✅ **[Impact 2]:** [Description]
-- ✅ **[Impact 3]:** [Description]
-
----
-
-## 📈 Success Metrics
-
-| Metric | Target | Actual | Status |
-|--------|--------|--------|--------|
-| Time to complete | <X hours | ${TIME_SPENT} | ✅ Met / ❌ Missed |
-| Test coverage | X% | Y% | ✅ Met / ❌ Missed |
-| Code quality | 0 issues | Y issues | ✅ Met / ❌ Missed |
-| Documentation | Complete | Complete | ✅ Met / ❌ Missed |
-
----
-
-## 💡 Key Learnings
-
-### ✅ What Worked Well
-
-- **[Success 1]:** [Why it worked]
-
-- **[Success 2]:** [Why it worked]
-
-- **[Success 3]:** [Why it worked]
-
-### ⚠️ Areas for Improvement
-
-- **[Area 1]:** [What could be better]
-
-- **[Area 2]:** [What could be better]
-
-### 🔄 Process Refinements
-
-1. **[Refinement 1]:** [How to improve next time]
-
-2. **[Refinement 2]:** [How to improve next time]
-
----
-
-## 🎯 Best Practices Identified
-
-1. **[Practice 1]:** [Description and rationale]
-
-2. **[Practice 2]:** [Description and rationale]
-
-3. **[Practice 3]:** [Description and rationale]
-
----
-
-## 🔄 Replicability Framework
-
-### This workflow is directly replicable for
-
-- ✅ [Use case 1]
-- ✅ [Use case 2]
-- ✅ [Use case 3]
-- ❌ Not suitable for [Use case that won't work]
-
-### Prerequisites for Replication
-
-- **Technology:** [Tools needed]
-- **Permissions:** [Access required]
-- **Knowledge:** [Skills/understanding needed]
-- **Documentation:** [Docs that must exist]
-
-### Expected Timeframe & Cost
-
-- **Simple version:** X minutes, ~Y tokens (~\$Z)
-- **Medium complexity:** X minutes, ~Y tokens (~\$Z)
-- **Complex version:** X hours, ~Y tokens (~\$Z)
-
----
-
-## 📝 Implementation Summary
-
-### Files Modified (${FILES_COUNT} total)
-
-${CHANGED_FILES}
-
-### Quality Verification Results
-
-\`\`\`bash
-# Tests
-✅ X/X tests passing
-✅ Y assertions successful
-
-# Code quality
-✅ 0 linting issues
-✅ 0 type errors
-\`\`\`
-
----
-
-## 🔗 Related Resources
-
-- **Pull Request:** [Link to PR]
-- **Issue/Ticket:** [Link to Jira/GitHub issue]
-- **Repository:** ${PROJECT_NAME}
-- **Branch:** ${BRANCH}
-- **Documentation:** [Links to relevant docs]
-EOF
-        generate_footer
-    } > "$OUTPUT_FILE"
+    # Read the implementation template
+    if [ ! -f "$TEMPLATE_FILE" ]; then
+        echo -e "${RED}Error: Template file not found: $TEMPLATE_FILE${NC}"
+        exit 1
+    fi
+    
+    TEMPLATE_CONTENT=$(cat "$TEMPLATE_FILE")
+    
+    # Prepare agent content
+    AGENTS_CONTENT=$(generate_agents_content)
+    
+    # Replace placeholders with actual values
+    echo "$TEMPLATE_CONTENT" | \
+    # Header section
+    sed "s|# 🎯 Claude Code: \[Brief Descriptive Title\]|# 🎯 ${AI_TOOL}: ${BRIEF_DESC}|" | \
+    sed "s|\*\*Date:\*\* YYYY-MM-DD (Week XX of YYYY)|**Date:** ${SESSION_DATE}|" | \
+    sed "s|\*\*Repository/Project:\*\* project-name|**Repository/Project:** ${PROJECT_NAME}|" | \
+    sed "s|\[TICKET-XXXXX\](https://your-jira-or-github/browse/TICKET-XXXXX)|[${TICKET}](https://your-jira-or-github/browse/${TICKET})|" | \
+    sed "s|\*\*Agent Used:\*\* Claude Code (Sonnet 4.5) / GitHub Copilot / Other|**Agent Used:** ${AI_TOOL}|" | \
+    sed "s|\*\*Complexity:\*\* Low / Medium / High|**Complexity:** ${COMPLEXITY}|" | \
+    sed "s|\*\*Time Saved:\*\* ~X hours vs manual approach|**Time Saved:** ~${TIME_SAVED} hours vs manual approach|" | \
+    sed "s|\*\*Session Duration:\*\* X hours YY minutes|**Session Duration:** ${TIME_SPENT}|" | \
+    # TL;DR section
+    sed "s|\*\*What:\*\* \[1-2 sentences: What did the AI help you accomplish?\]|**What:** ${TLDR_WHAT}|" | \
+    sed "s|\*\*Result:\*\* \[1-2 sentences: What was the outcome? Files changed, features added, etc.\]|**Result:** ${TLDR_RESULT}|" | \
+    sed "s|\*\*Time:\*\* \[X minutes (AI-assisted) vs Y hours manual approach\]|**Time:** ${TIME_SPENT} (AI-assisted) vs ${TIME_SAVED} hours manual approach|" | \
+    # AI Metrics section
+    sed "s|- \*\*Total Interactions:\*\* X back-and-forth exchanges between user and AI|- **Total Interactions:** ${TOTAL_INTERACTIONS} back-and-forth exchanges between user and AI|" | \
+    sed "s|- \*\*User Prompts:\*\* X total prompts/messages from user|- **User Prompts:** ${USER_PROMPTS} total prompts/messages from user|" | \
+    sed "s|- \*\*AI Responses:\*\* X total responses from AI|- **AI Responses:** ~${USER_PROMPTS} total responses from AI|" | \
+    sed "s|- \*\*Total Tokens Used:\*\* X,XXX tokens|- **Total Tokens Used:** ${TOTAL_TOKENS:-[Track in your AI tool]} tokens|" | \
+    sed "s|- \*\*Estimated Cost:\*\* ~\$X.XX (based on model pricing)|- **Estimated Cost:** ~\$${ESTIMATED_COST:-[Calculate based on tokens]} (based on model pricing)|" | \
+    sed "s|- \*\*Model Used:\*\* Claude Sonnet 4.5 / GPT-4 / Other|- **Model Used:** ${AI_TOOL}|" | \
+    # Business Context section
+    sed "s|\*\*Objective:\*\* \[What business problem were you solving?\]|**Objective:** ${OBJECTIVE}|" | \
+    sed "s|\*\*Background:\*\* \[Why was this work needed? What problem exists without it?\]|**Background:** ${BACKGROUND}|" | \
+    # Technical Details section
+    sed "s|- \*\*Primary AI Tool:\*\* \[Claude Code / Copilot / etc.\]|- **Primary AI Tool:** ${AI_TOOL}|" | \
+    sed "s|- \*\*Branch:\*\* \`branch-name\`|- **Branch:** \`${BRANCH}\`|" | \
+    # Results section
+    sed "s|- \*\*Files Modified:\*\* X files|- **Files Modified:** ${FILES_COUNT} files|" | \
+    sed "s|- \*\*Commits Created:\*\* Z|- **Commits Created:** ${RECENT_COMMITS}|" | \
+    # Success Metrics table
+    sed "s|| Time to complete | <X hours | Y minutes | ✅ Met / ❌ Missed || Time to complete | <${TIME_SAVED} hours | ${TIME_SPENT} | ✅ Met |" | \
+    # Related Resources section - first occurrence
+    sed "0,|- \*\*Repository:\*\* \[Repo name\]|s||- **Repository:** ${PROJECT_NAME}|" | \
+    sed "0,|- \*\*Branch:\*\* \`branch-name\`|s||- **Branch:** \`${BRANCH}\`|" | \
+    # Footer section
+    sed "s|\*\*Created:\*\* YYYY-MM-DD|**Created:** ${SESSION_DATE}|" | \
+    sed "s|\*\*Last Updated:\*\* YYYY-MM-DD|**Last Updated:** ${SESSION_DATE}|" \
+    > "$OUTPUT_FILE"
+    
+    # Now add files changed and git diff sections using awk
+    awk -v files_count="$FILES_COUNT" -v changed_files="$CHANGED_FILES" -v git_diff="$GIT_DIFF" '
+    /^\*\*Files Changed \([0-9X]+\):\*\*$/ {
+        print "**Files Changed (" files_count "):**"
+        if (changed_files != "") {
+            print ""
+            print changed_files
+        }
+        next
+    }
+    /^```$/ && prev_line ~ /^\*\*Git Changes:\*\*$/ {
+        print
+        if (git_diff != "") {
+            print git_diff
+        }
+        next
+    }
+    { prev_line = $0; print }
+    ' "$OUTPUT_FILE" > "$OUTPUT_FILE.tmp" && mv "$OUTPUT_FILE.tmp" "$OUTPUT_FILE"
+    
+    # Replace the Claude Agents section if agents were used
+    if [[ "$AGENTS_USED" =~ ^[Yy]$ ]] && [ ${#AGENT_NAMES[@]} -gt 0 ]; then
+        # Create a temporary file with the agents content
+        TEMP_AGENTS_FILE=$(mktemp)
+        echo "$AGENTS_CONTENT" > "$TEMP_AGENTS_FILE"
+        
+        # Use awk to replace the entire AI Agents section
+        awk '
+        /^### AI Agents Used$/ {
+            print
+            # Skip until we find the Agent Effectiveness Summary end
+            while (getline > 0) {
+                if (/^- \*\*Time saved by agents:/ || /^---$/) {
+                    print
+                    break
+                }
+            }
+            # Insert our custom agents content
+            while ((getline line < "'"$TEMP_AGENTS_FILE"'") > 0) {
+                print line
+            }
+            next
+        }
+        { print }
+        ' "$OUTPUT_FILE" > "$OUTPUT_FILE.tmp" && mv "$OUTPUT_FILE.tmp" "$OUTPUT_FILE"
+        
+        rm -f "$TEMP_AGENTS_FILE"
+    fi
 fi
 
 echo -e "${GREEN}✓ Documentation created!${NC}"
@@ -1207,12 +929,45 @@ read -p "Commit this documentation? (Y/n): " COMMIT_DOC
 COMMIT_DOC=${COMMIT_DOC:-y}
 
 if [[ "$COMMIT_DOC" =~ ^[Yy]$ ]]; then
+    # Build AI attribution footer based on tool selection
+    # Check for both tools using separate conditions for robustness
+    AI_ATTRIBUTION=""
+    if [[ "$AI_TOOL" == *"Claude Code"* ]] && [[ "$AI_TOOL" == *"Copilot"* ]]; then
+        # Both tools
+        AI_ATTRIBUTION="🤖 Generated with [Claude Code](https://claude.com/claude-code) + [GitHub Copilot](https://github.com/features/copilot)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+Co-Authored-By: GitHub Copilot <noreply@github.com>"
+    elif [[ "$AI_TOOL" == *"Claude Code"* ]]; then
+        AI_ATTRIBUTION="🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+    elif [[ "$AI_TOOL" == *"Copilot"* ]]; then
+        AI_ATTRIBUTION="🤖 Generated with [GitHub Copilot](https://github.com/features/copilot)
+
+Co-Authored-By: GitHub Copilot <noreply@github.com>"
+    else
+        AI_ATTRIBUTION="🤖 Generated with AI assistance"
+    fi
+
     git add "$OUTPUT_FILE"
-    git commit -m "docs: AI session ${SESSION_DATE} - ${TICKET} - ${AI_TOOL}"
+    # Use git commit -F - for safer handling of multi-line messages with special characters
+    git commit -F - <<EOF
+docs: AI session ${SESSION_DATE} - ${TICKET} - ${BRIEF_DESC}
+
+${TLDR_WHAT}
+
+${AI_ATTRIBUTION}
+EOF
     echo -e "${GREEN}✓ Documentation committed${NC}"
 
-    # Auto-sync will be triggered by post-commit hook
-    echo -e "${BLUE}📤 Post-commit hook will sync to central repository${NC}"
+    # Explicit sync (matches slash command behavior)
+    echo -e "${BLUE}📤 Syncing to hub...${NC}"
+    if bash "$SYNC_SCRIPT" "$PROJECT_PATH"; then
+        echo -e "${GREEN}✓ Documentation synced to hub${NC}"
+    else
+        echo -e "${YELLOW}⚠ Warning: Sync failed (documentation is committed locally)${NC}"
+    fi
 else
     echo -e "${YELLOW}Documentation saved but not committed${NC}"
     echo "To commit later: git add $OUTPUT_FILE && git commit -m 'docs: AI session'"

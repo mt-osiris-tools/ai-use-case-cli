@@ -2,16 +2,16 @@
 TEMPLATE-RESEARCH.md - Research Session Documentation Template
 This is the single source of truth for research session documentation structure.
 Location: ai-use-case-cli/docs/TEMPLATE-RESEARCH.md
-Used by: Claude Code slash command (/use-case:document-session)
+Used by: AI coding assistant slash commands (/use-case:document-session)
 -->
 
-# 🔬 Claude Code: [Research Topic/Question]
+# 🔬 AI Research: [Research Topic/Question]
 
 **Date:** YYYY-MM-DD (Week XX of YYYY)
 **Repository/Project:** project-name
 **Ticket:** [RESEARCH-XXX](https://your-jira-or-github/browse/RESEARCH-XXX)
 **Session Type:** Research & Exploration
-**Agent Used:** Claude Code (Sonnet 4.5) / GitHub Copilot / Other
+**AI Tool Used:** GitHub Copilot / Claude Code / OpenAI Codex / Other
 **Complexity:** Low / Medium / High
 **Time Saved:** ~X hours vs manual research
 **Session Duration:** X hours YY minutes
@@ -71,7 +71,9 @@ Used by: Claude Code slash command (/use-case:document-session)
 - **Time per Major Insight:** ~X minutes average
 - **Cost per Insight:** ~$X.XX / insight
 
-### Claude Agents Used
+### AI Agents Used
+
+*(Note: Specialized agents from Claude, Copilot, or other AI tools)*
 
 - **Explore Agent:** X invocations
   - **Purpose:** Codebase exploration, finding patterns, understanding architecture

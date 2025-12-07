@@ -1,21 +1,52 @@
 # Publish to Confluence - Automatic Mode
 
-**IMPORTANT**: You are Claude Code with access to the Atlassian MCP server. You should **automatically publish** the specified markdown file to Confluence as a child page under the specified parent page URL.
+**AI-Tool-Agnostic**: This command works with any AI coding assistant (Claude Code, GitHub Copilot, etc.) or can be invoked directly via shell script. The system automatically detects the best available integration method.
 
 ## Your Task
 
-Automatically publish an AI use case documentation file to Confluence using the Atlassian MCP tools.
+Automatically publish an AI use case documentation file to Confluence as a child page under the specified parent page URL.
+
+## Integration Methods
+
+This command supports multiple Confluence integration approaches:
+
+1. **Atlassian MCP Server** (preferred for MCP-enabled AI assistants)
+   - Used by Claude Code and potentially other AI tools
+   - Requires MCP tools like `mcp_atlassian_*`
+   - Automatic authentication via MCP
+
+2. **Shell Script with REST API** (universal fallback)
+   - Works with any AI tool or manual invocation
+   - Uses `scripts/core/publish-confluence.sh`
+   - Requires Confluence API token or OAuth configuration
 
 ## Prerequisites
 
 Before proceeding, verify:
-1. Atlassian MCP server is configured (check available MCP tools)
-2. User has provided:
+1. User has provided:
    - Markdown file path
    - Confluence parent page URL
-3. User has valid Confluence authentication (SSE or token via MCP)
+2. At least one integration method is available (MCP server OR API credentials)
 
 ## Automatic Publishing Workflow
+
+### Step 0: Detect Integration Method
+
+Check available Confluence integration methods in order of preference:
+
+```bash
+# Check for MCP tools (if you're an AI assistant with tool access)
+# Look for tools like: mcp_atlassian_atl_getConfluencePage, mcp_atlassian_atl_createConfluencePage
+
+# If MCP not available, check for shell script + API credentials
+# Check if scripts/core/publish-confluence.sh exists
+# Check if user has configured API credentials (via config)
+```
+
+**Decision logic**:
+- If MCP tools available → Use MCP-based workflow (Steps 4-8)
+- If no MCP but API configured → Use shell script workflow
+- If neither available → Prompt user to configure one method
 
 ### Step 1: Validate Inputs
 
@@ -55,7 +86,9 @@ Read the markdown content:
 cat <markdown-file-path>
 ```
 
-### Step 4: Verify Atlassian MCP Access
+### Step 4: Choose Integration Method
+
+**Option A: MCP-Based Integration** (if available)
 
 Check if Atlassian MCP tools are available by listing available tools.
 
@@ -64,19 +97,45 @@ Required MCP tools:
 - `mcp_atlassian_atl_createConfluencePage` - To create child page (if available)
 - Or alternative creation methods via MCP
 
-If MCP tools are not available, inform the user:
+If MCP tools are available, proceed with Steps 5-8 using MCP.
+
+**Option B: Shell Script Integration** (universal fallback)
+
+If MCP is not available, use the shell script approach:
+
+```bash
+# Invoke the publish script directly
+scripts/core/publish-confluence.sh \
+  --markdown <markdown-file-path> \
+  --parent-url <parent-page-url> \
+  --api-token "$CONFLUENCE_API_TOKEN" \
+  --base-url "$CONFLUENCE_BASE_URL"
 ```
-❌ Atlassian MCP server not configured
 
-To use this feature, you need to:
-1. Install the Atlassian MCP server in Claude Code
-   Run: claude mcp add --transport sse atlassian https://mcp.atlassian.com/v1/sse
-2. Configure authentication (SSE or Personal Access Token)
-3. Ensure you have permission to create pages in the target space
+The shell script will:
+1. Read API credentials from configuration or environment
+2. Convert markdown to Confluence storage format
+3. Use REST API to create the page
+4. Return the created page URL
 
-See:
-- Claude Code MCP: https://docs.claude.com/en/docs/claude-code/mcp
-- Atlassian MCP Setup: https://support.atlassian.com/atlassian-rovo-mcp-server/docs/setting-up-claude-ai/
+**If neither method is available**, inform the user:
+```
+❌ No Confluence integration method available
+
+Please configure one of the following:
+
+Option 1: Atlassian MCP Server (AI assistants with MCP support)
+  - Best for: Claude Code and other MCP-enabled AI tools
+  - Setup: Configure Atlassian MCP in your AI tool
+  - Docs: https://support.atlassian.com/atlassian-rovo-mcp-server/
+
+Option 2: Confluence REST API (universal)
+  - Best for: Any AI tool, manual invocation, CI/CD
+  - Setup: Configure API token via: ai-use-case config confluence
+  - Requires: Confluence API token or OAuth credentials
+  - Docs: Run 'ai-use-case config confluence --help'
+
+See docs/CONFLUENCE-INTEGRATION.md for detailed setup instructions.
 ```
 
 ### Step 5: Validate Parent Page Access
@@ -158,11 +217,13 @@ If publishing fails, provide detailed error information:
 
 ## Key Principles
 
-1. **Be Automatic**: Don't ask for details you can extract or infer
-2. **Be Validated**: Check all prerequisites before attempting publish
-3. **Be Secure**: Never expose credentials, use MCP auth
-4. **Be Helpful**: Provide clear error messages with solutions
-5. **Be Complete**: Include full content with proper formatting
+1. **Be AI-Tool-Agnostic**: Work with any AI assistant or manual invocation
+2. **Be Automatic**: Don't ask for details you can extract or infer
+3. **Be Adaptive**: Detect and use the best available integration method
+4. **Be Validated**: Check all prerequisites before attempting publish
+5. **Be Secure**: Never expose credentials, use secure auth methods
+6. **Be Helpful**: Provide clear error messages with solutions
+7. **Be Complete**: Include full content with proper formatting
 
 ## Command Parameters
 
@@ -193,12 +254,20 @@ ai-use-case publish-confluence \
 
 ## Error Scenarios
 
-### MCP Not Configured
+### No Integration Method Available
 ```
-❌ Atlassian MCP not available
+❌ No Confluence integration method configured
 
-This feature requires the Atlassian MCP server.
-Please configure it in Claude Code settings.
+Please choose one:
+
+1. MCP Server (for MCP-enabled AI assistants):
+   Configure Atlassian MCP in your AI tool settings
+
+2. REST API (universal):
+   Run: ai-use-case config confluence
+   Provide your Confluence API token and base URL
+
+See: docs/CONFLUENCE-INTEGRATION.md
 ```
 
 ### Invalid URL
@@ -262,7 +331,13 @@ Run without --dry-run to publish.
 
 ## Reference
 
-- Claude Code MCP Documentation: <https://docs.claude.com/en/docs/claude-code/mcp>
-- Atlassian MCP Setup Guide: <https://support.atlassian.com/atlassian-rovo-mcp-server/docs/setting-up-claude-ai/>
+### Integration Methods
+- Local Setup Guide: `docs/CONFLUENCE-INTEGRATION.md`
+- Atlassian MCP Setup: <https://support.atlassian.com/atlassian-rovo-mcp-server/>
 - Confluence REST API v2: <https://developer.atlassian.com/cloud/confluence/rest/v2/>
 - Confluence Storage Format: <https://confluence.atlassian.com/doc/confluence-storage-format-790796544.html>
+
+### Authentication Options
+- **MCP**: Handled by AI tool's MCP server configuration
+- **API Token**: Generate at `https://{site}.atlassian.net/wiki/people/{userId}/preferences/personal-access-tokens`
+- **OAuth**: For enterprise integrations (see Confluence API docs)

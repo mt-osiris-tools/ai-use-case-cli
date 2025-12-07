@@ -1,19 +1,34 @@
 #!/bin/bash
 # Publish AI Use Case Documentation to Confluence
-# Creates a child page under a specified parent page using Atlassian MCP
+# Creates a child page under a specified parent page
+#
+# Supports multiple integration methods:
+#   1. Atlassian MCP server (via AI coding assistants)
+#   2. Confluence REST API with API token (universal)
+#   3. Confluence REST API with OAuth (enterprise)
 #
 # Usage:
 #   publish-confluence.sh [options] <markdown-file> <parent-page-url>
 #
 # Options:
-#   --title <title>       Override page title (default: from filename)
-#   --space <space-key>   Confluence space key (default: from URL)
-#   --dry-run            Show what would be published without doing it
-#   --help               Show this help message
+#   --title <title>          Override page title (default: from filename)
+#   --space <space-key>      Confluence space key (default: from URL)
+#   --api-token <token>      Confluence API token (or use config/env)
+#   --base-url <url>         Confluence base URL (or use config)
+#   --email <email>          User email for API auth (or use config)
+#   --dry-run                Show what would be published without doing it
+#   --help                   Show this help message
+#
+# Authentication Methods (in order of precedence):
+#   1. Command-line options (--api-token, --base-url, --email)
+#   2. Environment variables (CONFLUENCE_API_TOKEN, CONFLUENCE_BASE_URL, CONFLUENCE_EMAIL)
+#   3. Configuration file (~/.config/ai-use-case-cli/config.json)
+#   4. MCP server (if available - for AI assistants only)
 #
 # Prerequisites:
-#   - Atlassian MCP server configured in Claude Code
-#   - Valid Confluence authentication (SSE or token)
+#   - One authentication method configured (see above)
+#   - curl (for REST API calls)
+#   - Permission to create pages in target Confluence space
 
 set -e
 
@@ -27,9 +42,14 @@ NC=$'\033[0m'
 
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_MANAGER="$SCRIPT_DIR/../utils/config-manager.sh"
 DRY_RUN=false
 CUSTOM_TITLE=""
 CUSTOM_SPACE=""
+API_TOKEN=""
+BASE_URL=""
+USER_EMAIL=""
+USE_REST_API=false
 
 # Show help
 show_help() {
@@ -44,14 +64,22 @@ ${YELLOW}Arguments:${NC}
   ${GREEN}<parent-page-url>${NC}     Confluence parent page URL
 
 ${YELLOW}Options:${NC}
-  ${GREEN}--title <title>${NC}       Override page title (default: from filename)
-  ${GREEN}--space <space-key>${NC}   Confluence space key (default: from URL)
-  ${GREEN}--dry-run${NC}             Show what would be published without doing it
-  ${GREEN}--help, -h${NC}            Show this help message
+  ${GREEN}--title <title>${NC}          Override page title (default: from filename)
+  ${GREEN}--space <space-key>${NC}      Confluence space key (default: from URL)
+  ${GREEN}--api-token <token>${NC}      Confluence API token (or use config/env)
+  ${GREEN}--base-url <url>${NC}         Confluence base URL (or use config)
+  ${GREEN}--email <email>${NC}          User email for API auth (or use config)
+  ${GREEN}--dry-run${NC}                Show what would be published without doing it
+  ${GREEN}--help, -h${NC}               Show this help message
+
+${YELLOW}Authentication Methods:${NC}
+  1. Command-line options (--api-token, --base-url, --email)
+  2. Environment variables (CONFLUENCE_API_TOKEN, CONFLUENCE_BASE_URL, CONFLUENCE_EMAIL)
+  3. Configuration file (~/.config/ai-use-case-cli/config.json)
 
 ${YELLOW}Prerequisites:${NC}
-  - Atlassian MCP server configured in Claude Code
-  - Valid Confluence authentication (SSE or Personal Access Token)
+  - One authentication method configured (see above)
+  - curl (for REST API calls)
   - Permission to create pages in target Confluence space
 
 ${YELLOW}Examples:${NC}
@@ -75,13 +103,21 @@ ${YELLOW}Confluence URL Formats:${NC}
   - https://{site}.atlassian.net/wiki/spaces/{space}/pages/{pageId}/{title}
   - https://{site}.atlassian.net/wiki/spaces/{space}/pages/edit-v2/{pageId}
 
-${YELLOW}Authentication:${NC}
-  Authentication is handled by the Atlassian MCP server in Claude Code.
-  Supports both:
-  - Atlassian SSE (Server-Sent Events) for OAuth
-  - Personal Access Token (PAT)
+${YELLOW}Authentication Setup:${NC}
+  ${CYAN}Option 1: Configuration file (recommended)${NC}
+    Run: ai-use-case config confluence
+    This will prompt for API token, base URL, and email
 
-  Configure in Claude Code MCP settings.
+  ${CYAN}Option 2: Environment variables${NC}
+    export CONFLUENCE_API_TOKEN="your-api-token"
+    export CONFLUENCE_BASE_URL="https://your-site.atlassian.net"
+    export CONFLUENCE_EMAIL="your-email@company.com"
+
+  ${CYAN}Option 3: Command-line options${NC}
+    Use --api-token, --base-url, and --email flags
+
+  ${CYAN}Generate API Token:${NC}
+    https://your-site.atlassian.net/wiki/people/me/preferences/personal-access-tokens
 
 EOF
 }
@@ -104,6 +140,21 @@ parse_args() {
                 ;;
             --space)
                 CUSTOM_SPACE="$2"
+                shift 2
+                ;;
+            --api-token)
+                API_TOKEN="$2"
+                USE_REST_API=true
+                shift 2
+                ;;
+            --base-url)
+                BASE_URL="$2"
+                USE_REST_API=true
+                shift 2
+                ;;
+            --email)
+                USER_EMAIL="$2"
+                USE_REST_API=true
                 shift 2
                 ;;
             -*)
@@ -229,6 +280,172 @@ get_file_size() {
     echo "scale=1; $size_bytes / 1024" | bc
 }
 
+# Load Confluence configuration from config file
+load_confluence_config() {
+    if [ -f "$CONFIG_MANAGER" ]; then
+        # Try to get confluence config from config file
+        local config_file="$HOME/.config/ai-use-case-cli/config.json"
+        if [ -f "$config_file" ] && command -v jq &>/dev/null; then
+            # Load from config if not already set via command line or env
+            if [ -z "$API_TOKEN" ] && [ -z "$CONFLUENCE_API_TOKEN" ]; then
+                API_TOKEN=$(jq -r '.confluence.apiToken // empty' "$config_file" 2>/dev/null)
+            fi
+            if [ -z "$BASE_URL" ] && [ -z "$CONFLUENCE_BASE_URL" ]; then
+                BASE_URL=$(jq -r '.confluence.baseUrl // empty' "$config_file" 2>/dev/null)
+            fi
+            if [ -z "$USER_EMAIL" ] && [ -z "$CONFLUENCE_EMAIL" ]; then
+                USER_EMAIL=$(jq -r '.confluence.email // empty' "$config_file" 2>/dev/null)
+            fi
+        fi
+    fi
+
+    # Fall back to environment variables
+    if [ -z "$API_TOKEN" ]; then
+        API_TOKEN="${CONFLUENCE_API_TOKEN:-}"
+    fi
+    if [ -z "$BASE_URL" ]; then
+        BASE_URL="${CONFLUENCE_BASE_URL:-}"
+    fi
+    if [ -z "$USER_EMAIL" ]; then
+        USER_EMAIL="${CONFLUENCE_EMAIL:-}"
+    fi
+}
+
+# Check if REST API authentication is configured
+check_rest_api_auth() {
+    load_confluence_config
+
+    if [ -n "$API_TOKEN" ] && [ -n "$BASE_URL" ] && [ -n "$USER_EMAIL" ]; then
+        USE_REST_API=true
+        return 0
+    fi
+    return 1
+}
+
+# Convert basic markdown to Confluence storage format
+# NOTE: This is a simplified converter suitable for basic markdown.
+# 
+# Supported:
+#   - Headers (h1-h6)
+#   - Bold and italic (simple cases)
+#   - Links
+#   - Basic paragraphs
+#
+# NOT supported (will be rendered as-is or may break):
+#   - Code blocks (will appear as plain text)
+#   - Tables (will not render as tables)
+#   - Images (will not be embedded)
+#   - Nested formatting (e.g., **bold _italic_**)
+#   - Lists (bullets/numbered)
+#   - Blockquotes
+#   - Literal asterisks or special characters
+#
+# For documents with complex formatting, consider:
+#   1. Using a proper markdown-to-confluence converter
+#   2. Manual formatting in Confluence after publishing
+#   3. Using Confluence's built-in markdown import
+#
+convert_markdown_to_confluence() {
+    local markdown_content="$1"
+    
+    # Basic conversion - handles simple markdown only
+    # Convert headers
+    local html_content
+    html_content=$(echo "$markdown_content" | sed -E '
+        s/^# (.+)$/<h1>\1<\/h1>/g
+        s/^## (.+)$/<h2>\1<\/h2>/g
+        s/^### (.+)$/<h3>\1<\/h3>/g
+        s/^#### (.+)$/<h4>\1<\/h4>/g
+        s/^##### (.+)$/<h5>\1<\/h5>/g
+        s/^###### (.+)$/<h6>\1<\/h6>/g
+    ')
+    
+    # Convert bold and italic (simple cases only - no nested formatting)
+    # Note: This will not handle complex cases like **bold _italic_** correctly
+    html_content=$(echo "$html_content" | sed -E '
+        s/\*\*([^*]+)\*\*/<strong>\1<\/strong>/g
+        s/\*([^*]+)\*/<em>\1<\/em>/g
+    ')
+    
+    # Convert links
+    html_content=$(echo "$html_content" | sed -E 's/\[([^]]+)\]\(([^)]+)\)/<a href="\2">\1<\/a>/g')
+    
+    # Wrap in paragraphs (skip headers and empty lines)
+    html_content=$(echo "$html_content" | sed -E '
+        /^<[hH][1-6]>/!{
+            /^$/!{
+                s/^(.+)$/<p>\1<\/p>/
+            }
+        }
+    ')
+    
+    echo "$html_content"
+}
+
+# Publish to Confluence via REST API
+publish_via_rest_api() {
+    local title="$1"
+    local content="$2"
+    local parent_id="$3"
+    local space_key="$4"
+    
+    echo -e "${CYAN}Publishing via Confluence REST API...${NC}"
+    
+    # Convert markdown to Confluence storage format
+    local confluence_content
+    confluence_content=$(convert_markdown_to_confluence "$content")
+    
+    # Prepare JSON payload
+    local json_payload
+    json_payload=$(jq -n \
+        --arg title "$title" \
+        --arg confluenceContent "$confluence_content" \
+        --arg parentId "$parent_id" \
+        --arg spaceKey "$space_key" \
+        '{
+            spaceKey: $spaceKey,
+            status: "current",
+            title: $title,
+            parentId: $parentId,
+            body: {
+                representation: "storage",
+                value: $confluenceContent
+            }
+        }')
+    
+    # Make API request with Basic authentication (email:token base64-encoded)
+    local auth_header
+    auth_header=$(echo -n "$USER_EMAIL:$API_TOKEN" | base64)
+    
+    local response
+    response=$(curl -s -w "\n%{http_code}" \
+        -X POST \
+        -H "Authorization: Basic $auth_header" \
+        -H "Content-Type: application/json" \
+        -H "Accept: application/json" \
+        -d "$json_payload" \
+        "$BASE_URL/wiki/api/v2/pages")
+    
+    local http_code=$(echo "$response" | tail -n1)
+    local body=$(echo "$response" | sed '$d')
+    
+    if [ "$http_code" -eq 200 ] || [ "$http_code" -eq 201 ]; then
+        local page_id=$(echo "$body" | jq -r '.id // empty')
+        local page_url=$(echo "$body" | jq -r '._links.webui // empty')
+        
+        echo -e "${GREEN}✓ Successfully published to Confluence!${NC}"
+        echo ""
+        echo "Page ID: $page_id"
+        echo "Page URL: $BASE_URL$page_url"
+        return 0
+    else
+        echo -e "${RED}✗ Failed to publish to Confluence${NC}" >&2
+        echo "HTTP Status: $http_code" >&2
+        echo "Response: $body" >&2
+        return 1
+    fi
+}
+
 # Show dry run preview
 show_dry_run() {
     local title="${CUSTOM_TITLE:-$(extract_title)}"
@@ -260,8 +477,8 @@ show_dry_run() {
     echo ""
 }
 
-# Generate Claude Code prompt
-generate_claude_prompt() {
+# Generate AI assistant prompt (for MCP-based publishing)
+generate_ai_prompt() {
     local title="${CUSTOM_TITLE:-$(extract_title)}"
 
     cat <<EOF
@@ -277,34 +494,41 @@ ${YELLOW}Publishing Information:${NC}
   Space: $CONFLUENCE_SPACE
   Parent Page ID: $CONFLUENCE_PAGE_ID
 
-${YELLOW}Next Steps:${NC}
-  This operation requires Claude Code with Atlassian MCP.
-
-  ${BLUE}Option 1: Use Claude Code${NC}
-  If you're using Claude Code, run the slash command:
+${YELLOW}Integration Method:${NC}
+  ${BLUE}Option 1: MCP Server${NC} (AI assistants with MCP support)
+  If your AI tool supports Atlassian MCP, use the slash command:
 
     ${GREEN}/publish-confluence $MARKDOWN_FILE $PARENT_URL${NC}
 
-  ${BLUE}Option 2: Manual Setup${NC}
-  1. Open the markdown file in Confluence
-  2. Create a new page under the parent
+  Supported AI tools:
+  - Claude Code with Atlassian MCP
+  - Other MCP-enabled AI assistants
+
+  ${BLUE}Option 2: REST API${NC} (universal)
+  Configure API credentials and run:
+
+    ${GREEN}ai-use-case config confluence${NC}  (first time setup)
+    ${GREEN}$0 $MARKDOWN_FILE $PARENT_URL${NC}
+
+  ${BLUE}Option 3: Manual${NC}
+  1. Open the markdown file
+  2. Create a new page under the parent in Confluence
   3. Copy/paste the content
   4. Format as needed
 
-${YELLOW}Prerequisites:${NC}
-  ${GREEN}✓${NC} Atlassian MCP server configured in Claude Code
-  ${GREEN}✓${NC} Valid Confluence authentication (SSE or token)
-  ${GREEN}✓${NC} Permission to create pages in space: $CONFLUENCE_SPACE
-
 ${YELLOW}Configuration Help:${NC}
-  To configure Atlassian MCP in Claude Code:
-  1. Run: claude mcp add --transport sse atlassian https://mcp.atlassian.com/v1/sse
-  2. Follow OAuth prompts to authenticate
-  3. Grant access to your Confluence site
+  For MCP (AI assistants):
+    - See your AI tool's MCP configuration docs
+    - Example (Claude Code): https://docs.claude.com/en/docs/claude-code/mcp
+
+  For REST API (universal):
+    1. Generate API token: https://{site}.atlassian.net/wiki/people/me/preferences/personal-access-tokens
+    2. Run: ai-use-case config confluence
+    3. Provide token, base URL, and email
 
   Documentation:
-  - Claude Code MCP: https://docs.claude.com/en/docs/claude-code/mcp
-  - Atlassian MCP Setup: https://support.atlassian.com/atlassian-rovo-mcp-server/docs/setting-up-claude-ai/
+  - Setup Guide: docs/CONFLUENCE-INTEGRATION.md
+  - Atlassian MCP: https://support.atlassian.com/atlassian-rovo-mcp-server/
 
 EOF
 }
@@ -327,14 +551,40 @@ main() {
 
     echo ""
 
-    # Dry run or actual publish
+    # Dry run mode - just show preview
     if [ "$DRY_RUN" = true ]; then
         show_dry_run
-    else
-        generate_claude_prompt
+        exit 0
     fi
 
-    exit 0
+    # Determine integration method
+    local title="${CUSTOM_TITLE:-$(extract_title)}"
+    
+    # Try REST API if configured
+    if check_rest_api_auth; then
+        echo -e "${CYAN}Using REST API integration${NC}"
+        echo ""
+        
+        # Read markdown content
+        local markdown_content
+        markdown_content=$(cat "$MARKDOWN_FILE")
+        
+        # Publish via REST API
+        if publish_via_rest_api "$title" "$markdown_content" "$CONFLUENCE_PAGE_ID" "$CONFLUENCE_SPACE"; then
+            exit 0
+        else
+            echo ""
+            echo -e "${YELLOW}REST API publish failed. See error above.${NC}"
+            exit 1
+        fi
+    else
+        # No REST API configured - show guidance for AI assistants or manual setup
+        echo -e "${YELLOW}No REST API credentials configured.${NC}"
+        echo -e "${YELLOW}Showing integration options...${NC}"
+        echo ""
+        generate_ai_prompt
+        exit 0
+    fi
 }
 
 # Run main function

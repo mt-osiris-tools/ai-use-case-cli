@@ -554,6 +554,204 @@ configure_tracing() {
     echo "  bash ~/.local/share/ai-use-case-cli/scripts/utils/tracing.sh install-deps"
 }
 
+# Function to configure Confluence integration
+configure_confluence() {
+    echo -e "${BLUE}=== Configure Confluence Integration ===${NC}"
+    echo ""
+    echo "This will configure Confluence REST API access for publishing documentation."
+    echo ""
+    echo -e "${YELLOW}Prerequisites:${NC}"
+    echo "  1. A Confluence Cloud account"
+    echo "  2. Permission to create pages in your target space"
+    echo "  3. A Personal Access Token (PAT) or API token"
+    echo ""
+    echo -e "${CYAN}Generate API Token:${NC}"
+    echo "  Visit: https://id.atlassian.com/manage-profile/security/api-tokens"
+    echo "  Or: {your-site}.atlassian.net/wiki/people/me/preferences/personal-access-tokens"
+    echo ""
+    
+    read -p "Press Enter to continue or Ctrl+C to cancel..."
+    echo ""
+    
+    # Get base URL
+    local base_url
+    read -p "Confluence base URL (e.g., https://mycompany.atlassian.net): " -r base_url
+    if [ -z "$base_url" ]; then
+        echo -e "${RED}Error: Base URL is required${NC}" >&2
+        return 1
+    fi
+    
+    # Remove trailing slash if present
+    base_url="${base_url%/}"
+    
+    # Validate URL format
+    if ! [[ "$base_url" =~ ^https?:// ]]; then
+        echo -e "${YELLOW}Warning: URL should start with http:// or https://${NC}"
+        read -p "Continue anyway? (y/N): " -r confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+            return 1
+        fi
+    fi
+    
+    echo ""
+    
+    # Get email
+    local email
+    read -p "Your Confluence email address: " -r email
+    if [ -z "$email" ]; then
+        echo -e "${RED}Error: Email is required${NC}" >&2
+        return 1
+    fi
+    
+    echo ""
+    
+    # Get API token
+    local api_token
+    read -sp "API Token (input hidden): " api_token
+    echo ""
+
+    # Trim leading/trailing whitespace
+    api_token="$(echo -n "$api_token" | xargs)"
+
+    if [ -z "$api_token" ]; then
+        echo -e "${RED}Error: API token is required${NC}" >&2
+        return 1
+    fi
+
+    # Check minimum length (Atlassian tokens are typically 24+ chars)
+    if [ "${#api_token}" -lt 24 ]; then
+        echo -e "${YELLOW}Warning: API token is unusually short (${#api_token} characters). Atlassian tokens are typically 24+ characters.${NC}"
+        read -p "Continue anyway? (y/N): " -r short_confirm
+        if [[ ! "$short_confirm" =~ ^[Yy]$ ]]; then
+            return 1
+        fi
+    fi
+
+    # Warn if token contains spaces (likely a password or copy-paste error)
+    if [[ "$api_token" =~ [[:space:]] ]]; then
+        echo -e "${YELLOW}Warning: API token contains whitespace. This may indicate a copy-paste error or a password, not an API token.${NC}"
+        read -p "Continue anyway? (y/N): " -r space_confirm
+        if [[ ! "$space_confirm" =~ ^[Yy]$ ]]; then
+            return 1
+        fi
+    fi
+    
+    echo ""
+    
+    # Save to config
+    ensure_config_dir
+    
+    # Create or update config with confluence section
+    if ! command -v jq &> /dev/null; then
+        echo -e "${RED}Error: jq not available. Cannot update configuration safely.${NC}" >&2
+        echo "Install jq: sudo apt-get install jq  # or appropriate package manager" >&2
+        return 1
+    fi
+    
+    local temp_file=$(mktemp)
+    trap "rm -f '$temp_file'" EXIT
+    
+    # Add or update confluence section
+    if [ ! -f "$CONFIG_FILE" ]; then
+        # Create new config with confluence section
+        jq -n \
+            --arg baseUrl "$base_url" \
+            --arg email "$email" \
+            --arg apiToken "$api_token" \
+            '{
+                version: "1.0.0",
+                hubMode: "local",
+                hubPath: ($ENV.HOME + "/.local/share/ai-use-case-cli/hub"),
+                gitUrl: "",
+                confluence: {
+                    baseUrl: $baseUrl,
+                    email: $email,
+                    apiToken: $apiToken,
+                    authMethod: "api-token"
+                }
+            }' > "$temp_file"
+    else
+        # Update existing config with confluence section
+        jq \
+            --arg baseUrl "$base_url" \
+            --arg email "$email" \
+            --arg apiToken "$api_token" \
+            '.confluence = {
+                baseUrl: $baseUrl,
+                email: $email,
+                apiToken: $apiToken,
+                authMethod: "api-token"
+            }' "$CONFIG_FILE" > "$temp_file"
+    fi
+    
+    # Validate temp file
+    if [ ! -s "$temp_file" ] || ! jq empty "$temp_file" 2>/dev/null; then
+        echo -e "${RED}Error: Failed to update configuration${NC}" >&2
+        trap - EXIT
+        rm -f "$temp_file"
+        return 1
+    fi
+    
+    # Atomic move
+    mv "$temp_file" "$CONFIG_FILE"
+    trap - EXIT
+    
+    # Set restrictive permissions on config file (contains API token)
+    chmod 600 "$CONFIG_FILE"
+    
+    echo ""
+    echo -e "${GREEN}✓ Confluence integration configured successfully${NC}"
+    echo ""
+    echo -e "${CYAN}Configuration saved to:${NC} $CONFIG_FILE"
+    echo -e "${CYAN}File permissions:${NC} 600 (owner read/write only)"
+    echo ""
+    echo -e "${YELLOW}Test the integration:${NC}"
+    echo "  ai-use-case publish-confluence --help"
+    echo ""
+    echo -e "${YELLOW}Security Note:${NC}"
+    echo "  Your API token is stored locally in $CONFIG_FILE"
+    echo "  Keep this file secure and never commit it to version control"
+    echo "  The file has restricted permissions (600) for security"
+}
+
+# Function to show Confluence configuration
+show_confluence_config() {
+    if [ ! -f "$CONFIG_FILE" ]; then
+        echo -e "${YELLOW}No configuration found${NC}"
+        echo "Run 'ai-use-case config confluence' to configure"
+        return 1
+    fi
+    
+    if ! command -v jq &> /dev/null; then
+        echo -e "${RED}Error: jq not available${NC}" >&2
+        return 1
+    fi
+    
+    echo -e "${BLUE}=== Confluence Configuration ===${NC}"
+    echo ""
+    
+    local has_confluence
+    has_confluence=$(jq -r '.confluence // empty' "$CONFIG_FILE" 2>/dev/null)
+    
+    if [ -z "$has_confluence" ]; then
+        echo -e "${YELLOW}Confluence not configured${NC}"
+        echo "Run 'ai-use-case config confluence' to configure"
+        return 0
+    fi
+    
+    local base_url email auth_method
+    base_url=$(jq -r '.confluence.baseUrl // "not set"' "$CONFIG_FILE")
+    email=$(jq -r '.confluence.email // "not set"' "$CONFIG_FILE")
+    auth_method=$(jq -r '.confluence.authMethod // "api-token"' "$CONFIG_FILE")
+    
+    echo -e "${GREEN}Base URL:${NC}      $base_url"
+    echo -e "${GREEN}Email:${NC}         $email"
+    echo -e "${GREEN}Auth Method:${NC}   $auth_method"
+    echo -e "${GREEN}API Token:${NC}     ${CYAN}(configured - hidden for security)${NC}"
+    echo ""
+    echo -e "${CYAN}Config file:${NC} $CONFIG_FILE"
+}
+
 # Main CLI interface
 if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
     case "${1:-}" in
@@ -566,6 +764,26 @@ if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
             ;;
         set)
             set_config "${2:-}" "${3:-}"
+            ;;
+        confluence)
+            case "$2" in
+                show)
+                    show_confluence_config
+                    ;;
+                configure|setup)
+                    configure_confluence
+                    ;;
+                *)
+                    if [ -z "$2" ]; then
+                        # Default action: configure
+                        configure_confluence
+                    else
+                        echo "Error: Unknown confluence command '${2:-}'"
+                        echo "Available: show, configure"
+                        exit 1
+                    fi
+                    ;;
+            esac
             ;;
         tracing)
             case "$2" in
@@ -661,6 +879,9 @@ Commands:
   is-git                  Check if git mode is enabled
   get <key>               Get configuration value
   set <key> <val>         Set configuration value
+  confluence <subcommand> Manage Confluence integration
+    show                  Show Confluence configuration
+    configure             Interactive Confluence setup
   tracing <subcommand>    Manage tracing configuration
     show                  Show tracing configuration
     configure             Interactive tracing setup
@@ -672,6 +893,8 @@ Examples:
   $(basename "$0") init
   $(basename "$0") show
   $(basename "$0") mode
+  $(basename "$0") confluence configure
+  $(basename "$0") confluence show
 EOF
             ;;
         *)

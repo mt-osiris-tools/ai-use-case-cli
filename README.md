@@ -42,10 +42,10 @@ Documentation shouldn't be a burden—it should be a valuable asset that grows y
 
 ## Features
 
-- 🎯 **Hybrid interface** - Use standalone CLI commands or Claude Code slash commands
-- 🚀 **AI-assisted documentation** - Automatic context capture with Claude Code integration
+- 🎯 **Hybrid interface** - Use standalone CLI commands or AI assistant slash commands
+- 🚀 **AI-assisted documentation** - Automatic context capture with GitHub Copilot, Claude Code, and other AI tools
 - 🔬 **Research & implementation sessions** - Document both code changes and exploratory work
-- 🤖 **Claude agent tracking** - Automatically track and document usage of specialized agents (Explore, Plan, etc.)
+- 🤖 **AI agent tracking** - Automatically track and document usage of specialized agents from any AI tool
 - 🧠 **Intelligent agents** - AI-powered agents for quality review, pattern analysis, and organization (Phase 1 complete, more coming!)
 - 📊 **Session data extraction** - Extract git history, token usage, and metrics for reporting (v3.4.0+)
 - 📊 **OpenTelemetry tracing** - Monitor CLI performance and usage with distributed tracing (v3.6.0+)
@@ -77,9 +77,9 @@ cd ~/.local/share/ai-use-case-cli
    ai-use-case --init
    ```
 
-2. **Work on your code with AI assistance**
+2. **Work on your code with AI assistance** (GitHub Copilot, Claude Code, or other AI tools)
 
-3. **Document your session** (in Claude Code):
+3. **Document your session** (in your AI coding assistant):
    ```
    /use-case:document-session
    ```
@@ -240,6 +240,11 @@ ai-use-case tracing disable
 ### Environment Variables
 
 ```bash
+# Override CLI installation directory (for custom installations)
+export AI_USECASES_CLI_ROOT="$HOME/.local/share/ai-use-case-cli"  # Default
+# Or use a custom path:
+# export AI_USECASES_CLI_ROOT="$HOME/custom/path/ai-use-case-cli"
+
 # Override hub location (works with both modes)
 export AI_USECASES_DIR="$HOME/.local/share/ai-use-case-cli/hub"  # Default for local mode
 # Or use a custom path:
@@ -430,14 +435,17 @@ ai-use-case --version
 Update to latest:
 
 ```bash
-# Recommended: Re-run install script (handles updates automatically)
+# Recommended: Use built-in update command
+ai-use-case update
+
+# OR: Re-run install script (handles updates automatically)
 curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/install/install.sh | bash
 
-# OR: Manual update
-cd ~/.local/share/ai-use-case-cli && git pull
+# OR: Manual update (if CLI installed at default location)
+cd "${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}" && git pull
 ```
 
-The installer automatically handles local modifications (like permission changes) during updates.
+The `ai-use-case update` command automatically handles updates and local modifications, then optionally updates all registered projects.
 
 ## Migration from v2.x
 

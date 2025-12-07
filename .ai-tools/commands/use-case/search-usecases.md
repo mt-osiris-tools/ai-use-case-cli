@@ -10,7 +10,7 @@ Help the user search, filter, and analyze their AI use case documentation across
 
 Use the search script for simple keyword searches:
 ```bash
-bash ~/.local/share/ai-use-case-cli/search-use-cases.sh <search-term>
+ai-use-case search <search-term>
 ```
 
 ## Available Search Methods
@@ -18,7 +18,7 @@ bash ~/.local/share/ai-use-case-cli/search-use-cases.sh <search-term>
 ### 1. Search by Topic/Keyword
 ```bash
 # Use the search script (recommended)
-bash ~/.local/share/ai-use-case-cli/search-use-cases.sh authentication
+ai-use-case search authentication
 
 # Or search manually:
 # Search filenames

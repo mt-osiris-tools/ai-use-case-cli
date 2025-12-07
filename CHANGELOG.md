@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Template-Based Documentation Generation**: Refactored `document-ai-session.sh` to read and populate template files instead of using inline heredoc
+  - Removed ~370 lines of heredoc documentation generation
+  - Now reads `docs/TEMPLATE.md` and `docs/TEMPLATE-RESEARCH.md` as single source of truth
+  - Uses sed for placeholder replacement with collected user input
+  - Ensures consistency with Claude Code slash command `/use-case:document-session`
+  - Prevents template/script divergence and reduces maintenance burden
+  - Template files remain the authoritative source for documentation structure
+- **AI Tool Agnostic Refactoring**: Made codebase support multiple AI coding assistants, not just Claude Code
+  - **Directory Structure**: Renamed `.claude/` to `.ai-tools/` to reflect support for multiple AI tools
+  - **Templates**: Updated TEMPLATE.md and TEMPLATE-RESEARCH.md
+    - Changed title from "🎯 Claude Code:" to "🎯 AI-Assisted:" (implementation) / "🔬 AI Research:" (research)
+    - Renamed "Agent Used" to "AI Tool Used" with support for GitHub Copilot, Claude Code, OpenAI Codex, etc.
+    - Updated "Claude Agents Used" section to "AI Agents Used" to support agents from any AI tool
+  - **Scripts**: Updated document-ai-session.sh and extract-session-data.sh
+    - Changed default AI tool from "Claude Code (Sonnet 4.5)" to "GitHub Copilot"
+    - Added OpenAI Codex / ChatGPT as an option
+    - Generalized agent tracking prompts to "AI agents" instead of "Claude agents"
+  - **Slash Commands**: Updated document-session.md to be tool-agnostic
+    - Generalized references to support any AI coding assistant
+    - Made commit attribution optional and tool-specific
+  - **Documentation**: Updated README.md, CLAUDE.md, and docs/CLAUDE.md
+    - Updated references to mention multiple AI tools (GitHub Copilot, Claude Code, OpenAI Codex, etc.)
+    - Changed "Claude Code slash commands" to "AI assistant slash commands"
+    - Updated file structure diagrams to show `.ai-tools/` directory
+  - **Migration**: update-project.sh now removes old `.claude/` directory structure automatically
+- **Refactored Slash Commands to Remove Hardcoded Paths**: Replaced all hardcoded CLI installation paths with portable solutions
+  - Updated 9 slash command files (46+ command references) to use `ai-use-case` wrapper commands
+  - Replaced direct script calls (e.g., `bash ~/.local/share/ai-use-case-cli/scripts/...`) with wrapper equivalents
+  - Introduced `AI_USECASES_CLI_ROOT` environment variable for custom installation paths
+  - Template access now uses `${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}` pattern
+  - Improves portability across different installation locations and deployment methods
+  - Maintains backward compatibility with default installation path
+  - Updated documentation in README.md and ai-use-case help output
+- **Extract Session Slash Command Simplification**: Refactored `/use-case:extract-session` command for better maintainability
+  - Reduced from 393 lines to 200 lines (49% reduction)
+  - Moved detailed documentation to `docs/EXTRACT-SESSION-REFERENCE.md`
+  - Kept essential workflow (Steps 1-6) and core functionality
+  - Extracted detailed exit code handling, cost calculations, JSON structure, and command substitution best practices to reference doc
+  - Added link to reference documentation for advanced details
+  - Improved consistency with other slash commands (sync-usecases: 49 lines, list-projects: 90 lines, check-updates: 115 lines)
+  - Reduced token overhead for AI processing while maintaining full functionality
+
 ### Added
 
 - **C4 Architecture Diagrams**: Added comprehensive architecture diagrams using PlantUML and C4 model
@@ -117,6 +161,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Commit Message Format**: Aligned commit message format with AI tool attribution for consistency and transparency
+  - Shell script (`document-ai-session.sh`) now uses multi-line commit format matching Claude Code slash command
+  - Dynamic AI attribution footer based on tool selection (Claude Code, Copilot, or both)
+  - Includes proper `Co-Authored-By` lines for AI tool attribution
+  - Commit message now includes: session date, ticket, brief description, TL;DR summary, and attribution footer
+  - Prepares for future GitHub Copilot support with tool-agnostic attribution format
+- **Duplicate Session Type Prompt**: Removed duplicate session type prompt in `document-ai-session.sh`
+  - Fixed confusing user experience where session type (implementation vs research) was prompted twice
+  - Removed first prompt (previously at lines 314-333) that appeared before data collection
+  - Kept single prompt in the interactive prompts section (lines 347-366) where it logically belongs
+  - Users now select session type only once during documentation workflow
+  - Fixes issue where selections could be inconsistent if user chose different options for duplicate prompts
+- **Unified Sync Behavior**: Shell script now explicitly calls sync script after commit
+  - Updated `document-ai-session.sh` to call `sync-ai-use-cases.sh` explicitly after commit
+  - Matches behavior of Claude Code slash command for consistency
+  - Ensures reliable sync even if post-commit hook is not configured
+  - Provides clear success/failure feedback to users
+  - Resolves inconsistency between manual and automatic documentation modes
 - **check-updates Command Output Issues**: Fixed color rendering and improved command guidance
   - Fixed ANSI color codes not rendering: replaced `cat <<EOF` with `echo -e` statements in help text
   - Removed misleading numbered list format from "Next steps" section to avoid confusion with interactive menus
