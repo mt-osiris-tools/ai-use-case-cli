@@ -35,8 +35,6 @@ partition "Find Use Case Files" {
   note right
     Exclude:
     - README.md
-    - *.draft.md
-    - *.local.md
   end note
 
   if (Files found?) then (no)
@@ -100,7 +98,7 @@ partition "For Each Use Case File" {
     :Skip invalid filename;
     note right
       Must match:
-      YYYY-Www-MM-DD_TICKET-XXX_description.md
+      YYYY-Www-MM-DD_TICKET-XXXXX_description.md
     end note
   endif
 }

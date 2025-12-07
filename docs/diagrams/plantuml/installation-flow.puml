@@ -59,7 +59,7 @@ if (Prerequisites met?) then (yes)
       :Write config file at ~/.config/ai-use-case-cli/config.json;
       note right
         {
-          "hub_mode": "local-only"
+          "hubMode": "local-only"
         }
       end note
     else (no)
@@ -67,8 +67,8 @@ if (Prerequisites met?) then (yes)
       :Write config file at ~/.config/ai-use-case-cli/config.json;
       note right
         {
-          "hub_mode": "private-git",
-          "hub_git_url": "<user-provided-url>"
+          "hubMode": "private-git",
+          "gitUrl": "<user-provided-url>"
         }
       end note
     endif
