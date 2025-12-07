@@ -464,19 +464,19 @@ EXIT_CODE=0
 
 if [ "$VALIDATE_LINKS" = true ]; then
     echo "=== Validating Links ==="
-    "$SCRIPT_DIR/validate-docs.sh" --links-only || EXIT_CODE=1
+    "$SCRIPT_DIR/validate-docs.sh" --links || EXIT_CODE=1
     echo ""
 fi
 
 if [ "$VALIDATE_PATHS" = true ]; then
     echo "=== Validating Paths ==="
-    "$SCRIPT_DIR/validate-docs.sh" --paths-only || EXIT_CODE=1
+    "$SCRIPT_DIR/validate-docs.sh" --paths || EXIT_CODE=1
     echo ""
 fi
 
 if [ "$VALIDATE_TEMPLATES" = true ]; then
     echo "=== Validating Templates ==="
-    "$SCRIPT_DIR/validate-docs.sh" --templates-only || EXIT_CODE=1
+    "$SCRIPT_DIR/validate-docs.sh" --templates || EXIT_CODE=1
     echo ""
 fi
 
