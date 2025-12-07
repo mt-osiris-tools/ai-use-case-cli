@@ -76,7 +76,7 @@ cd ~/.local/share/ai-use-case-cli
    ```bash
    ai-use-case --init
    ```
-   This creates `.usecase/cases/`, installs git hooks, copies slash commands to `.ai-tools/commands/`, and creates a `.claude/commands/` symlink for Claude Code compatibility.
+   This creates `.usecase/cases/`, installs git hooks, copies slash commands to `.ai-tools/commands/`, and creates a `.claude/commands/use-case/` symlink for Claude Code compatibility (preserving any custom commands).
 
 2. **Work on your code with AI assistance** (GitHub Copilot, Claude Code, or other AI tools)
 
@@ -104,7 +104,8 @@ This CLI provides slash commands for AI coding assistants like Claude Code and G
 
 **How it works:**
 - Commands are stored in `.ai-tools/commands/use-case/` (AI-tool-agnostic location)
-- A symlink at `.claude/commands/` points to `.ai-tools/commands/` for Claude Code compatibility
+- A subdirectory symlink at `.claude/commands/use-case/` points to `../../.ai-tools/commands/use-case/`
+- This preserves any custom commands you add to `.claude/commands/`
 - Claude Code automatically discovers commands from `.claude/commands/`
 - Use slash commands like `/use-case:document-session` directly in your AI assistant
 
@@ -115,8 +116,8 @@ ai-use-case --init  # Automatically creates symlink for Claude Code
 
 **Verification:**
 ```bash
-ls -la .claude/commands    # Should show: .claude/commands → ../.ai-tools/commands
-ls .ai-tools/commands/use-case/  # Should list all available commands
+ls -la .claude/commands/use-case    # Should show: use-case → ../../.ai-tools/commands/use-case
+ls .ai-tools/commands/use-case/     # Should list all available commands
 ```
 
 ### Core Commands

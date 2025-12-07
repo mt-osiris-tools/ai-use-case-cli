@@ -26,15 +26,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Benefits**: Visual documentation of command execution flows, easier onboarding, clearer understanding of complex workflows
   - **Color coding**: Success (green), Actions (blue), AI operations (lavender), Git operations (yellow), etc.
 
-- **Claude Code Symlink for AI-Tool-Agnostic Commands**: Added symlink compatibility layer for slash command discovery
-  - Created `.claude/commands/` symlink pointing to `.ai-tools/commands/` in CLI repository
-  - Updated `setup-project.sh` to automatically create `.claude/commands/` symlink in project directories (lines 339-357)
-  - **How it works**: Commands stored in `.ai-tools/commands/use-case/` (AI-tool-agnostic source), symlink at `.claude/commands/` enables Claude Code discovery
-  - **Automatic setup**: `ai-use-case --init` creates symlink automatically with verification logic
-  - **Smart handling**: Checks if symlink exists, validates target path, provides clear feedback for existing non-symlink directories
-  - **Documentation**: Added "Slash Commands for AI Coding Assistants" section to README.md and CLAUDE.md explaining symlink architecture
-  - **Compatibility**: Maintains AI-tool-agnostic architecture while ensuring Claude Code can discover commands from its expected `.claude/commands/` directory
-  - Resolves issue where Claude Code couldn't find commands after v3.11.0 migration from `.claude/` to `.ai-tools/`
+- **Agent Framework Component Diagram**: Added new C4 Component Diagram for Agent Framework
+  - Shows internal components: agent-registry.sh, invoke-agent.sh, quality-agent.sh, and agent prompts
+  - Visualizes agent lifecycle management, invocation flow, and integration points
+  - Includes notes on key features (caching, statistics, timeout handling) and registry management
+  - Located at `docs/diagrams/AI Use Case CLI - C4 Component Diagram (Agent Framework).svg`
+  - Part of comprehensive architecture documentation
 
 - **Agent Framework Component Diagram**: Added new C4 Component Diagram for Agent Framework
   - Shows internal components: agent-registry.sh, invoke-agent.sh, quality-agent.sh, and agent prompts
@@ -42,6 +39,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Includes notes on key features (caching, statistics, timeout handling) and registry management
   - Located at `docs/diagrams/AI Use Case CLI - C4 Component Diagram (Agent Framework).svg`
   - Part of comprehensive architecture documentation
+
+### Changed
+
+- **Update Script Preserves Custom Commands**: Fixed `update-project.sh` to work with new subdirectory symlink structure
+  - **Previous behavior**: Removed entire `.claude` directory during updates (lines 194-228), deleting custom commands
+  - **New behavior**: Preserves `.claude/commands/` directory and custom commands, only updates `use-case/` symlink
+  - **Handles migration**: Automatically migrates projects from old full-directory symlink to new structure
+  - **Custom command detection**: Reports number of custom commands found and confirms preservation
+  - **User benefit**: Custom commands in `.claude/commands/` are now preserved across CLI updates
+
+- **Claude Code Symlink Strategy - Subdirectory Level**: Changed from full-directory to subdirectory-level symlink to preserve custom commands
+  - **Previous approach**: `.claude/commands/` → `../.ai-tools/commands` (replaced entire directory, lost custom commands)
+  - **New approach**: `.claude/commands/use-case/` → `../../.ai-tools/commands/use-case` (preserves custom commands)
+  - **Updated `setup-project.sh`**: Lines 339-381 now create `.claude/commands/` as regular directory with only `use-case/` symlinked
+  - **Automatic migration**: Detects old full-directory symlink and automatically migrates to new structure (lines 346-358)
+  - **Migration process**: Removes old symlink, creates directory, adds subdirectory symlink - fully automated
+  - **Updated `update-project.sh`**: Lines 191-229 now preserve custom commands during project updates
+    - Detects old vs new structure intelligently
+    - Removes only `use-case/` symlink for refresh
+    - Preserves all custom command directories
+    - Shows which custom commands are preserved
+  - **User benefit**: Users can now safely add custom commands to `.claude/commands/other-commands/` without conflicts
+  - **Updated documentation**: README.md, CLAUDE.md, and docs/CLAUDE.md reflect new subdirectory symlink approach
+  - **Updated .gitignore**: Added `.claude/commands/` to prevent tracking generated symlinks in CLI repo
+  - **Fixed progress tracker bug**: Corrected task name mismatch in UPDATE_MODE ("Update Claude Code slash commands" → "Update AI tool slash commands")
 
 - **AI Assistant Repository Guidelines**: Added `COPILOT.md` with comprehensive guidelines for AI coding assistants
   - Project structure and module organization reference
@@ -51,8 +73,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Commit and PR workflow guidelines
   - Explicit guidance to use `echo -e` for ANSI color codes
   - Helps AI assistants (GitHub Copilot, Claude Code, etc.) understand repo patterns and contribute effectively
-
-### Changed
 
 - **Documentation Reorganization - Agent-Specific Structure**: Reorganized documentation into agent-specific directories
   - **New structure**: Created `docs/agents/` with subdirectories for `claude/`, `copilot/`, and `framework/`
