@@ -18,6 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Update Script Preserves Custom Commands**: Fixed `update-project.sh` to work with new subdirectory symlink structure
+  - **Previous behavior**: Removed entire `.claude` directory during updates (lines 194-228), deleting custom commands
+  - **New behavior**: Preserves `.claude/commands/` directory and custom commands, only updates `use-case/` symlink
+  - **Handles migration**: Automatically migrates projects from old full-directory symlink to new structure
+  - **Custom command detection**: Reports number of custom commands found and confirms preservation
+  - **Safe backup**: Creates timestamped backup if `use-case/` is unexpectedly a directory instead of symlink
+  - **User benefit**: Custom commands in `.claude/commands/` are now preserved across CLI updates
+
 - **Claude Code Symlink Strategy - Subdirectory Level**: Changed from full-directory to subdirectory-level symlink to preserve custom commands
   - **Previous approach**: `.claude/commands/` → `../.ai-tools/commands` (replaced entire directory, lost custom commands)
   - **New approach**: `.claude/commands/use-case/` → `../../.ai-tools/commands/use-case` (preserves custom commands)
