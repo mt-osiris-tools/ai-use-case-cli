@@ -11,7 +11,7 @@
 ## Progress Summary
 
 **Completed:** Phase 1 (Agent Framework) + Phase 2 (Quality Reviewer Agent)
-**Released:** v3.11.0 - 2025-12-07
+**Merged:** PR #116 on 2025-12-03, **Released:** v3.11.0 on 2025-12-07
 **Remaining:** Phase 3 (Pattern Analysis), Phase 4 (Session Selection), Phase 5 (Organization)
 
 ### Completion Stats
@@ -50,8 +50,8 @@
 
 ## Phase 1: Agent Framework
 
-**Timeline:** Week 1 (Completed: 2025-12-07)
-**Status:** ✅ Completed (Released in v3.11.0)
+**Timeline:** Week 1 (Merged: 2025-12-03)
+**Status:** ✅ Completed (Merged in PR #116, Released in v3.11.0)
 
 ### Task 1.1: Create Agent Registry Schema
 
@@ -284,8 +284,8 @@
 
 ## Phase 2: Documentation Quality Agent
 
-**Timeline:** Week 2 (Completed: 2025-12-07)
-**Status:** ✅ Completed (Released in v3.11.0)
+**Timeline:** Week 2 (Merged: 2025-12-03)
+**Status:** ✅ Completed (Merged in PR #116, Released in v3.11.0)
 
 ### Task 2.1: Create Quality Agent Prompt
 
@@ -320,7 +320,7 @@
   - [x] Iterate on prompt wording
 
 - [x] **Commit agent prompt**
-  - [x] Stage: `git add .claude/agents/use-case-quality-agent.md`
+  - [x] Stage: `git add .ai-tools/agents/use-case-quality-agent.md`
   - [x] Commit: `git commit -m "feat(agents): add documentation quality agent prompt"`
 
 ### Task 2.2: Implement Quality Agent CLI Wrapper
@@ -427,7 +427,7 @@
   - [x] Check output formatting
 
 - [x] **Commit slash command**
-  - [x] Stage: `git add .claude/commands/use-case/review-quality.md`
+  - [x] Stage: `git add .ai-tools/commands/use-case/review-quality.md`
   - [x] Commit: `git commit -m "feat(agents): add review-quality slash command"`
 
 ### Task 2.5: Phase 2 Testing & Documentation
