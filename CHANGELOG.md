@@ -33,6 +33,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Located at `docs/diagrams/AI Use Case CLI - C4 Component Diagram (Agent Framework).svg`
   - Part of comprehensive architecture documentation
 
+- **Session Statistics Automation** (v3.12.0+): Comprehensive automation of session statistics capture for AI-assisted development sessions
+  - **SessionEnd Hook**: Automatically captures session metadata when Claude Code sessions end
+    - Created `.claude/hooks/SessionEnd` - bash script executed automatically at session end
+    - Captures timestamp, repository info, branch, recent commits, and uncommitted changes
+    - Saves output to `.usecase/session-stats/YYYY-MM-DD-HHMMSS.txt`
+    - Provides instructions for running `/cost` command to capture full statistics
+    - Automatically installed by `ai-use-case --init` via `setup-project.sh`
+  - **Template Updates**: Added "📊 Session Statistics (/cost Command)" section to both documentation templates
+    - Updated `docs/TEMPLATE.md` with session statistics section and `/cost` command instructions
+    - Updated `docs/TEMPLATE-RESEARCH.md` with parallel section adapted for research sessions
+    - Includes instructions for capturing statistics, example output, and usage notes
+  - **Documentation Workflow Integration**: Added Step 6.5 to `/use-case:document-session` workflow
+    - Instructions for running `/cost` command during documentation
+    - Option to use auto-saved statistics from SessionEnd hook
+    - Graceful fallback if statistics unavailable
+  - **OpenTelemetry Configuration**: Enterprise-grade telemetry support for detailed metrics tracking
+    - Created `.claude/otel-config.sh` - configuration script with multiple export modes (console, file, OTLP)
+    - Created `docs/OPENTELEMETRY-SETUP.md` - 420+ line comprehensive setup guide
+    - Supports console output (development), file export (persistent), and OTLP endpoints (enterprise)
+    - Tracks token usage, costs, code changes, session duration, and tool usage patterns
+  - **Comprehensive Documentation**:
+    - Updated `docs/AI_SESSION_STATISTICS_GUIDE.md` with "Automated Session Statistics Capture" section
+    - Created `docs/features/session-statistics-automation/README.md` - complete feature documentation
+    - Includes testing procedures, migration guide, usage examples, and benefits analysis
+  - **Benefits**: Accurate real-time data from `/cost` command (not estimates), automatic capture eliminates manual errors, consistent tracking, enterprise monitoring with OpenTelemetry
+
+- **Documentation Consistency Checklist**: Created comprehensive workflow for testing documentation consistency
+  - New file: `docs/DOCUMENTATION-CONSISTENCY-CHECKLIST.md`
+  - Complete checklist for reviewing documentation when adding/modifying features
+  - Covers: Core docs (CHANGELOG, README, COMMANDS), templates, cross-references, version consistency
+  - Includes validation scripts for links, file paths, and template consistency
+  - Integration with PR workflow and pre-commit hooks
+  - Identifies common documentation issues and solutions
+
 ### Changed
 
 - **Update Script Preserves Custom Commands**: Fixed `update-project.sh` to work with new subdirectory symlink structure

@@ -51,6 +51,7 @@ Before creating any PR, verify ALL items:
 - [ ] Tested changes locally
 - [ ] **Verified cross-platform compatibility** (if shell scripts modified)
 - [ ] Updated all related documentation (docs/*, docs/agents/claude/README.md, CONTRIBUTING.md)
+- [ ] **Reviewed DOCUMENTATION-CONSISTENCY-CHECKLIST.md** (ensure all docs are consistent)
 - [ ] Used conventional commit messages
 - [ ] Reviewed HUB-SYNC-CHECKLIST.md if applicable
 
@@ -335,6 +336,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 - [COMMANDS.md](COMMANDS.md) - Command reference
 - [VERSION-MANAGEMENT.md](VERSION-MANAGEMENT.md) - Version bump guide
 - [VERSION-UPDATE-CHECKLIST.md](VERSION-UPDATE-CHECKLIST.md) - Verification checklist
+- [DOCUMENTATION-CONSISTENCY-CHECKLIST.md](DOCUMENTATION-CONSISTENCY-CHECKLIST.md) - Documentation consistency testing
 - [HUB-SYNC-CHECKLIST.md](HUB-SYNC-CHECKLIST.md) - Hub sync validation
 - [docs/agents/claude/README.md](agents/claude/README.md) - Quick reference guide
 - [docs/agents/claude/GUIDE.md](agents/claude/GUIDE.md) - Comprehensive guide
