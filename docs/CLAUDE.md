@@ -61,7 +61,7 @@ This creates a symlink at `~/.local/bin/ai-use-case` for global CLI access.
    - Installs git pre-commit hook for branch protection
    - Installs git post-commit hook for auto-sync
    - Copies slash commands to `.ai-tools/commands/use-case/`
-   - Creates `.claude/commands/` symlink for Claude Code compatibility
+   - Creates `.claude/commands/use-case/` symlink (preserves custom commands)
    - Adds `.gitignore` patterns for draft files
    - Performs initial sync to hub
 

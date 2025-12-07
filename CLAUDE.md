@@ -143,18 +143,19 @@ ai-use-case check-updates       # Check for outdated projects
 
 **How Commands Are Discovered:**
 
-Commands are stored in `.ai-tools/commands/use-case/` (AI-tool-agnostic) with a symlink at `.claude/commands/` for Claude Code compatibility:
+Commands are stored in `.ai-tools/commands/use-case/` (AI-tool-agnostic) with a subdirectory symlink for Claude Code compatibility:
 
 ```bash
-.ai-tools/commands/use-case/    # Source of truth (AI-tool-agnostic)
-.claude/commands/               # Symlink for Claude Code discovery
+.ai-tools/commands/use-case/           # Source of truth (AI-tool-agnostic)
+.claude/commands/                      # Regular directory (preserves custom commands)
+.claude/commands/use-case/             # Symlink → ../../.ai-tools/commands/use-case
 ```
 
-Claude Code automatically discovers commands from `.claude/commands/`. The `ai-use-case --init` command creates this symlink automatically in project directories.
+Claude Code automatically discovers commands from `.claude/commands/`. The `ai-use-case --init` command creates the subdirectory symlink automatically, preserving any custom user commands.
 
 **Verification:**
 ```bash
-ls -la .claude/commands         # Should show symlink → ../.ai-tools/commands
+ls -la .claude/commands/use-case    # Should show symlink → ../../.ai-tools/commands/use-case
 ```
 
 ## File Structure
@@ -168,7 +169,8 @@ ls -la .claude/commands         # Should show symlink → ../.ai-tools/commands
 │   ├── hub/                       # view-hub.sh, push-hub.sh
 │   └── utils/                     # version.sh, config-manager.sh
 ├── .ai-tools/commands/use-case/   # Slash commands for AI assistants
-├── .claude/commands/              # Symlink → ../.ai-tools/commands (Claude Code compatibility)
+├── .claude/commands/              # Directory for Claude Code commands
+│   └── use-case/                  # Symlink → ../../.ai-tools/commands/use-case
 └── docs/                          # Documentation
     ├── WORKFLOW.md                # Workflow guide (NEW)
     ├── COMMANDS.md                # Command reference (NEW)
