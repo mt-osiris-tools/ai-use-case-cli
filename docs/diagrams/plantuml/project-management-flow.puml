@@ -5,7 +5,7 @@ skinparam backgroundColor #FEFEFE
 skinparam activity {
   BackgroundColor<< Success >> #90EE90
   BackgroundColor<< Action >> #87CEEB
-  BackgroundColor<< Update >> #FFE4B5
+  BackgroundColor<< Update >> #FFA07A
   BorderColor #333333
   FontSize 12
 }

@@ -66,29 +66,21 @@ partition "Collect Statistics" {
     by-project/
   end note
 
-  :Count by session type;
+  :Calculate use cases per project;
   note right
-    - Implementation (has git commits)
-    - Research (exploration)
+    Sorted by count
   end note
 
-  :Analyze by time period;
+  :Find most common AI tools;
   note right
-    - Last 7 days
-    - Last 30 days
-    - All time
+    Parse "Agent Used:"
+    field from documents
   end note
 
-  :Group by topic;
+  :Calculate total time saved;
   note right
-    From by-topic/
-    symlinks
-  end note
-
-  :Calculate AI tool usage;
-  note right
-    Parse "AI Tool Used"
-    from documents
+    Sum of time estimates
+    from use case metadata
   end note
 }
 
@@ -97,10 +89,9 @@ note right
   Summary:
   - Total use cases: N
   - Projects: M
-  - Session types breakdown
-  - Recent activity
-  - Top topics
-  - AI tool distribution
+  - Use cases per project (sorted)
+  - Most common AI tools
+  - Total time saved
 end note
 
 stop

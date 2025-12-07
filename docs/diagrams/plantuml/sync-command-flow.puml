@@ -117,7 +117,13 @@ partition "Commit and Push (if git hub)" {
         "docs: sync from [project] - [count] files"
       end note
 
-      :Git push to remote;
+      :Prompt user: "Push changes to remote hub repository? (y/n)";
+
+      if (User confirms push?) then (yes)
+        :Git push to remote;
+      else (no)
+        :Skip push, local commit only;
+      endif
     else (no)
       :No changes to commit;
     endif

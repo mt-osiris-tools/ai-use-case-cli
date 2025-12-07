@@ -27,7 +27,7 @@ end note
 note right
   - Bash shell
   - Git installed
-  - jq installed
+  (jq checked at runtime)
 end note
 
 if (Prerequisites met?) then (yes)
@@ -45,17 +45,29 @@ if (Prerequisites met?) then (yes)
     :PATH already configured;
   endif
 
-  :Prompt for environment variables;
+  :Prompt user to select hub configuration mode;
   note right
-    Optional:
-    - AI_USECASES_DIR
-    - AI_USECASES_SYNC_SCRIPT
+    Choose one:
+    - Local-only (no remote sync)
+    - Private-git (sync to private hub repo)
   end note
 
-  if (User wants to add env vars?) then (yes)
-    :Add to shell profile;
+  if (User selects local-only?) then (yes)
+    :Write config file at ~/.config/ai-use-case-cli/config.json;
+    note right
+      {
+        "hub_mode": "local-only"
+      }
+    end note
   else (no)
-    :Skip environment setup;
+    :Prompt for private hub git URL;
+    :Write config file at ~/.config/ai-use-case-cli/config.json;
+    note right
+      {
+        "hub_mode": "private-git",
+        "hub_git_url": "<user-provided-url>"
+      }
+    end note
   endif
 
   :Display completion banner;
@@ -71,7 +83,6 @@ else (no)
   note right
     Missing prerequisites:
     - Install Git
-    - Install jq
   end note
 
   :Installation failed;
