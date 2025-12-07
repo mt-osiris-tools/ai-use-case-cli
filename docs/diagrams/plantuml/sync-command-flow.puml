@@ -1,0 +1,139 @@
+@startuml Sync Command Flow
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam activity {
+  BackgroundColor<< Success >> #90EE90
+  BackgroundColor<< Action >> #87CEEB
+  BackgroundColor<< Processing >> #DDA0DD
+  BorderColor #333333
+  FontSize 12
+}
+
+title AI Use Case CLI - Sync Command Flow
+
+start
+
+:User runs ai-use-case sync;
+note right
+  OR triggered by
+  post-commit git hook
+end note
+
+:Get hub directory path;
+note right
+  From config:
+  ~/.config/ai-use-case-cli/config.json
+end note
+
+:Get project name and path;
+
+partition "Find Use Case Files" {
+  :Scan .usecase/cases/ directory;
+
+  :Find all *.md files;
+  note right
+    Exclude:
+    - README.md
+    - *.draft.md
+    - *.local.md
+  end note
+
+  if (Files found?) then (no)
+    :No files to sync;
+    stop
+  else (yes)
+    :Process each file;
+  endif
+}
+
+partition "For Each Use Case File" {
+  :Parse filename << Processing >>;
+  note right
+    Extract:
+    - Date (YYYY-MM-DD)
+    - Week (Www)
+    - Ticket (PROJ-XXX)
+    - Description slug
+  end note
+
+  if (Filename valid?) then (yes)
+    partition "Copy to by-project/" {
+      :Create project directory in hub;
+      note right
+        hub/by-project/[project-name]/
+      end note
+
+      :Copy file to by-project/;
+    }
+
+    partition "Create by-date/ Symlink" {
+      :Extract YYYY and MM from filename;
+
+      :Create date directory structure;
+      note right
+        hub/by-date/YYYY/MM/
+      end note
+
+      :Create symlink to by-project file;
+      note right
+        [project]_[filename].md
+        → ../../by-project/[project]/[filename].md
+      end note
+    }
+
+    partition "Create by-topic/ Symlink" {
+      :Extract topic from description slug;
+
+      :Create topic directory;
+      note right
+        hub/by-topic/[topic]/
+      end note
+
+      :Create symlink to by-project file;
+      note right
+        [project]_[filename].md
+        → ../../by-project/[project]/[filename].md
+      end note
+    }
+  else (no)
+    :Skip invalid filename;
+    note right
+      Must match:
+      YYYY-Www-MM-DD_TICKET-XXX_description.md
+    end note
+  endif
+}
+
+partition "Commit and Push (if git hub)" {
+  if (Hub mode = private-git?) then (yes)
+    :Check for changes in hub;
+
+    if (Changes detected?) then (yes)
+      :Git add by-project/ files;
+
+      :Git commit with message;
+      note right
+        "docs: sync from [project] - [count] files"
+      end note
+
+      :Git push to remote;
+    else (no)
+      :No changes to commit;
+    endif
+  else (no)
+    :Local-only mode, skip git;
+  endif
+}
+
+:Display sync summary << Success >>;
+note right
+  ✓ Synced N files
+  ✓ Updated by-date symlinks
+  ✓ Updated by-topic symlinks
+  ✓ Committed and pushed (if git)
+end note
+
+stop
+
+@enduml

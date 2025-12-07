@@ -1,0 +1,108 @@
+@startuml Search and Stats Commands
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam activity {
+  BackgroundColor<< Success >> #90EE90
+  BackgroundColor<< Action >> #87CEEB
+  BackgroundColor<< Search >> #98FB98
+  BorderColor #333333
+  FontSize 12
+}
+
+title AI Use Case CLI - Search & Stats Commands
+
+|Search Command|
+start
+
+:User runs ai-use-case search <term>;
+
+:Get hub directory path;
+
+:Search all .md files in hub;
+note right
+  Searches in:
+  - by-project/*/*.md
+  - File content (grep)
+  - Filename matching
+end note
+
+:Find matches << Search >>;
+
+if (Matches found?) then (yes)
+  :Display results with context;
+  note right
+    Shows:
+    - Filename
+    - Project name
+    - Matching lines
+    - File path
+  end note
+
+  :Highlight search term;
+else (no)
+  :No matches found;
+endif
+
+stop
+
+|Stats Command|
+start
+
+:User runs ai-use-case stats;
+
+:Get hub directory path;
+
+partition "Collect Statistics" {
+  :Count total use cases;
+  note right
+    All .md files in
+    by-project/
+  end note
+
+  :Count projects;
+  note right
+    Subdirectories in
+    by-project/
+  end note
+
+  :Count by session type;
+  note right
+    - Implementation (has git commits)
+    - Research (exploration)
+  end note
+
+  :Analyze by time period;
+  note right
+    - Last 7 days
+    - Last 30 days
+    - All time
+  end note
+
+  :Group by topic;
+  note right
+    From by-topic/
+    symlinks
+  end note
+
+  :Calculate AI tool usage;
+  note right
+    Parse "AI Tool Used"
+    from documents
+  end note
+}
+
+:Display statistics << Success >>;
+note right
+  Summary:
+  - Total use cases: N
+  - Projects: M
+  - Session types breakdown
+  - Recent activity
+  - Top topics
+  - AI tool distribution
+end note
+
+stop
+
+@enduml

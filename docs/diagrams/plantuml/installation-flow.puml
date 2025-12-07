@@ -1,0 +1,83 @@
+@startuml Installation Flow
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam activity {
+  BackgroundColor<< Success >> #90EE90
+  BackgroundColor<< Action >> #87CEEB
+  BackgroundColor<< Decision >> #FFD700
+  BorderColor #333333
+  FontSize 12
+}
+
+title AI Use Case CLI - Installation Flow
+
+start
+
+:User runs installation command;
+note right
+  curl -fsSL <url> | bash
+  OR
+  ./install.sh
+end note
+
+:Display installation banner;
+
+:Check prerequisites;
+note right
+  - Bash shell
+  - Git installed
+  - jq installed
+end note
+
+if (Prerequisites met?) then (yes)
+  :Clone/Copy CLI to ~/.local/share/ai-use-case-cli;
+
+  :Create symlink at ~/.local/bin/ai-use-case;
+
+  if (PATH includes ~/.local/bin?) then (no)
+    :Prompt to add to PATH;
+    note right
+      Add to ~/.bashrc or ~/.zshrc:
+      export PATH="$HOME/.local/bin:$PATH"
+    end note
+  else (yes)
+    :PATH already configured;
+  endif
+
+  :Prompt for environment variables;
+  note right
+    Optional:
+    - AI_USECASES_DIR
+    - AI_USECASES_SYNC_SCRIPT
+  end note
+
+  if (User wants to add env vars?) then (yes)
+    :Add to shell profile;
+  else (no)
+    :Skip environment setup;
+  endif
+
+  :Display completion banner;
+  note right
+    ✓ CLI installed at ~/.local/bin/ai-use-case
+    ✓ Run: ai-use-case --help
+  end note
+
+  :Installation complete << Success >>;
+
+else (no)
+  :Display error message;
+  note right
+    Missing prerequisites:
+    - Install Git
+    - Install jq
+  end note
+
+  :Installation failed;
+  stop
+endif
+
+stop
+
+@enduml

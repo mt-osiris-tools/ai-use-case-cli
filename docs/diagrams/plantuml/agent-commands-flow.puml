@@ -1,0 +1,136 @@
+@startuml Agent Commands Flow
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam activity {
+  BackgroundColor<< Success >> #90EE90
+  BackgroundColor<< Action >> #87CEEB
+  BackgroundColor<< Agent >> #DDA0DD
+  BorderColor #333333
+  FontSize 12
+}
+
+title AI Use Case CLI - Agent Commands
+
+|agents list|
+start
+
+:User runs ai-use-case agents list;
+
+:Read agent registry;
+note right
+  ~/.local/share/ai-use-case-cli/
+  agents-registry.json
+end note
+
+if (Registry exists?) then (yes)
+  :Display agent table;
+  note right
+    Shows:
+    - Agent name
+    - Status (enabled/disabled)
+    - Description
+    - Last used
+  end note
+else (no)
+  :Initialize empty registry;
+  :Show no agents message;
+endif
+
+stop
+
+|agents enable/disable|
+start
+
+:User runs ai-use-case agents [enable|disable] <agent>;
+
+:Read agent registry;
+
+if (Agent exists?) then (yes)
+  :Update agent status;
+
+  :Save registry;
+
+  :Display confirmation << Success >>;
+  note right
+    ✓ Agent [name] enabled/disabled
+  end note
+else (no)
+  :Error: Agent not found;
+  stop
+endif
+
+stop
+
+|review-quality|
+start
+
+:User runs ai-use-case review-quality <file>;
+
+:Check if quality-reviewer agent enabled;
+
+if (Agent enabled?) then (no)
+  :Prompt to enable agent;
+
+  if (User enables?) then (no)
+    stop
+  endif
+endif
+
+:Read markdown file;
+
+:Invoke quality-reviewer agent << Agent >>;
+note right
+  Uses Claude API or
+  Claude Code integration
+end note
+
+partition "Quality Analysis" #Plum {
+  :Analyze documentation structure << Agent >>;
+
+  :Check completeness;
+  note right
+    - All required sections present
+    - No placeholders/TODOs
+    - Proper formatting
+  end note
+
+  :Assess technical accuracy;
+  note right
+    - Git metrics correct
+    - Technical details accurate
+    - Code examples valid
+  end note
+
+  :Evaluate clarity;
+  note right
+    - Clear objective
+    - Logical flow
+    - Actionable learnings
+  end note
+
+  :Generate quality report << Agent >>;
+}
+
+:Display quality report << Success >>;
+note right
+  Quality Score: X/100
+
+  Strengths:
+  - [positives]
+
+  Issues:
+  - [areas to improve]
+
+  Suggestions:
+  - [recommendations]
+end note
+
+:Cache result for performance;
+note right
+  Cache key: file hash + timestamp
+end note
+
+stop
+
+@enduml

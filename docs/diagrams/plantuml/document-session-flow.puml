@@ -1,0 +1,146 @@
+@startuml Document Session Flow
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam activity {
+  BackgroundColor<< Success >> #90EE90
+  BackgroundColor<< Action >> #87CEEB
+  BackgroundColor<< AI >> #E6E6FA
+  BackgroundColor<< Git >> #FFE4B5
+  BorderColor #333333
+  FontSize 12
+}
+
+title AI Use Case CLI - Document Session Flow (Claude Code)
+
+start
+
+:User invokes /use-case:document-session;
+note right
+  Slash command in
+  Claude Code
+end note
+
+partition "Session Selection" {
+  :Scan for undocumented work << AI >>;
+  note right
+    - Open/merged PRs without docs
+    - Recent commits (24h)
+    - Current conversation
+  end note
+
+  :Present options to user;
+  note right
+    Priority:
+    1. Undocumented PRs
+    2. Current conversation
+    3. Recent commits
+  end note
+
+  :User selects what to document;
+}
+
+partition "Git Analysis" #LightBlue {
+  if (Source = PR?) then (yes)
+    :Fetch PR details << Git >>;
+    :Get commits in PR;
+    :Get files changed;
+    :Get PR description;
+  elseif (Source = Commit?) then (yes)
+    :Fetch commit details << Git >>;
+    :Get commit message;
+    :Get files changed;
+    :Get diff stats;
+  else (Conversation)
+    :Analyze conversation context << AI >>;
+    :Check for uncommitted changes;
+  endif
+
+  :Extract metadata;
+  note right
+    - Ticket number (from commits/branch)
+    - Files changed
+    - Lines added/removed
+    - Technical decisions
+  end note
+}
+
+partition "AI Analysis & Generation" #Lavender {
+  :Analyze conversation history << AI >>;
+
+  :Identify session type;
+  note right
+    Implementation: Code changes
+    Research: Exploration only
+  end note
+
+  if (Session type?) then (Implementation)
+    :Use TEMPLATE.md structure;
+
+    :Auto-populate all sections << AI >>;
+    note right
+      - TL;DR from commits
+      - Objective from conversation
+      - Technical details from git
+      - Results with metrics
+      - Learnings and insights
+    end note
+  else (Research)
+    :Use TEMPLATE-RESEARCH.md structure;
+
+    :Auto-populate research sections << AI >>;
+    note right
+      - Initial query
+      - Query iterations
+      - Approaches evaluated
+      - Key insights
+      - Final decision
+    end note
+  endif
+
+  :Generate complete documentation;
+  note right
+    NO placeholders or TODOs
+    All sections filled with real data
+  end note
+}
+
+partition "Save and Sync" {
+  :Generate filename;
+  note right
+    Format:
+    YYYY-Www-MM-DD_TICKET-XXX_description.md
+  end note
+
+  :Write file to .usecase/cases/;
+
+  :Git add documentation file << Git >>;
+
+  :Git commit with message << Git >>;
+  note right
+    "docs: AI session YYYY-MM-DD - TICKET-XXX
+
+    [Auto-generated description]
+
+    🤖 Generated with Claude Code
+    Co-Authored-By: Claude <noreply@anthropic.com>"
+  end note
+
+  :Trigger sync to hub;
+  note right
+    Calls ai-use-case sync
+  end note
+}
+
+:Display completion message << Success >>;
+note right
+  ✓ Documentation created
+  ✓ Committed to project
+  ✓ Synced to hub
+
+  File: [filename]
+end note
+
+stop
+
+@enduml

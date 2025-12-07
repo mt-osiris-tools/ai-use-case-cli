@@ -4,6 +4,24 @@ This directory contains architectural diagrams for the AI Use Case CLI project.
 
 ## Available Diagrams
 
+### PlantUML Activity Diagrams (Command Flows)
+
+**Directory:** `plantuml/`
+
+Activity diagrams showing the execution flow of each CLI command:
+
+- **[installation-flow.puml](plantuml/installation-flow.puml)** - Installation process
+- **[init-command-flow.puml](plantuml/init-command-flow.puml)** - `ai-use-case --init` flow
+- **[sync-command-flow.puml](plantuml/sync-command-flow.puml)** - `ai-use-case sync` flow
+- **[document-session-flow.puml](plantuml/document-session-flow.puml)** - `/use-case:document-session` flow
+- **[search-command-flow.puml](plantuml/search-command-flow.puml)** - Search and stats commands
+- **[project-management-flow.puml](plantuml/project-management-flow.puml)** - Project registry commands
+- **[config-command-flow.puml](plantuml/config-command-flow.puml)** - Configuration management
+- **[publish-confluence-flow.puml](plantuml/publish-confluence-flow.puml)** - Confluence publishing
+- **[agent-commands-flow.puml](plantuml/agent-commands-flow.puml)** - Agent framework commands
+
+See **[plantuml/README.md](plantuml/README.md)** for viewing instructions and conventions.
+
 ### C4 Architecture Diagram
 
 **File:** `c4-architecture.puml`

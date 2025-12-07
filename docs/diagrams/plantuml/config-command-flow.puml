@@ -1,0 +1,118 @@
+@startuml Config Command Flow
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam activity {
+  BackgroundColor<< Success >> #90EE90
+  BackgroundColor<< Action >> #87CEEB
+  BackgroundColor<< Config >> #F0E68C
+  BorderColor #333333
+  FontSize 12
+}
+
+title AI Use Case CLI - Config Command Flow
+
+|config show|
+start
+
+:User runs ai-use-case config show;
+
+:Read configuration file;
+note right
+  ~/.config/ai-use-case-cli/config.json
+end note
+
+if (Config exists?) then (yes)
+  :Parse configuration;
+
+  :Display hub settings;
+  note right
+    Shows:
+    - Hub mode (local/private-git)
+    - Hub path
+    - Git URL (if private-git)
+    - Last updated
+  end note
+else (no)
+  :No configuration found;
+  note right
+    Run ai-use-case --init
+    to setup
+  end note
+endif
+
+stop
+
+|config reconfigure|
+start
+
+:User runs ai-use-case config reconfigure;
+
+if (Current config exists?) then (yes)
+  :Display current configuration;
+
+  :Prompt for confirmation;
+  note right
+    "Current configuration
+    will be replaced"
+  end note
+
+  if (User confirms?) then (no)
+    :Reconfiguration cancelled;
+    stop
+  endif
+
+  :Remove old config file;
+endif
+
+:Prompt for hub mode << Config >>;
+note right
+  Choose:
+  1. Local only
+  2. Private git repository
+end note
+
+if (Mode = private-git?) then (yes)
+  :Prompt for git repository URL;
+
+  :Validate git URL format;
+
+  if (Can access repository?) then (yes)
+    :Save git configuration;
+  else (no)
+    :Warning: Cannot access repository;
+    :Continue with configuration;
+    note right
+      User can clone manually later
+    end note
+  endif
+else (no)
+  :Use local directory;
+  note right
+    Default:
+    ~/.local/share/ai-use-case-cli/hub/
+  end note
+endif
+
+:Calculate hub path;
+
+:Save configuration to file << Config >>;
+note right
+  ~/.config/ai-use-case-cli/config.json
+  {
+    "hubMode": "local|private-git",
+    "hubPath": "/path/to/hub",
+    "gitUrl": "https://..." (if applicable)
+  }
+end note
+
+:Display confirmation << Success >>;
+note right
+  ✓ Configuration saved
+  Mode: [local/private-git]
+  Hub: [path]
+end note
+
+stop
+
+@enduml

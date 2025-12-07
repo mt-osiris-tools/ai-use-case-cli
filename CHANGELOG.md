@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **PlantUML Activity Diagrams**: Added comprehensive activity diagrams for all major CLI commands
+  - **New directory**: `docs/diagrams/plantuml/` with 9 PlantUML diagrams
+  - **Diagrams created**:
+    - `installation-flow.puml` - CLI installation process
+    - `init-command-flow.puml` - Project initialization with migration handling
+    - `sync-command-flow.puml` - Documentation sync to hub with symlink creation
+    - `document-session-flow.puml` - AI-powered session documentation
+    - `search-command-flow.puml` - Search and statistics commands
+    - `project-management-flow.puml` - Project registry management (list/check/update)
+    - `config-command-flow.puml` - Hub configuration management
+    - `publish-confluence-flow.puml` - Confluence publishing workflow
+    - `agent-commands-flow.puml` - Agent framework operations
+  - **Documentation**: Created `plantuml/README.md` with viewing instructions and conventions
+  - **Updated**: Main `docs/diagrams/README.md` to index PlantUML diagrams
+  - **Benefits**: Visual documentation of command execution flows, easier onboarding, clearer understanding of complex workflows
+  - **Color coding**: Success (green), Actions (blue), AI operations (lavender), Git operations (yellow), etc.
+
 - **Claude Code Symlink for AI-Tool-Agnostic Commands**: Added symlink compatibility layer for slash command discovery
   - Created `.claude/commands/` symlink pointing to `.ai-tools/commands/` in CLI repository
   - Updated `setup-project.sh` to automatically create `.claude/commands/` symlink in project directories (lines 339-357)
