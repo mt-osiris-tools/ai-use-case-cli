@@ -188,44 +188,44 @@ LEGACY_COMMANDS_DIR="$PROJECT_PATH/.claude/commands/use-case"
 AI_COMMANDS_DIR="$PROJECT_PATH/.ai-tools/commands/use-case"
 CLI_COMMANDS_SOURCE="$CLI_ROOT/.ai-tools/commands/use-case"
 
-# Remove old directory structure if it exists
-# Note: .claude directory is intended to contain only CLI-provided slash command templates,
-# but users may have added custom files. Check for non-standard files before removal.
-if [ -d "$LEGACY_COMMANDS_DIR" ]; then
-    echo -e "${CYAN}Checking .claude directory for custom files...${NC}"
+# Handle .claude directory structure update
+# New structure (v3.12.0+): .claude/commands/ is a directory with use-case/ symlink
+# Old structure: .claude/commands is a full-directory symlink
+if [ -L "$PROJECT_PATH/.claude/commands" ]; then
+    # Old structure: Full-directory symlink
+    echo -e "${CYAN}Detected old .claude/commands symlink structure${NC}"
+    echo -e "${CYAN}Removing old symlink (setup script will create new structure)...${NC}"
+    rm "$PROJECT_PATH/.claude/commands"
+    echo -e "${GREEN}✓${NC} Old .claude/commands symlink removed"
+elif [ -d "$PROJECT_PATH/.claude/commands" ]; then
+    # New structure: Directory with subdirectory symlinks
+    echo -e "${CYAN}Detected new .claude/commands directory structure${NC}"
 
-    # Define expected files (slash command templates in commands/use-case/*.md)
-    EXPECTED_FILES_PATTERN="commands/use-case/*.md"
-
-    # Find all files in .claude
-    ALL_FILES=$(find "$PROJECT_PATH/.claude" -type f 2>/dev/null)
-
-    # Check for unexpected files
-    CUSTOM_FILES_FOUND=false
-    while IFS= read -r file; do
-        # Get relative path from .claude directory
-        REL_PATH="${file#$PROJECT_PATH/.claude/}"
-
-        # Check if file matches expected pattern
-        if [[ ! "$REL_PATH" =~ ^commands/use-case/.*\.md$ ]]; then
-            if [ "$CUSTOM_FILES_FOUND" = false ]; then
-                echo -e "${YELLOW}⚠  Detected custom/non-standard files in .claude:${NC}"
-                CUSTOM_FILES_FOUND=true
+    # Check for custom commands (anything other than use-case/)
+    CUSTOM_COMMANDS_FOUND=false
+    shopt -s nullglob
+    for item in "$PROJECT_PATH/.claude/commands"/*; do
+        if [ "$(basename "$item")" != "use-case" ]; then
+            if [ "$CUSTOM_COMMANDS_FOUND" = false ]; then
+                echo -e "${BLUE}ℹ${NC}  Custom commands detected in .claude/commands/:"
+                CUSTOM_COMMANDS_FOUND=true
             fi
-            echo -e "  - $REL_PATH"
+            echo -e "  - $(basename "$item")"
         fi
-    done <<< "$ALL_FILES"
+    done
+    shopt -u nullglob
 
-    if [ "$CUSTOM_FILES_FOUND" = true ]; then
-        # Create a timestamped backup
-        BACKUP_NAME=".claude-backup-$(date +%Y%m%d-%H%M%S)"
-        cp -a "$PROJECT_PATH/.claude" "$PROJECT_PATH/$BACKUP_NAME"
-        echo -e "${YELLOW}⚠  Backup of .claude created at $BACKUP_NAME${NC}"
-        echo -e "${YELLOW}⚠  Proceeding to remove .claude directory...${NC}"
+    # Remove only use-case symlink/directory (setup script will recreate)
+    if [ -e "$LEGACY_COMMANDS_DIR" ]; then
+        rm -rf "$LEGACY_COMMANDS_DIR"
+        echo -e "${GREEN}✓${NC} Removed old use-case commands (will be refreshed by setup)"
     fi
 
-    rm -rf "$PROJECT_PATH/.claude"
-    echo -e "${GREEN}✓${NC} Old .claude directory removed (will be replaced with .ai-tools)"
+    if [ "$CUSTOM_COMMANDS_FOUND" = true ]; then
+        echo -e "${GREEN}✓${NC} Custom commands preserved"
+    fi
+else
+    echo -e "${CYAN}No .claude/commands structure found (setup will create it)${NC}"
 fi
 
 if [ -d "$AI_COMMANDS_DIR" ]; then
