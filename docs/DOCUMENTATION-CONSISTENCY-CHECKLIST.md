@@ -301,10 +301,11 @@ echo "Validating markdown links in docs/..."
 BROKEN_LINKS=0
 
 # Find all markdown files
-find docs -name "*.md" -type f | while read -r file; do
+# Use process substitution to avoid subshell variable scoping issues
+while read -r file; do
     # Extract relative links: [text](path.md)
     # Using portable grep + sed instead of grep -oP for macOS compatibility
-    grep -o '\[.*\]([^)]*)' "$file" 2>/dev/null | sed 's/.*(\([^)]*\)).*/\1/' | while read -r link; do
+    while read -r link; do
         # Skip external URLs
         if [[ "$link" =~ ^https?:// ]]; then
             continue
@@ -319,8 +320,8 @@ find docs -name "*.md" -type f | while read -r file; do
             echo "❌ Broken link in $file: $link (target: $target)"
             ((BROKEN_LINKS++))
         fi
-    done
-done
+    done < <(grep -o '\[.*\]([^)]*)' "$file" 2>/dev/null | sed 's/.*(\([^)]*\)).*/\1/')
+done < <(find docs -name "*.md" -type f)
 
 if [ $BROKEN_LINKS -eq 0 ]; then
     echo "✅ All markdown links valid"
@@ -349,8 +350,8 @@ MISSING_FILES=0
 # Common file path patterns in documentation
 # Look for: `.claude/path`, `scripts/path`, ` /path/to/file `
 # Using portable grep -oE instead of grep -oP for macOS compatibility
-find docs -name "*.md" -type f -exec grep -oE '`[./][^`]+`' {} \; | \
-    sort -u | while read -r path; do
+# Use process substitution to avoid subshell variable scoping issues
+while read -r path; do
     # Remove backticks
     clean_path=$(echo "$path" | tr -d '`')
 
@@ -364,7 +365,7 @@ find docs -name "*.md" -type f -exec grep -oE '`[./][^`]+`' {} \; | \
         echo "⚠️  Referenced path may not exist: $clean_path"
         ((MISSING_FILES++))
     fi
-done
+done < <(find docs -name "*.md" -type f -exec grep -oE '`[./][^`]+`' {} \; | sort -u)
 
 if [ $MISSING_FILES -eq 0 ]; then
     echo "✅ All file paths appear valid"
@@ -407,19 +408,14 @@ echo "✅ Template consistency check complete"
 
 **4. Integration Script** (`scripts/utils/validate-docs.sh`)
 
-**Note**: This example shows the master script calling individual validators. In practice, you would either:
-- Create separate validator scripts (`validate-docs-links.sh`, `validate-docs-paths.sh`, `validate-docs-templates.sh`)
-- Or implement all validation logic within this single script using internal functions
+**Note**: This example shows a master script with internal validation functions. Alternatively, you could create separate scripts (`validate-docs-links.sh`, `validate-docs-paths.sh`, `validate-docs-templates.sh`) and call those instead.
 
 ```bash
 #!/usr/bin/env bash
-# Master documentation validation script
-# This example assumes separate validator scripts exist, or that you'll implement
-# the validation logic as internal functions within this script
+# Master documentation validation script with internal validation functions
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 
@@ -442,6 +438,66 @@ EXAMPLES:
 EOF
 }
 
+# Validation function: Check for broken markdown links
+function validate_links() {
+    echo "Checking markdown links..."
+    local broken_count=0
+
+    while read -r file; do
+        while read -r link; do
+            # Skip external URLs
+            [[ "$link" =~ ^https?:// ]] && continue
+
+            # Check if local file exists
+            local target="$(dirname "$file")/$link"
+            if [ ! -f "$target" ]; then
+                echo "  ❌ Broken link in $file: $link"
+                ((broken_count++))
+            fi
+        done < <(grep -o '\[.*\]([^)]*)' "$file" 2>/dev/null | sed 's/.*(\([^)]*\)).*/\1/')
+    done < <(find docs -name "*.md" -type f)
+
+    [ $broken_count -eq 0 ] && echo "  ✅ All links valid" && return 0
+    echo "  ❌ Found $broken_count broken link(s)" && return 1
+}
+
+# Validation function: Check file path references
+function validate_paths() {
+    echo "Checking file path references..."
+    local missing_count=0
+
+    while read -r path; do
+        local clean_path=$(echo "$path" | tr -d '`')
+        [[ "$clean_path" =~ ^(\./|/) ]] && continue  # Skip command-like paths
+
+        if [ ! -f "$clean_path" ] && [ ! -d "$clean_path" ]; then
+            echo "  ⚠️  Missing: $clean_path"
+            ((missing_count++))
+        fi
+    done < <(find docs -name "*.md" -exec grep -oE '`[./][^`]+`' {} \; | sort -u)
+
+    [ $missing_count -eq 0 ] && echo "  ✅ All paths valid" && return 0
+    echo "  ⚠️  Found $missing_count potentially missing path(s)" && return 0  # Warn only
+}
+
+# Validation function: Check template consistency
+function validate_templates() {
+    echo "Checking template consistency..."
+
+    # Extract section headers from both templates
+    local sections1=$(grep "^## " docs/TEMPLATE.md | sed 's/^## //')
+    local sections2=$(grep "^## " docs/TEMPLATE-RESEARCH.md | sed 's/^## //')
+
+    if diff <(echo "$sections1") <(echo "$sections2") >/dev/null 2>&1; then
+        echo "  ✅ Templates have consistent sections"
+        return 0
+    else
+        echo "  ⚠️  Templates have different sections (may be intentional)"
+        return 0  # Don't fail, just warn
+    fi
+}
+
+# Parse command line arguments
 VALIDATE_LINKS=false
 VALIDATE_PATHS=false
 VALIDATE_TEMPLATES=false
@@ -468,23 +524,24 @@ while [ $# -gt 0 ]; do
     shift
 done
 
+# Run selected validations
 EXIT_CODE=0
 
 if [ "$VALIDATE_LINKS" = true ]; then
     echo "=== Validating Links ==="
-    "$SCRIPT_DIR/validate-docs.sh" --links || EXIT_CODE=1
+    validate_links || EXIT_CODE=1
     echo ""
 fi
 
 if [ "$VALIDATE_PATHS" = true ]; then
     echo "=== Validating Paths ==="
-    "$SCRIPT_DIR/validate-docs.sh" --paths || EXIT_CODE=1
+    validate_paths || EXIT_CODE=1
     echo ""
 fi
 
 if [ "$VALIDATE_TEMPLATES" = true ]; then
     echo "=== Validating Templates ==="
-    "$SCRIPT_DIR/validate-docs.sh" --templates || EXIT_CODE=1
+    validate_templates || EXIT_CODE=1
     echo ""
 fi
 
