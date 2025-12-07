@@ -340,19 +340,20 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
     # Claude Code only discovers commands in .claude/commands/, not .ai-tools/commands/
     # This symlink enables Claude Code to find our AI-tool-agnostic commands
     CLAUDE_SYMLINK="$PROJECT_PATH/.claude/commands"
+    EXPECTED_LINK_TARGET="../.ai-tools/commands"
     if [ ! -e "$CLAUDE_SYMLINK" ]; then
         mkdir -p "$PROJECT_PATH/.claude"
-        ln -s ../.ai-tools/commands "$CLAUDE_SYMLINK"
+        ln -s "$EXPECTED_LINK_TARGET" "$CLAUDE_SYMLINK"
         echo -e "${GREEN}✓${NC} Created Claude Code symlink: .claude/commands → .ai-tools/commands"
     elif [ ! -L "$CLAUDE_SYMLINK" ]; then
         echo -e "${YELLOW}⚠${NC} .claude/commands exists but is not a symlink (skipping)"
     else
         # Symlink exists, verify it points to the right place
         LINK_TARGET=$(readlink "$CLAUDE_SYMLINK")
-        if [ "$LINK_TARGET" = "../.ai-tools/commands" ]; then
+        if [ "$LINK_TARGET" = "$EXPECTED_LINK_TARGET" ]; then
             echo -e "${GREEN}✓${NC} Claude Code symlink already configured"
         else
-            echo -e "${YELLOW}⚠${NC} Claude Code symlink points to: $LINK_TARGET (expected: ../.ai-tools/commands)"
+            echo -e "${YELLOW}⚠${NC} Claude Code symlink points to: $LINK_TARGET (expected: $EXPECTED_LINK_TARGET)"
         fi
     fi
 else
