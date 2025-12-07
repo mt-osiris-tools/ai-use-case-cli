@@ -76,6 +76,7 @@ cd ~/.local/share/ai-use-case-cli
    ```bash
    ai-use-case --init
    ```
+   This creates `.usecase/cases/`, installs git hooks, copies slash commands to `.ai-tools/commands/`, and creates a `.claude/commands/` symlink for Claude Code compatibility.
 
 2. **Work on your code with AI assistance** (GitHub Copilot, Claude Code, or other AI tools)
 
