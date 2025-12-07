@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Documentation**: Created `plantuml/README.md` with viewing instructions and conventions
   - **Updated**: Main `docs/diagrams/README.md` to index PlantUML diagrams
   - **Benefits**: Visual documentation of command execution flows, easier onboarding, clearer understanding of complex workflows
-  - **Color coding**: Success (green), Actions (blue), AI operations (lavender), Git operations (yellow), etc.
+  - **Color coding**: Success (Green #90EE90), Actions (Light Blue #87CEEB), AI operations (Lavender #E6E6FA), Git operations (Yellow #FFFF99), etc. See `docs/diagrams/plantuml/README.md` for full color conventions.
 
 - **Agent Framework Component Diagram**: Added new C4 Component Diagram for Agent Framework
   - Shows internal components: agent-registry.sh, invoke-agent.sh, quality-agent.sh, and agent prompts

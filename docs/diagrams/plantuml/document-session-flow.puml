@@ -109,7 +109,7 @@ partition "Save and Sync" {
   :Generate filename;
   note right
     Format:
-    YYYY-Www-MM-DD_TICKET-XXX_description.md
+    YYYY-Www-MM-DD_TICKET-XXXXX_description.md
   end note
 
   :Write file to .usecase/cases/;
