@@ -100,6 +100,8 @@ Visit: https://www.plantuml.com/plantuml/uml/
 - **Pink (#FFB6C1)**: Migration/special handling
 - **Light Yellow (#FFE4B5)**: Git operations
 - **Light Green (#98FB98)**: Search operations
+- **Light Steel Blue (#B0C4DE)**: Confluence operations
+- **Plum (#DDA0DD)**: Agent operations
 
 ### Annotations
 
@@ -111,6 +113,9 @@ Visit: https://www.plantuml.com/plantuml/uml/
 - **<<Update>>**: Update operation
 - **<<Config>>**: Configuration change
 - **<<Search>>**: Search operation
+- **<<Processing>>**: Data processing operation
+- **<<Confluence>>**: Confluence-specific operation
+- **<<Agent>>**: Agent framework operation
 
 ### Partitions
 

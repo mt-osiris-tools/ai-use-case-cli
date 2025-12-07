@@ -19,8 +19,7 @@ start
 
 :Read agent registry;
 note right
-  ~/.local/share/ai-use-case-cli/
-  agents-registry.json
+  ~/.config/ai-use-case-cli/agents.json
 end note
 
 if (Registry exists?) then (yes)
