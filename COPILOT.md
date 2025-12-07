@@ -3,7 +3,7 @@
 ## Project Structure & Module Organization
 - Entry point: `ai-use-case` shell script at repo root; core workflows live in `scripts/core/` (`document-ai-session.sh`, `sync-ai-use-cases.sh`, `extract-session-data.sh`, `publish-confluence.sh`).
 - Project/system helpers: `scripts/utils/` (versioning, config manager, tracing, self-update, validation) and `scripts/project/` (setup, registry, update, list, check-updates).
-- Agent scaffolding: `scripts/agents/` for registry and invoker logic; `.ai-tools/commands/` holds Claude slash-command definitions.
+- Agent scaffolding: `scripts/agents/` for registry and invoker logic; `.ai-tools/commands/` holds AI assistant slash-command definitions.
 - Documentation and templates: `docs/` (developer guides, diagrams) and `templates/` (Confluence templates). Example data lives in `.usecase/cases/`.
 
 ## Build, Test, and Development Commands
@@ -16,6 +16,7 @@
 - Bash-first codebase; keep `set -e` (and `-u`/`-o pipefail` when safe) at the top of new scripts. Prefer 4-space indentation in functions and align wrapped command flags.
 - Use `snake_case` for shell functions, uppercase for environment variables, and kebab-case for files/scripts.
 - Keep user-facing output concise and colored as existing scripts do; log paths and decisions explicitly.
+- **Color output**: Always use `echo -e` when outputting ANSI color escape sequences (e.g., `echo -e "${CYAN}text${NC}"`). Using `echo` without `-e` will display literal escape codes instead of colors.
 - Respect single source of truth: `scripts/utils/version.sh` for versions, `scripts/utils/config-manager.sh` for config reads/writes.
 
 ## Testing Guidelines
