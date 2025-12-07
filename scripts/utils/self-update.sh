@@ -99,7 +99,7 @@ CURRENT_VERSION=$(grep 'export CLI_VERSION=' "$CLI_ROOT/scripts/utils/version.sh
 
 echo "Current installation:"
 echo "  Location: $CLI_ROOT"
-echo "  Version: ${CYAN}$CURRENT_VERSION${NC}"
+echo -e "  Version: ${CYAN}$CURRENT_VERSION${NC}"
 echo "  Branch: $CURRENT_BRANCH"
 echo "  Commit: $CURRENT_COMMIT"
 echo ""

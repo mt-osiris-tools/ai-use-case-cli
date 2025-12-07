@@ -9,9 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **AI Assistant Repository Guidelines**: Added `COPILOT.md` with comprehensive guidelines for AI coding assistants
+  - Project structure and module organization reference
+  - Build, test, and development command examples
+  - Coding style and naming conventions (bash, snake_case, kebab-case)
+  - Testing guidelines for local smoke tests
+  - Commit and PR workflow guidelines
+  - Explicit guidance to use `echo -e` for ANSI color codes
+  - Helps AI assistants (GitHub Copilot, Claude Code, etc.) understand repo patterns and contribute effectively
+
 ### Changed
 
 ### Fixed
+
+- **Self-Update Color Rendering**: Fixed ANSI color codes displaying as literal text in `scripts/utils/self-update.sh`
+  - Changed `echo` to `echo -e` at line 102 to properly interpret color escape sequences
+  - Version display now correctly shows cyan-colored version number instead of `\033[0;36m3.11.0\033[0m`
+  - Improves user experience when running `ai-use-case update`
 
 ## [3.11.0] - 2025-12-07
 
