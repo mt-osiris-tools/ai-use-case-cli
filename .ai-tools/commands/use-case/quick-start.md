@@ -56,8 +56,15 @@ ai-use-case --init
 Tell the user:
 - ✅ `.usecase/cases/` directory created in their project
 - ✅ Git post-commit hook installed for auto-syncing
+- ✅ Slash commands copied to `.ai-tools/commands/use-case/` (11 commands)
+- ✅ `.claude/commands/` symlink created for Claude Code discovery
 - ✅ `.gitignore` patterns added for draft files
 - ✅ CLI tools ready for use
+
+**Slash Command Discovery:**
+- Commands stored in `.ai-tools/commands/use-case/` (AI-tool-agnostic)
+- Symlink at `.claude/commands/` enables Claude Code to find them
+- Verify: `ls -la .claude/commands` should show symlink → `../.ai-tools/commands`
 
 ### 7. Show Available Commands
 

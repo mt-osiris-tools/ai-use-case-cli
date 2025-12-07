@@ -37,6 +37,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Quick Start Documentation Enhanced**: Updated all quick start sections to reflect symlink architecture and recent features
+  - **README.md**: Updated step 1 to explain what `ai-use-case --init` creates (including `.claude/commands/` symlink)
+  - **docs/CLAUDE.md**: Added symlink creation and slash command copying to setup-project.sh description
+  - **.ai-tools/commands/use-case/quick-start.md**: Enhanced step 6 with detailed slash command discovery explanation and verification commands
+  - All quick start sections now mention `.claude/commands/` symlink for Claude Code compatibility
+  - Users understand how slash commands are discovered, stored, and verified after setup
+
 - **Architecture Diagrams Updated for Agent Framework and AI Tool Agnosticism**: Updated all C4 diagrams to reflect recent architectural changes
   - **C4 Context Diagram**: Generalized "Claude Code" to "AI Coding Assistants" with examples (Claude Code, GitHub Copilot, etc.)
   - **C4 Container Diagram**:
