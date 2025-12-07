@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Agent Framework Component Diagram**: Added new C4 Component Diagram for Agent Framework
+  - Shows internal components: agent-registry.sh, invoke-agent.sh, quality-agent.sh, and agent prompts
+  - Visualizes agent lifecycle management, invocation flow, and integration points
+  - Includes notes on key features (caching, statistics, timeout handling) and registry management
+  - Located at `docs/diagrams/AI Use Case CLI - C4 Component Diagram (Agent Framework).svg`
+  - Part of comprehensive architecture documentation
+
 ### Changed
 
 - **Claude Code Symlink Strategy - Subdirectory Level**: Changed from full-directory to subdirectory-level symlink to preserve custom commands
@@ -26,13 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Updated documentation**: README.md, CLAUDE.md, and docs/CLAUDE.md reflect new subdirectory symlink approach
   - **Updated .gitignore**: Added `.claude/commands/` to prevent tracking generated symlinks in CLI repo
   - **Fixed progress tracker bug**: Corrected task name mismatch in UPDATE_MODE ("Update Claude Code slash commands" → "Update AI tool slash commands")
-
-- **Agent Framework Component Diagram**: Added new C4 Component Diagram for Agent Framework
-  - Shows internal components: agent-registry.sh, invoke-agent.sh, quality-agent.sh, and agent prompts
-  - Visualizes agent lifecycle management, invocation flow, and integration points
-  - Includes notes on key features (caching, statistics, timeout handling) and registry management
-  - Located at `docs/diagrams/AI Use Case CLI - C4 Component Diagram (Agent Framework).svg`
-  - Part of comprehensive architecture documentation
 
 - **AI Assistant Repository Guidelines**: Added `COPILOT.md` with comprehensive guidelines for AI coding assistants
   - Project structure and module organization reference
