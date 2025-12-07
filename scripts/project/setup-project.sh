@@ -343,6 +343,20 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
     CLAUDE_USECASE_SYMLINK="$CLAUDE_COMMANDS_DIR/use-case"
     EXPECTED_LINK_TARGET="../../.ai-tools/commands/use-case"
 
+    # Migrate from old full-directory symlink structure (if needed)
+    if [ -L "$CLAUDE_COMMANDS_DIR" ]; then
+        OLD_TARGET=$(readlink "$CLAUDE_COMMANDS_DIR")
+        echo -e "${BLUE}Detected old symlink structure: .claude/commands → $OLD_TARGET${NC}"
+        echo -e "${BLUE}Migrating to new subdirectory symlink structure...${NC}"
+
+        # Remove old symlink
+        rm "$CLAUDE_COMMANDS_DIR"
+        echo -e "${GREEN}✓${NC} Removed old full-directory symlink"
+
+        # Create new directory structure (will be created below)
+        echo -e "${GREEN}✓${NC} Migration prepared - will create new structure"
+    fi
+
     # Ensure .claude/commands/ directory exists
     if [ ! -d "$CLAUDE_COMMANDS_DIR" ]; then
         mkdir -p "$CLAUDE_COMMANDS_DIR"
