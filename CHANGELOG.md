@@ -27,6 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Installation Banner Display Improved**: Enhanced installer UX with persistent banner visibility
+  - Banner now clears screen and displays at installation start
+  - Banner refreshes after git operations complete
+  - Banner redisplays with completion message at installation end
+  - Provides consistent visual feedback throughout installation process
+  - Users see the branded banner at key transition points instead of it scrolling away
+
 - **FEATURE-002 Implementation Checklist Updated**: Marked Phase 1-2 as complete in intelligent agents integration checklist
   - Updated `docs/features/intelligent-agents-integration/03-implementation-checklist.md` to reflect completion status
   - **Phase 1 (Agent Framework)**: Marked 35/35 tasks complete (100%) - merged in PR #116 on 2025-12-03, released in v3.11.0 on 2025-12-07
