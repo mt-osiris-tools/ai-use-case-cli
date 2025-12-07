@@ -35,8 +35,6 @@ partition "Find Use Case Files" {
   note right
     Exclude:
     - README.md
-    - *.draft.md
-    - *.local.md
   end note
 
   if (Files found?) then (no)
