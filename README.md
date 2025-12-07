@@ -97,6 +97,27 @@ cd ~/.local/share/ai-use-case-cli
 
 ## Usage
 
+### Slash Commands for AI Coding Assistants
+
+This CLI provides slash commands for AI coding assistants like Claude Code and GitHub Copilot. After running `ai-use-case --init`, slash commands are automatically available in your project.
+
+**How it works:**
+- Commands are stored in `.ai-tools/commands/use-case/` (AI-tool-agnostic location)
+- A symlink at `.claude/commands/` points to `.ai-tools/commands/` for Claude Code compatibility
+- Claude Code automatically discovers commands from `.claude/commands/`
+- Use slash commands like `/use-case:document-session` directly in your AI assistant
+
+**Setup:**
+```bash
+ai-use-case --init  # Automatically creates symlink for Claude Code
+```
+
+**Verification:**
+```bash
+ls -la .claude/commands    # Should show: .claude/commands → ../.ai-tools/commands
+ls .ai-tools/commands/use-case/  # Should list all available commands
+```
+
 ### Core Commands
 
 Use **either** standalone CLI or Claude Code slash commands—whatever fits your workflow:

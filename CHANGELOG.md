@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Claude Code Symlink for AI-Tool-Agnostic Commands**: Added symlink compatibility layer for slash command discovery
+  - Created `.claude/commands/` symlink pointing to `.ai-tools/commands/` in CLI repository
+  - Updated `setup-project.sh` to automatically create `.claude/commands/` symlink in project directories (lines 339-357)
+  - **How it works**: Commands stored in `.ai-tools/commands/use-case/` (AI-tool-agnostic source), symlink at `.claude/commands/` enables Claude Code discovery
+  - **Automatic setup**: `ai-use-case --init` creates symlink automatically with verification logic
+  - **Smart handling**: Checks if symlink exists, validates target path, provides clear feedback for existing non-symlink directories
+  - **Documentation**: Added "Slash Commands for AI Coding Assistants" section to README.md and CLAUDE.md explaining symlink architecture
+  - **Compatibility**: Maintains AI-tool-agnostic architecture while ensuring Claude Code can discover commands from its expected `.claude/commands/` directory
+  - Resolves issue where Claude Code couldn't find commands after v3.11.0 migration from `.claude/` to `.ai-tools/`
+
 - **Agent Framework Component Diagram**: Added new C4 Component Diagram for Agent Framework
   - Shows internal components: agent-registry.sh, invoke-agent.sh, quality-agent.sh, and agent prompts
   - Visualizes agent lifecycle management, invocation flow, and integration points

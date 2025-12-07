@@ -141,6 +141,22 @@ ai-use-case check-updates       # Check for outdated projects
 /use-case:check-updates      # Check updates
 ```
 
+**How Commands Are Discovered:**
+
+Commands are stored in `.ai-tools/commands/use-case/` (AI-tool-agnostic) with a symlink at `.claude/commands/` for Claude Code compatibility:
+
+```bash
+.ai-tools/commands/use-case/    # Source of truth (AI-tool-agnostic)
+.claude/commands/               # Symlink for Claude Code discovery
+```
+
+Claude Code automatically discovers commands from `.claude/commands/`. The `ai-use-case --init` command creates this symlink automatically in project directories.
+
+**Verification:**
+```bash
+ls -la .claude/commands         # Should show symlink → ../.ai-tools/commands
+```
+
 ## File Structure
 
 ```
@@ -152,6 +168,7 @@ ai-use-case check-updates       # Check for outdated projects
 │   ├── hub/                       # view-hub.sh, push-hub.sh
 │   └── utils/                     # version.sh, config-manager.sh
 ├── .ai-tools/commands/use-case/   # Slash commands for AI assistants
+├── .claude/commands/              # Symlink → ../.ai-tools/commands (Claude Code compatibility)
 └── docs/                          # Documentation
     ├── WORKFLOW.md                # Workflow guide (NEW)
     ├── COMMANDS.md                # Command reference (NEW)
