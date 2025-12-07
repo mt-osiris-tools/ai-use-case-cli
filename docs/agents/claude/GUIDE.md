@@ -764,7 +764,7 @@ ai-use-case tracing status
 - `scripts/utils/tracing.sh`: Shell wrapper for bash instrumentation (351 lines)
 - `docs/TRACING.md`: Comprehensive documentation (409 lines)
 
-See [docs/TRACING.md](TRACING.md) for complete setup and usage guide.
+See [docs/TRACING.md](../../TRACING.md) for complete setup and usage guide.
 
 ## Version History
 
