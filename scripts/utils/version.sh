@@ -18,9 +18,11 @@
 # 4. Commit with message: "chore: bump version to X.Y.Z"
 
 # Current CLI version
-export CLI_VERSION="3.10.0"
+export CLI_VERSION="3.11.0"
 
 # Version history (for reference)
+# 3.11.0 - 2025-12-07 - Template-based docs, AI-tool-agnostic refactoring, PR #135 integration
+# 3.10.0 - 2025-12-01 - Claude Agent usage tracking
 # 3.9.1 - 2025-11-15 - Fix JSON parsing and script permissions
 # 3.9.0 - 2025-11-13 - Development git hooks installer
 # 3.8.0 - 2025-11-13 - Command-specific progress tracking
