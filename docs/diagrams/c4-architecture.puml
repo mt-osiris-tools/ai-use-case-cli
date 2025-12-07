@@ -51,7 +51,7 @@ System_Boundary(ai_use_case_system, "AI Use Case CLI System") {
 
     Container(ai_integration, "AI Assistant Integration", "Markdown", "Slash command definitions for AI-assisted automation (Claude Code, Copilot, etc.)")
 
-    Container(agent_framework, "Agent Framework", "Bash + Python", "Agent lifecycle management, invocation, caching, and statistics tracking")
+    Container(agent_framework, "Agent Framework", "Bash", "Agent lifecycle management, invocation, caching, and statistics tracking")
 
     Container(git_hooks, "Git Hooks", "Bash", "Pre-commit (branch protection) and post-commit (auto-sync)")
 
