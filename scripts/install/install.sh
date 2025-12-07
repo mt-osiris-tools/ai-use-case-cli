@@ -295,9 +295,6 @@ if [ "$RUN_CONFIG_AFTER" = true ]; then
 fi
 
 # Clear and show banner again with completion message
-echo ""
-echo -e "${BLUE}════════════════════════════════════════════════════════════════════${NC}"
-echo ""
 clear
 print_banner
 echo -e "${GREEN}=== Installation Complete! ===${NC}"
