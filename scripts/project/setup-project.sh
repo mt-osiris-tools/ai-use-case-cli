@@ -117,6 +117,7 @@ CLI_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 CENTRAL_DIR=$(ensure_hub_exists)
 POST_COMMIT_HOOK_SOURCE="$CLI_ROOT/git-hooks/post-commit"
 PRE_COMMIT_HOOK_SOURCE="$CLI_ROOT/git-hooks/pre-commit"
+SESSION_END_HOOK_SOURCE="$CLI_ROOT/claude-hooks/SessionEnd"
 SYNC_SCRIPT="$CLI_ROOT/scripts/core/sync-ai-use-cases.sh"
 
 # Parse flags
@@ -481,6 +482,47 @@ else
     chmod +x "$PRE_COMMIT_HOOK"
     echo -e "${GREEN}✓${NC} Git pre-commit hook installed (prevents direct commits to main)"
 fi
+
+# Install Claude Code SessionEnd hook
+CLAUDE_HOOKS_DIR=".claude/hooks"
+mkdir -p "$CLAUDE_HOOKS_DIR"
+SESSION_END_HOOK="$CLAUDE_HOOKS_DIR/SessionEnd"
+
+if [ -f "$SESSION_END_HOOK_SOURCE" ]; then
+    if [ -f "$SESSION_END_HOOK" ]; then
+        # Check if existing hook matches our template
+        if cmp -s "$SESSION_END_HOOK" "$SESSION_END_HOOK_SOURCE"; then
+            if [ "$VERBOSE" = true ]; then
+                echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook already up-to-date"
+            fi
+        else
+            # Backup existing hook if it has customizations
+            if [ "$UPDATE_MODE" = true ]; then
+                echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook contains customizations"
+                echo -e "  ${YELLOW}→${NC} Backup created at: $SESSION_END_HOOK.backup"
+                cp "$SESSION_END_HOOK" "$SESSION_END_HOOK.backup"
+                cp "$SESSION_END_HOOK_SOURCE" "$SESSION_END_HOOK"
+                chmod +x "$SESSION_END_HOOK"
+                echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook updated"
+            else
+                echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook differs from template"
+            fi
+        fi
+    else
+        # Install fresh hook
+        cp "$SESSION_END_HOOK_SOURCE" "$SESSION_END_HOOK"
+        chmod +x "$SESSION_END_HOOK"
+        echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook installed"
+    fi
+else
+    if [ "$VERBOSE" = true ]; then
+        echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook source not found: $SESSION_END_HOOK_SOURCE"
+        echo -e "  ${BLUE}ℹ${NC} This feature may not be available in your CLI version"
+    fi
+fi
+
+# Create session stats directory
+mkdir -p ".usecase/session-stats"
 
 if [ "$PROGRESS_ENABLED" = true ]; then
     if [ "$UPDATE_MODE" = true ]; then

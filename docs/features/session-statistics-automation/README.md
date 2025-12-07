@@ -1,7 +1,7 @@
 # Session Statistics Automation
 
 **Status**: Implemented
-**Version**: 3.4.0+
+**Version**: 3.12.0+
 **Date**: 2025-12-07
 
 ## Overview

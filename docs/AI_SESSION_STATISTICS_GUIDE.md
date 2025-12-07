@@ -478,7 +478,7 @@ ai-use-case search "authentication"
 
 ## Automated Session Statistics Capture
 
-**New in Version 3.4+**: The CLI now supports automatic capture of Claude Code session statistics!
+**New in Version 3.12+**: The CLI now supports automatic capture of Claude Code session statistics!
 
 ### SessionEnd Hook
 
