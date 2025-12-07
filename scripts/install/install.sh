@@ -206,9 +206,6 @@ else
 fi
 
 # Refresh banner after git operations
-echo ""
-echo -e "${BLUE}════════════════════════════════════════════════════════════════════${NC}"
-echo ""
 clear
 print_banner
 echo -e "${BLUE}=== Installation ===${NC}"
