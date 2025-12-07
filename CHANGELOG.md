@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+### Fixed
+
+## [3.11.0] - 2025-12-07
+
 ### Changed
 
 - **Template-Based Documentation Generation**: Refactored `document-ai-session.sh` to read and populate template files instead of using inline heredoc
@@ -53,6 +61,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Markdown Conversion Warnings**: Added pre-publish warnings for unsupported markdown features in `publish-confluence.sh` (PR #135 review feedback)
+  - Detects code blocks (```), tables (|), and images (![]()) before publishing
+  - Warns users about potential formatting issues
+  - Suggests manual formatting in Confluence for complex content
+  - Lines added: 394-411
+- **Confluence Integration Documentation**: Enhanced `docs/CONFLUENCE-INTEGRATION.md` with implementation cross-references (PR #135 review feedback)
+  - Added reference to `publish-confluence.sh` lines 326-346 (conversion logic)
+  - Added reference to lines 394-411 (warning system)
+  - Helps users find detailed implementation notes and understand markdown limitations
 - **C4 Architecture Diagrams**: Added comprehensive architecture diagrams using PlantUML and C4 model
   - **System Context Diagram**: Shows AI Use Case CLI system interactions with users and external systems
   - **Container Diagram**: Details internal containers (CLI Dispatcher, Core Scripts, Project Management, etc.)
@@ -161,6 +178,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Template-Based Documentation Generation**: Fixed multiple issues in `document-ai-session.sh` (PR #135 review feedback)
+  - **sed delimiter issues**: Changed all ~40 sed commands to use pipe (|) delimiter instead of forward slash (/)
+    - Now safely handles user input containing forward slashes (URLs, file paths)
+    - Added comprehensive inline documentation with examples and maintenance guidance
+  - **awk pattern matching**: Fixed inconsistent section header matching for AI Agents
+    - Pattern was looking for bold markdown (`\*\*Time saved by agents:`) but template uses plain text
+    - Updated both research and implementation template processing (lines 797, 900)
+  - **Template field mismatches**: Updated sed patterns to match current template structure
+    - "Agent Used" → "AI Tool Used" (matches TEMPLATE.md line 13)
+    - "# 🎯 Claude Code:" → "# 🎯 AI-Assisted:" (matches updated header)
+  - **Variable naming accuracy**: Renamed `most_valuable_agent` → `most_invoked_agent`
+    - Variable tracks invocation count (quantity), not subjective value (quality)
+    - More accurate self-documenting code (lines 678, 690, 699, 700)
+- **Temp File Security**: Fixed insecure temporary file creation in `config-manager.sh` (PR #135 review feedback)
+  - Changed 3 mktemp calls to use secure directory specification
+  - Now uses: `mktemp "$CONFIG_DIR/config.json.XXXXXX"` instead of `mktemp`
+  - Prevents security vulnerabilities from using default /tmp location
+  - Lines affected: 361, 433, 652
 - **Commit Message Format**: Aligned commit message format with AI tool attribution for consistency and transparency
   - Shell script (`document-ai-session.sh`) now uses multi-line commit format matching Claude Code slash command
   - Dynamic AI attribution footer based on tool selection (Claude Code, Copilot, or both)
