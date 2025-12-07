@@ -360,7 +360,7 @@ ai-use-case agents stats
 - **Result Caching** - Fast repeated operations
 - **Zero Overhead** - < 10ms impact on existing commands
 
-For complete documentation, see **[docs/AGENTS.md](docs/AGENTS.md)**
+For complete documentation, see **[docs/agents/framework/README.md](docs/agents/framework/README.md)**
 
 ## Examples
 

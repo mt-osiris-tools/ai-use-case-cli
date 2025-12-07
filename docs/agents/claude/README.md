@@ -1,9 +1,9 @@
 # AI Use Case CLI - AI Assistant Guide
 
 **Quick reference for AI coding assistants (Claude Code, GitHub Copilot, etc.).** For detailed guides, see:
-- **[docs/WORKFLOW.md](docs/WORKFLOW.md)** - Branch workflow, version management, PR checklist
-- **[docs/COMMANDS.md](docs/COMMANDS.md)** - Complete command reference
-- **[docs/CLAUDE.md](docs/CLAUDE.md)** - Comprehensive guide
+- **[docs/WORKFLOW.md](../../WORKFLOW.md)** - Branch workflow, version management, PR checklist
+- **[docs/COMMANDS.md](../../COMMANDS.md)** - Complete command reference
+- **[Comprehensive Guide](GUIDE.md)** - Comprehensive guide
 
 ## Repository Purpose
 
@@ -22,7 +22,7 @@ Supports: local-only (no git) or private git repository.
 ### 🚨 Mandatory Workflow
 
 1. **Branch-based only** - Never commit directly to `main`
-2. **Version bumps** - Update ALL references when bumping (see [docs/VERSION-UPDATE-CHECKLIST.md](docs/VERSION-UPDATE-CHECKLIST.md))
+2. **Version bumps** - Update ALL references when bumping (see [docs/VERSION-UPDATE-CHECKLIST.md](../../VERSION-UPDATE-CHECKLIST.md))
 3. **Documentation** - MUST update CHANGELOG.md and README.md for all changes
 
 ```bash
@@ -34,7 +34,7 @@ git push -u origin feature/description
 gh pr create
 ```
 
-See **[docs/WORKFLOW.md](docs/WORKFLOW.md)** for complete workflow guide.
+See **[docs/WORKFLOW.md](../../WORKFLOW.md)** for complete workflow guide.
 
 ### 📋 Pre-PR Checklist
 
@@ -109,11 +109,11 @@ mv 03-implementation-checklist.md [feature-name]-checklist.md
 - ✅ **Documentation** of design decisions
 - ✅ **Knowledge transfer** for maintainers
 
-**Full guide**: [docs/features/README.md](docs/features/README.md)
+**Full guide**: [docs/features/README.md](../../features/README.md)
 
 ## Quick Command Reference
 
-**Full reference:** [docs/COMMANDS.md](docs/COMMANDS.md)
+**Full reference:** [docs/COMMANDS.md](../../COMMANDS.md)
 
 ### Most Common Commands
 
@@ -239,15 +239,15 @@ Examples:
 **Commit Style**: Conventional commits (feat:, fix:, docs:)
 
 **📚 Documentation:**
-- **[docs/WORKFLOW.md](docs/WORKFLOW.md)** - Branch workflow, PR checklist, patterns
-- **[docs/COMMANDS.md](docs/COMMANDS.md)** - Complete command reference
-- **[docs/CLAUDE.md](docs/CLAUDE.md)** - Comprehensive guide
-- **[docs/VERSION-MANAGEMENT.md](docs/VERSION-MANAGEMENT.md)** - Version bumps
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Contribution guidelines
-- **[README.md](README.md)** - User-facing documentation
+- **[docs/WORKFLOW.md](../../WORKFLOW.md)** - Branch workflow, PR checklist, patterns
+- **[docs/COMMANDS.md](../../COMMANDS.md)** - Complete command reference
+- **[Comprehensive Guide](GUIDE.md)** - Comprehensive guide
+- **[docs/VERSION-MANAGEMENT.md](../../VERSION-MANAGEMENT.md)** - Version bumps
+- **[CONTRIBUTING.md](../../../CONTRIBUTING.md)** - Contribution guidelines
+- **[README.md](../../../README.md)** - User-facing documentation
 
 **🔍 When to use which doc:**
 - Quick reference needed? → This file (CLAUDE.md)
-- Need workflow details? → [docs/WORKFLOW.md](docs/WORKFLOW.md)
-- Looking for a command? → [docs/COMMANDS.md](docs/COMMANDS.md)
-- Deep dive required? → [docs/CLAUDE.md](docs/CLAUDE.md)
+- Need workflow details? → [docs/WORKFLOW.md](../../WORKFLOW.md)
+- Looking for a command? → [docs/COMMANDS.md](../../COMMANDS.md)
+- Deep dive required? → [Comprehensive Guide](GUIDE.md)

@@ -83,7 +83,7 @@ Before creating a pull request, ensure you have completed:
 - [ ] **MANDATORY: Validate version consistency** - Run `./scripts/utils/validate-versions.sh --unreleased` before creating PR
 - [ ] **Check docs/HUB-SYNC-CHECKLIST.md** - Review if changes affect hub repository
 - [ ] **Test changes locally** - Verify all scripts and CLI commands work
-- [ ] **Update all related documentation** - Update docs/*, CLAUDE.md, CONTRIBUTING.md if behavior/architecture changes
+- [ ] **Update all related documentation** - Update docs/*, docs/agents/claude/README.md, CONTRIBUTING.md if behavior/architecture changes
 
 **⚠️ DOCUMENTATION REVISION RULE (NON-NEGOTIABLE):**
 
@@ -100,7 +100,7 @@ Every code change MUST trigger a documentation review:
 
 3. **Related documentation** - MUST be updated if applicable
    - docs/COMMANDS.md - Update command reference for new commands
-   - docs/CLAUDE.md - Update developer guide for new features
+   - docs/agents/claude/GUIDE.md - Update developer guide for new features
    - Use proper version markers for new features (e.g., `v3.6.0+`)
 
 ---
@@ -129,7 +129,7 @@ Before creating any PR that touches version-related files, run:
 | `README.md` | Header version badge + footer version |
 | `CHANGELOG.md` | Latest release section |
 | `docs/COMMANDS.md` | Version markers for new features |
-| `docs/CLAUDE.md` | Version markers + version history |
+| `docs/agents/claude/GUIDE.md` | Version markers + version history |
 
 ### Version Marker Format
 
@@ -178,10 +178,10 @@ Shows configuration... (← no version needed for core features)
 - Use `ai-use-case bump-version` to update all locations automatically
 
 #### Issue: Missing version history
-**Problem**: New version released but not in docs/CLAUDE.md version history
+**Problem**: New version released but not in docs/agents/claude/GUIDE.md version history
 
 **Solution**:
-- Add entry to version history section in CLAUDE.md
+- Add entry to version history section in docs/agents/claude/GUIDE.md
 - Format: `- **v3.6.0**: Brief description of main features`
 
 ### Complete Documentation

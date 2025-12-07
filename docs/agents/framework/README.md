@@ -621,10 +621,10 @@ ai-use-case agents info quality-reviewer
 
 ## Resources
 
-- **Feature Plan:** [docs/features/intelligent-agents-integration/01-feature-plan.md](../features/intelligent-agents-integration/01-feature-plan.md)
-- **Requirements:** [docs/features/intelligent-agents-integration/02-requirements.md](../features/intelligent-agents-integration/02-requirements.md)
-- **Implementation Checklist:** [docs/features/intelligent-agents-integration/03-implementation-checklist.md](../features/intelligent-agents-integration/03-implementation-checklist.md)
-- **Quick Start:** [docs/features/intelligent-agents-integration/QUICKSTART.md](../features/intelligent-agents-integration/QUICKSTART.md)
+- **Feature Plan:** [docs/features/intelligent-agents-integration/01-feature-plan.md](../../features/intelligent-agents-integration/01-feature-plan.md)
+- **Requirements:** [docs/features/intelligent-agents-integration/02-requirements.md](../../features/intelligent-agents-integration/02-requirements.md)
+- **Implementation Checklist:** [docs/features/intelligent-agents-integration/03-implementation-checklist.md](../../features/intelligent-agents-integration/03-implementation-checklist.md)
+- **Quick Start:** [docs/features/intelligent-agents-integration/QUICKSTART.md](../../features/intelligent-agents-integration/QUICKSTART.md)
 
 ---
 

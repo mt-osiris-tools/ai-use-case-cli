@@ -1,6 +1,6 @@
 # Development Workflow Guide
 
-Complete guide for contributing to AI Use Case CLI. For quick reference, see [CLAUDE.md](../CLAUDE.md).
+Complete guide for contributing to AI Use Case CLI. For quick reference, see [docs/agents/claude/README.md](agents/claude/README.md).
 
 ## Branch-Based Workflow
 
@@ -50,7 +50,7 @@ Before creating any PR, verify ALL items:
 - [ ] Updated version if adding features (scripts/utils/version.sh)
 - [ ] Tested changes locally
 - [ ] **Verified cross-platform compatibility** (if shell scripts modified)
-- [ ] Updated all related documentation (docs/*, CLAUDE.md, CONTRIBUTING.md)
+- [ ] Updated all related documentation (docs/*, docs/agents/claude/README.md, CONTRIBUTING.md)
 - [ ] Used conventional commit messages
 - [ ] Reviewed HUB-SYNC-CHECKLIST.md if applicable
 
@@ -123,7 +123,7 @@ bash ~/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh .
 - Can invoke multiple times to document several sessions
 - Clear audit trail between PRs and their documentation
 
-See [CLAUDE.md](../CLAUDE.md) and [.ai-tools/commands/use-case/document-session.md](../.ai-tools/commands/use-case/document-session.md) for complete workflow.
+See [docs/agents/claude/README.md](agents/claude/README.md) and [.ai-tools/commands/use-case/document-session.md](../.ai-tools/commands/use-case/document-session.md) for complete workflow.
 
 ## Common Development Patterns
 
@@ -336,4 +336,5 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 - [VERSION-MANAGEMENT.md](VERSION-MANAGEMENT.md) - Version bump guide
 - [VERSION-UPDATE-CHECKLIST.md](VERSION-UPDATE-CHECKLIST.md) - Verification checklist
 - [HUB-SYNC-CHECKLIST.md](HUB-SYNC-CHECKLIST.md) - Hub sync validation
-- [CLAUDE.md](../CLAUDE.md) - Main comprehensive guide
+- [docs/agents/claude/README.md](agents/claude/README.md) - Quick reference guide
+- [docs/agents/claude/GUIDE.md](agents/claude/GUIDE.md) - Comprehensive guide
