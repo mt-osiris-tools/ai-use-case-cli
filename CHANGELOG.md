@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Agent Framework Component Diagram**: Added new C4 Component Diagram for Agent Framework
+  - Shows internal components: agent-registry.sh, invoke-agent.sh, quality-agent.sh, and agent prompts
+  - Visualizes agent lifecycle management, invocation flow, and integration points
+  - Includes notes on key features (caching, statistics, timeout handling) and registry management
+  - Located at `docs/diagrams/AI Use Case CLI - C4 Component Diagram (Agent Framework).svg`
+  - Part of comprehensive architecture documentation
+
 - **AI Assistant Repository Guidelines**: Added `COPILOT.md` with comprehensive guidelines for AI coding assistants
   - Project structure and module organization reference
   - Build, test, and development command examples
@@ -19,6 +26,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Helps AI assistants (GitHub Copilot, Claude Code, etc.) understand repo patterns and contribute effectively
 
 ### Changed
+
+- **Architecture Diagrams Updated for Agent Framework and AI Tool Agnosticism**: Updated all C4 diagrams to reflect recent architectural changes
+  - **C4 Context Diagram**: Generalized "Claude Code" to "AI Coding Assistants" with examples (Claude Code, GitHub Copilot, etc.)
+  - **C4 Container Diagram**:
+    - Added "Agent Framework" container with lifecycle management, invocation, caching, and statistics
+    - Renamed "Claude Code Integration" to "AI Assistant Integration"
+    - Updated Configuration database description to include agents.json
+    - Added relationships showing CLI → Agent Framework and Core Scripts → Agent Framework
+  - **C4 Deployment Diagram**:
+    - Added agents.json to configuration files (~/.config/ai-use-case-cli/)
+    - Updated project directory to show .ai-tools/ (formerly .claude/)
+    - Renamed "Claude Code Extension" to "AI Assistant Extensions"
+  - **Diagrams README**: Updated documentation to reflect new Agent Framework diagram and AI tool terminology
+  - All SVG files regenerated with latest changes
+  - Diagrams now accurately represent v3.11.0 architecture with Agent Framework (Phases 1 & 2)
 
 ### Fixed
 

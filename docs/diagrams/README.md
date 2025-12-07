@@ -14,18 +14,23 @@ This diagram uses the [C4 model](https://c4model.com/) to visualize the system a
 
 1. **System Context Diagram (C4 Level 1)**
    - Shows the AI Use Case CLI system and its interactions with users and external systems
-   - Highlights: Developer workflows, Claude Code integration, Git, GitHub, Confluence, OpenTelemetry
+   - Highlights: Developer workflows, AI coding assistants (Claude Code, Copilot, etc.), Git, GitHub, Confluence, OpenTelemetry
 
 2. **Container Diagram (C4 Level 2)**
    - Shows the internal containers/components of the AI Use Case CLI system
-   - Key containers: CLI Dispatcher, Core Scripts, Project Management, Search & Analytics, Configuration & Utilities, Claude Code Integration, Git Hooks
-   - Storage: Configuration files, Documentation Hub, Project Use Cases
+   - Key containers: CLI Dispatcher, Core Scripts, Project Management, Search & Analytics, Configuration & Utilities, AI Assistant Integration, Agent Framework, Git Hooks
+   - Storage: Configuration files (including agents.json), Documentation Hub, Project Use Cases
 
 3. **Component Diagram (C4 Level 3 - Core Scripts)**
    - Deep dive into the Core Scripts container
    - Components: document-ai-session.sh, sync-ai-use-cases.sh, publish-confluence.sh, extract-session-data.sh
 
-4. **Deployment Diagram**
+4. **Component Diagram (C4 Level 3 - Agent Framework)**
+   - Deep dive into the Agent Framework container
+   - Components: agent-registry.sh, invoke-agent.sh, quality-agent.sh, agent prompts
+   - Shows agent lifecycle management, invocation, and integration points
+
+5. **Deployment Diagram**
    - Shows physical deployment of the system on a developer's workstation
    - File system layout: ~/.local/bin, ~/.config, ~/.local/share, project directories
    - External cloud services: GitHub, Atlassian Cloud, Observability backends
@@ -84,10 +89,11 @@ plantuml -tsvg docs/diagrams/document-session-sequence.puml
 ```
 
 For C4 architecture, this generates:
-- `c4-architecture-1.png` - System Context Diagram
-- `c4-architecture-2.png` - Container Diagram
-- `c4-architecture-3.png` - Component Diagram
-- `c4-architecture-4.png` - Deployment Diagram
+- `AI Use Case CLI - C4 Context Diagram.svg` - System Context Diagram
+- `AI Use Case CLI - C4 Container Diagram.svg` - Container Diagram
+- `AI Use Case CLI - C4 Component Diagram (Core Scripts).svg` - Core Scripts Component Diagram
+- `AI Use Case CLI - C4 Component Diagram (Agent Framework).svg` - Agent Framework Component Diagram
+- `AI Use Case CLI - Deployment Diagram.svg` - Deployment Diagram
 
 For sequence diagram, this generates:
 - `document-session-sequence.png` - Document session workflow
