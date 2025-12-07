@@ -203,19 +203,17 @@ elif [ -d "$PROJECT_PATH/.claude/commands" ]; then
 
     # Check for custom commands (anything other than use-case/)
     CUSTOM_COMMANDS_FOUND=false
-    if [ -d "$PROJECT_PATH/.claude/commands" ]; then
-        shopt -s nullglob
-        for item in "$PROJECT_PATH/.claude/commands"/*; do
-            if [ "$(basename "$item")" != "use-case" ]; then
-                if [ "$CUSTOM_COMMANDS_FOUND" = false ]; then
-                    echo -e "${BLUE}ℹ${NC}  Custom commands detected in .claude/commands/:"
-                    CUSTOM_COMMANDS_FOUND=true
-                fi
-                echo -e "  - $(basename "$item")"
+    shopt -s nullglob
+    for item in "$PROJECT_PATH/.claude/commands"/*; do
+        if [ "$(basename "$item")" != "use-case" ]; then
+            if [ "$CUSTOM_COMMANDS_FOUND" = false ]; then
+                echo -e "${BLUE}ℹ${NC}  Custom commands detected in .claude/commands/:"
+                CUSTOM_COMMANDS_FOUND=true
             fi
-        done
-        shopt -u nullglob
-    fi
+            echo -e "  - $(basename "$item")"
+        fi
+    done
+    shopt -u nullglob
 
     # Remove only use-case symlink/directory (setup script will recreate)
     if [ -e "$LEGACY_COMMANDS_DIR" ]; then
