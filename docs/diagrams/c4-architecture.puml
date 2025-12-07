@@ -9,16 +9,16 @@ Person(developer, "Developer", "Uses AI tools (Claude Code) to build software an
 
 System(ai_use_case_cli, "AI Use Case CLI", "CLI tool for documenting, organizing, and syncing AI-assisted development sessions")
 
-System_Ext(claude_code, "Claude Code", "AI-powered IDE extension that executes slash commands and automates workflows")
+System_Ext(ai_assistants, "AI Coding Assistants", "AI-powered IDE extensions (Claude Code, GitHub Copilot, etc.) that execute slash commands and automate workflows")
 System_Ext(git, "Git", "Version control system for project code and hub documentation")
 System_Ext(github, "GitHub", "Hosts repositories, provides PR detection and version checking via API")
 System_Ext(confluence, "Atlassian Confluence", "Documentation platform for publishing use cases via MCP")
 System_Ext(opentelemetry, "OpenTelemetry Collector", "Distributed tracing backend for performance monitoring")
 
 Rel(developer, ai_use_case_cli, "Documents AI sessions, searches use cases", "CLI commands")
-Rel(developer, claude_code, "Uses for development", "IDE")
+Rel(developer, ai_assistants, "Uses for development", "IDE")
 
-Rel(claude_code, ai_use_case_cli, "Executes via slash commands", "/use-case:* commands")
+Rel(ai_assistants, ai_use_case_cli, "Executes via slash commands", "/use-case:* commands")
 Rel(ai_use_case_cli, git, "Reads history, commits docs", "git CLI")
 Rel(ai_use_case_cli, github, "Detects PRs, checks versions", "GitHub API / gh CLI")
 Rel(ai_use_case_cli, confluence, "Publishes documentation", "Atlassian MCP")
@@ -49,33 +49,36 @@ System_Boundary(ai_use_case_system, "AI Use Case CLI System") {
 
     Container(config_utils, "Configuration & Utilities", "Bash", "Hub config, version management, tracing, validation")
 
-    Container(claude_integration, "Claude Code Integration", "Markdown", "Slash command definitions for AI-assisted automation")
+    Container(ai_integration, "AI Assistant Integration", "Markdown", "Slash command definitions for AI-assisted automation (Claude Code, Copilot, etc.)")
+
+    Container(agent_framework, "Agent Framework", "Bash", "Agent lifecycle management, invocation, caching, and statistics tracking")
 
     Container(git_hooks, "Git Hooks", "Bash", "Pre-commit (branch protection) and post-commit (auto-sync)")
 
-    ContainerDb(config_db, "Configuration", "JSON", "Hub mode (local/git), tracing config, project registry")
+    ContainerDb(config_db, "Configuration", "JSON", "Hub mode (local/git), tracing config, project registry, agent registry")
 
     ContainerDb(hub_storage, "Documentation Hub", "File System", "Organized by project, date, and topic with symlink views")
 
     ContainerDb(project_storage, "Project Use Cases", "Markdown Files", ".usecase/cases/ directory in each project")
 }
 
-System_Ext(claude_code, "Claude Code", "AI IDE extension")
+System_Ext(ai_assistants, "AI Coding Assistants", "AI IDE extensions")
 System_Ext(git, "Git", "Version control")
 System_Ext(github, "GitHub", "Repository hosting")
 System_Ext(confluence, "Confluence", "Documentation platform")
 System_Ext(opentelemetry, "OpenTelemetry", "Tracing backend")
 
 Rel(developer, cli_dispatcher, "Executes commands", "CLI")
-Rel(developer, claude_code, "Uses for development", "IDE")
+Rel(developer, ai_assistants, "Uses for development", "IDE")
 
-Rel(claude_code, claude_integration, "Reads command definitions", "File read")
-Rel(claude_integration, cli_dispatcher, "Invokes commands", "Shell execution")
+Rel(ai_assistants, ai_integration, "Reads command definitions", "File read")
+Rel(ai_integration, cli_dispatcher, "Invokes commands", "Shell execution")
 
 Rel(cli_dispatcher, core_scripts, "Routes to", "Function call")
 Rel(cli_dispatcher, project_mgmt, "Routes to", "Function call")
 Rel(cli_dispatcher, search_analytics, "Routes to", "Function call")
 Rel(cli_dispatcher, config_utils, "Routes to", "Function call")
+Rel(cli_dispatcher, agent_framework, "Routes agent commands", "Function call")
 
 Rel(core_scripts, project_storage, "Creates/reads docs", "File I/O")
 Rel(core_scripts, hub_storage, "Syncs docs", "File I/O")
@@ -90,6 +93,9 @@ Rel(search_analytics, hub_storage, "Searches docs", "grep/find")
 
 Rel(config_utils, config_db, "Manages config", "JSON")
 Rel(config_utils, opentelemetry, "Sends traces", "OTLP")
+
+Rel(agent_framework, config_db, "Reads/writes agent registry", "JSON")
+Rel(core_scripts, agent_framework, "Invokes quality review", "Shell execution")
 
 Rel(git_hooks, core_scripts, "Triggers sync", "Shell execution")
 
@@ -141,6 +147,56 @@ Rel(extract_session, config_utils, "Uses utilities", "Source")
 
 @enduml
 
+@startuml AI Use Case CLI - C4 Component Diagram (Agent Framework)
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Component Diagram for Agent Framework Container
+
+Container_Boundary(agent_boundary, "Agent Framework Container") {
+    Component(agent_registry, "agent-registry.sh", "Bash", "Agent lifecycle management: init, list, enable, disable, register, stats, reset")
+
+    Component(agent_invoker, "invoke-agent.sh", "Bash", "Agent invocation with validation, caching, statistics, and timeout handling")
+
+    Component(quality_agent, "quality-agent.sh", "Bash", "Quality assessment wrapper with single/batch/project modes and JSON output")
+
+    Component(agent_prompts, "Agent Prompts", "Markdown", "AI agent prompt definitions (.ai-tools/agents/*.md)")
+}
+
+ContainerDb_Ext(config_db, "Configuration", "JSON")
+Container_Ext(core_scripts, "Core Scripts", "Bash")
+Container_Ext(ai_integration, "AI Assistant Integration", "Markdown")
+System_Ext(ai_assistants, "AI Coding Assistants", "IDE Extensions")
+
+Rel(agent_registry, config_db, "Reads/writes agents.json", "JSON I/O")
+Rel(agent_invoker, agent_registry, "Validates agent status", "Function call")
+Rel(agent_invoker, config_db, "Updates invocation stats", "JSON I/O")
+Rel(agent_invoker, agent_prompts, "Reads agent definitions", "File read")
+Rel(agent_invoker, ai_assistants, "Executes agent prompts", "Task tool")
+
+Rel(quality_agent, agent_invoker, "Invokes quality-reviewer agent", "Function call")
+Rel(core_scripts, quality_agent, "Triggers quality review", "Shell execution")
+Rel(ai_integration, quality_agent, "Slash command integration", "Shell execution")
+
+note right of agent_invoker
+  **Key Features:**
+  • Result caching (configurable duration)
+  • Statistics tracking (invocations, success rate)
+  • Timeout handling and error recovery
+  • Multiple output formats (text/json)
+end note
+
+note right of agent_registry
+  **Registry Management:**
+  • 4 agents: quality-reviewer, pattern-analyzer,
+    session-selector, organization-optimizer
+  • Enable/disable state management
+  • Invocation and success metrics
+end note
+
+@enduml
+
 @startuml AI Use Case CLI - Deployment Diagram
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Deployment.puml
 
@@ -150,7 +206,7 @@ title Deployment Diagram for AI Use Case CLI
 
 Deployment_Node(dev_machine, "Developer Workstation", "Linux/macOS/WSL") {
     Deployment_Node(project_workspace, "Project Directory", "/path/to/project") {
-        Container(project_repo, "Project Repository", "Git", "Contains .usecase/cases/ with documented sessions")
+        Container(project_repo, "Project Repository", "Git", "Contains .usecase/cases/ and .ai-tools/ with slash commands")
         Container(git_hooks_deployed, "Git Hooks", "Bash", "Pre-commit and post-commit hooks")
     }
 
@@ -159,7 +215,7 @@ Deployment_Node(dev_machine, "Developer Workstation", "Linux/macOS/WSL") {
     }
 
     Deployment_Node(user_config, "User Configuration", "~/.config/ai-use-case-cli") {
-        ContainerDb(config_files, "Configuration Files", "JSON", "config.json, tracing.json")
+        ContainerDb(config_files, "Configuration Files", "JSON", "config.json, tracing.json, agents.json")
     }
 
     Deployment_Node(user_data, "User Data", "~/.local/share/ai-use-case-cli") {
@@ -172,7 +228,7 @@ Deployment_Node(dev_machine, "Developer Workstation", "Linux/macOS/WSL") {
     }
 
     Deployment_Node(ide, "IDE", "VS Code or Terminal") {
-        Container(claude_code_ext, "Claude Code Extension", "TypeScript", "Executes slash commands")
+        Container(ai_assistant_ext, "AI Assistant Extensions", "TypeScript", "Executes slash commands (Claude Code, Copilot, etc.)")
     }
 }
 
@@ -195,7 +251,7 @@ Rel(cli_executable, hub_repo, "Syncs docs", "File I/O")
 Rel(cli_executable, local_hub, "Syncs docs (local mode)", "File I/O")
 
 Rel(git_hooks_deployed, cli_executable, "Invokes sync", "Shell exec")
-Rel(claude_code_ext, cli_executable, "Executes commands", "Shell exec")
+Rel(ai_assistant_ext, cli_executable, "Executes commands", "Shell exec")
 
 Rel(hub_repo, remote_repos, "Pushes changes", "git push")
 Rel(project_repo, remote_repos, "Pushes changes", "git push")
