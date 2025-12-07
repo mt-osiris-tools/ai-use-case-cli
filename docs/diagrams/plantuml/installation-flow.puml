@@ -45,28 +45,39 @@ if (Prerequisites met?) then (yes)
     :PATH already configured;
   endif
 
-  :Prompt user to select hub configuration mode;
-  note right
-    Choose one:
-    - Local-only (no remote sync)
-    - Private-git (sync to private hub repo)
-  end note
+  :Prompt: "Would you like to configure hub mode now? (y/N)";
 
-  if (User selects local-only?) then (yes)
-    :Write config file at ~/.config/ai-use-case-cli/config.json;
+  if (Configure hub now?) then (yes)
+    :Prompt user to select hub configuration mode;
     note right
-      {
-        "hub_mode": "local-only"
-      }
+      Choose one:
+      - Local-only (no remote sync)
+      - Private-git (sync to private hub repo)
     end note
+
+    if (User selects local-only?) then (yes)
+      :Write config file at ~/.config/ai-use-case-cli/config.json;
+      note right
+        {
+          "hub_mode": "local-only"
+        }
+      end note
+    else (no)
+      :Prompt for private hub git URL;
+      :Write config file at ~/.config/ai-use-case-cli/config.json;
+      note right
+        {
+          "hub_mode": "private-git",
+          "hub_git_url": "<user-provided-url>"
+        }
+      end note
+    endif
+
   else (no)
-    :Prompt for private hub git URL;
-    :Write config file at ~/.config/ai-use-case-cli/config.json;
+    :Use default local-only mode;
     note right
-      {
-        "hub_mode": "private-git",
-        "hub_git_url": "<user-provided-url>"
-      }
+      Hub configured on first use
+      Configure later: ai-use-case config reconfigure
     end note
   endif
 
