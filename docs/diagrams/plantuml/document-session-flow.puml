@@ -118,7 +118,7 @@ partition "Save and Sync" {
 
   :Git commit with message << Git >>;
   note right
-    "docs: AI session YYYY-MM-DD - TICKET-XXX
+    "docs: AI session YYYY-MM-DD - TICKET-XXXXX
 
     [Auto-generated description]
 
