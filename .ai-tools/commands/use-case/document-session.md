@@ -570,6 +570,52 @@ Use the Read tool to read the template file from this path. This is your source 
 - Order of sections
 - What information goes in each section
 
+### Step 6.5: Capture Session Statistics (Optional but Recommended)
+
+**Before generating documentation, capture real-time session statistics:**
+
+**IMPORTANT: How to run /cost command**
+
+The `/cost` command is a Claude Code built-in command that provides session statistics. You have two options to capture this data:
+
+**Option 1: Instruct the User (Recommended)**
+Since Claude cannot directly execute slash commands like `/cost` in the current context, inform the user:
+
+```
+⚠️ To include accurate session statistics in your documentation, please run:
+   /cost
+
+Then paste the output here or save it for reference when I generate the documentation.
+```
+
+**Option 2: Use Auto-Saved Statistics**
+If the SessionEnd hook is configured (`.claude/hooks/SessionEnd`), session statistics are automatically saved to:
+```
+.usecase/session-stats/YYYY-MM-DD-HHMMSS.txt
+```
+
+Check for recent session stats files:
+```bash
+ls -lt .usecase/session-stats/ | head -5
+```
+
+**What /cost provides:**
+- Total cost (USD)
+- Total duration (API and wall time)
+- Total code changes (lines added/removed)
+- Token usage breakdown (if available)
+
+**How to use the data:**
+- Populate the "Session Statistics (/cost Command)" section in the template
+- Use token counts to fill "Token Usage Summary"
+- Use cost data for "Cost Efficiency Analysis"
+- Include duration in "Time Analysis"
+
+**If /cost is not available:**
+- Continue with estimation based on conversation analysis
+- Note in documentation that exact statistics were not captured
+- Use the auto-saved session statistics from SessionEnd hook if available
+
 ### Step 7: Generate Complete Documentation
 
 Create a comprehensive markdown file **following the template structure exactly**:

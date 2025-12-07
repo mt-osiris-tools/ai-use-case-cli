@@ -476,6 +476,81 @@ ai-use-case search "authentication"
 
 ---
 
+## Automated Session Statistics Capture
+
+**New in Version 3.12+**: The CLI now supports automatic capture of Claude Code session statistics!
+
+### SessionEnd Hook
+
+Automatically saves session data when Claude Code sessions end:
+
+```bash
+# Hook location
+.claude/hooks/SessionEnd
+
+# Stats saved to
+.usecase/session-stats/YYYY-MM-DD-HHMMSS.txt
+```
+
+**What it captures:**
+- Session end time
+- Repository and branch
+- Recent commits (last 2 hours)
+- Uncommitted changes
+- Instructions to run `/cost`
+
+### /cost Command Integration
+
+Claude Code's built-in `/cost` command provides real-time statistics:
+
+```bash
+# Run in Claude Code
+/cost
+```
+
+**Output includes:**
+- Total cost (USD)
+- Total duration (API and wall time)
+- Code changes (lines added/removed)
+- Token usage breakdown
+
+**Integration with documentation:**
+- Templates now include a "Session Statistics" section
+- `/use-case:document-session` workflow prompts for `/cost` output
+- Automatically populate token/cost data in documentation
+
+### OpenTelemetry Support
+
+For enterprise-grade tracking, configure OpenTelemetry:
+
+```bash
+# Enable telemetry
+source .claude/otel-config.sh && claude
+```
+
+**Benefits:**
+- Detailed metrics and events
+- Multiple export formats (console, file, OTLP)
+- Centralized monitoring across teams
+- Custom dashboards and analysis
+
+**See:** [OPENTELEMETRY-SETUP.md](./OPENTELEMETRY-SETUP.md) for complete setup guide
+
+### Workflow Integration
+
+**Recommended workflow:**
+
+1. **Start session**: OTel begins collecting (optional)
+2. **Work**: Code, test, document as usual
+3. **Session end**: SessionEnd hook auto-saves metadata
+4. **Capture stats**: Run `/cost` before closing
+5. **Document**: Run `/use-case:document-session`
+6. **Paste output**: Include `/cost` output in documentation
+
+This provides complete, accurate session statistics with minimal manual effort!
+
+---
+
 ## Example Real-World Session
 
 ```markdown

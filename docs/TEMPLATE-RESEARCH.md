@@ -97,6 +97,31 @@ Used by: AI coding assistant slash commands (/use-case:document-session)
 
 ---
 
+## 📊 Session Statistics (/cost Command)
+
+**Capture session statistics by running:** `/cost`
+
+This provides real-time data about token usage, costs, and research session metrics from Claude Code.
+
+```
+[Paste the output of /cost command here]
+
+Example output:
+Total cost: $0.32
+Total duration (API): 1m 45s
+Total duration (wall): 25m 18s
+Total code changes: 0 (research session - no code modified)
+```
+
+**When to capture:**
+- **During session**: Run `/cost` periodically to track token usage during exploration
+- **End of session**: Run `/cost` before ending the session for final statistics
+- **Post-session**: If using SessionEnd hook, statistics are auto-saved to `.usecase/session-stats/`
+
+**Note:** For research sessions, the `/cost` command helps quantify the cost of exploration and iterative query refinement. This data populates the "Token Usage Summary" and "Research Efficiency" sections above.
+
+---
+
 ## 🔍 Research Context
 
 **Initial Query:** [Your original question or problem statement]

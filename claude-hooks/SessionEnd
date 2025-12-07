@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+#
+# Claude Code SessionEnd Hook
+# Automatically captures session metadata when a Claude Code session ends
+#
+# This hook captures session metadata and provides instructions for capturing
+# full statistics via the /cost command.
+#
+# Output location: .usecase/session-stats/YYYY-MM-DD-HHMMSS.txt
+#
+
+set -euo pipefail
+
+# Get repository root
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+STATS_DIR="${REPO_ROOT}/.usecase/session-stats"
+
+# Create stats directory if it doesn't exist
+mkdir -p "$STATS_DIR"
+
+# Generate timestamp for filename
+TIMESTAMP=$(date +%Y-%m-%d-%H%M%S)
+STATS_FILE="${STATS_DIR}/${TIMESTAMP}.txt"
+
+# Capture session metadata
+echo "==================================" > "$STATS_FILE"
+echo "Claude Code Session Statistics" >> "$STATS_FILE"
+echo "==================================" >> "$STATS_FILE"
+echo "" >> "$STATS_FILE"
+echo "Session End Time: $(date '+%Y-%m-%d %H:%M:%S %Z')" >> "$STATS_FILE"
+echo "Repository: $(basename "$REPO_ROOT")" >> "$STATS_FILE"
+echo "Branch: $(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")" >> "$STATS_FILE"
+echo "" >> "$STATS_FILE"
+
+# Note: The /cost command needs to be executed manually by the user or via
+# Claude Code's command system. This hook captures the session end event but
+# cannot directly execute slash commands from within the hook context.
+#
+# For now, we save session metadata and instructions for the user.
+
+echo "==================================" >> "$STATS_FILE"
+echo "Session Statistics" >> "$STATS_FILE"
+echo "==================================" >> "$STATS_FILE"
+echo "" >> "$STATS_FILE"
+echo "To capture full session statistics, run:" >> "$STATS_FILE"
+echo "  /cost" >> "$STATS_FILE"
+echo "" >> "$STATS_FILE"
+echo "The output will include:" >> "$STATS_FILE"
+echo "  - Total cost (USD)" >> "$STATS_FILE"
+echo "  - Total duration (API and wall time)" >> "$STATS_FILE"
+echo "  - Code changes (lines added/removed)" >> "$STATS_FILE"
+echo "  - Token usage breakdown" >> "$STATS_FILE"
+echo "" >> "$STATS_FILE"
+
+# Git statistics (if available)
+if git rev-parse HEAD >/dev/null 2>&1; then
+    echo "==================================" >> "$STATS_FILE"
+    echo "Git Activity (Last Session)" >> "$STATS_FILE"
+    echo "==================================" >> "$STATS_FILE"
+    echo "" >> "$STATS_FILE"
+
+    # Recent commits (last 2 hours)
+    RECENT_COMMITS=$(git log --since="2 hours ago" --oneline 2>/dev/null | wc -l)
+    echo "Recent commits: $RECENT_COMMITS" >> "$STATS_FILE"
+
+    if [ "$RECENT_COMMITS" -gt 0 ]; then
+        echo "" >> "$STATS_FILE"
+        echo "Commits:" >> "$STATS_FILE"
+        git log --since="2 hours ago" --pretty=format:"  %h - %s (%ar)" 2>/dev/null >> "$STATS_FILE"
+        echo "" >> "$STATS_FILE"
+    fi
+
+    # Check for uncommitted changes
+    if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+        echo "" >> "$STATS_FILE"
+        echo "Uncommitted changes detected:" >> "$STATS_FILE"
+        git status --short 2>/dev/null | sed 's/^/  /' >> "$STATS_FILE"
+    fi
+
+    echo "" >> "$STATS_FILE"
+fi
+
+# Success message (to stderr so it doesn't interfere with Claude Code output)
+echo "✅ Session statistics saved to: ${STATS_FILE}" >&2
+
+# Return success
+exit 0

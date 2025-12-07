@@ -97,6 +97,31 @@ command-3
 
 ---
 
+## 📊 Session Statistics (/cost Command)
+
+**Capture session statistics by running:** `/cost`
+
+This provides real-time data about token usage, costs, and code changes from Claude Code.
+
+```
+[Paste the output of /cost command here]
+
+Example output:
+Total cost: $0.45
+Total duration (API): 2m 34s
+Total duration (wall): 15m 42s
+Total code changes: +487 -92
+```
+
+**When to capture:**
+- **During session**: Run `/cost` periodically to track cumulative usage
+- **End of session**: Run `/cost` before ending the session for final statistics
+- **Post-session**: If using SessionEnd hook, statistics are auto-saved to `.usecase/session-stats/`
+
+**Note:** The `/cost` command output provides actual measured data that can be used to populate the "Token Usage Summary" and "Detailed Token Usage Analysis" sections above.
+
+---
+
 ## 💬 Key User Queries (Optional)
 
 **For detailed guidance on capturing queries, see [CAPTURING_USER_QUERIES.md](https://github.com/mt-osiris-tools/ai-use-case-cli/blob/main/docs/CAPTURING_USER_QUERIES.md)**

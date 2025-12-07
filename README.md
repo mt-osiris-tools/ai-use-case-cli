@@ -48,6 +48,7 @@ Documentation shouldn't be a burden—it should be a valuable asset that grows y
 - 🤖 **AI agent tracking** - Automatically track and document usage of specialized agents from any AI tool
 - 🧠 **Intelligent agents** - AI-powered agents for quality review, pattern analysis, and organization (Phase 1 complete, more coming!)
 - 📊 **Session data extraction** - Extract git history, token usage, and metrics for reporting (v3.4.0+)
+- 📈 **Session statistics automation** - SessionEnd hook, /cost integration, and OpenTelemetry for tracking costs, tokens, and time (v3.12.0+)
 - 📊 **OpenTelemetry tracing** - Monitor CLI performance and usage with distributed tracing (v3.6.0+)
 - 📈 **Command progress tracking** - Visual real-time progress indicators for all commands (v3.8.0+)
 - 🔄 **Automatic syncing** - Git hooks sync docs to your chosen hub automatically
