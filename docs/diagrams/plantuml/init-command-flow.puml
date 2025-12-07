@@ -1,0 +1,121 @@
+@startuml Init Command Flow
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam activity {
+  BackgroundColor<< Success >> #90EE90
+  BackgroundColor<< Action >> #87CEEB
+  BackgroundColor<< Migration >> #FFB6C1
+  BorderColor #333333
+  FontSize 12
+}
+
+title AI Use Case CLI - Init Command Flow (ai-use-case --init)
+
+start
+
+:User runs ai-use-case --init [--update];
+note right
+  Options:
+  --update: Refresh existing installation
+end note
+
+if (Hub config exists?) then (no)
+  :First time setup;
+  :Prompt for hub mode;
+  note right
+    1. Local only (~/.local/share/ai-use-case-cli/hub/)
+    2. Private git repository
+  end note
+
+  :Save configuration to
+  ~/.config/ai-use-case-cli/config.json;
+else (yes)
+  :Load existing hub configuration;
+endif
+
+if (Hub directory exists?) then (no)
+  if (Hub mode = private-git?) then (yes)
+    :Clone git repository;
+  else (no)
+    :Create local directory;
+  endif
+else (yes)
+  :Hub directory found;
+endif
+
+:Create hub structure
+(by-project/, by-date/, by-topic/);
+
+partition "Project Setup" {
+  if (Project has .usecase/cases/?) then (no)
+    :Create .usecase/cases/ directory;
+    :Create README.md;
+  else (yes)
+    :Directory already exists;
+  endif
+
+  partition "Install AI Tool Commands" {
+    :Create .ai-tools/commands/use-case/;
+    :Copy command files from CLI;
+    note right
+      - document-session.md
+      - setup-project.md
+      - sync-usecases.md
+      - etc.
+    end note
+
+    partition "Claude Code Symlink" {
+      if (.claude/commands is symlink?) then (yes)
+        :Migrate from old structure << Migration >>;
+        :Remove old full-directory symlink;
+        :Create .claude/commands/ directory;
+        :Create use-case/ subdirectory symlink;
+      elseif (.claude/commands exists?) then (yes)
+        :Directory already exists;
+        if (.claude/commands/use-case exists?) then (no)
+          :Create use-case/ symlink;
+        else (yes)
+          :Symlink already configured;
+        endif
+      else (no)
+        :Create .claude/commands/ directory;
+        :Create use-case/ symlink;
+      endif
+    }
+  }
+
+  partition "Install Git Hooks" {
+    :Install pre-commit hook
+    (branch protection);
+
+    :Install post-commit hook
+    (auto-sync);
+  }
+
+  :Add .usecase/cases/ to .gitignore;
+
+  :Perform initial sync;
+  note right
+    Calls sync-ai-use-cases.sh
+  end note
+
+  :Register project in registry;
+  note right
+    ~/.local/share/ai-use-case-cli/
+    projects-registry.json
+  end note
+}
+
+:Display completion message << Success >>;
+note right
+  ✓ Setup complete
+  - Use cases directory created
+  - Git hooks installed
+  - Claude Code commands available
+  - Initial sync complete
+end note
+
+stop
+
+@enduml

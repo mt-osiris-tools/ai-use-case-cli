@@ -1,0 +1,145 @@
+@startuml Project Management Commands
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam activity {
+  BackgroundColor<< Success >> #90EE90
+  BackgroundColor<< Action >> #87CEEB
+  BackgroundColor<< Update >> #FFA07A
+  BorderColor #333333
+  FontSize 12
+}
+
+title AI Use Case CLI - Project Management Commands
+
+|list-projects|
+start
+
+:User runs ai-use-case list-projects;
+
+:Read projects registry;
+note right
+  ~/.local/share/ai-use-case-cli/
+  projects-registry.json
+end note
+
+if (Registry exists?) then (yes)
+  :Parse project entries;
+
+  :Display project table;
+  note right
+    Shows:
+    - Project name
+    - Path
+    - CLI version
+    - Cases directory
+    - Last updated
+  end note
+else (no)
+  :No projects registered;
+endif
+
+stop
+
+|check-updates|
+start
+
+:User runs ai-use-case check-updates;
+
+:Get current CLI version;
+note right
+  From scripts/utils/version.sh
+end note
+
+:Read projects registry;
+
+:For each registered project;
+
+if (Project version < CLI version?) then (yes)
+  :Mark as outdated << Update >>;
+  note right
+    Needs update from
+    v3.10.0 → v3.11.0
+  end note
+else (no)
+  :Mark as up-to-date;
+endif
+
+:Display results table;
+note right
+  Shows:
+  - Outdated projects (highlighted)
+  - Current version
+  - Available version
+  - Update command
+end note
+
+stop
+
+|update-project|
+start
+
+:User runs ai-use-case update-project <path>;
+
+:Verify project exists and is registered;
+
+if (Project registered?) then (no)
+  :Error: Project not registered;
+  stop
+else (yes)
+  :Get project details from registry;
+endif
+
+:Check if update needed;
+
+if (Already up-to-date?) then (yes)
+  :Display "Already up to date" message;
+  stop
+else (no)
+  :Display update plan;
+
+  if (Auto-confirm flag?) then (no)
+    :Prompt user for confirmation;
+
+    if (User confirms?) then (no)
+      :Update cancelled;
+      stop
+    endif
+  endif
+
+  partition "Migration and Cleanup" {
+    if (.claude/commands is symlink?) then (yes)
+      :Migrate to new structure << Update >>;
+      :Remove old full-directory symlink;
+    elseif (.claude/commands is directory?) then (yes)
+      :Preserve custom commands << Update >>;
+      :List custom commands;
+      :Remove only use-case/ symlink;
+    endif
+
+    :Remove old .ai-tools/commands/use-case/;
+
+    :Copy fresh commands from CLI;
+  }
+
+  :Run setup-project.sh --update;
+  note right
+    Refreshes:
+    - Slash commands
+    - Git hooks
+    - Symlink structure
+  end note
+
+  :Update registry with new version;
+
+  :Display completion message << Success >>;
+  note right
+    ✓ Updated from v3.10.0 → v3.11.0
+    ✓ Custom commands preserved
+    ✓ Registry updated
+  end note
+endif
+
+stop
+
+@enduml

@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **PlantUML Activity Diagrams**: Added comprehensive activity diagrams for all major CLI commands
+  - **New directory**: `docs/diagrams/plantuml/` with 9 PlantUML diagrams
+  - **Diagrams created**:
+    - `installation-flow.puml` - CLI installation process
+    - `init-command-flow.puml` - Project initialization with migration handling
+    - `sync-command-flow.puml` - Documentation sync to hub with symlink creation
+    - `document-session-flow.puml` - AI-powered session documentation
+    - `search-command-flow.puml` - Search and statistics commands
+    - `project-management-flow.puml` - Project registry management (list/check/update)
+    - `config-command-flow.puml` - Hub configuration management
+    - `publish-confluence-flow.puml` - Confluence publishing workflow
+    - `agent-commands-flow.puml` - Agent framework operations
+  - **Documentation**: Created `plantuml/README.md` with viewing instructions and conventions
+  - **Updated**: Main `docs/diagrams/README.md` to index PlantUML diagrams
+  - **Benefits**: Visual documentation of command execution flows, easier onboarding, clearer understanding of complex workflows
+  - **Color coding**: Success (Green #90EE90), Actions (Light Blue #87CEEB), AI operations (Lavender #E6E6FA), Git operations (Yellow #FFFF99), etc. See `docs/diagrams/plantuml/README.md` for full color conventions.
+
 - **Agent Framework Component Diagram**: Added new C4 Component Diagram for Agent Framework
   - Shows internal components: agent-registry.sh, invoke-agent.sh, quality-agent.sh, and agent prompts
   - Visualizes agent lifecycle management, invocation flow, and integration points

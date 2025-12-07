@@ -1,0 +1,105 @@
+@startuml Installation Flow
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam activity {
+  BackgroundColor<< Success >> #90EE90
+  BackgroundColor<< Action >> #87CEEB
+  BackgroundColor<< Decision >> #FFD700
+  BorderColor #333333
+  FontSize 12
+}
+
+title AI Use Case CLI - Installation Flow
+
+start
+
+:User runs installation command;
+note right
+  curl -fsSL <url> | bash
+  OR
+  ./install.sh
+end note
+
+:Display installation banner;
+
+:Check prerequisites;
+note right
+  - Bash shell
+  - Git installed
+  (jq checked at runtime)
+end note
+
+if (Prerequisites met?) then (yes)
+  :Clone/Copy CLI to ~/.local/share/ai-use-case-cli;
+
+  :Create symlink at ~/.local/bin/ai-use-case;
+
+  if (PATH includes ~/.local/bin?) then (no)
+    :Prompt to add to PATH;
+    note right
+      Add to ~/.bashrc or ~/.zshrc:
+      export PATH="$HOME/.local/bin:$PATH"
+    end note
+  else (yes)
+    :PATH already configured;
+  endif
+
+  :Prompt: "Would you like to configure hub mode now? (y/N)";
+
+  if (Configure hub now?) then (yes)
+    :Prompt user to select hub configuration mode;
+    note right
+      Choose one:
+      - Local-only (no remote sync)
+      - Private-git (sync to private hub repo)
+    end note
+
+    if (User selects local-only?) then (yes)
+      :Write config file at ~/.config/ai-use-case-cli/config.json;
+      note right
+        {
+          "hubMode": "local-only"
+        }
+      end note
+    else (no)
+      :Prompt for private hub git URL;
+      :Write config file at ~/.config/ai-use-case-cli/config.json;
+      note right
+        {
+          "hubMode": "private-git",
+          "gitUrl": "<user-provided-url>"
+        }
+      end note
+    endif
+
+  else (no)
+    :Use default local-only mode;
+    note right
+      Hub configured on first use
+      Configure later: ai-use-case config reconfigure
+    end note
+  endif
+
+  :Display completion banner;
+  note right
+    ✓ CLI installed at ~/.local/bin/ai-use-case
+    ✓ Run: ai-use-case --help
+  end note
+
+  :Installation complete << Success >>;
+
+else (no)
+  :Display error message;
+  note right
+    Missing prerequisites:
+    - Install Git
+  end note
+
+  :Installation failed;
+  stop
+endif
+
+stop
+
+@enduml

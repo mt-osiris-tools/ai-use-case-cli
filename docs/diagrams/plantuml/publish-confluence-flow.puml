@@ -1,0 +1,100 @@
+@startuml Publish Confluence Flow
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam activity {
+  BackgroundColor<< Success >> #90EE90
+  BackgroundColor<< Action >> #87CEEB
+  BackgroundColor<< Confluence >> #B0C4DE
+  BorderColor #333333
+  FontSize 12
+}
+
+title AI Use Case CLI - Publish to Confluence
+
+start
+
+:User runs ai-use-case publish-confluence [file];
+
+if (File specified?) then (no)
+  :List available use case files;
+
+  :Prompt user to select file;
+else (yes)
+  :Use specified file;
+endif
+
+:Read markdown file;
+
+:Parse front matter and content;
+note right
+  Extract:
+  - Title
+  - Metadata
+  - Content sections
+end note
+
+partition "Confluence Integration" #LightBlue {
+  :Determine authentication method;
+  note right
+    Priority order:
+    1. CLI options (--api-token)
+    2. Environment variables
+    3. Config file
+    4. MCP server (AI assistants)
+  end note
+
+  if (REST API credentials?) then (yes)
+    :Use REST API authentication;
+    note right
+      - API token + email
+      - Base URL + space key
+    end note
+  elseif (MCP tools available?) then (yes)
+    :Use Atlassian MCP server << Confluence >>;
+    :Authenticate with Atlassian;
+    :Get accessible resources;
+  else (no auth)
+    :Error: No authentication configured;
+    note right
+      Options:
+      - Set API token
+      - Configure MCP server
+      - Use environment variables
+    end note
+    stop
+  endif
+
+  :Prompt for target space/parent page << Confluence >>;
+
+  :Convert markdown to Confluence format;
+  note right
+    - Markdown → ADF (Atlassian Document Format)
+    - Preserve formatting
+    - Handle code blocks
+    - Convert tables
+  end note
+
+  :Create or update page << Confluence >>;
+
+  if (Page exists?) then (yes)
+    :Update existing page;
+    :Add version comment;
+  else (no)
+    :Create new page;
+  endif
+
+  :Get page URL;
+
+  :Display success message << Success >>;
+  note right
+    ✓ Published to Confluence
+    Page: [URL]
+    Space: [space name]
+    Method: [REST API/MCP]
+  end note
+}
+
+stop
+
+@enduml

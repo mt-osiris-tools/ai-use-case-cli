@@ -1,0 +1,99 @@
+@startuml Search and Stats Commands
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam activity {
+  BackgroundColor<< Success >> #90EE90
+  BackgroundColor<< Action >> #87CEEB
+  BackgroundColor<< Search >> #98FB98
+  BorderColor #333333
+  FontSize 12
+}
+
+title AI Use Case CLI - Search & Stats Commands
+
+|Search Command|
+start
+
+:User runs ai-use-case search <term>;
+
+:Get hub directory path;
+
+:Search all .md files in hub;
+note right
+  Searches in:
+  - by-project/*/*.md
+  - File content (grep)
+  - Filename matching
+end note
+
+:Find matches << Search >>;
+
+if (Matches found?) then (yes)
+  :Display results with context;
+  note right
+    Shows:
+    - Filename
+    - Project name
+    - Matching lines
+    - File path
+  end note
+
+  :Highlight search term;
+else (no)
+  :No matches found;
+endif
+
+stop
+
+|Stats Command|
+start
+
+:User runs ai-use-case stats;
+
+:Get hub directory path;
+
+partition "Collect Statistics" {
+  :Count total use cases;
+  note right
+    All .md files in
+    by-project/
+  end note
+
+  :Count projects;
+  note right
+    Subdirectories in
+    by-project/
+  end note
+
+  :Calculate use cases per project;
+  note right
+    Sorted by count
+  end note
+
+  :Find most common AI tools;
+  note right
+    Parse "Agent Used:"
+    field from documents
+  end note
+
+  :Calculate total time saved;
+  note right
+    Sum of time estimates
+    from use case metadata
+  end note
+}
+
+:Display statistics << Success >>;
+note right
+  Summary:
+  - Total use cases: N
+  - Projects: M
+  - Use cases per project (sorted)
+  - Most common AI tools
+  - Total time saved
+end note
+
+stop
+
+@enduml
