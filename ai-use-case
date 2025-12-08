@@ -69,6 +69,7 @@ ${YELLOW}COMMANDS${NC}
   ${GREEN}publish-confluence${NC}        Publish use case to Confluence
   ${GREEN}agents <subcommand>${NC}       Manage AI agents (list, enable, disable, info)
   ${GREEN}review-quality <file>${NC}     Review documentation quality with AI agent
+  ${GREEN}analyze-patterns${NC}          Analyze documentation patterns with AI agent
   ${GREEN}tracing [subcommand]${NC}      Manage tracing configuration
   ${GREEN}reset [options]${NC}           Reset CLI configuration and data
   ${GREEN}update [options]${NC}          Update CLI to latest version
@@ -103,6 +104,8 @@ ${YELLOW}EXAMPLES${NC}
   ai-use-case agents list         # List available agents
   ai-use-case agents enable quality-reviewer  # Enable an agent
   ai-use-case review-quality file.md  # Review documentation quality
+  ai-use-case analyze-patterns       # Analyze documentation patterns
+  ai-use-case analyze-patterns --hub # Analyze patterns across all projects
 
 ${YELLOW}PROJECT REGISTRY (v3.1.0+)${NC}
   ${GREEN}list-projects${NC}             List registered projects with versions
@@ -333,6 +336,19 @@ case "${1:-}" in
             trace_event "error" "command=review-quality" "error=script_not_found" "script=quality-agent.sh"
             echo -e "${RED}Error: quality-agent.sh not found${NC}"
             echo -e "${YELLOW}Quality agent feature may not be installed${NC}"
+            exit 1
+        fi
+        ;;
+    analyze-patterns)
+        trace_event "command_start" "command=analyze-patterns" "mode=${2:-default}"
+        if [ -f "$SCRIPT_DIR/scripts/agents/pattern-agent.sh" ]; then
+            # Pass all arguments to pattern-agent.sh
+            shift
+            trace_run "analyze-patterns" bash "$SCRIPT_DIR/scripts/agents/pattern-agent.sh" "$@"
+        else
+            trace_event "error" "command=analyze-patterns" "error=script_not_found" "script=pattern-agent.sh"
+            echo -e "${RED}Error: pattern-agent.sh not found${NC}"
+            echo -e "${YELLOW}Pattern analysis agent feature may not be installed${NC}"
             exit 1
         fi
         ;;
