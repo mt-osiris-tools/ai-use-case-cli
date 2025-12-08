@@ -85,8 +85,8 @@ ai-use-case config reconfigure
 ```
 
 This allows you to:
-- Switch from local-only to private git
-- Switch from private git to local-only
+- Switch from Local Only to Private Git
+- Switch from Private Git to Local Only
 - Change git repository URL
 - Migrate existing documentation
 
@@ -114,7 +114,7 @@ ai-use-case reset --all
 ai-use-case reset --help
 ```
 
-**Important**: The hub directory is protected and requires explicit `--hub` flag to delete (only works in local-only mode).
+**Important**: The hub directory is protected and requires explicit `--hub` flag to delete (only works in Local Only mode).
 
 ## Environment Variables
 
@@ -152,7 +152,7 @@ export AI_USECASES_DIR="$HOME/Documents/my-custom-hub"
 - Shared network storage
 - Different disk partitions
 
-**Note**: Works with both local-only and private git modes.
+**Note**: Works with both Local Only and Private Git modes.
 
 ### PATH Configuration
 

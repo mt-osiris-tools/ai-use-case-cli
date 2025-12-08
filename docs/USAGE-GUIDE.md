@@ -50,7 +50,7 @@ Use **either** standalone CLI or Claude Code slash commands—whatever fits your
 | Search use cases | `ai-use-case search <term>` | `/use-case:search-usecases` |
 | View statistics | `ai-use-case stats` | |
 | Extract session data | `ai-use-case extract [hours] [format]` | `/use-case:extract-session` |
-| List projects | `ai-use-case list` | `/use-case:list-projects` |
+| List projects | `ai-use-case list-projects` | `/use-case:list-projects` |
 | Check for updates | `ai-use-case check-updates` | `/use-case:check-updates` |
 | Update project | `ai-use-case update-project <path>` | `/use-case:update-project` |
 | Reset configuration | `ai-use-case reset [options]` | |
@@ -303,5 +303,5 @@ Updates:
 - [CONFIGURATION.md](CONFIGURATION.md) - Configuration options
 - [FEATURES.md](FEATURES.md) - Feature descriptions
 - [TRACING.md](TRACING.md) - OpenTelemetry tracing setup
-- [docs/agents/](agents/) - AI agent framework documentation
+- [agents/](agents/) - AI agent framework documentation
 - [WORKFLOW.md](WORKFLOW.md) - Development workflow for contributors

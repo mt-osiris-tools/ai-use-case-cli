@@ -460,7 +460,7 @@ ai-use-case agents stats
 
 **Available Since**: v3.11.0 (framework), agents coming in future releases
 
-**Learn More**: See [docs/agents/framework/README.md](agents/framework/README.md)
+**Learn More**: See [agents/framework/README.md](agents/framework/README.md)
 
 ## Feature Comparison Matrix
 
@@ -502,4 +502,4 @@ For complete version history, see [CHANGELOG.md](../CHANGELOG.md).
 - [USAGE-GUIDE.md](USAGE-GUIDE.md) - Detailed usage instructions
 - [CONFIGURATION.md](CONFIGURATION.md) - Configuration options
 - [TRACING.md](TRACING.md) - OpenTelemetry tracing setup
-- [docs/agents/](agents/) - AI agent framework documentation
+- [agents/](agents/) - AI agent framework documentation
