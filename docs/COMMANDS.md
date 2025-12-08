@@ -127,6 +127,61 @@ ai-use-case tracing set <key> <value>
 - View in VS Code AI Toolkit > Tracing
 - Real-time performance monitoring
 
+### Intelligent Agents (v3.11.0+)
+
+Manage and invoke AI-powered agents for documentation analysis:
+
+```bash
+# Agent Registry Management
+ai-use-case agents init         # Initialize agent registry
+ai-use-case agents list         # List all available agents
+ai-use-case agents list --enabled  # List only enabled agents
+ai-use-case agents enable <id>  # Enable an agent
+ai-use-case agents disable <id> # Disable an agent
+ai-use-case agents info <id>    # Show detailed agent information
+ai-use-case agents stats        # Show agent usage statistics
+
+# Documentation Quality Review (Phase 2)
+ai-use-case review-quality <file>  # Review single file quality
+                               # - Quality scoring (0-10)
+                               # - Category breakdown
+                               # - Improvement suggestions
+
+ai-use-case review-quality --batch '*.md'
+                               # Batch review multiple files
+
+ai-use-case review-quality --project <name>
+                               # Review all files in a project
+
+# Pattern Analysis (Phase 3)
+ai-use-case analyze-patterns    # Analyze current project patterns
+                               # - Pattern detection
+                               # - Trend analysis
+                               # - Recommendations
+
+ai-use-case analyze-patterns --project <name>
+                               # Analyze specific project from hub
+
+ai-use-case analyze-patterns --hub
+                               # Analyze entire hub
+
+ai-use-case analyze-patterns --hub --compare
+                               # Compare all projects in hub
+
+ai-use-case analyze-patterns --period 6months
+                               # Analyze specific time period
+                               # Options: 1month, 3months, 6months, 1year
+                               # Or: YYYY-MM-DD:YYYY-MM-DD
+
+ai-use-case analyze-patterns --format json
+                               # Output in JSON format
+```
+
+**Agent Configuration:**
+- Registry file: `~/.config/ai-use-case-cli/agents.json`
+- Cache directory: `~/.cache/ai-use-case-cli/agents/`
+- See [docs/agents/framework/README.md](agents/framework/README.md) for complete guide
+
 ### Utility Commands
 
 ```bash
@@ -156,6 +211,17 @@ For AI-assisted documentation with automatic context capture:
 /use-case:list-projects      # List all registered projects with versions
 /use-case:check-updates      # Check which projects need CLI updates
 /use-case:update-project     # Update a project to latest CLI version
+
+# v3.11.0+ Intelligent Agent Commands
+/use-case:review-quality     # Review documentation quality with AI agent
+                            # - Interactive file selection
+                            # - Quality scoring and suggestions
+                            # - Option to apply improvements
+
+/use-case:analyze-patterns   # Analyze documentation patterns
+                            # - Project or hub-wide analysis
+                            # - Trend visualization
+                            # - Prioritized recommendations
 ```
 
 ## Direct Script Access (Advanced)
