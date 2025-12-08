@@ -1,8 +1,8 @@
 # AI Use Case CLI - Intelligent Agents Guide
 
-**Version:** 1.0.0 (Phase 1 - Agent Framework)
+**Version:** 1.2.0 (Phase 1-3 - Agent Framework + Quality + Patterns)
 **Feature ID:** FEATURE-002
-**Status:** Agent Framework Complete
+**Status:** Phase 1-3 Complete (Quality Reviewer, Pattern Analyzer)
 
 ---
 
@@ -195,11 +195,9 @@ Invokes agents with:
 
 ## Available Agents
 
-### Currently Available (Phase 1)
+### Currently Available
 
-All agents are registered but **not yet implemented**. Implementations will be added in Phases 2-5.
-
-#### 1. Quality Reviewer (Phase 2 - Planned)
+#### 1. Quality Reviewer ✅ (Phase 2 - Implemented)
 
 **ID:** `quality-reviewer`
 **Subagent Type:** `use-case-quality-agent`
@@ -207,34 +205,56 @@ All agents are registered but **not yet implemented**. Implementations will be a
 **Purpose:** Analyzes documentation quality and provides improvement suggestions
 
 **Capabilities:**
-- Quality scoring (0-10)
-- Completeness verification
-- Style review
-- Actionable improvement suggestions
+- Quality scoring (0-10) with weighted categories
+- Completeness verification for all template sections
+- Style review and formatting checks
+- Actionable improvement suggestions with examples
 
-**Usage (when implemented):**
+**Usage:**
 ```bash
+# Review single file
 ai-use-case review-quality .usecase/cases/example.md
+
+# Batch review all files
+ai-use-case review-quality --batch '.usecase/cases/*.md'
+
+# Review specific project from hub
+ai-use-case review-quality --project my-project
+
+# Claude Code slash command
 /use-case:review-quality [file]
 ```
 
-#### 2. Pattern Analyzer (Phase 3 - Planned)
+#### 2. Pattern Analyzer ✅ (Phase 3 - Implemented)
 
 **ID:** `pattern-analyzer`
 **Subagent Type:** `use-case-pattern-agent`
 
-**Purpose:** Learns from documentation patterns and provides recommendations
+**Purpose:** Analyzes documentation patterns across projects and provides recommendations
 
 **Capabilities:**
-- Pattern detection across projects
-- Project classification
-- Recommendation generation
-- Trend analysis
+- Pattern detection across projects (session types, complexity, tools)
+- Project classification by type and maturity
+- Trend analysis (documentation frequency, quality trends)
+- Prioritized recommendations for improvement
+- Hub-wide analysis with project comparison
 
-**Usage (when implemented):**
+**Usage:**
 ```bash
+# Analyze current project
+ai-use-case analyze-patterns
+
+# Analyze specific project from hub
 ai-use-case analyze-patterns --project my-project
-/use-case:analyze-patterns
+
+# Analyze entire hub with comparison
+ai-use-case analyze-patterns --hub --compare
+
+# Analyze specific time period
+ai-use-case analyze-patterns --period 6months
+
+# Claude Code slash command
+/use-case:analyze-patterns [options]
 ```
 
 #### 3. Session Selector (Phase 4 - Planned)
@@ -591,31 +611,39 @@ ai-use-case agents info quality-reviewer
 
 ## Roadmap
 
-### Phase 1: Agent Framework ✅ (Current)
+### Phase 1: Agent Framework ✅ (Complete)
 - ✅ Agent registry system
 - ✅ Agent invocation framework
 - ✅ CLI integration
 - ✅ Statistics and caching
 
-### Phase 2: Quality Reviewer (Next)
-- Documentation quality analysis
-- Quality scoring and suggestions
-- CLI and slash commands
+### Phase 2: Quality Reviewer ✅ (Complete - v3.11.0)
+- ✅ Documentation quality analysis
+- ✅ Quality scoring (0-10) with weighted categories
+- ✅ CLI command: `ai-use-case review-quality`
+- ✅ Slash command: `/use-case:review-quality`
+- ✅ Batch and project modes
 
-### Phase 3: Pattern Analyzer
-- Pattern detection
-- Project recommendations
-- Trend analysis
+### Phase 3: Pattern Analyzer ✅ (Complete)
+- ✅ Pattern detection across projects
+- ✅ Project classification and maturity assessment
+- ✅ Trend analysis (frequency, quality)
+- ✅ Prioritized recommendations
+- ✅ CLI command: `ai-use-case analyze-patterns`
+- ✅ Slash command: `/use-case:analyze-patterns`
+- ✅ Hub-wide analysis with comparison
 
-### Phase 4: Session Selector
+### Phase 4: Session Selector (Next)
 - Intelligent PR analysis
 - Commit grouping
 - Priority scoring
+- Context extraction
 
 ### Phase 5: Organization Intelligence
 - Hub organization optimization
 - Topic analysis
 - Relationship mapping
+- Tag suggestions
 
 ---
 
@@ -636,6 +664,6 @@ ai-use-case agents info quality-reviewer
 
 ---
 
-**Last Updated:** 2025-12-02
-**Version:** 1.0.0 (Phase 1 Complete)
-**Status:** Agent Framework Operational, Agent Implementations Pending (Phase 2-5)
+**Last Updated:** 2025-12-07
+**Version:** 1.2.0 (Phase 1-3 Complete)
+**Status:** Agent Framework + Quality Reviewer + Pattern Analyzer Operational
