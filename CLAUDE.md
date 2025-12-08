@@ -1,0 +1,1 @@
+- Always consider using set -euo pipefail instead of just set -e for more robust error handling.
