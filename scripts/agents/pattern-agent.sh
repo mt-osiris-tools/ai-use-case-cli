@@ -360,14 +360,13 @@ analyze_project() {
             }
         }')
 
-    # Prepare invocation parameters
-    local invoke_params="pattern-analyzer --context '$context'"
-    [ "$format" = "json" ] && invoke_params="$invoke_params --format json"
-    [ "$no_cache" = "true" ] && invoke_params="$invoke_params --no-cache"
-
-    # Invoke agent
+    # Invoke agent safely without eval to prevent shell injection
     local result=""
-    if result=$(eval "invoke_agent $invoke_params" 2>&1); then
+    local invoke_args=("pattern-analyzer" "--context" "$context")
+    [ "$format" = "json" ] && invoke_args+=("--format" "json")
+    [ "$no_cache" = "true" ] && invoke_args+=("--no-cache")
+
+    if result=$(invoke_agent "${invoke_args[@]}" 2>&1); then
         if [ "$format" = "json" ]; then
             echo "$result"
         else
@@ -478,14 +477,13 @@ analyze_hub() {
             }
         }')
 
-    # Prepare invocation parameters
-    local invoke_params="pattern-analyzer --context '$context'"
-    [ "$format" = "json" ] && invoke_params="$invoke_params --format json"
-    [ "$no_cache" = "true" ] && invoke_params="$invoke_params --no-cache"
-
-    # Invoke agent
+    # Invoke agent safely without eval to prevent shell injection
     local result=""
-    if result=$(eval "invoke_agent $invoke_params" 2>&1); then
+    local invoke_args=("pattern-analyzer" "--context" "$context")
+    [ "$format" = "json" ] && invoke_args+=("--format" "json")
+    [ "$no_cache" = "true" ] && invoke_args+=("--no-cache")
+
+    if result=$(invoke_agent "${invoke_args[@]}" 2>&1); then
         if [ "$format" = "json" ]; then
             echo "$result"
         else
