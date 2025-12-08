@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Automated Test Suite**: Comprehensive bats-core testing framework for CI/CD and development
   - **Test Framework**: bats-core with bats-support, bats-assert, and bats-file libraries (git submodules)
   - **Test Runner**: `./run-tests.sh` script with filtering, verbose mode, and TAP output support
-  - **Test Coverage**: 10 test files covering ~80 tests across all core functionality
+  - **Test Coverage**: 10 test files covering 190 tests across all core functionality
     - `version.bats` - Version system and semver validation
     - `config-manager.bats` - Configuration management functions
     - `hub-utils.bats` - Hub utility functions
