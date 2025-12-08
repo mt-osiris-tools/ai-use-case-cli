@@ -223,9 +223,65 @@ If your changes affect:
 
 Then review **docs/HUB-SYNC-CHECKLIST.md** and ensure corresponding updates are made to the hub repository.
 
-#### Testing
+#### Running Tests
 
-Test your changes thoroughly:
+The project uses [bats-core](https://github.com/bats-core/bats-core) for automated testing.
+
+**Setup** (one-time):
+```bash
+git submodule update --init --recursive
+```
+
+**Running Tests**:
+```bash
+# Run all tests
+./run-tests.sh
+
+# Run specific test file
+./run-tests.sh version
+./run-tests.sh config-manager
+
+# Run with verbose output
+./run-tests.sh --verbose
+
+# Run tests matching a pattern
+./run-tests.sh --filter "help"
+
+# List available test files
+./run-tests.sh --list
+```
+
+**Writing Tests**:
+
+Test files are located in `tests/` with `.bats` extension. Each test file should:
+
+1. Load the test helper: `load 'test_helper'`
+2. Use `setup()` and `teardown()` for test isolation
+3. Follow existing patterns in the codebase
+
+Example test:
+```bash
+#!/usr/bin/env bats
+load 'test_helper'
+
+setup() {
+    common_setup
+}
+
+teardown() {
+    common_teardown
+}
+
+@test "descriptive test name" {
+    run some_command
+    assert_success
+    assert_output --partial "expected output"
+}
+```
+
+#### Manual Testing
+
+In addition to automated tests, verify your changes work end-to-end:
 
 ```bash
 # Test CLI commands

@@ -290,7 +290,20 @@ We welcome contributions! This project follows a branch-based workflow.
 1. Fork the repository
 2. Create feature branch: `git checkout -b feature/amazing-feature`
 3. Make changes and update CHANGELOG.md
-4. Push and open PR
+4. Run tests: `./run-tests.sh`
+5. Push and open PR
+
+**Testing:**
+```bash
+# Initialize test framework (first time only)
+git submodule update --init --recursive
+
+# Run all tests
+./run-tests.sh
+
+# Run specific tests
+./run-tests.sh version config-manager
+```
 
 **[Full Contributing Guide →](CONTRIBUTING.md)**
 
