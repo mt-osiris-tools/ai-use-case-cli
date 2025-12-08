@@ -8,24 +8,16 @@
 
 ## Table of Contents
 
-- 🎯 [Why This Tool?](#why-this-tool)
-- ✨ [Features](#features)
-- 📦 [Quick Install](#quick-install)
-- 🚀 [Quick Start](#quick-start)
-- 📖 [Usage](#usage)
-- ⚙️ [How It Works](#how-it-works)
-- 🔧 [Configuration](#configuration)
-- 🗂️ [Project Registry (v3.1.0+)](#project-registry-v310)
-- 💡 [Examples](#examples)
-- 🔍 [Troubleshooting](#troubleshooting)
-- 🔄 [Updates](#updates)
-- 🚚 [Migration from v2.x](#migration-from-v2x)
-- 🗑️ [Uninstall](#uninstall)
-- 🤝 [Contributing](#contributing)
-- 📋 [Requirements](#requirements)
-- 💬 [Support](#support)
-- 🔗 [Related Projects](#related-projects)
-- 📄 [License](#license)
+- [Why This Tool?](#why-this-tool)
+- [Features](#features)
+- [Quick Install](#quick-install)
+- [Quick Start](#quick-start)
+- [Core Commands](#core-commands)
+- [Learn More](#learn-more)
+- [Examples](#examples)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
@@ -42,20 +34,16 @@ Documentation shouldn't be a burden—it should be a valuable asset that grows y
 
 ## Features
 
-- 🎯 **Hybrid interface** - Use standalone CLI commands or AI assistant slash commands
-- 🚀 **AI-assisted documentation** - Automatic context capture with GitHub Copilot, Claude Code, and other AI tools
-- 🔬 **Research & implementation sessions** - Document both code changes and exploratory work
-- 🤖 **AI agent tracking** - Automatically track and document usage of specialized agents from any AI tool
-- 🧠 **Intelligent agents** - AI-powered agents for quality review, pattern analysis, and organization (Phase 1 complete, more coming!)
-- 📊 **Session data extraction** - Extract git history, token usage, and metrics for reporting (v3.4.0+)
-- 📈 **Session statistics automation** - SessionEnd hook, /cost integration, and OpenTelemetry for tracking costs, tokens, and time (v3.12.0+)
-- 📊 **OpenTelemetry tracing** - Monitor CLI performance and usage with distributed tracing (v3.6.0+)
-- 📈 **Command progress tracking** - Visual real-time progress indicators for all commands (v3.8.0+)
-- 🔄 **Automatic syncing** - Git hooks sync docs to your chosen hub automatically
-- 🔧 **Flexible storage** - Choose between local-only or private git repository (v3.2.0+)
-- 🗂️ **Project registry** - Track and update all projects using the CLI (v3.1.0+)
-- 🔍 **Search & stats** - Find and analyze documented use cases
-- 📤 **Confluence publishing** - Publish use cases to Confluence as child pages
+- 🎯 **Hybrid interface** - Use standalone CLI or AI assistant slash commands
+- 🚀 **AI-assisted documentation** - Automatic context capture with any AI coding assistant
+- 🔬 **Research & implementation** - Document both code changes and exploratory work
+- 🤖 **Agent tracking** - Automatically track specialized agents from any AI tool
+- 📊 **Session statistics** - Track costs, tokens, and time automatically
+- 🔄 **Automatic syncing** - Git hooks sync docs to your hub
+- 🔧 **Flexible storage** - Choose local-only or private git repository
+- 🔍 **Search & analytics** - Find and analyze documented use cases
+
+**[View All Features →](docs/FEATURES.md)**
 
 ## Quick Install
 
@@ -73,318 +61,153 @@ cd ~/.local/share/ai-use-case-cli
 
 ## Quick Start
 
-1. **Setup your project**:
-   ```bash
-   ai-use-case --init
-   ```
-   This creates `.usecase/cases/`, installs git hooks, copies slash commands to `.ai-tools/commands/`, and creates a `.claude/commands/use-case/` symlink for Claude Code compatibility (preserving any custom commands).
-
-2. **Work on your code with AI assistance** (GitHub Copilot, Claude Code, or other AI tools)
-
-3. **Document your session** (in your AI coding assistant):
-   ```
-   /use-case:document-session
-   ```
-   **v3.4.0+**: Interactively select which work to document (PRs, current session, or recent commits), then automatic generation captures context, git changes, and creates complete documentation.
-
-   **v3.9.0+**: Shows real-time progress through 8 visible steps (tracking 6 workflow phases) with todo list.
-
-   **v3.10.0+**: Checklist appears first, checks git user (always), then asks what to scan (conversation/git/both) before running git history commands.
-
-4. **Search and analyze**:
-   ```bash
-   ai-use-case search "authentication"
-   ai-use-case stats
-   ```
-
-## Usage
-
-### Slash Commands for AI Coding Assistants
-
-This CLI provides slash commands for AI coding assistants like Claude Code and GitHub Copilot. After running `ai-use-case --init`, slash commands are automatically available in your project.
-
-**How it works:**
-- Commands are stored in `.ai-tools/commands/use-case/` (AI-tool-agnostic location)
-- A subdirectory symlink at `.claude/commands/use-case/` points to `../../.ai-tools/commands/use-case/`
-- This preserves any custom commands you add to `.claude/commands/`
-- Claude Code automatically discovers commands from `.claude/commands/`
-- Use slash commands like `/use-case:document-session` directly in your AI assistant
-
-**Setup:**
-```bash
-ai-use-case --init  # Automatically creates symlink for Claude Code
-```
-
-**Verification:**
-```bash
-ls -la .claude/commands/use-case    # Should show: use-case → ../../.ai-tools/commands/use-case
-ls .ai-tools/commands/use-case/     # Should list all available commands
-```
-
-### Core Commands
-
-Use **either** standalone CLI or Claude Code slash commands—whatever fits your workflow:
-
-| Task | CLI Command | Claude Code |
-|------|-------------|-------------|
-| Setup project | `ai-use-case --init` | `/use-case:setup-project` |
-| Update project installation | `ai-use-case --init --update` | |
-| Show hub config | `ai-use-case config show` | |
-| Reconfigure hub | `ai-use-case config reconfigure` | |
-| Document session | N/A – use Claude Code | `/use-case:document-session` |
-| Sync to hub | `ai-use-case sync` | `/use-case:sync-usecases` |
-| Search use cases | `ai-use-case search <term>` | `/use-case:search-usecases` |
-| View statistics | `ai-use-case stats` | |
-| Extract session data | `ai-use-case extract [hours] [format]` | `/use-case:extract-session` |
-| List projects | `ai-use-case list` | `/use-case:list-projects` |
-| Check for updates | `ai-use-case check-updates` | `/use-case:check-updates` |
-| Update project | `ai-use-case update-project <path>` | `/use-case:update-project` |
-| Reset configuration | `ai-use-case reset [options]` | |
-| Publish to Confluence | `ai-use-case publish-confluence` | `/use-case:publish-confluence` |
-| View hub | `ai-use-case view` | |
-| Push hub changes | `ai-use-case push` | |
-| **Initialize tracing** | `ai-use-case tracing init` | |
-| Configure tracing | `ai-use-case tracing configure` | |
-| View tracing status | `ai-use-case tracing status` | |
-
-### Additional Commands
+### 1. Setup Your Project
 
 ```bash
-ai-use-case --version     # Show version information
-ai-use-case --help        # Show help message
-ai-use-case uninstall     # Uninstall the CLI tool
+ai-use-case --init
 ```
 
-### Session Types
+This creates:
+- `.usecase/cases/` directory for documentation
+- Git hooks for automatic syncing
+- Slash commands in `.ai-tools/commands/`
+- Claude Code compatibility via `.claude/commands/use-case/` symlink
 
-The CLI supports two types of AI sessions:
+Choose your hub mode:
+- **Local Only** (default): Documentation stays on your machine
+- **Private Git**: Full version control with your repository
 
-**🎯 Implementation Sessions** - For code changes:
-- Captures git statistics (files changed, lines added/removed)
-- Includes code snippets and technical details
-- Uses project-specific tickets (e.g., `PROJ-1234`)
+### 2. Work With AI
 
-**🔬 Research Sessions** - For exploration:
-- No code changes required
-- Documents query refinement and decision-making
-- Auto-generates `RESEARCH-XXX` tickets
+Use your preferred AI coding assistant:
+- GitHub Copilot
+- Claude Code
+- Cursor
+- Any other AI tool
 
-Examples: Evaluating architectures, comparing solutions, understanding codebases, investigating issues before fixing.
+### 3. Document Your Session
 
-## How It Works
-
-### Architecture
-
-> 📊 **[View Architecture Diagrams](docs/diagrams/)** - C4 model diagrams (system context, containers, components, deployment) and sequence diagrams (document-session workflow)
-
-The CLI provides flexible documentation storage options:
-
-- **CLI Tools** (this repo): Scripts for documenting and managing use cases
-- **Documentation Hub**: Your choice of storage location
-  - **Local Only** (default): `~/.local/share/ai-use-case-cli/hub/` - No git, no remote sync
-  - **Private Git**: Your own repository - Full version control
-  - Organized by project, date, and topic using symlinks
-
-### Workflow
-
-1. **Setup**: Creates `.usecase/cases/` in your project + installs git hooks
-2. **Document**: `/use-case:document-session` shows checklist → checks git user → asks what to scan → presents options → you select → automatic generation with real-time progress
-3. **Sync**: Git hooks automatically sync to hub (with git operations if configured)
-4. **Organize**: Hub organizes docs by project, date, and topic
-
-### File Naming Convention
-
+In your AI assistant:
 ```
-YYYY-Www-MM-DD_TICKET-XXXXX_brief-description.md
+/use-case:document-session
 ```
 
-Where `Www` is the ISO 8601 week number (W01-W53).
+The AI assistant will:
+1. Show pre-flight checklist (git config, branch status)
+2. Ask what to scan (conversation/git/both)
+3. Present options (undocumented PRs, current session, recent commits)
+4. Generate complete documentation automatically
+5. Sync to hub via git hooks
 
-Examples:
-```
-2025-W44-11-03_PROJ-1234_implement-user-authentication.md
-2025-W44-11-03_RESEARCH-001_evaluate-database-strategies.md
-```
-
-## Configuration
-
-### Hub Configuration (v3.2.0+)
-
-When you run `ai-use-case --init` for the first time, you'll choose a hub mode:
-
-**1. Local Only (Default)**
-- Files stored in `~/.local/share/ai-use-case-cli/hub/`
-- No git, no version control, no remote sync
-- Best for: Personal use, quick local documentation
-- Complete privacy - everything stays on your machine
-
-**2. Private Git**
-- Connect to your own private git repository
-- Full version control with your chosen remote
-- Best for: Private team documentation, version-controlled workflow
-- You control the repository and access
-
-### Managing Configuration
+### 4. Search and Analyze
 
 ```bash
-# View current configuration
-ai-use-case config show
-
-# Change hub mode (switch between local/private)
-ai-use-case config reconfigure
-```
-
-### Tracing and Monitoring (v3.6.0+)
-
-Monitor CLI performance and usage with OpenTelemetry tracing:
-
-```bash
-# Quick setup (one command - recommended)
-ai-use-case tracing init      # Initialize config + install dependencies
-ai-use-case tracing enable    # Enable tracing
-ai-use-case tracing test      # Verify it works
-
-# Or manual setup
-ai-use-case tracing install-deps   # Install dependencies
-ai-use-case tracing configure      # Configure interactively
-
-# Check tracing status
-ai-use-case tracing status
-
-# Enable/disable tracing
-ai-use-case tracing enable
-ai-use-case tracing disable
-```
-
-**AI Toolkit Integration**: Tracing data is sent to VS Code AI Toolkit's built-in tracing viewer for real-time monitoring and analysis.
-
-**Learn More**: See the [Tracing Guide](docs/TRACING.md) for comprehensive setup and usage instructions.
-
-
-### Environment Variables
-
-```bash
-# Override CLI installation directory (for custom installations)
-export AI_USECASES_CLI_ROOT="$HOME/.local/share/ai-use-case-cli"  # Default
-# Or use a custom path:
-# export AI_USECASES_CLI_ROOT="$HOME/custom/path/ai-use-case-cli"
-
-# Override hub location (works with both modes)
-export AI_USECASES_DIR="$HOME/.local/share/ai-use-case-cli/hub"  # Default for local mode
-# Or use a custom path:
-# export AI_USECASES_DIR="$HOME/Documents/my-custom-hub"
-
-# Ensure CLI is in PATH (usually handled by install script)
-export PATH="$HOME/.local/bin:$PATH"
-```
-
-Add to `~/.bashrc` or `~/.zshrc` for persistence.
-
-## Project Registry (v3.1.0+)
-
-The CLI now tracks all projects using the tool, enabling version management:
-
-```bash
-# List all registered projects with versions
-ai-use-case list-projects
-
-# Find projects needing updates
-ai-use-case check-updates
-
-# Update a specific project
-ai-use-case update-project /path/to/project
-
-# Refresh project installation (slash commands, git hooks)
-ai-use-case --init --update
-```
-
-Registry location: `~/.local/share/ai-use-case-cli/projects-registry.json`
-
-### Updating Project Installations
-
-When you update the CLI to a newer version, you may want to refresh your existing project installations to get the latest features:
-
-**Use `--init --update` to:**
-- Update Claude Code slash commands to newer versions
-- Update git hooks (pre-commit and post-commit) with latest changes
-- Preserve your existing `.usecase/cases/` directory and documentation
-
-**When to use:**
-- After updating the CLI (`git pull` in `~/.local/share/ai-use-case-cli`)
-- When new slash commands are added to the CLI
-- When git hooks receive bug fixes or improvements
-- If setup warnings suggest using `--update` to refresh components
-
-## Intelligent Agents (FEATURE-002)
-
-**Status:** Phase 1 Complete - Agent Framework Operational
-
-The CLI now includes an intelligent agent framework that provides AI-powered analysis and recommendations. This hybrid architecture combines reliable bash scripts with intelligent AI agents for context-aware automation.
-
-### Quick Start
-
-```bash
-# Initialize agent registry
-ai-use-case agents init
-
-# List available agents
-ai-use-case agents list
-
-# Enable an agent
-ai-use-case agents enable quality-reviewer
-
-# View agent information
-ai-use-case agents info quality-reviewer
+# Search use cases
+ai-use-case search "authentication"
 
 # View statistics
-ai-use-case agents stats
+ai-use-case stats
+
+# Extract session data
+ai-use-case extract
 ```
 
-### Available Agents (Planned)
+**[Complete Usage Guide →](docs/USAGE-GUIDE.md)**
 
-**Phase 1 (Complete):** Agent framework operational
-- ✅ Agent registry system
-- ✅ Agent invocation framework
-- ✅ CLI integration (`ai-use-case agents`)
-- ✅ Statistics and caching
+## Core Commands
 
-**Phase 2-5 (Coming Soon):**
-- 🔄 **Quality Reviewer** - Documentation quality analysis and improvement suggestions
-- 🔄 **Pattern Analyzer** - Learn from past sessions, provide recommendations
-- 🔄 **Session Selector** - Intelligent PR/commit analysis for documentation
-- 🔄 **Organization Intelligence** - Hub optimization and relationship mapping
+### Essential Commands
 
-### Key Features
+| Command | Description |
+|---------|-------------|
+| `ai-use-case --init` | Setup project and configure hub |
+| `ai-use-case --init --update` | Update project installation |
+| `ai-use-case sync` | Manually sync to hub |
+| `ai-use-case search <term>` | Search use cases |
+| `ai-use-case stats` | View statistics |
+| `ai-use-case --version` | Show version |
+| `ai-use-case --help` | Show help |
 
-- **Optional & Opt-In** - Agents are enhancements, not requirements
-- **CLI Independence** - CLI works fully without agents
-- **Statistics Tracking** - Monitor agent usage and effectiveness
-- **Result Caching** - Fast repeated operations
-- **Zero Overhead** - < 10ms impact on existing commands
+### Slash Commands (AI Assistant)
 
-For complete documentation, see **[docs/agents/framework/README.md](docs/agents/framework/README.md)**
+| Command | Description |
+|---------|-------------|
+| `/use-case:document-session` | Document current session |
+| `/use-case:sync-usecases` | Sync to hub |
+| `/use-case:search-usecases` | Search use cases |
+| `/use-case:publish-confluence` | Publish to Confluence |
+
+### Configuration Commands
+
+| Command | Description |
+|---------|-------------|
+| `ai-use-case config show` | View configuration |
+| `ai-use-case config reconfigure` | Change hub mode |
+| `ai-use-case reset [options]` | Reset configuration |
+
+### Project Management
+
+| Command | Description |
+|---------|-------------|
+| `ai-use-case list-projects` | List all registered projects |
+| `ai-use-case check-updates` | Find projects needing updates |
+| `ai-use-case update-project <path>` | Update specific project |
+
+### Monitoring
+
+| Command | Description |
+|---------|-------------|
+| `ai-use-case tracing init` | Initialize tracing |
+| `ai-use-case tracing enable` | Enable tracing |
+| `ai-use-case tracing status` | View tracing status |
+
+**[Full Command Reference →](docs/USAGE-GUIDE.md#core-commands)**
+
+## Learn More
+
+### Documentation
+
+- **[Usage Guide](docs/USAGE-GUIDE.md)** - Detailed usage instructions
+- **[Configuration](docs/CONFIGURATION.md)** - Hub modes, environment variables, tracing
+- **[Features](docs/FEATURES.md)** - Complete feature descriptions
+- **[Architecture](docs/diagrams/)** - C4 model and sequence diagrams
+- **[Tracing](docs/TRACING.md)** - OpenTelemetry monitoring setup
+- **[Agents](docs/agents/framework/README.md)** - AI agent framework
+
+### Development
+
+- **[Contributing](CONTRIBUTING.md)** - Contribution guidelines
+- **[Workflow](docs/WORKFLOW.md)** - Development workflow
+- **[Changelog](CHANGELOG.md)** - Version history
 
 ## Examples
 
 ### Document a Bug Fix
 
-In Claude Code, after fixing a bug with commits:
+After fixing a bug with commits:
 
 ```
 /use-case:document-session
 ```
 
-Claude Code automatically extracts ticket from commits, analyzes git changes, captures conversation insights, generates complete documentation, and syncs to hub.
+The AI extracts:
+- Ticket from commit messages
+- Git statistics (files changed, lines)
+- Conversation insights
+- Complete documentation
 
 ### Document Research Session
 
-After exploring approaches without code changes:
+After exploring approaches without code:
 
 ```
 /use-case:document-session
 ```
 
-Claude Code detects no commits and creates a research session with auto-generated `RESEARCH-XXX` ticket.
+The AI creates:
+- Research session with auto-generated `RESEARCH-XXX` ticket
+- Analysis and findings
+- Decision rationale
 
 ### Publish to Confluence
 
@@ -392,90 +215,64 @@ Claude Code detects no commits and creates a research session with auto-generate
 /use-case:publish-confluence
 ```
 
-Prerequisites: Atlassian MCP server configured, valid Confluence auth, page creation permissions.
+Publishes documentation as Confluence pages (requires Atlassian MCP server).
+
+**[More Examples →](docs/USAGE-GUIDE.md#workflow-details)**
 
 ## Troubleshooting
 
-### CLI command not found
+### CLI Command Not Found
 
 ```bash
 # Check PATH
 echo $PATH | grep ".local/bin"
 
-# Add to shell profile if missing
+# Add to shell profile
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### Hooks not syncing
+### Hooks Not Syncing
 
 ```bash
-# Check hook permissions
+# Check permissions
 ls -la /path/to/project/.git/hooks/post-commit
 chmod +x /path/to/project/.git/hooks/post-commit
 
-# Test manual sync
+# Test manually
 ai-use-case sync
 ```
 
-### Reset configuration or data
-
-If you need to start fresh or fix configuration issues:
+### Reset Configuration
 
 ```bash
-# Preview what would be reset (dry-run)
+# Preview changes
 ai-use-case reset --config --dry-run
 
-# Reset only configuration files
+# Reset configuration
 ai-use-case reset --config
 
-# Reset tracing setup
-ai-use-case reset --tracing
-
-# Reset project registry
-ai-use-case reset --registry
-
-# Reset everything (prompts for confirmation)
+# Reset everything
 ai-use-case reset --all
-
-# See all options
-ai-use-case reset --help
 ```
 
-**Note**: The hub directory is protected and requires explicit `--hub` flag to delete (only for local-only mode).
-
-### Colors not rendering
-
-If you see escape sequences like `\033[0;32m`, update to v2.1+ which uses proper ANSI color syntax.
+**[Complete Troubleshooting →](docs/CONFIGURATION.md#troubleshooting-configuration)**
 
 ## Updates
 
-Check your version:
-
+Check version:
 ```bash
 ai-use-case --version
 ```
 
 Update to latest:
-
 ```bash
-# Recommended: Use built-in update command
+# Recommended
 ai-use-case update
 
-# OR: Re-run install script (handles updates automatically)
+# Or re-run install script
 curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/install/install.sh | bash
-
-# OR: Manual update (if CLI installed at default location)
-cd "${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}" && git pull
 ```
-
-The `ai-use-case update` command automatically handles updates and local modifications, then optionally updates all registered projects.
-
-## Migration from v2.x
-
-Good news! v3.1.0 restores all v2.x standalone CLI commands while adding Claude Code integration. No migration needed—your old commands still work!
-
-For historical details on v3.0.0 breaking changes and migration steps, see [CHANGELOG.md](./CHANGELOG.md).
 
 ## Uninstall
 
@@ -483,27 +280,26 @@ For historical details on v3.0.0 breaking changes and migration steps, see [CHAN
 ai-use-case uninstall
 ```
 
-Removes symlink and optionally removes CLI directory and shell profile entries. Project-level setups remain intact.
+Removes CLI and optionally cleans up configuration.
 
 ## Contributing
 
-We welcome contributions! This project follows a branch-based workflow with pull requests.
+We welcome contributions! This project follows a branch-based workflow.
 
 **Quick Start:**
 1. Fork the repository
 2. Create feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'feat: Add amazing feature'`
-4. Update CHANGELOG.md
-5. Push and open PR
+3. Make changes and update CHANGELOG.md
+4. Push and open PR
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for complete guidelines.
+**[Full Contributing Guide →](CONTRIBUTING.md)**
 
 ## Requirements
 
 - **OS**: Linux, macOS, WSL on Windows
 - **Shell**: Bash 4.0+
 - **Git**: For version control and hooks
-- **Dependencies**: `realpath`, `find`, `grep` (standard Unix tools)
+- **Dependencies**: Standard Unix tools (`realpath`, `find`, `grep`)
 
 ## Support
 
@@ -513,7 +309,8 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for complete guidelines.
 
 ## Related Projects
 
-- [Claude Code](https://claude.com/code) - AI coding assistant that powers the automatic documentation feature
+- [Claude Code](https://claude.com/code) - AI coding assistant integration
+- [GitHub Copilot](https://github.com/features/copilot) - AI-powered code completion
 
 ## License
 
