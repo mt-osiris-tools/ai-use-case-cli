@@ -122,6 +122,7 @@ ai-use-case extract
 |---------|-------------|
 | `ai-use-case --init` | Setup project and configure hub |
 | `ai-use-case --init --update` | Update project installation |
+| `ai-use-case --link-claude` | Create Claude Code symlinks (after Claude setup) |
 | `ai-use-case sync` | Manually sync to hub |
 | `ai-use-case search <term>` | Search use cases |
 | `ai-use-case stats` | View statistics |
