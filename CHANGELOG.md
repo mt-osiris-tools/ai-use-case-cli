@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Comprehensive Documentation Restructure**: Enhanced documentation organization with dedicated guides
+  - **docs/USAGE-GUIDE.md** (NEW): Complete usage guide with detailed command reference, session types, file naming conventions, and workflow details
+  - **docs/CONFIGURATION.md** (NEW): Comprehensive configuration guide covering hub modes, environment variables, tracing setup, project registry, and git hooks
+  - **docs/FEATURES.md** (NEW): Detailed feature descriptions with version history, comparison matrix, and use cases
+
+### Changed
+
+- **README.md Streamlined**: Reduced from 526 to 322 lines (39% reduction) for better readability
+  - Removed version-specific noise (v3.x.x+ annotations throughout)
+  - Condensed features list from 13 to 8 high-level points
+  - Simplified table of contents from 18 to 10 items
+  - Moved detailed sections to dedicated documentation files
+  - Added clear "Learn More" section with organized documentation links
+  - Focus on quick start flow rather than comprehensive reference
+- **CONTRIBUTING.md**: Updated documentation references to include new guide structure
+  - Added references to USAGE-GUIDE.md, CONFIGURATION.md, and FEATURES.md
+  - Updated version consistency table with new documentation files
+
 ## [3.12.0] - 2025-12-07
 
 ### Added

@@ -99,7 +99,9 @@ Every code change MUST trigger a documentation review:
    - New options/flags → document in usage section
 
 3. **Related documentation** - MUST be updated if applicable
-   - docs/COMMANDS.md - Update command reference for new commands
+   - docs/USAGE-GUIDE.md - Update usage guide for new commands
+   - docs/CONFIGURATION.md - Update configuration guide for new options
+   - docs/FEATURES.md - Update feature descriptions for new capabilities
    - docs/agents/claude/GUIDE.md - Update developer guide for new features
    - Use proper version markers for new features (e.g., `v3.6.0+`)
 
@@ -128,7 +130,9 @@ Before creating any PR that touches version-related files, run:
 | `scripts/utils/version.sh` | Source of truth (CLI_VERSION) |
 | `README.md` | Header version badge + footer version |
 | `CHANGELOG.md` | Latest release section |
-| `docs/COMMANDS.md` | Version markers for new features |
+| `docs/USAGE-GUIDE.md` | Version markers for new commands |
+| `docs/CONFIGURATION.md` | Version markers for new configuration options |
+| `docs/FEATURES.md` | Version markers for new features |
 | `docs/agents/claude/GUIDE.md` | Version markers + version history |
 
 ### Version Marker Format
@@ -237,8 +241,11 @@ Test your changes thoroughly:
 #### Documentation Updates
 
 Update relevant documentation:
-- **README.md** - User-facing documentation, installation, usage
-- **docs/CLAUDE.md** - Instructions for Claude Code when working in this repo
+- **README.md** - Quick start and overview
+- **docs/USAGE-GUIDE.md** - Detailed usage instructions
+- **docs/CONFIGURATION.md** - Configuration options
+- **docs/FEATURES.md** - Feature descriptions
+- **docs/agents/claude/README.md** - Quick reference for Claude Code
 - **CHANGELOG.md** - Version history and changes
 - **docs/HUB-SYNC-CHECKLIST.md** - If adding features that affect the hub
 
