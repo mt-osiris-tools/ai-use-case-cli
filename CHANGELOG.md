@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Automated Test Suite**: Comprehensive bats-core testing framework for CI/CD and development
+  - **Test Framework**: bats-core with bats-support, bats-assert, and bats-file libraries (git submodules)
+  - **Test Runner**: `./run-tests.sh` script with filtering, verbose mode, and TAP output support
+  - **Test Coverage**: 10 test files covering 190 tests across all core functionality
+    - `version.bats` - Version system and semver validation
+    - `config-manager.bats` - Configuration management functions
+    - `hub-utils.bats` - Hub utility functions
+    - `cli-commands.bats` - Main CLI entry point and commands
+    - `search.bats` - Search functionality
+    - `stats.bats` - Statistics generation
+    - `sync.bats` - Hub synchronization
+    - `setup-project.bats` - Project initialization
+    - `registry.bats` - Project registry management
+    - `integration.bats` - End-to-end workflow tests
+  - **Test Isolation**: Temporary directories and HOME override for safe testing
+  - **Documentation**: Updated CONTRIBUTING.md and README.md with testing instructions
+
 - **Pattern Analysis Agent** (Phase 3 - Intelligent Agents Integration): Full implementation of pattern analysis capabilities
   - **Agent Prompt**: Created `.ai-tools/agents/use-case-pattern-agent.md` with comprehensive analysis methodology
     - Pattern detection (session types, complexity, tools, ticket types)

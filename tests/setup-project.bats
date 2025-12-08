@@ -1,0 +1,261 @@
+#!/usr/bin/env bats
+# Tests for scripts/project/setup-project.sh
+
+load 'test_helper'
+
+setup() {
+    common_setup
+    create_test_config "local" "$TEST_HUB_DIR"
+}
+
+teardown() {
+    common_teardown
+}
+
+SETUP_SCRIPT="$(script_path scripts/project/setup-project.sh)"
+CLI="$(script_path ai-use-case)"
+
+# ============================================
+# Help Tests
+# ============================================
+
+@test "setup-project: shows help with --help" {
+    run bash "$SETUP_SCRIPT" --help
+    assert_success
+    assert_output --partial "Setup"
+    assert_output --partial "Usage"
+}
+
+@test "setup-project: shows help with -h" {
+    run bash "$SETUP_SCRIPT" -h
+    assert_success
+    assert_output --partial "Usage"
+}
+
+# ============================================
+# Directory Validation Tests
+# ============================================
+
+@test "setup-project: fails with non-existent directory" {
+    run bash "$SETUP_SCRIPT" "/nonexistent/path"
+    assert_failure
+    assert_output --partial "Error"
+}
+
+@test "setup-project: requires git repository" {
+    local non_git_dir="${TEST_TEMP_DIR}/non-git-project"
+    mkdir -p "$non_git_dir"
+
+    run bash "$SETUP_SCRIPT" "$non_git_dir"
+    assert_failure
+    assert_output --partial "git"
+}
+
+# ============================================
+# Setup Structure Tests
+# ============================================
+
+@test "setup-project: creates .usecase directory" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    run bash "$SETUP_SCRIPT" "$project_dir"
+    assert_success
+    assert_dir_exists "${project_dir}/.usecase"
+}
+
+@test "setup-project: creates .usecase/cases directory" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    run bash "$SETUP_SCRIPT" "$project_dir"
+    assert_success
+    assert_dir_exists "${project_dir}/.usecase/cases"
+}
+
+@test "setup-project: creates README in cases directory" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    run bash "$SETUP_SCRIPT" "$project_dir"
+    assert_success
+    assert_file_exists "${project_dir}/.usecase/cases/README.md"
+}
+
+# ============================================
+# Git Hooks Tests
+# ============================================
+
+@test "setup-project: creates post-commit hook" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    run bash "$SETUP_SCRIPT" "$project_dir"
+    assert_success
+    assert_file_exists "${project_dir}/.git/hooks/post-commit"
+}
+
+@test "setup-project: post-commit hook is executable" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    bash "$SETUP_SCRIPT" "$project_dir"
+    [ -x "${project_dir}/.git/hooks/post-commit" ]
+}
+
+# ============================================
+# Completion Tests
+# ============================================
+
+@test "setup-project: shows completion message" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    run bash "$SETUP_SCRIPT" "$project_dir"
+    assert_success
+    assert_output --partial "Setup" || assert_output --partial "Complete" || assert_output --partial "Success"
+}
+
+@test "setup-project: output is colored" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    run bash "$SETUP_SCRIPT" "$project_dir"
+    assert_success
+    assert_has_color_output
+}
+
+# ============================================
+# Update Mode Tests
+# ============================================
+
+@test "setup-project --update: works on existing installation" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Initial setup
+    bash "$SETUP_SCRIPT" "$project_dir"
+
+    # Update
+    run bash "$SETUP_SCRIPT" --update "$project_dir"
+    assert_success
+}
+
+@test "setup-project --update: preserves existing use cases" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Initial setup
+    bash "$SETUP_SCRIPT" "$project_dir"
+
+    # Create a use case
+    echo "# Existing use case" > "${project_dir}/.usecase/cases/2025-W45-11-07_EXIST-001_existing.md"
+
+    # Update
+    run bash "$SETUP_SCRIPT" --update "$project_dir"
+    assert_success
+
+    # Use case should still exist
+    assert_file_exists "${project_dir}/.usecase/cases/2025-W45-11-07_EXIST-001_existing.md"
+}
+
+# ============================================
+# CLI Integration Tests
+# ============================================
+
+@test "ai-use-case --init: works via CLI" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    cd "$project_dir"
+    run "$CLI" --init
+    assert_success
+}
+
+@test "ai-use-case init: works via CLI" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    cd "$project_dir"
+    run "$CLI" init
+    assert_success
+}
+
+@test "ai-use-case --init --update: works via CLI" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Initial setup
+    cd "$project_dir"
+    "$CLI" --init
+
+    # Update
+    run "$CLI" --init --update
+    assert_success
+}
+
+# ============================================
+# Idempotency Tests
+# ============================================
+
+@test "setup-project: can run multiple times safely" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # First setup
+    run bash "$SETUP_SCRIPT" "$project_dir"
+    assert_success
+
+    # Second setup
+    run bash "$SETUP_SCRIPT" "$project_dir"
+    assert_success
+}
+
+@test "setup-project: does not duplicate hook content" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Run setup twice
+    bash "$SETUP_SCRIPT" "$project_dir"
+    bash "$SETUP_SCRIPT" "$project_dir"
+
+    # Hook should not have duplicated content
+    local hook_size
+    hook_size=$(wc -l < "${project_dir}/.git/hooks/post-commit")
+    # Reasonable hook size (not doubled)
+    [ "$hook_size" -lt 100 ]
+}
+
+# ============================================
+# Error Handling Tests
+# ============================================
+
+@test "setup-project: shows helpful error for non-git directory" {
+    local non_git_dir="${TEST_TEMP_DIR}/not-a-repo"
+    mkdir -p "$non_git_dir"
+
+    run bash "$SETUP_SCRIPT" "$non_git_dir"
+    assert_failure
+    assert_output --partial "git"
+}
+
+@test "setup-project: error message includes path" {
+    run bash "$SETUP_SCRIPT" "/invalid/path/here"
+    assert_failure
+    assert_output --partial "/invalid/path"
+}
+
+# ============================================
+# Registry Tests
+# ============================================
+
+@test "setup-project: registers project in registry" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    run bash "$SETUP_SCRIPT" "$project_dir"
+    assert_success
+
+    # Registry file should exist
+    assert_file_exists "${TEST_CONFIG_DIR}/registry.json"
+}
