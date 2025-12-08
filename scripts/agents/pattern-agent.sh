@@ -2,7 +2,7 @@
 # AI Use Case CLI - Pattern Analysis Agent
 # Analyzes documentation patterns across projects and hubs
 
-set -e
+set -euo pipefail
 
 # Color definitions
 RED=$'\033[0;31m'
@@ -541,6 +541,10 @@ main() {
                 ;;
             --format)
                 format="$2"
+                if [[ "$format" != "text" && "$format" != "json" ]]; then
+                    echo -e "${RED}Error: Invalid format '$format'. Valid values: text, json${NC}"
+                    exit 1
+                fi
                 shift 2
                 ;;
             --include-quality)
@@ -553,6 +557,10 @@ main() {
                 ;;
             --focus)
                 focus="$2"
+                if [[ "$focus" != "patterns" && "$focus" != "trends" && "$focus" != "recommendations" && "$focus" != "all" ]]; then
+                    echo -e "${RED}Error: Invalid focus '$focus'. Valid values: patterns, trends, recommendations, all${NC}"
+                    exit 1
+                fi
                 shift 2
                 ;;
             --no-cache)
@@ -568,6 +576,13 @@ main() {
                 ;;
         esac
     done
+
+    # Validate mutually exclusive options
+    if [ "$hub_mode" = true ] && [ -n "$project_name" ]; then
+        echo -e "${RED}Error: --project and --hub are mutually exclusive${NC}"
+        echo -e "${CYAN}Use --project to analyze a specific project, or --hub to analyze the entire hub${NC}"
+        exit 1
+    fi
 
     # Determine analysis mode
     if [ "$hub_mode" = true ]; then
