@@ -64,11 +64,8 @@ if [ ! -d "$CLAUDE_COMMANDS_DIR" ]; then
 fi
 
 # Handle symlink creation
-if [ ! -e "$CLAUDE_USECASE_SYMLINK" ]; then
-    # Create the symlink
-    ln -s "$EXPECTED_LINK_TARGET" "$CLAUDE_USECASE_SYMLINK"
-    echo -e "${GREEN}✓${NC} Created symlink: .claude/commands/use-case → .ai-tools/commands/use-case"
-elif [ -L "$CLAUDE_USECASE_SYMLINK" ]; then
+# Note: Check for symlink first (-L) because -e returns false for broken symlinks
+if [ -L "$CLAUDE_USECASE_SYMLINK" ]; then
     # It's a symlink - check if it points to the right place
     LINK_TARGET=$(readlink "$CLAUDE_USECASE_SYMLINK")
     if [ "$LINK_TARGET" = "$EXPECTED_LINK_TARGET" ]; then
@@ -82,7 +79,7 @@ elif [ -L "$CLAUDE_USECASE_SYMLINK" ]; then
         echo "  ai-use-case --link-claude"
         exit 1
     fi
-else
+elif [ -e "$CLAUDE_USECASE_SYMLINK" ]; then
     # It exists but is not a symlink (it's a directory or file)
     echo -e "${YELLOW}⚠${NC} .claude/commands/use-case exists but is not a symlink"
     echo ""
@@ -91,6 +88,10 @@ else
     echo "  rm -rf $CLAUDE_USECASE_SYMLINK"
     echo "  ai-use-case --link-claude"
     exit 1
+else
+    # Create the symlink
+    ln -s "$EXPECTED_LINK_TARGET" "$CLAUDE_USECASE_SYMLINK"
+    echo -e "${GREEN}✓${NC} Created symlink: .claude/commands/use-case → .ai-tools/commands/use-case"
 fi
 
 echo ""
@@ -98,10 +99,14 @@ echo -e "${GREEN}=== Link Complete! ===${NC}"
 echo ""
 echo "Claude Code can now discover the ai-use-case slash commands."
 echo "Available commands:"
-for cmd_file in "$AI_TOOLS_COMMANDS"/*.md; do
-    if [ -f "$cmd_file" ]; then
-        cmd_name=$(basename "$cmd_file" .md)
-        echo "  /use-case:$cmd_name"
-    fi
-done
+if compgen -G "$AI_TOOLS_COMMANDS"/*.md > /dev/null; then
+    for cmd_file in "$AI_TOOLS_COMMANDS"/*.md; do
+        if [ -f "$cmd_file" ]; then
+            cmd_name=$(basename "$cmd_file" .md)
+            echo "  /use-case:$cmd_name"
+        fi
+    done
+else
+    echo "  (No commands found)"
+fi
 echo ""

@@ -407,6 +407,41 @@ LINK_CLAUDE_SCRIPT="$(script_path scripts/project/link-claude.sh)"
     [ -L "${project_dir}/.claude/commands/use-case" ]
 }
 
+@test "link-claude: warns when symlink points to wrong target" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Run setup first (without .claude)
+    rm -rf "${project_dir}/.claude"
+    bash "$SETUP_SCRIPT" "$project_dir"
+
+    # Create .claude/commands with wrong symlink
+    mkdir -p "${project_dir}/.claude/commands"
+    ln -s "/wrong/path" "${project_dir}/.claude/commands/use-case"
+
+    # Run link-claude - should fail with warning
+    run bash "$LINK_CLAUDE_SCRIPT" "$project_dir"
+    assert_failure
+    assert_output --partial "points to"
+}
+
+@test "link-claude: warns when use-case exists as directory" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Run setup first (without .claude)
+    rm -rf "${project_dir}/.claude"
+    bash "$SETUP_SCRIPT" "$project_dir"
+
+    # Create .claude/commands/use-case as a directory
+    mkdir -p "${project_dir}/.claude/commands/use-case"
+
+    # Run link-claude - should fail with warning
+    run bash "$LINK_CLAUDE_SCRIPT" "$project_dir"
+    assert_failure
+    assert_output --partial "not a symlink"
+}
+
 @test "ai-use-case --link-claude: works via CLI" {
     local project_dir
     project_dir="$(create_test_git_repo)"
