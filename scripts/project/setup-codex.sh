@@ -84,25 +84,26 @@ shopt -s nullglob
 
 INSTALLED_COUNT=0
 for prompt_file in "$CLI_CODEX_PROMPTS"/*.md; do
-    if [ -f "$prompt_file" ]; then
-        prompt_name=$(basename "$prompt_file")
-        target_file="$CODEX_PROMPTS_DIR/$prompt_name"
+    prompt_name=$(basename "$prompt_file")
+    target_file="$CODEX_PROMPTS_DIR/$prompt_name"
 
-        if [ -f "$target_file" ]; then
-            # Check if files are different
-            if ! diff -q "$prompt_file" "$target_file" > /dev/null 2>&1; then
-                echo -e "${YELLOW}⚠${NC} Updating: $prompt_name (file changed)"
-                cp "$prompt_file" "$target_file"
-            else
-                echo -e "${GREEN}✓${NC} Already current: $prompt_name"
-            fi
-        else
+    if [ -f "$target_file" ]; then
+        # Check if files are different
+        if ! diff -q "$prompt_file" "$target_file" > /dev/null 2>&1; then
+            echo -e "${YELLOW}⚠${NC} Updating: $prompt_name (file changed)"
             cp "$prompt_file" "$target_file"
-            echo -e "${GREEN}✓${NC} Installed: $prompt_name"
+        else
+            echo -e "${GREEN}✓${NC} Already current: $prompt_name"
         fi
-        INSTALLED_COUNT=$((INSTALLED_COUNT + 1))
+    else
+        cp "$prompt_file" "$target_file"
+        echo -e "${GREEN}✓${NC} Installed: $prompt_name"
     fi
+    INSTALLED_COUNT=$((INSTALLED_COUNT + 1))
 done
+
+# Restore default glob behavior
+shopt -u nullglob
 
 echo -e "${GREEN}✓${NC} Processed $INSTALLED_COUNT prompt file(s)"
 

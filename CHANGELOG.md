@@ -9,10 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **OpenAI Codex CLI Integration**: Full support for OpenAI's Codex CLI coding assistant
-  - **Note**: This integrates with [OpenAI Codex CLI](https://developers.openai.com/codex/overview),
-    OpenAI's terminal-based coding assistant. This does NOT use the deprecated Codex completion API,
-    but rather provides slash command prompts for the Codex CLI tool.
+- **Codex CLI Integration**: Support for Codex-style CLI tools with slash commands
+  - **Note**: This integration provides slash command prompts compatible with CLI tools that use
+    the Codex CLI pattern (YAML frontmatter, `/prompts:` invocation). This does NOT use the
+    deprecated OpenAI Codex completion API, but rather provides project-local prompt files for
+    compatible CLI coding assistants.
   - **New Command**: `ai-use-case --setup-codex` to install Codex prompts into project
   - **Codex Prompts**: Project-local `.codex/prompts/` directory with YAML frontmatter
     - `use-case-document-session.md` - Document AI sessions with hybrid parameters
