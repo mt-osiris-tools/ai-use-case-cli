@@ -5,7 +5,7 @@ argument-hint: [FILE=<markdown-file>] [PARENT_URL=<confluence-url>] [DRY_RUN=tru
 
 # Publish to Confluence - Codex CLI
 
-**OpenAI Codex Integration**: This command publishes AI use case documentation to Confluence using the REST API via shell scripts.
+**Codex-Style CLI Integration**: This command publishes AI use case documentation to Confluence using the REST API via shell scripts.
 
 ## Parameters
 
@@ -86,7 +86,7 @@ Option 1: Environment variables
   export CONFLUENCE_EMAIL="your-email@example.com"
 
 Option 2: Configuration file (~/.config/ai-use-case-cli/config.json)
-  Add a "confluence" section with your credentials:
+  Edit the file and add a "confluence" section with your credentials:
   {
     "confluence": {
       "api_token": "your-api-token",

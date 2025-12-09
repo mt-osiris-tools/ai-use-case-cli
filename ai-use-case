@@ -59,7 +59,7 @@ ${YELLOW}USAGE${NC}
 ${YELLOW}COMMANDS${NC}
   ${GREEN}--init, init [--update]${NC}   Setup current project (use --update to refresh)
   ${GREEN}--link-claude${NC}             Create Claude Code symlinks (after Claude setup)
-  ${GREEN}--setup-codex${NC}             Setup OpenAI Codex CLI prompts (after Codex setup)
+  ${GREEN}--setup-codex${NC}             Setup Codex-style CLI prompts (after Codex setup)
   ${GREEN}config [show|reconfigure]${NC} Show or reconfigure hub settings
   ${GREEN}sync${NC}                      Sync use cases from project to hub
   ${GREEN}search <term>${NC}             Search documented use cases
@@ -93,8 +93,8 @@ ${YELLOW}CLAUDE CODE INTEGRATION${NC}
   ${GREEN}/use-case:publish-confluence${NC} Publish (alternative)
   ${GREEN}/use-case:quick-start${NC}        Quick start guide
 
-${YELLOW}CODEX CLI INTEGRATION${NC}
-  For OpenAI Codex CLI with hybrid parameter support:
+${YELLOW}CODEX-STYLE CLI INTEGRATION${NC}
+  For Codex-style CLI tools with hybrid parameter support:
   ${GREEN}/prompts:use-case-document-session${NC}   Document AI session
   ${GREEN}/prompts:use-case-publish-confluence${NC} Publish to Confluence
   Setup: ${CYAN}ai-use-case --setup-codex${NC}

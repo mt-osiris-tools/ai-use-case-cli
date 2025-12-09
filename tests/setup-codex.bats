@@ -83,6 +83,9 @@ CLI="$(script_path ai-use-case)"
     run bash "$SETUP_CODEX_SCRIPT" "$project_dir"
     assert_success
     assert_file_exists "${project_dir}/.codex/prompts/use-case-document-session.md"
+    # Verify it's a copy, not a symlink
+    run test ! -L "${project_dir}/.codex/prompts/use-case-document-session.md"
+    assert_success
 }
 
 @test "setup-codex: copies publish-confluence prompt" {
@@ -106,8 +109,10 @@ CLI="$(script_path ai-use-case)"
     bash "$SETUP_CODEX_SCRIPT" "$project_dir"
 
     # Verify files are NOT symlinks (unlike Claude integration which uses symlinks)
-    [ ! -L "${project_dir}/.codex/prompts/use-case-document-session.md" ]
-    [ ! -L "${project_dir}/.codex/prompts/use-case-publish-confluence.md" ]
+    run test ! -L "${project_dir}/.codex/prompts/use-case-document-session.md"
+    assert_success
+    run test ! -L "${project_dir}/.codex/prompts/use-case-publish-confluence.md"
+    assert_success
 }
 
 # ============================================
@@ -123,9 +128,9 @@ CLI="$(script_path ai-use-case)"
     bash "$SETUP_CODEX_SCRIPT" "$project_dir"
 
     # Check that files start with ---
-    run bash -c "head -1 '${project_dir}/.codex/prompts/use-case-document-session.md' | grep -q '^---$'"
+    run grep -q "^---$" <(head -1 "${project_dir}/.codex/prompts/use-case-document-session.md")
     assert_success
-    run bash -c "head -1 '${project_dir}/.codex/prompts/use-case-publish-confluence.md' | grep -q '^---$'"
+    run grep -q "^---$" <(head -1 "${project_dir}/.codex/prompts/use-case-publish-confluence.md")
     assert_success
 }
 
@@ -138,9 +143,9 @@ CLI="$(script_path ai-use-case)"
     bash "$SETUP_CODEX_SCRIPT" "$project_dir"
 
     # Check for description field
-    run grep -q "^description:" "${project_dir}/.codex/prompts/use-case-document-session.md"
+    run grep "^description:" "${project_dir}/.codex/prompts/use-case-document-session.md"
     assert_success
-    run grep -q "^description:" "${project_dir}/.codex/prompts/use-case-publish-confluence.md"
+    run grep "^description:" "${project_dir}/.codex/prompts/use-case-publish-confluence.md"
     assert_success
 }
 

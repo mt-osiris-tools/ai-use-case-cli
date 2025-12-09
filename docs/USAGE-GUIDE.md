@@ -12,7 +12,7 @@ Complete guide for using AI Use Case CLI in your daily workflow.
 
 ## Slash Commands for AI Coding Assistants
 
-This CLI provides slash commands for AI coding assistants like Claude Code, OpenAI Codex CLI, and GitHub Copilot. After running `ai-use-case --init`, slash commands are automatically available in your project.
+This CLI provides slash commands for AI coding assistants like Claude Code, Codex-style CLI tools, and GitHub Copilot. After running `ai-use-case --init`, slash commands are automatically available in your project.
 
 ### How It Works
 
@@ -25,7 +25,7 @@ This CLI provides slash commands for AI coding assistants like Claude Code, Open
 - Preserves any custom commands you add to `.claude/commands/`
 - Commands are invoked as `/use-case:command-name`
 
-**OpenAI Codex CLI Integration:**
+**Codex-Style CLI Integration:**
 - Codex-specific wrappers in `.codex/prompts/` with YAML frontmatter
 - Uses hybrid parameters (optional with interactive fallback)
 - Commands are invoked as `/prompts:use-case-command-name`
@@ -36,7 +36,7 @@ This CLI provides slash commands for AI coding assistants like Claude Code, Open
 # Claude Code (automatic with --init)
 ai-use-case --init
 
-# OpenAI Codex CLI (separate setup)
+# Codex-style CLI tools (separate setup)
 ai-use-case --setup-codex
 ```
 
@@ -48,7 +48,7 @@ ls -la .claude/commands/use-case    # Should show: use-case → ../../.ai-tools/
 ls .ai-tools/commands/use-case/     # Should list all available commands
 ```
 
-**OpenAI Codex CLI:**
+**Codex-Style CLI:**
 ```bash
 ls .codex/prompts/                  # Should list Codex prompt files
 ```

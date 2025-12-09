@@ -5,7 +5,7 @@ argument-hint: [SCAN_TYPE=<conversation|git|both>] [SESSION_TYPE=<implementation
 
 # Document AI Session - Codex CLI
 
-**OpenAI Codex Integration**: Interactive selection with automatic documentation generation for AI coding sessions.
+**Codex-Style CLI Integration**: Interactive selection with automatic documentation generation for AI coding sessions.
 
 ## Parameters
 
@@ -209,14 +209,17 @@ git status --short
 Templates are located in the CLI installation directory (default: `~/.local/share/ai-use-case-cli/docs/`):
 
 ```bash
+# Get CLI root from ai-use-case script location
+CLI_ROOT=$(dirname "$(dirname "$(which ai-use-case)")")/share/ai-use-case-cli
+
 # Implementation template
-cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE.md
+cat "${CLI_ROOT}/docs/TEMPLATE.md"
 
 # Research template
-cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE-RESEARCH.md
+cat "${CLI_ROOT}/docs/TEMPLATE-RESEARCH.md"
 ```
 
-**Note**: If templates aren't found at the default location, check `AI_USECASES_CLI_ROOT` environment variable for custom installation paths.
+**Note**: If templates aren't found, the CLI may be installed in a custom location.
 
 ### Step 10: Generate Documentation
 
