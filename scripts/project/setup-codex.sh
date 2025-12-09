@@ -79,6 +79,9 @@ fi
 echo ""
 echo "Installing Codex prompts..."
 
+# Enable nullglob so glob expands to nothing if no files match
+shopt -s nullglob
+
 INSTALLED_COUNT=0
 for prompt_file in "$CLI_CODEX_PROMPTS"/*.md; do
     if [ -f "$prompt_file" ]; then
@@ -110,8 +113,8 @@ echo "Available commands (invoke in Codex CLI):"
 for prompt_file in "$CODEX_PROMPTS_DIR"/*.md; do
     if [ -f "$prompt_file" ]; then
         prompt_name=$(basename "$prompt_file" .md)
-        # Extract description from frontmatter
-        description=$(grep -A1 "^---$" "$prompt_file" | grep "^description:" | cut -d':' -f2- | sed 's/^ *//' | head -1)
+        # Extract description from YAML frontmatter at the top of the file
+        description=$(sed -n '/^---$/,/^---$/p' "$prompt_file" | grep "^description:" | cut -d':' -f2- | sed 's/^ *//' | head -1)
         echo "  /prompts:$prompt_name"
         if [ -n "$description" ]; then
             echo "    └─ $description"

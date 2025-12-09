@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **OpenAI Codex CLI Integration**: Full support for OpenAI Codex CLI slash commands
+  - **New Command**: `ai-use-case --setup-codex` to install Codex prompts into project
+  - **Codex Prompts**: Project-local `.codex/prompts/` directory with YAML frontmatter
+    - `use-case-document-session.md` - Document AI sessions with hybrid parameters
+    - `use-case-publish-confluence.md` - Publish to Confluence via REST API
+  - **Hybrid Parameters**: Optional named parameters with interactive fallback
+  - **Setup Script**: `scripts/project/setup-codex.sh` handles prompt installation and updates
+  - **Documentation**: Updated README and USAGE-GUIDE with Codex CLI integration details
+
 - **Decoupled .ai-tools Setup**: `.ai-tools` folder is now created during `--init` even without `.claude` folder
   - **New Command**: `ai-use-case --link-claude` to create Claude Code symlinks on demand
   - **Improved Flexibility**: Users can set up ai-use-case before installing Claude Code
