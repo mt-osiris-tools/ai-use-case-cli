@@ -6,7 +6,7 @@ skinparam defaultFontSize 11
 title Git Hooks Architecture - AI Use Case CLI
 
 actor Developer
-participant "setup-project.sh\nor install-dev-hooks.sh" as Setup
+participant "setup-project.sh" as Setup
 database "git-hooks/\n(templates)" as Templates
 database ".git/hooks/\n(active hooks)" as GitHooks
 database ".claude/hooks/\n(Claude Code)" as ClaudeHooks
