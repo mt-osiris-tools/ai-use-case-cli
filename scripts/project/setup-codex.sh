@@ -104,6 +104,8 @@ for prompt_file in "$CLI_CODEX_PROMPTS"/*.md; do
     fi
 done
 
+echo -e "${GREEN}✓${NC} Processed $INSTALLED_COUNT prompt file(s)"
+
 echo ""
 echo -e "${GREEN}=== Setup Complete! ===${NC}"
 echo ""

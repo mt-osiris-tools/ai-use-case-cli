@@ -110,8 +110,10 @@ CLI="$(script_path ai-use-case)"
     bash "$SETUP_CODEX_SCRIPT" "$project_dir"
 
     # Check that files start with ---
-    head -1 "${project_dir}/.codex/prompts/use-case-document-session.md" | grep -q "^---$"
-    head -1 "${project_dir}/.codex/prompts/use-case-publish-confluence.md" | grep -q "^---$"
+    run bash -c "head -1 '${project_dir}/.codex/prompts/use-case-document-session.md' | grep -q '^---$'"
+    assert_success
+    run bash -c "head -1 '${project_dir}/.codex/prompts/use-case-publish-confluence.md' | grep -q '^---$'"
+    assert_success
 }
 
 @test "setup-codex: prompts have description in frontmatter" {
@@ -123,8 +125,10 @@ CLI="$(script_path ai-use-case)"
     bash "$SETUP_CODEX_SCRIPT" "$project_dir"
 
     # Check for description field
-    grep -q "^description:" "${project_dir}/.codex/prompts/use-case-document-session.md"
-    grep -q "^description:" "${project_dir}/.codex/prompts/use-case-publish-confluence.md"
+    run grep -q "^description:" "${project_dir}/.codex/prompts/use-case-document-session.md"
+    assert_success
+    run grep -q "^description:" "${project_dir}/.codex/prompts/use-case-publish-confluence.md"
+    assert_success
 }
 
 # ============================================
