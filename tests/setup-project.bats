@@ -13,6 +13,7 @@ teardown() {
 }
 
 SETUP_SCRIPT="$(script_path scripts/project/setup-project.sh)"
+LINK_CLAUDE_SCRIPT="$(script_path scripts/project/link-claude.sh)"
 CLI="$(script_path ai-use-case)"
 
 # ============================================
@@ -324,8 +325,6 @@ CLI="$(script_path ai-use-case)"
 # ============================================
 # --link-claude Command Tests
 # ============================================
-
-LINK_CLAUDE_SCRIPT="$(script_path scripts/project/link-claude.sh)"
 
 @test "link-claude: fails without .ai-tools" {
     local project_dir
