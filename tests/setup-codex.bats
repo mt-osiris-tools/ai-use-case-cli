@@ -97,6 +97,19 @@ CLI="$(script_path ai-use-case)"
     assert_file_exists "${project_dir}/.codex/prompts/use-case-publish-confluence.md"
 }
 
+@test "setup-codex: creates copies not symlinks (key difference from Claude)" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Initialize project first
+    bash "$SETUP_PROJECT_SCRIPT" "$project_dir"
+    bash "$SETUP_CODEX_SCRIPT" "$project_dir"
+
+    # Verify files are NOT symlinks (unlike Claude integration which uses symlinks)
+    [ ! -L "${project_dir}/.codex/prompts/use-case-document-session.md" ]
+    [ ! -L "${project_dir}/.codex/prompts/use-case-publish-confluence.md" ]
+}
+
 # ============================================
 # YAML Frontmatter Tests
 # ============================================

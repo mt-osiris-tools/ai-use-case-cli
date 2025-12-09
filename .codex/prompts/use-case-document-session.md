@@ -94,14 +94,11 @@ fi
 
 Verify the CLI is up-to-date:
 ```bash
-# Check current version
-ai-use-case --version 2>&1 | grep -o 'version [0-9.]*' | cut -d' ' -f2
-
-# Get latest version from GitHub
-curl -s https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/utils/version.sh | grep '^export CLI_VERSION=' | head -1 | cut -d'"' -f2
+# Check for updates using the established CLI command
+ai-use-case check-updates
 ```
 
-If versions differ, warn the user about available update.
+If updates are available, inform the user they can run `ai-use-case update`.
 
 ### Step 3: Verify Setup
 
@@ -209,13 +206,17 @@ git status --short
 
 ### Step 9: Read Template
 
+Templates are located in the CLI installation directory (default: `~/.local/share/ai-use-case-cli/docs/`):
+
 ```bash
 # Implementation template
-cat "${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE.md"
+cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE.md
 
 # Research template
-cat "${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE-RESEARCH.md"
+cat ~/.local/share/ai-use-case-cli/docs/TEMPLATE-RESEARCH.md
 ```
+
+**Note**: If templates aren't found at the default location, check `AI_USECASES_CLI_ROOT` environment variable for custom installation paths.
 
 ### Step 10: Generate Documentation
 
