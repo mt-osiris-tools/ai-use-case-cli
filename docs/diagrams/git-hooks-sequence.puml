@@ -1,0 +1,252 @@
+@startuml Git Hooks Detailed Sequence
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 150
+
+title Git Hooks - Detailed Sequence Diagram
+
+actor Developer
+participant "Git CLI" as Git
+participant "pre-commit\nHook" as PreCommit
+participant "Git\nRepository" as Repo
+participant "post-commit\nHook" as PostCommit
+participant "git status" as GitStatus
+participant "sync-ai-use-cases.sh" as SyncScript
+database "Use Case Hub\nRepository" as Hub
+participant "Claude Code\nSession" as Claude
+participant "SessionEnd\nHook" as SessionEnd
+database ".usecase/session-stats/\nYYYY-MM-DD-HHMMSS.txt" as Stats
+
+== Scenario 1: Successful Commit on Feature Branch ==
+
+Developer -> Git: git commit -m "Add new feature"
+activate Git
+
+Git -> Git: Check for pre-commit hook
+Git -> PreCommit: Execute .git/hooks/pre-commit
+activate PreCommit
+
+PreCommit -> PreCommit: Get current branch name\n(git branch --show-current)
+PreCommit -> PreCommit: Check if branch is "main" or "master"
+
+alt Branch is main or master
+  PreCommit -> PreCommit: ❌ Branch protection triggered
+  PreCommit --> Git: Exit code 1 (FAIL)
+  Git --> Developer: ❌ ERROR: Direct commits to protected branches not allowed\n\n**Suggested branch names:**\n  • feature/description\n  • fix/description\n  • docs/description\n  • refactor/description\n  • test/description\n\n**Bypass:** git commit --no-verify
+  deactivate PreCommit
+
+else Branch is feature/fix/docs/etc
+  PreCommit -> PreCommit: ✓ Branch validation passed
+  PreCommit --> Git: Exit code 0 (SUCCESS)
+  deactivate PreCommit
+
+  Git -> Repo: Create commit object
+  activate Repo
+  Repo -> Repo: Update HEAD reference
+  Repo -> Repo: Update branch pointer
+  Repo --> Git: Commit created (SHA: abc123)
+  deactivate Repo
+
+  Git -> Git: Check for post-commit hook
+  Git -> PostCommit: Execute .git/hooks/post-commit
+  activate PostCommit
+
+  PostCommit -> GitStatus: git diff-tree --no-commit-id\n--name-only -r HEAD
+  activate GitStatus
+  GitStatus --> PostCommit: List of changed files:\n  • src/feature.js\n  • .usecase/cases/feature-123.md\n  • tests/feature.test.js
+  deactivate GitStatus
+
+  PostCommit -> PostCommit: Check if any files in\n.usecase/cases/ were modified
+
+  alt .usecase/cases/ files changed
+    PostCommit -> PostCommit: ✓ AI use case changes detected
+    PostCommit -> PostCommit: Resolve sync script path:\n1. Check $AI_USECASES_SYNC_SCRIPT\n2. Check $AI_USECASES_DIR\n3. Default: ~/Documents/ai-use-case-hub/\n   sync-ai-use-cases.sh
+
+    PostCommit -> SyncScript: Execute sync script
+    activate SyncScript
+    note right of SyncScript
+      Sync script performs:
+      1. Copy .usecase/ to hub
+      2. Create symlinks
+      3. git add & commit
+      4. git push to remote
+    end note
+
+    SyncScript -> Hub: Copy documentation files
+    activate Hub
+    Hub --> SyncScript: Files copied
+
+    SyncScript -> Hub: Create symlinks\nfor organization
+    Hub --> SyncScript: Symlinks created
+
+    SyncScript -> Hub: git add .
+    SyncScript -> Hub: git commit -m "Sync from project"
+    Hub --> SyncScript: Commit created
+
+    SyncScript -> Hub: git push origin main
+    Hub --> SyncScript: Push successful
+    deactivate Hub
+
+    SyncScript --> PostCommit: Exit code 0 (SUCCESS)\n✓ Documentation synced
+    deactivate SyncScript
+
+    PostCommit --> Git: ✓ Auto-sync completed
+
+  else No .usecase/cases/ changes
+    PostCommit -> PostCommit: No AI use case changes
+    PostCommit --> Git: No sync needed
+  end
+
+  deactivate PostCommit
+
+  Git --> Developer: ✓ Commit successful: abc123\n[feature/new-feature abc123] Add new feature\n 3 files changed, 42 insertions(+), 5 deletions(-)
+end
+
+deactivate Git
+
+== Scenario 2: Commit to Protected Branch (Blocked) ==
+
+Developer -> Git: git commit -m "Fix bug"
+activate Git
+note right of Developer: Currently on main branch
+Git -> PreCommit: Execute .git/hooks/pre-commit
+activate PreCommit
+
+PreCommit -> PreCommit: Get current branch: "main"
+PreCommit -> PreCommit: ❌ Protected branch detected
+
+PreCommit --> Git: Exit code 1 (FAIL)
+deactivate PreCommit
+
+Git --> Developer: ❌ ERROR: Cannot commit to main\n\n╔═══════════════════════════════════════╗\n║  COMMIT TO PROTECTED BRANCH BLOCKED   ║\n╚═══════════════════════════════════════╝\n\nYou are currently on branch: main\n\nDirect commits to 'main' and 'master'\nbranches are not allowed.\n\nPlease create a feature branch instead.\n\n**Bypass (not recommended):**\ngit commit --no-verify
+deactivate Git
+
+== Scenario 3: Post-Commit Hook with Sync Failure (Non-Blocking) ==
+
+Developer -> Git: git commit -m "Update docs"
+activate Git
+note right of Developer: On feature/docs-update branch
+
+Git -> PreCommit: Execute pre-commit hook
+activate PreCommit
+PreCommit -> PreCommit: ✓ Branch validation passed
+PreCommit --> Git: Exit code 0
+deactivate PreCommit
+
+Git -> Repo: Create commit
+activate Repo
+Repo --> Git: Commit created
+deactivate Repo
+
+Git -> PostCommit: Execute post-commit hook
+activate PostCommit
+
+PostCommit -> GitStatus: Get changed files
+activate GitStatus
+GitStatus --> PostCommit: .usecase/cases/docs-update.md
+deactivate GitStatus
+
+PostCommit -> PostCommit: ✓ Use case changes detected
+PostCommit -> SyncScript: Execute sync script
+activate SyncScript
+
+SyncScript -> Hub: Attempt to sync
+activate Hub
+Hub --> SyncScript: ❌ ERROR: Hub repository not found\nor network issue
+deactivate Hub
+
+SyncScript --> PostCommit: Exit code 1 (FAILURE)
+deactivate SyncScript
+
+PostCommit -> PostCommit: Log warning (non-fatal)
+PostCommit --> Git: ⚠ Warning: Sync failed\n(commit still successful)
+deactivate PostCommit
+
+Git --> Developer: ✓ Commit successful\n⚠ Warning: Could not sync to hub\nManually run: ai-use-case sync
+deactivate Git
+
+== Scenario 4: Claude Code Session End ==
+
+Developer -> Claude: End session (/exit or close)
+activate Claude
+
+Claude -> Claude: Prepare session end cleanup
+Claude -> Claude: Check for .claude/hooks/SessionEnd
+
+Claude -> SessionEnd: Execute SessionEnd hook
+activate SessionEnd
+
+SessionEnd -> SessionEnd: Capture session metadata:\n• Timestamp: 2025-12-08 23:30:45\n• Repository path\n• Current branch
+
+SessionEnd -> SessionEnd: git log --since="2 hours ago"\n--pretty=format:"%h %s"
+note right of SessionEnd
+  Captures recent commits
+  from last 2 hours to
+  correlate with session
+end note
+
+SessionEnd -> SessionEnd: git status --short
+note right of SessionEnd
+  Checks for uncommitted
+  changes made during
+  the session
+end note
+
+SessionEnd -> SessionEnd: Create statistics file:\n.usecase/session-stats/\n2025-12-08-233045.txt
+
+SessionEnd -> Stats: Write session data
+activate Stats
+note right of Stats
+  **File Contents:**
+  ================
+  Session End: 2025-12-08 23:30:45
+  Repository: ai-use-case-cli
+  Branch: feature/new-feature
+
+  Recent Commits (last 2h):
+  - abc123 Add new feature
+  - def456 Update tests
+
+  Uncommitted Changes: Yes
+  - Modified: src/feature.js
+  - Modified: tests/feature.test.js
+
+  Run /cost for full statistics
+  ================
+end note
+Stats --> SessionEnd: File created
+deactivate Stats
+
+SessionEnd --> Claude: Exit code 0\n✓ Session statistics saved
+deactivate SessionEnd
+
+Claude --> Developer: ✓ Session ended\nStatistics saved to:\n.usecase/session-stats/2025-12-08-233045.txt
+deactivate Claude
+
+== Scenario 5: Bypass Pre-Commit Hook (Emergency) ==
+
+Developer -> Git: git commit -m "Hotfix" --no-verify
+activate Git
+note right of Developer: Using --no-verify flag\nto bypass hooks
+
+Git -> Git: Check --no-verify flag
+Git -> Git: ✓ Skip pre-commit hook
+
+Git -> Repo: Create commit directly
+activate Repo
+Repo --> Git: Commit created on main
+deactivate Repo
+
+Git -> Git: Skip post-commit hook\n(due to --no-verify)
+
+Git --> Developer: ✓ Commit successful (hooks bypassed)\n⚠ Warning: Pre-commit protections were skipped
+deactivate Git
+
+note right of Developer
+  **Use --no-verify sparingly!**
+  Only for emergencies or
+  when hooks are causing issues
+end note
+
+@enduml

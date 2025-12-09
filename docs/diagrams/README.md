@@ -53,6 +53,38 @@ This diagram uses the [C4 model](https://c4model.com/) to visualize the system a
    - File system layout: ~/.local/bin, ~/.config, ~/.local/share, project directories
    - External cloud services: GitHub, Atlassian Cloud, Observability backends
 
+### Git Hooks Architecture Diagrams
+
+**Files:** `git-hooks-overview.puml`, `git-hooks-flow.puml`, `git-hooks-sequence.puml`
+
+These diagrams explain the git-hooks system used in the project:
+
+1. **git-hooks-overview.puml** - Simple overview showing:
+   - The three main hooks (pre-commit, post-commit, SessionEnd)
+   - When each hook triggers and what it does
+   - Basic workflow
+
+2. **git-hooks-flow.puml** - Detailed architecture showing:
+   - Installation process and hook setup
+   - Complete pre-commit flow with branch validation
+   - Complete post-commit flow with auto-sync to use case hub
+   - Claude Code SessionEnd hook integration
+   - Configuration details and environment variables
+
+3. **git-hooks-sequence.puml** - Detailed sequence diagram showing:
+   - **Scenario 1:** Successful commit on feature branch (with auto-sync)
+   - **Scenario 2:** Commit to protected branch (blocked by pre-commit)
+   - **Scenario 3:** Post-commit sync failure (non-blocking)
+   - **Scenario 4:** Claude Code session end (statistics capture)
+   - **Scenario 5:** Bypass hooks with --no-verify flag
+   - Complete temporal flow and interactions between all components
+   - Error handling and edge cases
+
+**Hooks Included:**
+- **pre-commit** - Branch protection (blocks commits to main/master)
+- **post-commit** - Auto-syncs `.usecase/cases/` to documentation hub
+- **SessionEnd** - Captures Claude Code session statistics
+
 ### Document Session Sequence Diagram
 
 **File:** `document-session-sequence.puml`
