@@ -12,54 +12,73 @@ Complete guide for using AI Use Case CLI in your daily workflow.
 
 ## Slash Commands for AI Coding Assistants
 
-This CLI provides slash commands for AI coding assistants like Claude Code and GitHub Copilot. After running `ai-use-case --init`, slash commands are automatically available in your project.
+This CLI provides slash commands for AI coding assistants like Claude Code, OpenAI Codex CLI, and GitHub Copilot. After running `ai-use-case --init`, slash commands are automatically available in your project.
 
 ### How It Works
 
-- Commands are stored in `.ai-tools/commands/use-case/` (AI-tool-agnostic location)
+**AI-Tool-Agnostic Design:**
+- Commands are stored in `.ai-tools/commands/use-case/` (source of truth)
+- Tool-specific integrations provide compatibility layers
+
+**Claude Code Integration:**
 - A subdirectory symlink at `.claude/commands/use-case/` points to `../../.ai-tools/commands/use-case/`
-- This preserves any custom commands you add to `.claude/commands/`
-- Claude Code automatically discovers commands from `.claude/commands/`
-- Use slash commands like `/use-case:document-session` directly in your AI assistant
+- Preserves any custom commands you add to `.claude/commands/`
+- Commands are invoked as `/use-case:command-name`
+
+**OpenAI Codex CLI Integration:**
+- Codex-specific wrappers in `.codex/prompts/` with YAML frontmatter
+- Uses hybrid parameters (optional with interactive fallback)
+- Commands are invoked as `/prompts:use-case-command-name`
 
 ### Setup
 
 ```bash
-ai-use-case --init  # Automatically creates symlink for Claude Code
+# Claude Code (automatic with --init)
+ai-use-case --init
+
+# OpenAI Codex CLI (separate setup)
+ai-use-case --setup-codex
 ```
 
 ### Verification
 
+**Claude Code:**
 ```bash
 ls -la .claude/commands/use-case    # Should show: use-case → ../../.ai-tools/commands/use-case
 ls .ai-tools/commands/use-case/     # Should list all available commands
 ```
 
+**OpenAI Codex CLI:**
+```bash
+ls .codex/prompts/                  # Should list Codex prompt files
+```
+
 ## Core Commands
 
-Use **either** standalone CLI or Claude Code slash commands—whatever fits your workflow:
+Use standalone CLI, Claude Code slash commands, or Codex CLI prompts—whatever fits your workflow:
 
-| Task | CLI Command | Claude Code |
-|------|-------------|-------------|
-| Setup project | `ai-use-case --init` | `/use-case:setup-project` |
-| Update project installation | `ai-use-case --init --update` | |
-| Show hub config | `ai-use-case config show` | |
-| Reconfigure hub | `ai-use-case config reconfigure` | |
-| Document session | N/A – use Claude Code | `/use-case:document-session` |
-| Sync to hub | `ai-use-case sync` | `/use-case:sync-usecases` |
-| Search use cases | `ai-use-case search <term>` | `/use-case:search-usecases` |
-| View statistics | `ai-use-case stats` | |
-| Extract session data | `ai-use-case extract [hours] [format]` | `/use-case:extract-session` |
-| List projects | `ai-use-case list-projects` | `/use-case:list-projects` |
-| Check for updates | `ai-use-case check-updates` | `/use-case:check-updates` |
-| Update project | `ai-use-case update-project <path>` | `/use-case:update-project` |
-| Reset configuration | `ai-use-case reset [options]` | |
-| Publish to Confluence | `ai-use-case publish-confluence` | `/use-case:publish-confluence` |
-| View hub | `ai-use-case view` | |
-| Push hub changes | `ai-use-case push` | |
-| Initialize tracing | `ai-use-case tracing init` | |
-| Configure tracing | `ai-use-case tracing configure` | |
-| View tracing status | `ai-use-case tracing status` | |
+| Task | CLI Command | Claude Code | Codex CLI |
+|------|-------------|-------------|-----------|
+| Setup project | `ai-use-case --init` | `/use-case:setup-project` | |
+| Update project installation | `ai-use-case --init --update` | | |
+| Setup Codex CLI | `ai-use-case --setup-codex` | | |
+| Show hub config | `ai-use-case config show` | | |
+| Reconfigure hub | `ai-use-case config reconfigure` | | |
+| Document session | N/A – use AI assistant | `/use-case:document-session` | `/prompts:use-case-document-session` |
+| Sync to hub | `ai-use-case sync` | `/use-case:sync-usecases` | |
+| Search use cases | `ai-use-case search <term>` | `/use-case:search-usecases` | |
+| View statistics | `ai-use-case stats` | | |
+| Extract session data | `ai-use-case extract [hours] [format]` | `/use-case:extract-session` | |
+| List projects | `ai-use-case list-projects` | `/use-case:list-projects` | |
+| Check for updates | `ai-use-case check-updates` | `/use-case:check-updates` | |
+| Update project | `ai-use-case update-project <path>` | `/use-case:update-project` | |
+| Reset configuration | `ai-use-case reset [options]` | | |
+| Publish to Confluence | `ai-use-case publish-confluence` | `/use-case:publish-confluence` | `/prompts:use-case-publish-confluence` |
+| View hub | `ai-use-case view` | | |
+| Push hub changes | `ai-use-case push` | | |
+| Initialize tracing | `ai-use-case tracing init` | | |
+| Configure tracing | `ai-use-case tracing configure` | | |
+| View tracing status | `ai-use-case tracing status` | | |
 
 ### Additional Commands
 

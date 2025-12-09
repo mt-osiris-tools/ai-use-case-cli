@@ -97,7 +97,7 @@ for prompt_file in "$CLI_CODEX_PROMPTS"/*.md; do
             cp "$prompt_file" "$target_file"
             echo -e "${GREEN}✓${NC} Installed: $prompt_name"
         fi
-        ((INSTALLED_COUNT++))
+        INSTALLED_COUNT=$((INSTALLED_COUNT + 1))
     fi
 done
 
