@@ -1,0 +1,66 @@
+@startuml Git Hooks Overview
+!theme plain
+
+title Git Hooks - Simple Overview
+
+skinparam componentStyle rectangle
+skinparam backgroundColor #FFFFFF
+
+' Components
+package "Git Hooks System" {
+
+  [pre-commit] as PreCommit #LightBlue
+  [post-commit] as PostCommit #LightGreen
+  [SessionEnd] as SessionEnd #LightYellow
+
+  note right of PreCommit
+    **Triggers:** Before commit
+    **Purpose:** Branch protection
+    **Action:** Block commits to main/master
+  end note
+
+  note right of PostCommit
+    **Triggers:** After commit
+    **Purpose:** Auto-sync documentation
+    **Action:** Sync .usecase/cases/ to hub
+  end note
+
+  note right of SessionEnd
+    **Triggers:** Claude Code session ends
+    **Purpose:** Capture statistics
+    **Action:** Save session metadata
+  end note
+}
+
+' Flow diagram
+actor Developer
+cloud "Git Repository" as Git
+database "Use Case Hub" as Hub
+database "Session Stats" as Stats
+
+Developer -> PreCommit: 1. git commit
+PreCommit -> Git: 2. Validate branch ✓
+Git -> PostCommit: 3. Commit created
+PostCommit -> Hub: 4. Auto-sync docs
+Developer -> SessionEnd: 5. End Claude session
+SessionEnd -> Stats: 6. Save statistics
+
+' Legend
+legend right
+  **Three Independent Hooks:**
+
+  **1. pre-commit** - Enforces branch workflow
+  **2. post-commit** - Syncs documentation
+  **3. SessionEnd** - Tracks AI sessions
+
+  **Installation:**
+  Run: ./scripts/project/setup-project.sh
+  Or: ./scripts/install-dev-hooks.sh
+
+  **Locations:**
+  • .git/hooks/ (git hooks)
+  • .claude/hooks/ (Claude Code hooks)
+  • .usecase/session-stats/ (statistics)
+endlegend
+
+@enduml

@@ -1,0 +1,132 @@
+@startuml Git Hooks Architecture
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 11
+
+title Git Hooks Architecture - AI Use Case CLI
+
+actor Developer
+participant "setup-project.sh\nor install-dev-hooks.sh" as Setup
+database "git-hooks/\n(templates)" as Templates
+database ".git/hooks/\n(active hooks)" as GitHooks
+database ".claude/hooks/\n(Claude Code)" as ClaudeHooks
+participant "git commit" as GitCommit
+participant "pre-commit hook" as PreCommit
+participant "post-commit hook" as PostCommit
+participant "Git Status" as GitStatus
+participant "sync script" as SyncScript
+database "Use Case Hub" as Hub
+participant "Claude Code Session" as Session
+participant "SessionEnd hook" as SessionEnd
+database ".usecase/session-stats/\nYYYY-MM-DD-HHMMSS.txt" as Stats
+
+== Installation Phase ==
+
+Developer -> Setup: Run setup script
+activate Setup
+Setup -> Templates: Read hook templates
+Setup -> GitHooks: Copy pre-commit
+Setup -> GitHooks: Copy post-commit
+Setup -> GitHooks: Set executable (chmod +x)
+Setup -> ClaudeHooks: Copy SessionEnd hook
+Setup -> Setup: Create .usecase/session-stats/
+Setup --> Developer: Hooks installed ✓
+deactivate Setup
+
+note right of Templates
+  **Hook Templates Location:**
+  • git-hooks/pre-commit
+  • git-hooks/post-commit
+  • claude-hooks/SessionEnd
+end note
+
+== Git Workflow: Pre-Commit Hook (Branch Protection) ==
+
+Developer -> GitCommit: git commit -m "message"
+activate GitCommit
+GitCommit -> PreCommit: Execute before commit
+activate PreCommit
+
+alt Current branch is main or master
+  PreCommit -> PreCommit: Check branch name
+  PreCommit --> GitCommit: ❌ REJECT commit
+  GitCommit --> Developer: Error: Direct commits\nto protected branches\nnot allowed
+else On feature/fix/docs branch
+  PreCommit -> PreCommit: ✓ Branch check passed
+  PreCommit --> GitCommit: ✓ ALLOW commit
+  deactivate PreCommit
+
+  == Git Workflow: Post-Commit Hook (Auto-Sync) ==
+
+  GitCommit -> GitCommit: Create commit
+  GitCommit -> PostCommit: Execute after commit
+  activate PostCommit
+  PostCommit -> GitStatus: Get changed files
+  GitStatus --> PostCommit: List of modified files
+
+  alt Files in .usecase/cases/ changed
+    PostCommit -> PostCommit: Detect AI use case changes
+    PostCommit -> SyncScript: Run sync-ai-use-cases.sh
+    activate SyncScript
+    SyncScript -> Hub: Sync documentation
+    Hub --> SyncScript: Sync complete
+    SyncScript --> PostCommit: ✓ Success
+    deactivate SyncScript
+    PostCommit --> GitCommit: Commit completed with sync
+  else No use case changes
+    PostCommit --> GitCommit: Commit completed (no sync)
+  end
+  deactivate PostCommit
+  GitCommit --> Developer: Commit successful ✓
+end
+deactivate GitCommit
+
+note right of PreCommit
+  **Branch Protection Rules:**
+  ✓ Allowed: feature/*, fix/*,
+            docs/*, refactor/*,
+            test/*
+  ❌ Blocked: main, master
+
+  **Bypass:**
+  git commit --no-verify
+end note
+
+note right of PostCommit
+  **Sync Configuration:**
+  • AI_USECASES_SYNC_SCRIPT env
+  • AI_USECASES_DIR env
+  • Default: ~/Documents/
+    ai-use-case-hub/
+    sync-ai-use-cases.sh
+
+  **Non-blocking:**
+  Sync failures don't prevent commits
+end note
+
+== Claude Code Integration: SessionEnd Hook ==
+
+Developer -> Session: End Claude Code session
+activate Session
+Session -> SessionEnd: Trigger SessionEnd hook
+activate SessionEnd
+SessionEnd -> SessionEnd: Capture session metadata
+SessionEnd -> SessionEnd: Get recent commits\n(last 2 hours)
+SessionEnd -> SessionEnd: Check uncommitted changes
+SessionEnd -> Stats: Write statistics file
+Stats --> SessionEnd: File created
+SessionEnd --> Session: Hook complete
+deactivate SessionEnd
+Session --> Developer: Session ended\nStats saved ✓
+deactivate Session
+
+note right of SessionEnd
+  **Statistics Captured:**
+  • Session end timestamp
+  • Current branch & repository
+  • Recent commits (2h window)
+  • Uncommitted changes
+  • Token usage (via /cost)
+end note
+
+@enduml
