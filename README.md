@@ -335,7 +335,7 @@ git submodule update --init --recursive
 ## Related Projects
 
 - [Claude Code](https://claude.com/code) - AI coding assistant integration
-- [OpenAI Codex CLI](https://developers.openai.com/codex) - OpenAI coding assistant
+- [OpenAI Codex CLI](https://developers.openai.com/codex/overview) - OpenAI coding assistant
 - [GitHub Copilot](https://github.com/features/copilot) - AI-powered code completion
 
 ## License

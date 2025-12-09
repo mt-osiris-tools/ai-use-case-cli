@@ -85,8 +85,15 @@ Option 1: Environment variables
   export CONFLUENCE_BASE_URL="https://yoursite.atlassian.net"
   export CONFLUENCE_EMAIL="your-email@example.com"
 
-Option 2: Configuration file
-  Run: ai-use-case config confluence
+Option 2: Configuration file (~/.config/ai-use-case-cli/config.json)
+  Add a "confluence" section with your credentials:
+  {
+    "confluence": {
+      "api_token": "your-api-token",
+      "base_url": "https://yoursite.atlassian.net",
+      "email": "your-email@example.com"
+    }
+  }
 
 Generate API token at:
   https://{site}.atlassian.net/wiki/people/{userId}/preferences/personal-access-tokens
@@ -194,11 +201,14 @@ Then follow prompts to select file and provide URL.
 ```
 ❌ No Confluence credentials configured
 
-Please configure via:
-  ai-use-case config confluence
+Please configure using one of these methods:
 
-Or set environment variables:
-  CONFLUENCE_API_TOKEN, CONFLUENCE_BASE_URL, CONFLUENCE_EMAIL
+1. Environment variables:
+   export CONFLUENCE_API_TOKEN="your-api-token"
+   export CONFLUENCE_BASE_URL="https://yoursite.atlassian.net"
+   export CONFLUENCE_EMAIL="your-email@example.com"
+
+2. Configuration file (~/.config/ai-use-case-cli/config.json)
 ```
 
 ### Invalid URL
