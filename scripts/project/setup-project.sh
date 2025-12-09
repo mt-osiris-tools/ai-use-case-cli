@@ -197,7 +197,7 @@ if [ "$PROGRESS_ENABLED" = true ]; then
         progress_init \
             "Validate project structure" \
             "Setup use case directory" \
-            "Install Claude Code slash commands" \
+            "Install AI tool slash commands" \
             "Install git hooks" \
             "Configure .gitignore" \
             "Perform initial sync" \
@@ -340,45 +340,53 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
     # Create symlink for Claude Code compatibility
     # Claude Code only discovers commands in .claude/commands/, not .ai-tools/commands/
     # We symlink only the use-case subdirectory to preserve any custom user commands
+    CLAUDE_DIR="$PROJECT_PATH/.claude"
     CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
     CLAUDE_USECASE_SYMLINK="$CLAUDE_COMMANDS_DIR/use-case"
     EXPECTED_LINK_TARGET="../../.ai-tools/commands/use-case"
 
-    # Migrate from old full-directory symlink structure (if needed)
-    if [ -L "$CLAUDE_COMMANDS_DIR" ]; then
-        OLD_TARGET=$(readlink "$CLAUDE_COMMANDS_DIR")
-        echo -e "${BLUE}Detected old symlink structure: .claude/commands → $OLD_TARGET${NC}"
-        echo -e "${BLUE}Migrating to new subdirectory symlink structure...${NC}"
+    # Check if .claude folder exists before creating symlinks
+    if [ -d "$CLAUDE_DIR" ] || [ -L "$CLAUDE_COMMANDS_DIR" ]; then
+        # Migrate from old full-directory symlink structure (if needed)
+        if [ -L "$CLAUDE_COMMANDS_DIR" ]; then
+            OLD_TARGET=$(readlink "$CLAUDE_COMMANDS_DIR")
+            echo -e "${BLUE}Detected old symlink structure: .claude/commands → $OLD_TARGET${NC}"
+            echo -e "${BLUE}Migrating to new subdirectory symlink structure...${NC}"
 
-        # Remove old symlink
-        rm "$CLAUDE_COMMANDS_DIR"
-        echo -e "${GREEN}✓${NC} Removed old full-directory symlink"
+            # Remove old symlink
+            rm "$CLAUDE_COMMANDS_DIR"
+            echo -e "${GREEN}✓${NC} Removed old full-directory symlink"
 
-        # Create new directory structure (will be created below)
-        echo -e "${GREEN}✓${NC} Migration prepared - will create new structure"
-    fi
-
-    # Ensure .claude/commands/ directory exists
-    if [ ! -d "$CLAUDE_COMMANDS_DIR" ]; then
-        mkdir -p "$CLAUDE_COMMANDS_DIR"
-        echo -e "${GREEN}✓${NC} Created: .claude/commands/"
-    fi
-
-    # Create or verify use-case symlink
-    if [ ! -e "$CLAUDE_USECASE_SYMLINK" ]; then
-        ln -s "$EXPECTED_LINK_TARGET" "$CLAUDE_USECASE_SYMLINK"
-        echo -e "${GREEN}✓${NC} Created Claude Code symlink: .claude/commands/use-case → .ai-tools/commands/use-case"
-    elif [ ! -L "$CLAUDE_USECASE_SYMLINK" ]; then
-        echo -e "${YELLOW}⚠${NC} .claude/commands/use-case exists but is not a symlink"
-        echo -e "${YELLOW}⚠${NC} To enable command syncing, remove it and run: ai-use-case --init --update"
-    else
-        # Symlink exists, verify it points to the right place
-        LINK_TARGET=$(readlink "$CLAUDE_USECASE_SYMLINK")
-        if [ "$LINK_TARGET" = "$EXPECTED_LINK_TARGET" ]; then
-            echo -e "${GREEN}✓${NC} Claude Code symlink already configured"
-        else
-            echo -e "${YELLOW}⚠${NC} Claude Code symlink points to: $LINK_TARGET (expected: $EXPECTED_LINK_TARGET)"
+            # Create new directory structure (will be created below)
+            echo -e "${GREEN}✓${NC} Migration prepared - will create new structure"
         fi
+
+        # Ensure .claude/commands/ directory exists
+        if [ ! -d "$CLAUDE_COMMANDS_DIR" ]; then
+            mkdir -p "$CLAUDE_COMMANDS_DIR"
+            echo -e "${GREEN}✓${NC} Created: .claude/commands/"
+        fi
+
+        # Create or verify use-case symlink
+        if [ ! -e "$CLAUDE_USECASE_SYMLINK" ]; then
+            ln -s "$EXPECTED_LINK_TARGET" "$CLAUDE_USECASE_SYMLINK"
+            echo -e "${GREEN}✓${NC} Created Claude Code symlink: .claude/commands/use-case → .ai-tools/commands/use-case"
+        elif [ ! -L "$CLAUDE_USECASE_SYMLINK" ]; then
+            echo -e "${YELLOW}⚠${NC} .claude/commands/use-case exists but is not a symlink"
+            echo -e "${YELLOW}⚠${NC} To enable command syncing, remove it and run: ai-use-case --init --update"
+        else
+            # Symlink exists, verify it points to the right place
+            LINK_TARGET=$(readlink "$CLAUDE_USECASE_SYMLINK")
+            if [ "$LINK_TARGET" = "$EXPECTED_LINK_TARGET" ]; then
+                echo -e "${GREEN}✓${NC} Claude Code symlink already configured"
+            else
+                echo -e "${YELLOW}⚠${NC} Claude Code symlink points to: $LINK_TARGET (expected: $EXPECTED_LINK_TARGET)"
+            fi
+        fi
+    else
+        # .claude folder doesn't exist - skip symlink creation and inform user
+        echo -e "${BLUE}ℹ${NC} .claude folder not found - skipping Claude Code symlink creation"
+        echo -e "${BLUE}ℹ${NC} Run '${GREEN}ai-use-case --link-claude${NC}' after setting up Claude Code to create symlinks"
     fi
 else
     echo -e "${YELLOW}⚠${NC} AI tool commands not found in CLI installation"

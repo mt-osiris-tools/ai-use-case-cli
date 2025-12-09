@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Decoupled .ai-tools Setup**: `.ai-tools` folder is now created during `--init` even without `.claude` folder
+  - **New Command**: `ai-use-case --link-claude` to create Claude Code symlinks on demand
+  - **Improved Flexibility**: Users can set up ai-use-case before installing Claude Code
+  - **Informational Messages**: Clear guidance when `.claude` folder is missing during setup
+  - **Idempotent**: Both `--init` and `--link-claude` can be safely run multiple times
+  - **Tests**: Comprehensive bats tests for all new functionality
+
 - **Automated Test Suite**: Comprehensive bats-core testing framework for CI/CD and development
   - **Test Framework**: bats-core with bats-support, bats-assert, and bats-file libraries (git submodules)
   - **Test Runner**: `./run-tests.sh` script with filtering, verbose mode, and TAP output support

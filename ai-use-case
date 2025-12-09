@@ -58,6 +58,7 @@ ${YELLOW}USAGE${NC}
 
 ${YELLOW}COMMANDS${NC}
   ${GREEN}--init, init [--update]${NC}   Setup current project (use --update to refresh)
+  ${GREEN}--link-claude${NC}             Create Claude Code symlinks (after Claude setup)
   ${GREEN}config [show|reconfigure]${NC} Show or reconfigure hub settings
   ${GREEN}sync${NC}                      Sync use cases from project to hub
   ${GREEN}search <term>${NC}             Search documented use cases
@@ -94,6 +95,7 @@ ${YELLOW}CLAUDE CODE INTEGRATION${NC}
 ${YELLOW}EXAMPLES${NC}
   ai-use-case --init              # Setup current project
   ai-use-case --init --update     # Update project installation
+  ai-use-case --link-claude       # Create Claude Code symlinks
   ai-use-case config show         # Show current hub configuration
   ai-use-case config reconfigure  # Change hub mode (local/private)
   ai-use-case sync                # Sync use cases to hub
@@ -147,6 +149,17 @@ case "${1:-}" in
         else
             trace_event "error" "command=init" "error=script_not_found" "script=setup-project.sh"
             echo -e "${RED}Error: setup-project.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    --link-claude|link-claude)
+        trace_event "command_start" "command=link-claude" "working_dir=$(pwd)"
+        echo -e "${BLUE}Linking Claude Code commands...${NC}"
+        if [ -f "$SCRIPT_DIR/scripts/project/link-claude.sh" ]; then
+            trace_run "link-claude" bash "$SCRIPT_DIR/scripts/project/link-claude.sh" .
+        else
+            trace_event "error" "command=link-claude" "error=script_not_found" "script=link-claude.sh"
+            echo -e "${RED}Error: link-claude.sh not found${NC}"
             exit 1
         fi
         ;;

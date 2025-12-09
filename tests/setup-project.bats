@@ -13,6 +13,7 @@ teardown() {
 }
 
 SETUP_SCRIPT="$(script_path scripts/project/setup-project.sh)"
+LINK_CLAUDE_SCRIPT="$(script_path scripts/project/link-claude.sh)"
 CLI="$(script_path ai-use-case)"
 
 # ============================================
@@ -258,4 +259,218 @@ CLI="$(script_path ai-use-case)"
 
     # Registry file should exist
     assert_file_exists "${TEST_CONFIG_DIR}/registry.json"
+}
+
+# ============================================
+# .ai-tools Decoupling Tests
+# ============================================
+
+@test "setup-project: creates .ai-tools without .claude folder" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Ensure no .claude folder exists
+    rm -rf "${project_dir}/.claude"
+
+    run bash "$SETUP_SCRIPT" "$project_dir"
+    assert_success
+
+    # .ai-tools should be created
+    assert_dir_exists "${project_dir}/.ai-tools"
+    assert_dir_exists "${project_dir}/.ai-tools/commands/use-case"
+}
+
+@test "setup-project: shows message when .claude missing" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Ensure no .claude folder exists
+    rm -rf "${project_dir}/.claude"
+
+    run bash "$SETUP_SCRIPT" "$project_dir"
+    assert_success
+
+    # Should show informational message about --link-claude
+    assert_output --partial "link-claude"
+}
+
+@test "setup-project: does not create .claude symlink without .claude folder" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Ensure no .claude folder exists
+    rm -rf "${project_dir}/.claude"
+
+    run bash "$SETUP_SCRIPT" "$project_dir"
+    assert_success
+
+    # .claude/commands/use-case should NOT exist
+    [ ! -e "${project_dir}/.claude/commands/use-case" ]
+}
+
+@test "setup-project: creates symlink when .claude exists" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Create .claude folder first
+    mkdir -p "${project_dir}/.claude"
+
+    run bash "$SETUP_SCRIPT" "$project_dir"
+    assert_success
+
+    # .claude/commands/use-case should be a symlink
+    [ -L "${project_dir}/.claude/commands/use-case" ]
+}
+
+# ============================================
+# --link-claude Command Tests
+# ============================================
+
+@test "link-claude: fails without .ai-tools" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Don't run setup, so no .ai-tools exists
+    run bash "$LINK_CLAUDE_SCRIPT" "$project_dir"
+    assert_failure
+    assert_output --partial ".ai-tools"
+}
+
+@test "link-claude: creates .claude folder if missing" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Run setup first to create .ai-tools (without .claude)
+    rm -rf "${project_dir}/.claude"
+    bash "$SETUP_SCRIPT" "$project_dir"
+
+    # Now run link-claude
+    run bash "$LINK_CLAUDE_SCRIPT" "$project_dir"
+    assert_success
+
+    # .claude should be created
+    assert_dir_exists "${project_dir}/.claude"
+}
+
+@test "link-claude: creates commands directory" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Run setup first (without .claude)
+    rm -rf "${project_dir}/.claude"
+    bash "$SETUP_SCRIPT" "$project_dir"
+
+    # Now run link-claude
+    run bash "$LINK_CLAUDE_SCRIPT" "$project_dir"
+    assert_success
+
+    # .claude/commands should be created
+    assert_dir_exists "${project_dir}/.claude/commands"
+}
+
+@test "link-claude: creates correct symlink" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Run setup first (without .claude)
+    rm -rf "${project_dir}/.claude"
+    bash "$SETUP_SCRIPT" "$project_dir"
+
+    # Now run link-claude
+    run bash "$LINK_CLAUDE_SCRIPT" "$project_dir"
+    assert_success
+
+    # Check symlink exists and points to right place
+    [ -L "${project_dir}/.claude/commands/use-case" ]
+    local link_target
+    link_target=$(readlink "${project_dir}/.claude/commands/use-case")
+    [ "$link_target" = "../../.ai-tools/commands/use-case" ]
+}
+
+@test "link-claude: is idempotent" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Run setup first (without .claude)
+    rm -rf "${project_dir}/.claude"
+    bash "$SETUP_SCRIPT" "$project_dir"
+
+    # Run link-claude twice
+    run bash "$LINK_CLAUDE_SCRIPT" "$project_dir"
+    assert_success
+
+    run bash "$LINK_CLAUDE_SCRIPT" "$project_dir"
+    assert_success
+
+    # Symlink should still be correct
+    [ -L "${project_dir}/.claude/commands/use-case" ]
+}
+
+@test "link-claude: warns when symlink points to wrong target" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Run setup first (without .claude)
+    rm -rf "${project_dir}/.claude"
+    bash "$SETUP_SCRIPT" "$project_dir"
+
+    # Create .claude/commands with wrong symlink
+    mkdir -p "${project_dir}/.claude/commands"
+    ln -s "/wrong/path" "${project_dir}/.claude/commands/use-case"
+
+    # Run link-claude - should fail with warning
+    run bash "$LINK_CLAUDE_SCRIPT" "$project_dir"
+    assert_failure
+    assert_output --partial "points to"
+}
+
+@test "link-claude: warns when use-case exists as directory" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Run setup first (without .claude)
+    rm -rf "${project_dir}/.claude"
+    bash "$SETUP_SCRIPT" "$project_dir"
+
+    # Create .claude/commands/use-case as a directory
+    mkdir -p "${project_dir}/.claude/commands/use-case"
+
+    # Run link-claude - should fail with warning
+    run bash "$LINK_CLAUDE_SCRIPT" "$project_dir"
+    assert_failure
+    assert_output --partial "not a symlink"
+}
+
+@test "ai-use-case --link-claude: works via CLI" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Run setup first (without .claude)
+    rm -rf "${project_dir}/.claude"
+    cd "$project_dir"
+    "$CLI" --init
+
+    # Run link-claude via CLI
+    run "$CLI" --link-claude
+    assert_success
+
+    # Symlink should exist
+    [ -L "${project_dir}/.claude/commands/use-case" ]
+}
+
+@test "ai-use-case link-claude: works via CLI (without dashes)" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    # Run setup first (without .claude)
+    rm -rf "${project_dir}/.claude"
+    cd "$project_dir"
+    "$CLI" init
+
+    # Run link-claude via CLI (without dashes)
+    run "$CLI" link-claude
+    assert_success
+
+    # Symlink should exist
+    [ -L "${project_dir}/.claude/commands/use-case" ]
 }
