@@ -27,7 +27,7 @@ Git -> Git: Check for pre-commit hook
 Git -> PreCommit: Execute .git/hooks/pre-commit
 activate PreCommit
 
-PreCommit -> PreCommit: Get current branch name\n(git branch --show-current)
+PreCommit -> PreCommit: Get current branch name\n(git symbolic-ref --short HEAD)
 PreCommit -> PreCommit: Check if branch is "main" or "master"
 
 alt Branch is main or master
@@ -179,7 +179,7 @@ activate SessionEnd
 
 SessionEnd -> SessionEnd: Capture session metadata:\n• Timestamp: 2025-12-08 23:30:45\n• Repository path\n• Current branch
 
-SessionEnd -> SessionEnd: git log --since="2 hours ago"\n--pretty=format:"%h %s"
+SessionEnd -> SessionEnd: git log --since="2 hours ago"\n--pretty=format:"  %h - %s (%ar)"
 note right of SessionEnd
   Captures recent commits
   from last 2 hours to
