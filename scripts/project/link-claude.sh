@@ -18,14 +18,14 @@ NC='\033[0m' # No Color
 # Parse arguments
 PROJECT_PATH="${1:-.}"
 
-# Resolve to absolute path
-PROJECT_PATH="$(cd "$PROJECT_PATH" && pwd)"
-
-# Verify we're in a valid directory
+# Verify directory exists before trying to resolve absolute path
 if [ ! -d "$PROJECT_PATH" ]; then
     echo -e "${RED}Error: Directory $PROJECT_PATH does not exist${NC}"
     exit 1
 fi
+
+# Resolve to absolute path
+PROJECT_PATH="$(cd "$PROJECT_PATH" && pwd)"
 
 # Define paths
 AI_TOOLS_COMMANDS="$PROJECT_PATH/.ai-tools/commands/use-case"
@@ -75,7 +75,7 @@ if [ -L "$CLAUDE_USECASE_SYMLINK" ]; then
         echo -e "${YELLOW}⚠${NC} Expected: $EXPECTED_LINK_TARGET"
         echo ""
         echo "To fix this, remove the existing symlink and run this command again:"
-        echo "  rm $CLAUDE_USECASE_SYMLINK"
+        echo "  rm \"$CLAUDE_USECASE_SYMLINK\""
         echo "  ai-use-case --link-claude"
         exit 1
     fi
@@ -85,7 +85,7 @@ elif [ -e "$CLAUDE_USECASE_SYMLINK" ]; then
     echo ""
     echo "This may be a directory with custom commands or a file."
     echo "Please review and remove it manually if you want to use the symlink:"
-    echo "  rm -rf $CLAUDE_USECASE_SYMLINK"
+    echo "  rm -rf \"$CLAUDE_USECASE_SYMLINK\""
     echo "  ai-use-case --link-claude"
     exit 1
 else
