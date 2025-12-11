@@ -345,11 +345,6 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
             cmd_name=$(basename "$cmd_file")
             target_file="$AI_COMMANDS_DIR/$cmd_name"
 
-            # Skip manifest.json (not a command)
-            if [ "$cmd_name" = "manifest.json" ]; then
-                continue
-            fi
-
             # Skip if source and target are the same file (self-setup scenario)
             if [ "$cmd_file" -ef "$target_file" ]; then
                 continue

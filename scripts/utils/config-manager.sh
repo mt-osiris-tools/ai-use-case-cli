@@ -308,11 +308,20 @@ set_install_mode() {
         fi
     else
         # Fallback: simple sed-based update (works for flat JSON)
+        # Cross-platform sed -i (BSD/macOS vs GNU/Linux)
         if grep -q '"installMode"' "$CONFIG_FILE"; then
-            sed -i "s|\"installMode\": \"[^\"]*\"|\"installMode\": \"$mode\"|" "$CONFIG_FILE"
+            if [[ "$(uname)" == "Darwin" ]]; then
+                sed -i '' "s|\"installMode\": \"[^\"]*\"|\"installMode\": \"$mode\"|" "$CONFIG_FILE"
+            else
+                sed -i "s|\"installMode\": \"[^\"]*\"|\"installMode\": \"$mode\"|" "$CONFIG_FILE"
+            fi
         else
             # Add field before closing brace
-            sed -i "s|}$|,\n  \"installMode\": \"$mode\"\n}|" "$CONFIG_FILE"
+            if [[ "$(uname)" == "Darwin" ]]; then
+                sed -i '' "s|}$|,\n  \"installMode\": \"$mode\"\n}|" "$CONFIG_FILE"
+            else
+                sed -i "s|}$|,\n  \"installMode\": \"$mode\"\n}|" "$CONFIG_FILE"
+            fi
         fi
     fi
 
@@ -360,11 +369,20 @@ set_advanced_enabled() {
         fi
     else
         # Fallback: simple sed-based update
+        # Cross-platform sed -i (BSD/macOS vs GNU/Linux)
         if grep -q '"advancedEnabled"' "$CONFIG_FILE"; then
-            sed -i "s|\"advancedEnabled\": [^,}]*|\"advancedEnabled\": $value|" "$CONFIG_FILE"
+            if [[ "$(uname)" == "Darwin" ]]; then
+                sed -i '' "s|\"advancedEnabled\": [^,}]*|\"advancedEnabled\": $value|" "$CONFIG_FILE"
+            else
+                sed -i "s|\"advancedEnabled\": [^,}]*|\"advancedEnabled\": $value|" "$CONFIG_FILE"
+            fi
         else
             # Add field before closing brace
-            sed -i "s|}$|,\n  \"advancedEnabled\": $value\n}|" "$CONFIG_FILE"
+            if [[ "$(uname)" == "Darwin" ]]; then
+                sed -i '' "s|}$|,\n  \"advancedEnabled\": $value\n}|" "$CONFIG_FILE"
+            else
+                sed -i "s|}$|,\n  \"advancedEnabled\": $value\n}|" "$CONFIG_FILE"
+            fi
         fi
     fi
 

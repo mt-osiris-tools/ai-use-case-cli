@@ -380,7 +380,12 @@ if command -v jq &> /dev/null && [ -f "$CONFIG_FILE" ]; then
 elif [ -f "$CONFIG_FILE" ]; then
     # Fallback: Add fields using sed if config exists
     if ! grep -q '"installMode"' "$CONFIG_FILE"; then
-        sed -i 's/}$/,\n  "installMode": "'"$INSTALL_MODE"'",\n  "advancedEnabled": '"$ADVANCED_ENABLED"'\n}/' "$CONFIG_FILE"
+        # Cross-platform sed -i (BSD/macOS vs GNU/Linux)
+        if [[ "$(uname)" == "Darwin" ]]; then
+            sed -i '' 's/}$/,\n  "installMode": "'"$INSTALL_MODE"'",\n  "advancedEnabled": '"$ADVANCED_ENABLED"'\n}/' "$CONFIG_FILE"
+        else
+            sed -i 's/}$/,\n  "installMode": "'"$INSTALL_MODE"'",\n  "advancedEnabled": '"$ADVANCED_ENABLED"'\n}/' "$CONFIG_FILE"
+        fi
         echo -e "${GREEN}✓${NC} Installation mode saved to config"
     fi
 else
