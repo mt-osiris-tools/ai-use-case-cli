@@ -306,7 +306,7 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
 
     # Check if advanced features are enabled (v3.13.0+)
     ADVANCED_ENABLED=false
-    if type is_advanced_enabled &>/dev/null && is_advanced_enabled; then
+    if type is_advanced_enabled >/dev/null 2>&1 && is_advanced_enabled; then
         ADVANCED_ENABLED=true
     fi
 

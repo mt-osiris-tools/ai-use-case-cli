@@ -58,7 +58,7 @@ fi
 # Check if advanced features are enabled (with backward compatibility)
 check_advanced_enabled() {
     # If config-manager was sourced, use its function
-    if type is_advanced_enabled &>/dev/null; then
+    if type is_advanced_enabled >/dev/null 2>&1; then
         is_advanced_enabled
         return $?
     fi
@@ -612,7 +612,7 @@ EOF
 
         read -p "Enable advanced features? (y/N): " confirm
         if [[ "$confirm" =~ ^[Yy]$ ]]; then
-            if type set_advanced_enabled &>/dev/null; then
+            if type set_advanced_enabled >/dev/null 2>&1; then
                 set_advanced_enabled "true"
                 echo ""
                 echo "You can now use:"
@@ -634,7 +634,7 @@ EOF
         ;;
     disable-advanced)
         trace_event "command_start" "command=disable-advanced"
-        if type set_advanced_enabled &>/dev/null; then
+        if type set_advanced_enabled >/dev/null 2>&1; then
             set_advanced_enabled "false"
             echo -e "${YELLOW}Note:${NC} Existing advanced commands in projects will remain."
             echo "       They simply won't be visible in CLI help."
@@ -652,7 +652,7 @@ EOF
         # Get install mode and advanced status
         _install_mode="light"
         _advanced_status="disabled"
-        if type get_install_mode &>/dev/null; then
+        if type get_install_mode >/dev/null 2>&1; then
             _install_mode=$(get_install_mode)
         fi
         if check_advanced_enabled; then
@@ -663,7 +663,7 @@ EOF
         echo -e "Advanced Features: $([ "$_advanced_status" = "enabled" ] && echo "${GREEN}enabled${NC}" || echo "${YELLOW}disabled${NC}")"
 
         # Get hub configuration
-        if type get_hub_mode &>/dev/null && type get_hub_path &>/dev/null; then
+        if type get_hub_mode >/dev/null 2>&1 && type get_hub_path >/dev/null 2>&1; then
             _hub_mode=$(get_hub_mode)
             _hub_path=$(get_hub_path)
             echo -e "Hub Mode:          ${CYAN}$_hub_mode${NC}"

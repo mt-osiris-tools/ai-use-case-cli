@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # Feature Registry for AI Use Case CLI
 # Defines command classifications for light/full installation modes
 
