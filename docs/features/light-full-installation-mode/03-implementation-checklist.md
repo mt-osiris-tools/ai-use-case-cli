@@ -1,7 +1,7 @@
 # Implementation Checklist: Light/Full Installation Mode
 
 **Feature ID:** FEATURE-LIGHT-FULL-INSTALL
-**Status:** Complete
+**Status:** Implementation Complete (Automated Tests Pending)
 
 ---
 
@@ -117,16 +117,25 @@
 
 ## Testing
 
-### Unit Tests
+### Automated Tests (Bats)
+
+- [ ] Add unit tests for get_install_mode() function
+- [ ] Add unit tests for get_advanced_enabled() function
+- [ ] Add unit tests for is_advanced_enabled() function
+- [ ] Add unit tests for set_install_mode() function
+- [ ] Add unit tests for set_advanced_enabled() function
+- [ ] Add integration tests for enable-advanced command
+- [ ] Add integration tests for disable-advanced command
+- [ ] Add integration tests for status command
+- [ ] Add tests for selective slash command installation
+
+### Manual Testing (Completed)
 
 - [x] Test is_advanced_enabled() returns true for legacy configs
 - [x] Test is_advanced_enabled() returns false for light mode
 - [x] Test is_advanced_enabled() returns true for full mode
 - [x] Test enable-advanced sets correct config
 - [x] Test disable-advanced sets correct config
-
-### Integration Tests
-
 - [x] Fresh install defaults to light mode
 - [x] Fresh install with --full flag enables all features
 - [x] ai-use-case --help shows only core commands in light mode
@@ -137,9 +146,6 @@
 - [x] ai-use-case --init installs only core slash commands in light mode
 - [x] ai-use-case --init --update after enable-advanced adds advanced slash commands
 - [x] Existing installations (no installMode) have full access
-
-### Manual Testing
-
 - [x] Test curl installation flow (light mode)
 - [x] Test curl installation flow with --full
 - [x] Test project setup in light mode
@@ -154,7 +160,9 @@
 
 ## Final Steps
 
-- [x] All tests passing
+- [x] Implementation complete
+- [x] Manual testing complete
+- [ ] Automated bats tests added
 - [ ] Documentation updated
 - [x] PR created
 - [ ] PR reviewed and approved
@@ -163,4 +171,5 @@
 
 ---
 
-**Progress:** 47/50 tasks completed (documentation pending)
+**Progress:** Core implementation: 47/47 completed ✓
+**Remaining:** Automated tests (9 tasks) + Documentation (3 tasks)

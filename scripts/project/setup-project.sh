@@ -319,7 +319,7 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
         local cmd_basename="${cmd_name%.md}"
 
         # If manifest exists and jq is available, use it
-        if [ -f "$MANIFEST_FILE" ] && command -v jq &>/dev/null; then
+        if [ -f "$MANIFEST_FILE" ] && command -v jq >/dev/null 2>&1; then
             local category=$(jq -r ".commands[\"$cmd_basename\"].category // \"core\"" "$MANIFEST_FILE" 2>/dev/null)
             [ "$category" = "advanced" ]
             return $?

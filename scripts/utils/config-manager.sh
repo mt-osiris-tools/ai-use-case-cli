@@ -302,8 +302,8 @@ set_install_mode() {
             trap - EXIT
         else
             echo -e "${RED}Error: Failed to update configuration${NC}" >&2
-            trap - EXIT
             rm -f "$temp_file"
+            trap - EXIT
             return 1
         fi
     else

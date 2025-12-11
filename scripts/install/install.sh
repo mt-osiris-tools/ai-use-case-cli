@@ -405,9 +405,9 @@ elif [ -f "$CONFIG_FILE" ]; then
     # Update advancedEnabled if present, else add it
     if grep -q '"advancedEnabled"' "$CONFIG_FILE"; then
         if [[ "$(uname)" == "Darwin" ]]; then
-            sed -i '' 's/"advancedEnabled": *[a-z]*/"advancedEnabled": '"$ADVANCED_ENABLED"'/' "$CONFIG_FILE"
+            sed -i '' 's/"advancedEnabled": *[^,}]*/"advancedEnabled": '"$ADVANCED_ENABLED"'/' "$CONFIG_FILE"
         else
-            sed -i 's/"advancedEnabled": *[a-z]*/"advancedEnabled": '"$ADVANCED_ENABLED"'/' "$CONFIG_FILE"
+            sed -i 's/"advancedEnabled": *[^,}]*/"advancedEnabled": '"$ADVANCED_ENABLED"'/' "$CONFIG_FILE"
         fi
     else
         if [[ "$(uname)" == "Darwin" ]]; then
