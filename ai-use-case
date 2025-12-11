@@ -59,6 +59,7 @@ ${YELLOW}USAGE${NC}
 ${YELLOW}COMMANDS${NC}
   ${GREEN}--init, init [--update]${NC}   Setup current project (use --update to refresh)
   ${GREEN}--link-claude${NC}             Create Claude Code symlinks (after Claude setup)
+  ${GREEN}--setup-codex${NC}             Setup Codex-style CLI prompts (after Codex setup)
   ${GREEN}config [show|reconfigure]${NC} Show or reconfigure hub settings
   ${GREEN}sync${NC}                      Sync use cases from project to hub
   ${GREEN}search <term>${NC}             Search documented use cases
@@ -92,10 +93,17 @@ ${YELLOW}CLAUDE CODE INTEGRATION${NC}
   ${GREEN}/use-case:publish-confluence${NC} Publish (alternative)
   ${GREEN}/use-case:quick-start${NC}        Quick start guide
 
+${YELLOW}CODEX-STYLE CLI INTEGRATION${NC}
+  For Codex-style CLI tools with hybrid parameter support:
+  ${GREEN}/prompts:use-case-document-session${NC}   Document AI session
+  ${GREEN}/prompts:use-case-publish-confluence${NC} Publish to Confluence
+  Setup: ${CYAN}ai-use-case --setup-codex${NC}
+
 ${YELLOW}EXAMPLES${NC}
   ai-use-case --init              # Setup current project
   ai-use-case --init --update     # Update project installation
   ai-use-case --link-claude       # Create Claude Code symlinks
+  ai-use-case --setup-codex       # Setup Codex CLI prompts
   ai-use-case config show         # Show current hub configuration
   ai-use-case config reconfigure  # Change hub mode (local/private)
   ai-use-case sync                # Sync use cases to hub
@@ -160,6 +168,17 @@ case "${1:-}" in
         else
             trace_event "error" "command=link-claude" "error=script_not_found" "script=link-claude.sh"
             echo -e "${RED}Error: link-claude.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    --setup-codex|setup-codex)
+        trace_event "command_start" "command=setup-codex" "working_dir=$(pwd)"
+        echo -e "${BLUE}Setting up Codex CLI prompts...${NC}"
+        if [ -f "$SCRIPT_DIR/scripts/project/setup-codex.sh" ]; then
+            trace_run "setup-codex" bash "$SCRIPT_DIR/scripts/project/setup-codex.sh" .
+        else
+            trace_event "error" "command=setup-codex" "error=script_not_found" "script=setup-codex.sh"
+            echo -e "${RED}Error: setup-codex.sh not found${NC}"
             exit 1
         fi
         ;;

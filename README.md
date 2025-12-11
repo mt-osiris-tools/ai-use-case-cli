@@ -82,6 +82,7 @@ Choose your hub mode:
 Use your preferred AI coding assistant:
 - GitHub Copilot
 - Claude Code
+- Codex-style CLI tools
 - Cursor
 - Any other AI tool
 
@@ -123,13 +124,14 @@ ai-use-case extract
 | `ai-use-case --init` | Setup project and configure hub |
 | `ai-use-case --init --update` | Update project installation |
 | `ai-use-case --link-claude` | Create Claude Code symlinks (after Claude setup) |
+| `ai-use-case --setup-codex` | Setup Codex-style CLI prompts |
 | `ai-use-case sync` | Manually sync to hub |
 | `ai-use-case search <term>` | Search use cases |
 | `ai-use-case stats` | View statistics |
 | `ai-use-case --version` | Show version |
 | `ai-use-case --help` | Show help |
 
-### Slash Commands (AI Assistant)
+### Slash Commands (Claude Code)
 
 | Command | Description |
 |---------|-------------|
@@ -137,6 +139,15 @@ ai-use-case extract
 | `/use-case:sync-usecases` | Sync to hub |
 | `/use-case:search-usecases` | Search use cases |
 | `/use-case:publish-confluence` | Publish to Confluence |
+
+### Slash Commands (Codex-Style CLI)
+
+| Command | Description |
+|---------|-------------|
+| `/prompts:use-case-document-session` | Document current session |
+| `/prompts:use-case-publish-confluence` | Publish to Confluence |
+
+Setup: `ai-use-case --setup-codex`
 
 ### Configuration Commands
 
@@ -324,6 +335,7 @@ git submodule update --init --recursive
 ## Related Projects
 
 - [Claude Code](https://claude.com/code) - AI coding assistant integration
+- Codex-style CLI tools - Various coding assistants with prompt-based workflows
 - [GitHub Copilot](https://github.com/features/copilot) - AI-powered code completion
 
 ## License
