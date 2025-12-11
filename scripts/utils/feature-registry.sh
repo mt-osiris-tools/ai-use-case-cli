@@ -85,6 +85,12 @@ ADVANCED_SLASH_COMMANDS=(
 # Usage: is_advanced_cli_command "agents"
 is_advanced_cli_command() {
     local cmd="$1"
+
+    # Validate argument is provided
+    if [ -z "$cmd" ]; then
+        return 1  # false - empty argument is not advanced
+    fi
+
     for advanced_cmd in "${ADVANCED_CLI_COMMANDS[@]}"; do
         if [ "$cmd" = "$advanced_cmd" ]; then
             return 0  # true
@@ -97,6 +103,12 @@ is_advanced_cli_command() {
 # Usage: is_advanced_slash_command "analyze-patterns"
 is_advanced_slash_command() {
     local cmd="$1"
+
+    # Validate argument is provided
+    if [ -z "$cmd" ]; then
+        return 1  # false - empty argument is not advanced
+    fi
+
     for advanced_cmd in "${ADVANCED_SLASH_COMMANDS[@]}"; do
         if [ "$cmd" = "$advanced_cmd" ]; then
             return 0  # true
