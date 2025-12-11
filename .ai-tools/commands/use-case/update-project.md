@@ -98,8 +98,8 @@ Assistant: "I'll update the current project to the latest CLI version."
 User: "Update my-app to the latest version"
 Assistant: "I'll update the my-app project. Let me find the registered path first."
 [Runs: ai-use-case list-projects --registry-only]
-[Finds path: /home/user/Projects/my-app]
-[Runs: ai-use-case update-project /home/user/Projects/my-app]
+[Finds path: /path/to/my-app]
+[Runs: ai-use-case update-project /path/to/my-app]
 ```
 
 **Multiple projects:**

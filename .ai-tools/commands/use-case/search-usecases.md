@@ -20,49 +20,49 @@ ai-use-case search <search-term>
 # Use the search script (recommended)
 ai-use-case search authentication
 
-# Or search manually:
+# Or search manually (HUB_PATH is ~/.local/share/ai-use-case-cli/hub or $AI_USECASES_DIR):
 # Search filenames
-find ~/Documents/ai-use-case-hub/by-project -name "*keyword*" -type f
+find $HUB_PATH/by-project -name "*keyword*" -type f
 
 # Search content
-grep -r "search term" ~/Documents/ai-use-case-hub/by-project --include="*.md" -l
+grep -r "search term" $HUB_PATH/by-project --include="*.md" -l
 
 # Search with context
-grep -r "search term" ~/Documents/ai-use-case-hub/by-project --include="*.md" -B 2 -A 2
+grep -r "search term" $HUB_PATH/by-project --include="*.md" -B 2 -A 2
 ```
 
 ### 2. Search by Date Range
 ```bash
 # Use cases from October 2025
-find ~/Documents/ai-use-case-hub/by-date/2025/10 -name "*.md" -type l
+find $HUB_PATH/by-date/2025/10 -name "*.md" -type l
 
 # Recent (last 30 days)
-find ~/Documents/ai-use-case-hub/by-date -name "*.md" -type f -mtime -30
+find $HUB_PATH/by-date -name "*.md" -type f -mtime -30
 ```
 
 ### 3. Search by Project
 ```bash
 # List all projects
-ls ~/Documents/ai-use-case-hub/by-project/
+ls $HUB_PATH/by-project/
 
 # Use cases for specific project
-ls -lh ~/Documents/ai-use-case-hub/by-project/PROJECT_NAME/
+ls -lh $HUB_PATH/by-project/PROJECT_NAME/
 ```
 
 ### 4. Search by Topic Tag
 ```bash
 # All authentication-related use cases
-ls ~/Documents/ai-use-case-hub/by-topic/ | grep -i auth
+ls $HUB_PATH/by-topic/ | grep -i auth
 
 # Use cases in a specific topic
-ls -lh ~/Documents/ai-use-case-hub/by-topic/TOPIC_NAME/
+ls -lh $HUB_PATH/by-topic/TOPIC_NAME/
 ```
 
 ## Analysis Queries
 
 ### Count use cases per project:
 ```bash
-for dir in ~/Documents/ai-use-case-hub/by-project/*/; do
+for dir in $HUB_PATH/by-project/*/; do
     count=$(find "$dir" -name "*.md" -type f | wc -l)
     echo "$(basename "$dir"): $count"
 done | sort -t: -k2 -rn
@@ -70,12 +70,12 @@ done | sort -t: -k2 -rn
 
 ### Find most common AI tools used:
 ```bash
-grep -h "Agent Used:" ~/Documents/ai-use-case-hub/by-project/*/*.md 2>/dev/null | sort | uniq -c | sort -rn
+grep -h "Agent Used:" $HUB_PATH/by-project/*/*.md 2>/dev/null | sort | uniq -c | sort -rn
 ```
 
 ### Total time saved:
 ```bash
-grep -h "Time Saved:" ~/Documents/ai-use-case-hub/by-project/*/*.md 2>/dev/null | grep -oP '\d+(\.\d+)?' | awk '{sum+=$1} END {print "Total hours saved: " sum}'
+grep -h "Time Saved:" $HUB_PATH/by-project/*/*.md 2>/dev/null | grep -oP '\d+(\.\d+)?' | awk '{sum+=$1} END {print "Total hours saved: " sum}'
 ```
 
 ## Interaction Flow
@@ -99,11 +99,14 @@ grep -h "Time Saved:" ~/Documents/ai-use-case-hub/by-project/*/*.md 2>/dev/null 
 ## Examples
 
 **User asks:** "Show me all authentication use cases"
-- Search filenames: `find ~/Documents/ai-use-case-hub/by-project -name "*auth*" -type f`
-- Search content: `grep -r "authentication" ~/Documents/ai-use-case-hub/by-project --include="*.md" -l`
+
+- Search filenames: `find $HUB_PATH/by-project -name "*auth*" -type f`
+- Search content: `grep -r "authentication" $HUB_PATH/by-project --include="*.md" -l`
 
 **User asks:** "What did I work on last week?"
-- `find ~/Documents/ai-use-case-hub/by-date -name "*.md" -type f -mtime -7 -printf '%TY-%Tm-%Td %p\n' | sort -r`
+
+- `find $HUB_PATH/by-date -name "*.md" -type f -mtime -7 -printf '%TY-%Tm-%Td %p\n' | sort -r`
 
 **User asks:** "How many hours have I saved using Claude Code?"
+
 - Extract and sum time saved metrics from all use cases

@@ -57,7 +57,7 @@ After viewing the projects, you can offer to:
 
 2. **View use cases** for a specific project:
    ```bash
-   ls ~/Documents/ai-use-case-hub/by-project/PROJECT_NAME/
+   ls $HUB_PATH/by-project/PROJECT_NAME/
    ```
 
 3. **Update a project** to the latest version:
