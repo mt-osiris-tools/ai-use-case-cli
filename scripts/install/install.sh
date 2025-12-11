@@ -369,12 +369,18 @@ fi
 if command -v jq &> /dev/null && [ -f "$CONFIG_FILE" ]; then
     # Use jq if available to update existing config
     TEMP_FILE=$(mktemp)
+    trap "rm -f '$TEMP_FILE'" EXIT
+
     jq --arg mode "$INSTALL_MODE" --argjson advanced "$ADVANCED_ENABLED" \
         '. + {installMode: $mode, advancedEnabled: $advanced}' "$CONFIG_FILE" > "$TEMP_FILE"
-    if [ -s "$TEMP_FILE" ]; then
+
+    # Validate output is non-empty and valid JSON before moving
+    if [ -s "$TEMP_FILE" ] && jq empty "$TEMP_FILE" 2>/dev/null; then
         mv "$TEMP_FILE" "$CONFIG_FILE"
+        trap - EXIT
         echo -e "${GREEN}✓${NC} Installation mode saved to config"
     else
+        trap - EXIT
         rm -f "$TEMP_FILE"
     fi
 elif [ -f "$CONFIG_FILE" ]; then

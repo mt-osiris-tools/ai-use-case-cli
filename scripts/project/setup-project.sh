@@ -210,8 +210,8 @@ fi
 
 if [ -z "$AI_USECASES_SYNC_SCRIPT" ]; then
     echo -e "${YELLOW}⚠ Warning: AI_USECASES_SYNC_SCRIPT environment variable not set${NC}"
-    echo -e "${BLUE}ℹ${NC} Post-commit hooks may not work correctly after repository separation"
-    echo -e "${BLUE}ℹ${NC} Add to your shell profile (~/.bashrc or ~/.zshrc):"
+    echo -e "${BLUE}i${NC} Post-commit hooks may not work correctly after repository separation"
+    echo -e "${BLUE}i${NC} Add to your shell profile (~/.bashrc or ~/.zshrc):"
     echo -e "${CYAN}export AI_USECASES_SYNC_SCRIPT=\"$CLI_ROOT/scripts/core/sync-ai-use-cases.sh\"${NC}"
     echo ""
 fi
@@ -352,13 +352,9 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
 
             # Check if this is an advanced command
             if is_advanced_command "$cmd_name" && [ "$ADVANCED_ENABLED" = false ]; then
-                # In update mode, preserve existing advanced commands
-                if [ "$UPDATE_MODE" = true ] && [ -f "$target_file" ]; then
-                    cp "$cmd_file" "$target_file"
-                    COMMANDS_UPDATED=$((COMMANDS_UPDATED + 1))
-                else
-                    COMMANDS_SKIPPED=$((COMMANDS_SKIPPED + 1))
-                fi
+                # Skip advanced commands when advanced features are disabled
+                # (existing advanced commands remain but are not updated)
+                COMMANDS_SKIPPED=$((COMMANDS_SKIPPED + 1))
                 continue
             fi
 
@@ -384,7 +380,7 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
         echo -e "${GREEN}✓${NC} Updated $COMMANDS_UPDATED AI tool slash command(s)"
     fi
     if [ $COMMANDS_SKIPPED -gt 0 ]; then
-        echo -e "${BLUE}ℹ${NC} $COMMANDS_SKIPPED advanced command(s) available with '${CYAN}ai-use-case enable-advanced${NC}'"
+        echo -e "${BLUE}i${NC} $COMMANDS_SKIPPED advanced command(s) available with '${CYAN}ai-use-case enable-advanced${NC}'"
     fi
     if [ $COMMANDS_COPIED -eq 0 ] && [ $COMMANDS_UPDATED -eq 0 ] && [ $COMMANDS_SKIPPED -eq 0 ]; then
         echo -e "${YELLOW}⚠${NC} AI tool slash commands already installed (use --update to refresh)"
@@ -438,8 +434,8 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
         fi
     else
         # .claude folder doesn't exist - skip symlink creation and inform user
-        echo -e "${BLUE}ℹ${NC} .claude folder not found - skipping Claude Code symlink creation"
-        echo -e "${BLUE}ℹ${NC} Run '${GREEN}ai-use-case --link-claude${NC}' after setting up Claude Code to create symlinks"
+        echo -e "${BLUE}i${NC} .claude folder not found - skipping Claude Code symlink creation"
+        echo -e "${BLUE}i${NC} Run '${GREEN}ai-use-case --link-claude${NC}' after setting up Claude Code to create symlinks"
     fi
 else
     echo -e "${YELLOW}⚠${NC} AI tool commands not found in CLI installation"
@@ -491,14 +487,14 @@ if [ -f "$POST_COMMIT_HOOK" ]; then
                 # Hook has customizations - do not overwrite
                 echo -e "${YELLOW}⚠${NC} Git post-commit hook contains customizations"
                 echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes"
-                echo -e "${BLUE}ℹ${NC} To manually update: compare your hook with $POST_COMMIT_HOOK_SOURCE"
+                echo -e "${BLUE}i${NC} To manually update: compare your hook with $POST_COMMIT_HOOK_SOURCE"
             fi
         else
             echo -e "${YELLOW}⚠${NC} Git post-commit hook already installed (use --update to refresh)"
         fi
     else
         # Append our hook to existing hook
-        echo -e "${BLUE}ℹ${NC} Existing post-commit hook detected - appending our hook"
+        echo -e "${BLUE}i${NC} Existing post-commit hook detected - appending our hook"
         echo "" >> "$POST_COMMIT_HOOK"
         cat "$POST_COMMIT_HOOK_SOURCE" >> "$POST_COMMIT_HOOK"
         echo -e "${GREEN}✓${NC} Git post-commit hook appended to existing hook"
@@ -525,14 +521,14 @@ if [ -f "$PRE_COMMIT_HOOK" ]; then
                 # Hook has customizations - do not overwrite
                 echo -e "${YELLOW}⚠${NC} Git pre-commit hook contains customizations"
                 echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes"
-                echo -e "${BLUE}ℹ${NC} To manually update: compare your hook with $PRE_COMMIT_HOOK_SOURCE"
+                echo -e "${BLUE}i${NC} To manually update: compare your hook with $PRE_COMMIT_HOOK_SOURCE"
             fi
         else
             echo -e "${YELLOW}⚠${NC} Git pre-commit hook already installed (use --update to refresh)"
         fi
     else
         # Append our hook to existing hook
-        echo -e "${BLUE}ℹ${NC} Existing pre-commit hook detected - appending our hook"
+        echo -e "${BLUE}i${NC} Existing pre-commit hook detected - appending our hook"
         echo "" >> "$PRE_COMMIT_HOOK"
         cat "$PRE_COMMIT_HOOK_SOURCE" >> "$PRE_COMMIT_HOOK"
         echo -e "${GREEN}✓${NC} Git pre-commit hook appended to existing hook"
@@ -578,7 +574,7 @@ if [ -f "$SESSION_END_HOOK_SOURCE" ]; then
 else
     if [ "$VERBOSE" = true ]; then
         echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook source not found: $SESSION_END_HOOK_SOURCE"
-        echo -e "  ${BLUE}ℹ${NC} This feature may not be available in your CLI version"
+        echo -e "  ${BLUE}i${NC} This feature may not be available in your CLI version"
     fi
 fi
 
