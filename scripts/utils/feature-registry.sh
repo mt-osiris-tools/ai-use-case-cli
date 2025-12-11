@@ -13,6 +13,7 @@ CORE_CLI_COMMANDS=(
     "--init"
     "init"
     "--link-claude"
+    "--setup-codex"
     "config"
     "sync"
     "search"

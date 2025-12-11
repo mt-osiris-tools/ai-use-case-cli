@@ -384,16 +384,29 @@ if command -v jq &> /dev/null && [ -f "$CONFIG_FILE" ]; then
         rm -f "$TEMP_FILE"
     fi
 elif [ -f "$CONFIG_FILE" ]; then
-    # Fallback: Add fields using sed if config exists
-    if ! grep -q '"installMode"' "$CONFIG_FILE"; then
-        # Cross-platform sed -i (BSD/macOS vs GNU/Linux)
-        if [[ "$(uname)" == "Darwin" ]]; then
-            sed -i '' 's/}$/,\n  "installMode": "'"$INSTALL_MODE"'",\n  "advancedEnabled": '"$ADVANCED_ENABLED"'\n}/' "$CONFIG_FILE"
-        else
-            sed -i 's/}$/,\n  "installMode": "'"$INSTALL_MODE"'",\n  "advancedEnabled": '"$ADVANCED_ENABLED"'\n}/' "$CONFIG_FILE"
-        fi
-        echo -e "${GREEN}✓${NC} Installation mode saved to config"
+    # Fallback: Update or add fields using sed if config exists
+    # Cross-platform sed -i (BSD/macOS vs GNU/Linux)
+    if [[ "$(uname)" == "Darwin" ]]; then
+        SED_CMD="sed -i ''"
+    else
+        SED_CMD="sed -i"
     fi
+
+    # Update installMode if present, else add it
+    if grep -q '"installMode"' "$CONFIG_FILE"; then
+        eval $SED_CMD 's/"installMode": *"[^"]*"/"installMode": "'"$INSTALL_MODE"'"/' "$CONFIG_FILE"
+    else
+        eval $SED_CMD 's/}$/,\n  "installMode": "'"$INSTALL_MODE"'"\n}/' "$CONFIG_FILE"
+    fi
+
+    # Update advancedEnabled if present, else add it
+    if grep -q '"advancedEnabled"' "$CONFIG_FILE"; then
+        eval $SED_CMD 's/"advancedEnabled": *[a-z]*/"advancedEnabled": '"$ADVANCED_ENABLED"'/' "$CONFIG_FILE"
+    else
+        eval $SED_CMD 's/}$/,\n  "advancedEnabled": '"$ADVANCED_ENABLED"'\n}/' "$CONFIG_FILE"
+    fi
+
+    echo -e "${GREEN}✓${NC} Installation mode saved to config"
 else
     # Create minimal config if none exists
     cat > "$CONFIG_FILE" <<EOF
