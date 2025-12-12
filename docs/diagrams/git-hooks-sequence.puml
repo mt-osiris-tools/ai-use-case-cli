@@ -36,6 +36,12 @@ alt Branch is main or master
   Git --> Developer: ❌ ERROR: Direct commits to protected branches not allowed\n\n**Suggested branch names:**\n  • feature/description\n  • fix/description\n  • docs/description\n  • refactor/description\n  • test/description\n\n**Bypass:** git commit --no-verify
   deactivate PreCommit
 
+  note right of Developer
+    _Note: The actual pre-commit hook displays a more detailed_
+    _error message with Unicode box-drawing characters (╭─╮│╰╯)._
+    _This diagram shows a simplified version for clarity._
+  end note
+
 else Branch is feature/fix/docs/etc
   PreCommit -> PreCommit: ✓ Branch validation passed
   PreCommit --> Git: Exit code 0 (SUCCESS)
@@ -119,8 +125,14 @@ PreCommit -> PreCommit: ❌ Protected branch detected
 PreCommit --> Git: Exit code 1 (FAIL)
 deactivate PreCommit
 
-Git --> Developer: ❌ ERROR: Cannot commit to main\n\n╔═══════════════════════════════════════╗\n║  COMMIT TO PROTECTED BRANCH BLOCKED   ║\n╚═══════════════════════════════════════╝\n\nYou are currently on branch: main\n\nDirect commits to 'main' and 'master'\nbranches are not allowed.\n\nPlease create a feature branch instead.\n\n**Bypass (not recommended):**\ngit commit --no-verify
+Git --> Developer: ❌ ERROR: Cannot commit to main
 deactivate Git
+
+note right of Git
+  The actual pre-commit hook displays a detailed, multi-line message
+  with a Unicode box and instructions. This diagram shows a simplified
+  version for clarity.
+end note
 
 == Scenario 3: Post-Commit Hook with Sync Failure (Non-Blocking) ==
 
@@ -238,9 +250,18 @@ activate Repo
 Repo --> Git: Commit created on main
 deactivate Repo
 
-Git -> Git: Skip post-commit hook\n(due to --no-verify)
+note right of Git
+  Note: --no-verify only skips pre-commit
+  and commit-msg hooks. Post-commit still runs.
+end note
 
-Git --> Developer: ✓ Commit successful (hooks bypassed)\n⚠ Warning: Pre-commit protections were skipped
+Git -> PostCommit: Execute .git/hooks/post-commit
+activate PostCommit
+PostCommit -> PostCommit: Check for .usecase/cases/ changes
+PostCommit --> Git: Post-commit completed
+deactivate PostCommit
+
+Git --> Developer: ✓ Commit successful (pre-commit hook bypassed)\n⚠ Warning: Pre-commit protections were skipped
 deactivate Git
 
 note right of Developer
