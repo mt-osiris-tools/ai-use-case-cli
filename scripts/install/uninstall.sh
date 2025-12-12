@@ -134,6 +134,13 @@ fi
 echo ""
 read -p "Remove entries from shell profile? (y/N): " clean_profile
 if [[ "$clean_profile" =~ ^[Yy]$ ]]; then
+    # Cross-platform sed -i: macOS requires a backup extension argument
+    if [[ "$(uname)" == "Darwin" ]]; then
+        SED_INPLACE="sed -i ''"
+    else
+        SED_INPLACE="sed -i"
+    fi
+
     for profile in "$HOME/.bashrc" "$HOME/.zshrc"; do
         if [ -f "$profile" ]; then
             if grep -qE "AI_USECASES_DIR|AI Use Case CLI|ai-use-case" "$profile"; then
@@ -141,8 +148,8 @@ if [[ "$clean_profile" =~ ^[Yy]$ ]]; then
                 cp "$profile" "${profile}.backup"
 
                 # Remove lines related to CLI
-                sed -i '/# AI Use Case CLI/d' "$profile" 2>/dev/null || true
-                sed -i '/\.local\/bin.*PATH/d' "$profile" 2>/dev/null || true
+                eval "$SED_INPLACE '/# AI Use Case CLI/d' \"$profile\"" 2>/dev/null || true
+                eval "$SED_INPLACE '/\.local\/bin.*PATH/d' \"$profile\"" 2>/dev/null || true
 
                 # Only remove AI_USECASES_DIR if user confirms
                 if grep -q "AI_USECASES_DIR" "$profile"; then
@@ -150,8 +157,8 @@ if [[ "$clean_profile" =~ ^[Yy]$ ]]; then
                     echo -e "${YELLOW}Found AI_USECASES_DIR in $profile${NC}"
                     read -p "Remove AI_USECASES_DIR? (y/N): " remove_env
                     if [[ "$remove_env" =~ ^[Yy]$ ]]; then
-                        sed -i '/AI_USECASES_DIR/d' "$profile" 2>/dev/null || true
-                        sed -i '/# AI Use Case Hub/d' "$profile" 2>/dev/null || true
+                        eval "$SED_INPLACE '/AI_USECASES_DIR/d' \"$profile\"" 2>/dev/null || true
+                        eval "$SED_INPLACE '/# AI Use Case Hub/d' \"$profile\"" 2>/dev/null || true
                     fi
                 fi
 
