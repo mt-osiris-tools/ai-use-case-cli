@@ -168,7 +168,7 @@ check_cli_version() {
 # Function to ensure hub repository exists
 ensure_hub_exists() {
     local hub_dir
-    local default_hub="$HOME/Documents/ai-use-case-hub"
+    local default_hub="$HOME/.local/share/ai-use-case-cli/hub"
 
     # Check if AI_USECASES_DIR is set
     if [ -n "$AI_USECASES_DIR" ]; then

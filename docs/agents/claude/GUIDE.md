@@ -491,7 +491,7 @@ The scripts support these optional environment variables:
 
 ```bash
 # Location of the documentation hub (not this CLI repo)
-export AI_USECASES_DIR="$HOME/Documents/ai-use-case-hub"
+export AI_USECASES_DIR="$HOME/.local/share/ai-use-case-cli/hub"
 
 # Path to the sync script (auto-detected if AI_USECASES_DIR is set)
 export AI_USECASES_SYNC_SCRIPT="$AI_USECASES_DIR/sync-ai-use-cases.sh"
@@ -499,7 +499,7 @@ export AI_USECASES_SYNC_SCRIPT="$AI_USECASES_DIR/sync-ai-use-cases.sh"
 
 **Note**: If `AI_USECASES_DIR` is not set, scripts default to:
 1. Directory where the script is located (for development)
-2. `$HOME/Documents/ai-use-case-hub` (for installed hub)
+2. `$HOME/.local/share/ai-use-case-cli/hub` (for installed hub)
 
 ## Common Commands (End User Perspective)
 
@@ -584,7 +584,7 @@ All scripts are self-contained bash scripts with embedded documentation. They:
 Scripts resolve paths in this priority order:
 1. `AI_USECASES_DIR` environment variable (points to hub)
 2. Script's own directory (for development and installed scenarios)
-3. Default: `$HOME/Documents/ai-use-case-hub`
+3. Default: `$HOME/.local/share/ai-use-case-cli/hub`
 
 ### Testing Changes
 
@@ -697,15 +697,16 @@ chmod +x /path/to/project/.git/hooks/post-commit
 bash -x ~/.local/bin/ai-use-case sync
 
 # Check hub exists
-ls ~/Documents/ai-use-case-hub
+ls ~/.local/share/ai-use-case-cli/hub
 ```
 
 ### Hub repository not found
 
 ```bash
 # Clone the hub repository
-cd ~/Documents
-git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git ai-use-case-hub
+mkdir -p ~/.local/share/ai-use-case-cli
+cd ~/.local/share/ai-use-case-cli
+git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git hub
 ```
 
 ## Version Checking
