@@ -49,12 +49,17 @@ fi
 #### Layer 2: Hub Signature Detection
 ```bash
 # Explicitly check for hub-specific directories
-if [ -d "$CLI_DIR/by-project" ] || [ -d "$CLI_DIR/by-date" ] || [ -d "$CLI_DIR/by-topic" ]; then
+if [ -n "$CLI_DIR" ] && { [ -d "$CLI_DIR/by-project" ] || [ -d "$CLI_DIR/by-date" ] || [ -d "$CLI_DIR/by-topic" ]; }; then
+    # Display formatted error message (simplified here for readability)
+    # Actual implementation uses color-coded box border
     echo "ERROR: Detected directory looks like the documentation hub!"
     echo "Refusing to remove: $CLI_DIR"
+    echo "The hub should NEVER be removed by this script."
     CLI_DIR=""
 fi
 ```
+
+*Note: Actual implementation displays a formatted red error box. Simplified for documentation.*
 
 #### Layer 3: Keyword Warning
 ```bash

@@ -49,11 +49,12 @@ if [ -z "$CLI_DIR" ] && [ -L "$HOME/.local/bin/ai-use-case" ]; then
         # macOS: Use a while loop to resolve symlinks
         SYMLINK_TARGET="$HOME/.local/bin/ai-use-case"
         while [ -L "$SYMLINK_TARGET" ]; do
+            SYMLINK_DIR="$(dirname "$SYMLINK_TARGET")"
             SYMLINK_TARGET="$(readlink "$SYMLINK_TARGET")"
             # Handle relative symlinks
             case "$SYMLINK_TARGET" in
                 /*) ;;  # absolute path
-                *) SYMLINK_TARGET="$(dirname "$HOME/.local/bin/ai-use-case")/$SYMLINK_TARGET" ;;
+                *) SYMLINK_TARGET="$SYMLINK_DIR/$SYMLINK_TARGET" ;;
             esac
         done
     else
@@ -72,32 +73,30 @@ if [ -z "$CLI_DIR" ] && [ -L "$HOME/.local/bin/ai-use-case" ]; then
 fi
 
 # CRITICAL SAFETY CHECK: Never remove directories that look like the hub
-if [ -n "$CLI_DIR" ]; then
-    # Check if this looks like the hub (has characteristic hub directories)
-    if [ -d "$CLI_DIR/by-project" ] || [ -d "$CLI_DIR/by-date" ] || [ -d "$CLI_DIR/by-topic" ]; then
-        echo -e "${RED}╭────────────────────────────────────────────────────────────╮${NC}"
-        echo -e "${RED}│${NC}  ${RED}⚠ SAFETY CHECK FAILED${NC}                                  ${RED}│${NC}"
-        echo -e "${RED}│${NC}                                                            ${RED}│${NC}"
-        echo -e "${RED}│${NC}  Detected directory looks like the documentation hub!     ${RED}│${NC}"
-        echo -e "${RED}│${NC}                                                            ${RED}│${NC}"
-        echo -e "${RED}│${NC}  Refusing to remove:                                      ${RED}│${NC}"
-        echo -e "${RED}│${NC}  ${YELLOW}$CLI_DIR${NC}"
-        echo -e "${RED}│${NC}                                                            ${RED}│${NC}"
-        echo -e "${RED}│${NC}  ${YELLOW}The hub should NEVER be removed by this script.${NC}        ${RED}│${NC}"
-        echo -e "${RED}╰────────────────────────────────────────────────────────────╯${NC}"
-        echo ""
-        CLI_DIR=""
-    fi
+# Check if this looks like the hub (has characteristic hub directories)
+if [ -n "$CLI_DIR" ] && { [ -d "$CLI_DIR/by-project" ] || [ -d "$CLI_DIR/by-date" ] || [ -d "$CLI_DIR/by-topic" ]; }; then
+    echo -e "${RED}╭────────────────────────────────────────────────────────────╮${NC}"
+    echo -e "${RED}│${NC}  ${RED}⚠ SAFETY CHECK FAILED${NC}                                  ${RED}│${NC}"
+    echo -e "${RED}│${NC}                                                            ${RED}│${NC}"
+    echo -e "${RED}│${NC}  Detected directory looks like the documentation hub!     ${RED}│${NC}"
+    echo -e "${RED}│${NC}                                                            ${RED}│${NC}"
+    echo -e "${RED}│${NC}  Refusing to remove:                                      ${RED}│${NC}"
+    echo -e "${RED}│${NC}    ${YELLOW}$CLI_DIR${NC}"
+    echo -e "${RED}│${NC}                                                            ${RED}│${NC}"
+    echo -e "${RED}│${NC}  ${YELLOW}The hub should NEVER be removed by this script.${NC}        ${RED}│${NC}"
+    echo -e "${RED}╰────────────────────────────────────────────────────────────╯${NC}"
+    echo ""
+    CLI_DIR=""
+fi
 
-    # Additional safety: Check if path contains "hub" keyword
-    if [ -n "$CLI_DIR" ] && [[ "$CLI_DIR" =~ hub ]]; then
-        echo -e "${YELLOW}⚠ Warning: Path contains 'hub' keyword: $CLI_DIR${NC}"
-        echo -e "${YELLOW}Please verify this is the CLI directory and not the hub.${NC}"
-        read -p "Is this the CLI directory? (y/N): " verify_cli
-        if [[ ! "$verify_cli" =~ ^[Yy]$ ]]; then
-            echo -e "${BLUE}Skipping directory removal for safety${NC}"
-            CLI_DIR=""
-        fi
+# Additional safety: Check if path contains "hub" keyword
+if [ -n "$CLI_DIR" ] && [[ "$CLI_DIR" =~ hub ]]; then
+    echo -e "${YELLOW}⚠ Warning: Path contains 'hub' keyword: $CLI_DIR${NC}"
+    echo -e "${YELLOW}Please verify this is the CLI directory and not the hub.${NC}"
+    read -p "Is this the CLI directory? (y/N): " verify_cli
+    if [[ ! "$verify_cli" =~ ^[Yy]$ ]]; then
+        echo -e "${BLUE}Skipping directory removal for safety${NC}"
+        CLI_DIR=""
     fi
 fi
 

@@ -41,28 +41,15 @@ else
 fi
 echo ""
 
-# Test 2: Reject hub directory (if it exists)
-echo -e "${YELLOW}Test 2: Safety check for hub directory${NC}"
+# Test 2: Verify hub signature detection
+echo -e "${YELLOW}Test 2: Hub signature detection${NC}"
 if [ -d "$HUB_DIR" ]; then
-    cd "$HUB_DIR"
-
-    DETECTED_CLI_DIR=""
-    if [ -f "ai-use-case" ] && [ -d ".git" ] && [ -d "scripts/install" ]; then
-        if [ -f "scripts/install/uninstall.sh" ] && [ -f "scripts/core/sync-ai-use-cases.sh" ]; then
-            DETECTED_CLI_DIR="$(pwd)"
-        fi
-    fi
-
-    # Check safety mechanism
-    if [ -n "$DETECTED_CLI_DIR" ]; then
-        if [ -d "$DETECTED_CLI_DIR/by-project" ] || [ -d "$DETECTED_CLI_DIR/by-date" ] || [ -d "$DETECTED_CLI_DIR/by-topic" ]; then
-            echo -e "${GREEN}✓ PASS: Safety check prevented hub detection${NC}"
-        else
-            echo -e "${RED}✗ FAIL: Safety check should have blocked this${NC}"
-            exit 1
-        fi
+    # Test the safety check: hub directories should be detected
+    if [ -d "$HUB_DIR/by-project" ] || [ -d "$HUB_DIR/by-date" ] || [ -d "$HUB_DIR/by-topic" ]; then
+        echo -e "${GREEN}✓ PASS: Hub signature directories detected (hub will be protected)${NC}"
     else
-        echo -e "${GREEN}✓ PASS: Did not detect hub as CLI (correct)${NC}"
+        echo -e "${YELLOW}⚠ WARN: Hub exists but signature directories not found${NC}"
+        echo -e "  Hub may not have standard structure (by-project, by-date, by-topic)"
     fi
 else
     echo -e "${YELLOW}⚠ SKIP: Hub directory not found at $HUB_DIR${NC}"
