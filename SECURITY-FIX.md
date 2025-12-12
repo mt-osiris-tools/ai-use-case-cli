@@ -1,16 +1,16 @@
-# Security Fix: Uninstall Script Directory Detection Vulnerability
+# Safety Fix: Uninstall Script Directory Detection Issue
 
 ## Issue Summary
 
-**Severity**: HIGH
-**Impact**: Potential data loss (documentation hub deletion)
+**Severity**: HIGH (Data Loss Risk)
+**Impact**: Potential accidental deletion of documentation hub
 **Component**: `scripts/install/uninstall.sh`
 
-## Vulnerability Description
+## Problem Description
 
-The uninstall script's directory detection logic was unsafe and could accidentally delete the documentation hub instead of the CLI installation:
+The uninstall script's directory detection logic was insufficient and could accidentally delete the documentation hub instead of the CLI installation:
 
-### Original Code (VULNERABLE)
+### Original Code (Unsafe)
 ```bash
 if [ -f "ai-use-case" ] && [ -d ".git" ]; then
     CLI_DIR="$(pwd)"
@@ -25,12 +25,12 @@ This logic could match ANY git repository that happens to contain a file named "
 - The documentation hub (if user copied/symlinked the ai-use-case file)
 - Any other project with similar naming
 
-### Attack Scenario
+### Risk Scenario
 1. User accidentally creates `ai-use-case` file in hub directory (copy, symlink, etc.)
 2. User runs `ai-use-case uninstall` from hub directory
-3. Script detects hub as CLI directory
+3. Script incorrectly detects hub as CLI directory
 4. User confirms deletion
-5. **Entire hub with all documentation is deleted** (`rm -rf`)
+5. **Entire hub with all documentation is accidentally deleted** (`rm -rf`)
 
 ## Fix Implementation
 
@@ -85,7 +85,7 @@ Created comprehensive test suite: `scripts/install/test-uninstall-detection.sh`
 
 All tests passing:
 - ✅ Correctly detects CLI directory when running from CLI repo
-- ✅ Rejects hub directory (prevents vulnerability)
+- ✅ Rejects hub directory (prevents accidental deletion)
 - ✅ Identifies paths with "hub" keyword
 - ✅ Verifies CLI-specific files exist
 
