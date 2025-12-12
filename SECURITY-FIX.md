@@ -83,11 +83,15 @@ fi
 
 Created comprehensive test suite: `scripts/install/test-uninstall-detection.sh`
 
-All tests passing:
-- ✅ Correctly detects CLI directory when running from CLI repo
-- ✅ Rejects hub directory (prevents accidental deletion)
-- ✅ Identifies paths with "hub" keyword
-- ✅ Verifies CLI-specific files exist
+**Note**: Tests verify the detection algorithm logic by replicating the core detection checks inline. They validate the logic correctness rather than invoking the full uninstall.sh script.
+
+All detection logic tests passing:
+- ✅ Correctly detects CLI directory when running from CLI repo (Method 1)
+- ✅ Verifies hub signature detection (Layer 2 safety check)
+- ✅ Identifies paths with "hub" keyword (Layer 3 safety check)
+- ✅ Verifies CLI-specific files exist (strict verification)
+
+*Symlink resolution (Method 3) requires integration testing with actual symlinks.*
 
 ## Impact Assessment
 

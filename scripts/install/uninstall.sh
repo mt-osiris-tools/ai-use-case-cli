@@ -50,11 +50,11 @@ if [ -z "$CLI_DIR" ] && [ -L "$HOME/.local/bin/ai-use-case" ]; then
         SYMLINK_TARGET="$HOME/.local/bin/ai-use-case"
         while [ -L "$SYMLINK_TARGET" ]; do
             SYMLINK_DIR="$(dirname "$SYMLINK_TARGET")"
-            SYMLINK_TARGET="$(readlink "$SYMLINK_TARGET")"
-            # Handle relative symlinks
-            case "$SYMLINK_TARGET" in
-                /*) ;;  # absolute path
-                *) SYMLINK_TARGET="$SYMLINK_DIR/$SYMLINK_TARGET" ;;
+            LINK_VALUE="$(readlink "$SYMLINK_TARGET")"
+            # Handle relative symlinks: always resolve relative to the symlink's directory
+            case "$LINK_VALUE" in
+                /*) SYMLINK_TARGET="$LINK_VALUE" ;;  # absolute path
+                *) SYMLINK_TARGET="$SYMLINK_DIR/$LINK_VALUE" ;;
             esac
         done
     else
@@ -80,11 +80,9 @@ if [ -n "$CLI_DIR" ] && { [ -d "$CLI_DIR/by-project" ] || [ -d "$CLI_DIR/by-date
     echo -e "${RED}│${NC}                                                            ${RED}│${NC}"
     echo -e "${RED}│${NC}  Detected directory looks like the documentation hub!     ${RED}│${NC}"
     echo -e "${RED}│${NC}                                                            ${RED}│${NC}"
-    echo -e "${RED}│${NC}  Refusing to remove:                                      ${RED}│${NC}"
-    echo -e "${RED}│${NC}    ${YELLOW}$CLI_DIR${NC}"
-    echo -e "${RED}│${NC}                                                            ${RED}│${NC}"
     echo -e "${RED}│${NC}  ${YELLOW}The hub should NEVER be removed by this script.${NC}        ${RED}│${NC}"
     echo -e "${RED}╰────────────────────────────────────────────────────────────╯${NC}"
+    echo -e "${YELLOW}Refusing to remove path:${NC} $CLI_DIR"
     echo ""
     CLI_DIR=""
 fi
