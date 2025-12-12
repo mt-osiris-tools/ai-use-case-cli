@@ -129,7 +129,7 @@ For each file that needs updating:
 
 ### Hub Repository Location
 ```bash
-~/Documents/ai-use-case-hub
+~/.local/share/ai-use-case-cli/hub
 # or
 $AI_USECASES_DIR
 ```
@@ -149,7 +149,7 @@ $AI_USECASES_DIR
 
 3. **Update hub**
    ```bash
-   cd ~/Documents/ai-use-case-hub
+   cd ${AI_USECASES_DIR:-~/.local/share/ai-use-case-cli/hub}
    # Update templates, docs, changelog
    git add .
    git commit -m "docs: Update for CLI v2.X.X feature"
