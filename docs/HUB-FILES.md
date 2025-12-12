@@ -56,9 +56,10 @@ This separation allows:
 To set up the documentation hub:
 
 ```bash
-cd ~/Documents
-git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git ai-use-case-hub
-export AI_USECASES_DIR="$HOME/Documents/ai-use-case-hub"
+mkdir -p ~/.local/share/ai-use-case-cli
+cd ~/.local/share/ai-use-case-cli
+git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git hub
+export AI_USECASES_DIR="$HOME/.local/share/ai-use-case-cli/hub"
 ```
 
 Or let the installer do it for you:
