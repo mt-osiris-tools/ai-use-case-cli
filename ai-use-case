@@ -45,8 +45,52 @@ else
     trace_attribute() { true; }
 fi
 
-# Show help
+# Source config manager for installation mode checking
+if [ -f "$SCRIPT_DIR/scripts/utils/config-manager.sh" ]; then
+    source "$SCRIPT_DIR/scripts/utils/config-manager.sh"
+fi
+
+# Source feature registry for command classification
+if [ -f "$SCRIPT_DIR/scripts/utils/feature-registry.sh" ]; then
+    source "$SCRIPT_DIR/scripts/utils/feature-registry.sh"
+fi
+
+# Check if advanced features are enabled (with backward compatibility)
+check_advanced_enabled() {
+    # If config-manager was sourced, use its function
+    if type is_advanced_enabled >/dev/null 2>&1; then
+        is_advanced_enabled
+        return $?
+    fi
+    # Fallback: allow all (for backward compatibility)
+    return 0
+}
+
+# Gate function for advanced commands - shows friendly unlock message
+require_advanced() {
+    if ! check_advanced_enabled; then
+        echo -e "${YELLOW}This is an advanced feature.${NC}"
+        echo ""
+        echo -e "Run ${CYAN}ai-use-case enable-advanced${NC} to unlock advanced features."
+        echo ""
+        echo "Advanced features include:"
+        echo "  - ${GREEN}agents${NC}           AI agent management"
+        echo "  - ${GREEN}review-quality${NC}   AI-powered documentation review"
+        echo "  - ${GREEN}analyze-patterns${NC} Cross-project pattern analysis"
+        echo "  - ${GREEN}extract${NC}          Session data extraction"
+        echo "  - ${GREEN}tracing${NC}          OpenTelemetry tracing"
+        exit 1
+    fi
+}
+
+# Show help (mode-aware)
 show_help() {
+    # Check if advanced features are enabled
+    local show_advanced=false
+    if check_advanced_enabled; then
+        show_advanced=true
+    fi
+
     cat <<EOF
 ${BLUE}╭────────────────────────────────────────────────────────────╮${NC}
 ${BLUE}│${NC} ${GREEN}AI Use Case CLI${NC} v${VERSION}                                ${BLUE}│${NC}
@@ -65,20 +109,41 @@ ${YELLOW}COMMANDS${NC}
   ${GREEN}search <term>${NC}             Search documented use cases
   ${GREEN}list${NC}                      List all registered projects
   ${GREEN}stats${NC}                     View use case statistics
-  ${GREEN}extract [hours] [format]${NC}  Extract session data for reporting
   ${GREEN}view${NC}                      Open hub directory in file explorer
   ${GREEN}push${NC}                      Push hub changes to remote repository
   ${GREEN}publish-confluence${NC}        Publish use case to Confluence
-  ${GREEN}agents <subcommand>${NC}       Manage AI agents (list, enable, disable, info)
-  ${GREEN}review-quality <file>${NC}     Review documentation quality with AI agent
-  ${GREEN}analyze-patterns${NC}          Analyze documentation patterns with AI agent
-  ${GREEN}tracing [subcommand]${NC}      Manage tracing configuration
   ${GREEN}reset [options]${NC}           Reset CLI configuration and data
   ${GREEN}update [options]${NC}          Update CLI to latest version
-  ${GREEN}bump-version <type>${NC}       Bump version (major|minor|patch)
+  ${GREEN}status${NC}                    Show CLI status and configuration
   ${GREEN}uninstall${NC}                 Uninstall the CLI tool
   ${GREEN}--version, -v, version${NC}    Show version information
   ${GREEN}--help, -h, help${NC}          Show this help message
+EOF
+
+    # Show advanced commands section based on mode
+    if [ "$show_advanced" = true ]; then
+        cat <<EOF
+
+${YELLOW}ADVANCED COMMANDS${NC}
+  ${GREEN}agents <subcommand>${NC}       Manage AI agents (list, enable, disable, info)
+  ${GREEN}review-quality <file>${NC}     Review documentation quality with AI agent
+  ${GREEN}analyze-patterns${NC}          Analyze documentation patterns with AI agent
+  ${GREEN}extract [hours] [format]${NC}  Extract session data for reporting
+  ${GREEN}tracing [subcommand]${NC}      Manage tracing configuration
+  ${GREEN}bump-version <type>${NC}       Bump version (major|minor|patch)
+EOF
+    else
+        cat <<EOF
+
+${YELLOW}MORE FEATURES${NC}
+  Run ${CYAN}ai-use-case enable-advanced${NC} to unlock:
+  - AI agents for quality review and pattern analysis
+  - Session data extraction for reporting
+  - OpenTelemetry tracing integration
+EOF
+    fi
+
+    cat <<EOF
 
 ${YELLOW}CLAUDE CODE INTEGRATION${NC}
   For AI-assisted documentation with automatic context capture:
@@ -86,12 +151,23 @@ ${YELLOW}CLAUDE CODE INTEGRATION${NC}
   ${GREEN}/use-case:setup-project${NC}      Setup project (alternative to --init)
   ${GREEN}/use-case:sync-usecases${NC}      Sync to hub (alternative to sync)
   ${GREEN}/use-case:search-usecases${NC}    Search (alternative to search)
-  ${GREEN}/use-case:extract-session${NC}    Extract session data (alternative to extract)
   ${GREEN}/use-case:list-projects${NC}      List projects (alternative to list)
   ${GREEN}/use-case:check-updates${NC}      Check updates (alternative to check-updates)
   ${GREEN}/use-case:update-project${NC}     Update project (alternative to update-project)
-  ${GREEN}/use-case:publish-confluence${NC} Publish (alternative)
+  ${GREEN}/use-case:publish-confluence${NC} Publish to Confluence
   ${GREEN}/use-case:quick-start${NC}        Quick start guide
+EOF
+
+    # Show advanced slash commands if enabled
+    if [ "$show_advanced" = true ]; then
+        cat <<EOF
+  ${GREEN}/use-case:extract-session${NC}    Extract session data (alternative to extract)
+  ${GREEN}/use-case:review-quality${NC}     Review documentation quality
+  ${GREEN}/use-case:analyze-patterns${NC}   Analyze documentation patterns
+EOF
+    fi
+
+    cat <<EOF
 
 ${YELLOW}CODEX-STYLE CLI INTEGRATION${NC}
   For Codex-style CLI tools with hybrid parameter support:
@@ -105,19 +181,12 @@ ${YELLOW}EXAMPLES${NC}
   ai-use-case --link-claude       # Create Claude Code symlinks
   ai-use-case --setup-codex       # Setup Codex CLI prompts
   ai-use-case config show         # Show current hub configuration
-  ai-use-case config reconfigure  # Change hub mode (local/private)
   ai-use-case sync                # Sync use cases to hub
   ai-use-case search "auth"       # Search for auth-related use cases
   ai-use-case list                # List all projects
-  ai-use-case stats               # View statistics
-  ai-use-case extract 8 json      # Extract last 8 hours as JSON
-  ai-use-case agents list         # List available agents
-  ai-use-case agents enable quality-reviewer  # Enable an agent
-  ai-use-case review-quality file.md  # Review documentation quality
-  ai-use-case analyze-patterns       # Analyze documentation patterns
-  ai-use-case analyze-patterns --hub # Analyze patterns across all projects
+  ai-use-case status              # Show CLI status
 
-${YELLOW}PROJECT REGISTRY (v3.1.0+)${NC}
+${YELLOW}PROJECT REGISTRY${NC}
   ${GREEN}list-projects${NC}             List registered projects with versions
   ${GREEN}check-updates${NC}             Check which projects need CLI updates
   ${GREEN}update-project <path>${NC}     Update project to latest CLI version
@@ -266,6 +335,7 @@ case "${1:-}" in
         fi
         ;;
     extract)
+        require_advanced
         trace_event "command_start" "command=extract" "args=$*"
         if [ -f "$SCRIPT_DIR/scripts/core/extract-session-data.sh" ]; then
             # Pass all arguments to the script
@@ -346,6 +416,7 @@ case "${1:-}" in
         fi
         ;;
     agents)
+        require_advanced
         trace_event "command_start" "command=agents" "subcommand=${2:-list}"
         if [ -f "$SCRIPT_DIR/scripts/agents/agent-registry.sh" ]; then
             # Pass all arguments to agent-registry.sh
@@ -359,6 +430,7 @@ case "${1:-}" in
         fi
         ;;
     review-quality)
+        require_advanced
         trace_event "command_start" "command=review-quality" "file=${2:-none}"
         if [ -f "$SCRIPT_DIR/scripts/agents/quality-agent.sh" ]; then
             # Pass all arguments to quality-agent.sh
@@ -372,6 +444,7 @@ case "${1:-}" in
         fi
         ;;
     analyze-patterns)
+        require_advanced
         trace_event "command_start" "command=analyze-patterns" "mode=${2:-default}"
         if [ -f "$SCRIPT_DIR/scripts/agents/pattern-agent.sh" ]; then
             # Pass all arguments to pattern-agent.sh
@@ -385,6 +458,7 @@ case "${1:-}" in
         fi
         ;;
     tracing)
+        require_advanced
         trace_event "command_start" "command=tracing" "subcommand=${2:-show}"
         if [ -f "$SCRIPT_DIR/scripts/utils/config-manager.sh" ]; then
             case "${2:-show}" in
@@ -489,6 +563,7 @@ EOF
         fi
         ;;
     bump-version|bump)
+        require_advanced
         if [ -z "${2:-}" ]; then
             trace_event "error" "command=bump-version" "error=missing_argument" "required=bump_type"
             echo -e "${RED}Error: Bump type required${NC}"
@@ -515,6 +590,93 @@ EOF
             trace_event "error" "command=uninstall" "error=script_not_found" "script=uninstall.sh"
             echo -e "${RED}Error: uninstall.sh not found${NC}"
             exit 1
+        fi
+        ;;
+    enable-advanced)
+        trace_event "command_start" "command=enable-advanced"
+        echo -e "${BLUE}=== Enable Advanced Features ===${NC}"
+        echo ""
+        echo "Advanced features include:"
+        echo "  ${GREEN}agents${NC}           - AI agent management and statistics"
+        echo "  ${GREEN}review-quality${NC}   - AI-powered documentation quality review"
+        echo "  ${GREEN}analyze-patterns${NC} - Cross-project pattern analysis"
+        echo "  ${GREEN}extract${NC}          - Session data extraction for reporting"
+        echo "  ${GREEN}tracing${NC}          - OpenTelemetry tracing configuration"
+        echo ""
+
+        # Check if already enabled
+        if check_advanced_enabled; then
+            echo -e "${GREEN}✓ Advanced features are already enabled${NC}"
+            exit 0
+        fi
+
+        read -p "Enable advanced features? (y/N): " confirm
+        if [[ "$confirm" =~ ^[Yy]$ ]]; then
+            if type set_advanced_enabled >/dev/null 2>&1; then
+                set_advanced_enabled "true"
+                echo ""
+                echo "You can now use:"
+                echo "  ${CYAN}ai-use-case agents list${NC}"
+                echo "  ${CYAN}ai-use-case review-quality <file>${NC}"
+                echo "  ${CYAN}ai-use-case analyze-patterns${NC}"
+                echo "  ${CYAN}ai-use-case extract${NC}"
+                echo "  ${CYAN}ai-use-case tracing${NC}"
+                echo ""
+                echo -e "${YELLOW}Tip:${NC} Run ${CYAN}ai-use-case --init --update${NC} in your projects"
+                echo "     to install advanced slash commands."
+            else
+                echo -e "${RED}Error: Configuration manager not available${NC}"
+                exit 1
+            fi
+        else
+            echo -e "${BLUE}Cancelled${NC}"
+        fi
+        ;;
+    disable-advanced)
+        trace_event "command_start" "command=disable-advanced"
+        if type set_advanced_enabled >/dev/null 2>&1; then
+            set_advanced_enabled "false"
+            echo -e "${YELLOW}Note:${NC} Existing advanced commands in projects will remain."
+            echo "       They simply won't be visible in CLI help."
+        else
+            echo -e "${RED}Error: Configuration manager not available${NC}"
+            exit 1
+        fi
+        ;;
+    status)
+        trace_event "command_start" "command=status"
+        echo -e "${BLUE}=== AI Use Case CLI Status ===${NC}"
+        echo ""
+        echo -e "Version:           ${GREEN}$VERSION${NC}"
+
+        # Get install mode and advanced status
+        _install_mode="light"
+        _advanced_status="disabled"
+        if type get_install_mode >/dev/null 2>&1; then
+            _install_mode=$(get_install_mode)
+        fi
+        if check_advanced_enabled; then
+            _advanced_status="enabled"
+        fi
+
+        echo -e "Install Mode:      ${CYAN}$_install_mode${NC}"
+        echo -e "Advanced Features: $([ "$_advanced_status" = "enabled" ] && echo "${GREEN}enabled${NC}" || echo "${YELLOW}disabled${NC}")"
+
+        # Get hub configuration
+        if type get_hub_mode >/dev/null 2>&1 && type get_hub_path >/dev/null 2>&1; then
+            _hub_mode=$(get_hub_mode)
+            _hub_path=$(get_hub_path)
+            echo -e "Hub Mode:          ${CYAN}$_hub_mode${NC}"
+            echo -e "Hub Path:          ${CYAN}$_hub_path${NC}"
+        fi
+
+        echo ""
+        echo -e "CLI Root:          ${CYAN}$SCRIPT_DIR${NC}"
+        echo -e "Config File:       ${CYAN}$HOME/.config/ai-use-case-cli/config.json${NC}"
+        echo ""
+
+        if [ "$_advanced_status" != "enabled" ]; then
+            echo -e "${YELLOW}Tip:${NC} Run ${CYAN}ai-use-case enable-advanced${NC} for more features"
         fi
         ;;
     document)

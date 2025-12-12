@@ -1,0 +1,66 @@
+{
+  "version": "1.0.0",
+  "description": "AI Use Case CLI slash commands manifest",
+  "commands": {
+    "document-session": {
+      "category": "core",
+      "description": "Document AI coding session automatically",
+      "priority": 1
+    },
+    "setup-project": {
+      "category": "core",
+      "description": "Setup project for AI use case documentation",
+      "priority": 2
+    },
+    "sync-usecases": {
+      "category": "core",
+      "description": "Sync use cases from project to hub",
+      "priority": 3
+    },
+    "search-usecases": {
+      "category": "core",
+      "description": "Search documented use cases",
+      "priority": 4
+    },
+    "list-projects": {
+      "category": "core",
+      "description": "List all registered projects",
+      "priority": 5
+    },
+    "check-updates": {
+      "category": "core",
+      "description": "Check which projects need CLI updates",
+      "priority": 6
+    },
+    "update-project": {
+      "category": "core",
+      "description": "Update project to latest CLI version",
+      "priority": 7
+    },
+    "publish-confluence": {
+      "category": "core",
+      "description": "Publish documentation to Confluence",
+      "priority": 8
+    },
+    "quick-start": {
+      "category": "core",
+      "description": "Quick start guide for first-time users",
+      "priority": 9
+    },
+    "analyze-patterns": {
+      "category": "advanced",
+      "description": "Analyze documentation patterns with AI agent",
+      "priority": 10
+    },
+    "review-quality": {
+      "category": "advanced",
+      "description": "Review documentation quality with AI agent",
+      "priority": 11
+    },
+    "extract-session": {
+      "category": "advanced",
+      "description": "Extract session data for reporting",
+      "priority": 12
+    }
+  }
+}
