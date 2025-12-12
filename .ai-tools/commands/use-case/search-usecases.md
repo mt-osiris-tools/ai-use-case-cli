@@ -20,7 +20,7 @@ ai-use-case search <search-term>
 # Use the search script (recommended)
 ai-use-case search authentication
 
-# Or search manually (HUB_PATH is ~/.local/share/ai-use-case-cli/hub or $AI_USECASES_DIR):
+# Or search manually (replace $HUB_PATH with your actual hub path, e.g. ~/.local/share/ai-use-case-cli/hub, or use $AI_USECASES_DIR if set):
 # Search filenames
 find $HUB_PATH/by-project -name "*keyword*" -type f
 
