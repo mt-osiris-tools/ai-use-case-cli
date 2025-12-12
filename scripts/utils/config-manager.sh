@@ -87,13 +87,9 @@ init_config() {
 
     ensure_config_dir
 
-    # Set default hub path based on mode
+    # Set default hub path if not provided
     if [ -z "$hub_path" ]; then
-        if [ "$hub_mode" = "local" ]; then
-            hub_path="$HOME/.local/share/ai-use-case-cli/hub"
-        else
-            hub_path="$HOME/Documents/ai-use-case-hub"
-        fi
+        hub_path="$HOME/.local/share/ai-use-case-cli/hub"
     fi
 
     cat > "$CONFIG_FILE" <<EOF
@@ -181,14 +177,9 @@ get_hub_path() {
     # Check config file
     local path=$(get_config "hubPath")
 
-    # Default based on mode if not set
+    # Use default if not set
     if [ -z "$path" ]; then
-        local mode=$(get_hub_mode)
-        if [ "$mode" = "local" ]; then
-            echo "$HOME/.local/share/ai-use-case-cli/hub"
-        else
-            echo "$HOME/Documents/ai-use-case-hub"
-        fi
+        echo "$HOME/.local/share/ai-use-case-cli/hub"
     else
         echo "$path"
     fi
@@ -446,8 +437,8 @@ prompt_hub_mode() {
                     fi
                 fi
 
-                read -p "Local hub directory path [$HOME/Documents/ai-use-case-hub]: " hub_path
-                hub_path=${hub_path:-$HOME/Documents/ai-use-case-hub}
+                read -p "Local hub directory path [$HOME/.local/share/ai-use-case-cli/hub]: " hub_path
+                hub_path=${hub_path:-$HOME/.local/share/ai-use-case-cli/hub}
 
                 # Validate path
                 if ! validate_path "$hub_path"; then
