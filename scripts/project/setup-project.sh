@@ -304,9 +304,42 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
         echo -e "${GREEN}✓${NC} Created: .ai-tools/commands/use-case/"
     fi
 
-    # Copy all command files from use-case directory
+    # Check if advanced features are enabled (v3.13.0+)
+    ADVANCED_ENABLED=false
+    if type is_advanced_enabled >/dev/null 2>&1 && is_advanced_enabled; then
+        ADVANCED_ENABLED=true
+    fi
+
+    # Load manifest for command categorization
+    MANIFEST_FILE="$AI_COMMANDS_SOURCE/manifest.json"
+
+    # Helper function to check if command is advanced
+    is_advanced_command() {
+        local cmd_name="$1"
+        local cmd_basename="${cmd_name%.md}"
+
+        # If manifest exists and jq is available, use it
+        if [ -f "$MANIFEST_FILE" ] && command -v jq >/dev/null 2>&1; then
+            local category=$(jq -r ".commands[\"$cmd_basename\"].category // \"core\"" "$MANIFEST_FILE" 2>/dev/null)
+            [ "$category" = "advanced" ]
+            return $?
+        fi
+
+        # Fallback: hardcoded list of advanced commands
+        case "$cmd_basename" in
+            analyze-patterns|review-quality|extract-session)
+                return 0  # true - is advanced
+                ;;
+            *)
+                return 1  # false - is core
+                ;;
+        esac
+    }
+
+    # Copy command files based on mode
     COMMANDS_COPIED=0
     COMMANDS_UPDATED=0
+    COMMANDS_SKIPPED=0
     for cmd_file in "$AI_COMMANDS_SOURCE"/*.md; do
         if [ -f "$cmd_file" ]; then
             cmd_name=$(basename "$cmd_file")
@@ -314,6 +347,14 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
 
             # Skip if source and target are the same file (self-setup scenario)
             if [ "$cmd_file" -ef "$target_file" ]; then
+                continue
+            fi
+
+            # Check if this is an advanced command
+            if is_advanced_command "$cmd_name" && [ "$ADVANCED_ENABLED" = false ]; then
+                # Skip advanced commands when advanced features are disabled
+                # (existing advanced commands remain but are not updated)
+                COMMANDS_SKIPPED=$((COMMANDS_SKIPPED + 1))
                 continue
             fi
 
@@ -327,13 +368,21 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
         fi
     done
 
+    # Copy manifest file as well (for reference)
+    if [ -f "$MANIFEST_FILE" ]; then
+        cp "$MANIFEST_FILE" "$AI_COMMANDS_DIR/"
+    fi
+
     if [ $COMMANDS_COPIED -gt 0 ]; then
         echo -e "${GREEN}✓${NC} Installed $COMMANDS_COPIED AI tool slash command(s)"
     fi
     if [ $COMMANDS_UPDATED -gt 0 ]; then
         echo -e "${GREEN}✓${NC} Updated $COMMANDS_UPDATED AI tool slash command(s)"
     fi
-    if [ $COMMANDS_COPIED -eq 0 ] && [ $COMMANDS_UPDATED -eq 0 ]; then
+    if [ $COMMANDS_SKIPPED -gt 0 ]; then
+        echo -e "${BLUE}ℹ${NC} $COMMANDS_SKIPPED advanced command(s) available with '${CYAN}ai-use-case enable-advanced${NC}'"
+    fi
+    if [ $COMMANDS_COPIED -eq 0 ] && [ $COMMANDS_UPDATED -eq 0 ] && [ $COMMANDS_SKIPPED -eq 0 ]; then
         echo -e "${YELLOW}⚠${NC} AI tool slash commands already installed (use --update to refresh)"
     fi
 

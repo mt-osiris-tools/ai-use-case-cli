@@ -223,6 +223,172 @@ is_git_mode() {
     [ "$mode" = "private-git" ]
 }
 
+# Get installation mode (light or full)
+get_install_mode() {
+    local mode=$(get_config "installMode")
+
+    # Default to "light" for new installs, but legacy installs (no field) get "full"
+    if [ -z "$mode" ]; then
+        # Check if config file exists - if so, it's a legacy install
+        if [ -f "$CONFIG_FILE" ]; then
+            echo "full"  # Legacy installs get full access
+        else
+            echo "light"  # New installs default to light
+        fi
+    else
+        echo "$mode"
+    fi
+}
+
+# Get advanced enabled status
+get_advanced_enabled() {
+    if [ ! -f "$CONFIG_FILE" ]; then
+        # No config file = new install = disabled by default
+        echo "false"
+        return
+    fi
+
+    # Check for advancedEnabled field (handles both boolean and string values)
+    if grep -q '"advancedEnabled"' "$CONFIG_FILE"; then
+        # Extract value - handles both true/false (boolean) and "true"/"false" (string)
+        local value=$(grep '"advancedEnabled"' "$CONFIG_FILE" | sed 's/.*: *\([^,}]*\).*/\1/' | tr -d ' "')
+        if [ "$value" = "true" ]; then
+            echo "true"
+        else
+            echo "false"
+        fi
+    else
+        # Field not present = legacy install = full access
+        echo "true"
+    fi
+}
+
+# Check if advanced features are enabled
+# Returns 0 (true) if enabled, 1 (false) if disabled
+is_advanced_enabled() {
+    local advanced=$(get_advanced_enabled)
+    [ "$advanced" = "true" ]
+}
+
+# Set installation mode
+set_install_mode() {
+    local mode="$1"
+
+    if [ "$mode" != "light" ] && [ "$mode" != "full" ]; then
+        echo -e "${RED}Error: Invalid install mode. Use 'light' or 'full'${NC}" >&2
+        return 1
+    fi
+
+    # Check if config file exists
+    if [ ! -f "$CONFIG_FILE" ]; then
+        echo -e "${RED}Error: Configuration file not found${NC}" >&2
+        return 1
+    fi
+
+    # Use jq if available for proper JSON handling, fallback to sed
+    if command -v jq &> /dev/null; then
+        local temp_file=$(mktemp)
+        trap "rm -f '$temp_file'" EXIT
+
+        # Add or update installMode field
+        if grep -q '"installMode"' "$CONFIG_FILE"; then
+            jq --arg mode "$mode" '.installMode = $mode' "$CONFIG_FILE" > "$temp_file"
+        else
+            jq --arg mode "$mode" '. + {installMode: $mode}' "$CONFIG_FILE" > "$temp_file"
+        fi
+
+        if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
+            mv "$temp_file" "$CONFIG_FILE"
+            trap - EXIT
+        else
+            echo -e "${RED}Error: Failed to update configuration${NC}" >&2
+            rm -f "$temp_file"
+            trap - EXIT
+            return 1
+        fi
+    else
+        # Fallback: simple sed-based update (works for flat JSON)
+        # Cross-platform sed -i (BSD/macOS vs GNU/Linux)
+        if grep -q '"installMode"' "$CONFIG_FILE"; then
+            if [[ "$(uname)" == "Darwin" ]]; then
+                sed -i '' "s|\"installMode\": \"[^\"]*\"|\"installMode\": \"$mode\"|" "$CONFIG_FILE"
+            else
+                sed -i "s|\"installMode\": \"[^\"]*\"|\"installMode\": \"$mode\"|" "$CONFIG_FILE"
+            fi
+        else
+            # Add field before closing brace
+            if [[ "$(uname)" == "Darwin" ]]; then
+                sed -i '' "s|}$|,\n  \"installMode\": \"$mode\"\n}|" "$CONFIG_FILE"
+            else
+                sed -i "s|}$|,\n  \"installMode\": \"$mode\"\n}|" "$CONFIG_FILE"
+            fi
+        fi
+    fi
+
+    echo -e "${GREEN}✓${NC} Installation mode set to: $mode"
+}
+
+# Set advanced enabled status
+set_advanced_enabled() {
+    local value="$1"
+
+    if [ "$value" != "true" ] && [ "$value" != "false" ]; then
+        echo -e "${RED}Error: Invalid value. Use 'true' or 'false'${NC}" >&2
+        return 1
+    fi
+
+    # Check if config file exists
+    if [ ! -f "$CONFIG_FILE" ]; then
+        echo -e "${RED}Error: Configuration file not found${NC}" >&2
+        return 1
+    fi
+
+    # Use jq if available for proper JSON handling
+    if command -v jq &> /dev/null; then
+        local temp_file=$(mktemp)
+        trap "rm -f '$temp_file'" EXIT
+
+        # Convert string to boolean for jq
+        local bool_value=$( [ "$value" = "true" ] && echo "true" || echo "false" )
+
+        # Add or update advancedEnabled field
+        if grep -q '"advancedEnabled"' "$CONFIG_FILE"; then
+            jq --argjson enabled "$bool_value" '.advancedEnabled = $enabled' "$CONFIG_FILE" > "$temp_file"
+        else
+            jq --argjson enabled "$bool_value" '. + {advancedEnabled: $enabled}' "$CONFIG_FILE" > "$temp_file"
+        fi
+
+        if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
+            mv "$temp_file" "$CONFIG_FILE"
+            trap - EXIT
+        else
+            echo -e "${RED}Error: Failed to update configuration${NC}" >&2
+            trap - EXIT
+            rm -f "$temp_file"
+            return 1
+        fi
+    else
+        # Fallback: simple sed-based update
+        # Cross-platform sed -i (BSD/macOS vs GNU/Linux)
+        if grep -q '"advancedEnabled"' "$CONFIG_FILE"; then
+            if [[ "$(uname)" == "Darwin" ]]; then
+                sed -i '' "s|\"advancedEnabled\": [^,}]*|\"advancedEnabled\": $value|" "$CONFIG_FILE"
+            else
+                sed -i "s|\"advancedEnabled\": [^,}]*|\"advancedEnabled\": $value|" "$CONFIG_FILE"
+            fi
+        else
+            # Add field before closing brace
+            if [[ "$(uname)" == "Darwin" ]]; then
+                sed -i '' "s|}$|,\n  \"advancedEnabled\": $value\n}|" "$CONFIG_FILE"
+            else
+                sed -i "s|}$|,\n  \"advancedEnabled\": $value\n}|" "$CONFIG_FILE"
+            fi
+        fi
+    fi
+
+    echo -e "${GREEN}✓${NC} Advanced features: $( [ "$value" = "true" ] && echo "enabled" || echo "disabled" )"
+}
+
 # Interactive hub mode selection
 prompt_hub_mode() {
     echo -e "${BLUE}=== Hub Configuration ===${NC}" >&2
