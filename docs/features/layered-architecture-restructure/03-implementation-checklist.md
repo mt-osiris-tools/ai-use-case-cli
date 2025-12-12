@@ -22,8 +22,8 @@
   - [x] Review affected files from exploration phase
 
 - [ ] **Set up test environment**
-  - [x] CLI installation directory: `/home/james/Documents/Projects/ai/ai-use-case-cli`
-  - [x] Hub directory: `/home/james/Documents/Projects/ai/ai-use-case-hub`
+  - [x] CLI installation directory: `<CLI_INSTALLATION_DIR>`
+  - [x] Hub directory: `<HUB_DIRECTORY>`
   - [ ] Verify baseline functionality: Run `./run-tests.sh`
 
 ---
@@ -107,7 +107,7 @@
 
 - [ ] **Add default paths**
   - [ ] DEFAULT_HUB_DIR
-  - [ ] DEFAULT_CLI_ROOT
+  - [ ] CLI_ROOT
   - [ ] CONFIG_DIR, CONFIG_FILE
   - [ ] TRACING_CONFIG_FILE, AGENTS_CONFIG_FILE
 
@@ -130,7 +130,7 @@
 **Estimated Time:** 30 minutes
 
 - [ ] **Run full test suite**
-  - [ ] Execute: `cd /home/james/Documents/Projects/ai/ai-use-case-cli && ./run-tests.sh`
+  - [ ] Execute: `./run-tests.sh`
   - [ ] Verify: All tests pass
   - [ ] Time: Record execution time (target < 90s currently, < 60s future)
 

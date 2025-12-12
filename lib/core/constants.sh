@@ -59,7 +59,7 @@ readonly CONFIG_KEY_ADVANCED_ENABLED="advancedEnabled"
 
 # Valid hub modes
 readonly HUB_MODE_LOCAL="local"
-readonly HUB_MODE_GIT="git"
+readonly HUB_MODE_PRIVATE_GIT="private-git"
 
 # Valid install modes
 readonly INSTALL_MODE_LIGHT="light"
