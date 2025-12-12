@@ -19,6 +19,24 @@ CYAN=$'\033[0;36m'
 YELLOW=$'\033[1;33m'
 NC=$'\033[0m' # No Color
 
+# Parse installation flags
+INSTALL_MODE=""  # Will be set during installation: "light" or "full"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --full)
+            INSTALL_MODE="full"
+            shift
+            ;;
+        --light)
+            INSTALL_MODE="light"
+            shift
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+
 # Function to get remote version from version.sh (single source of truth)
 get_remote_version() {
     local remote_version=""
@@ -256,8 +274,48 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     fi
 fi
 
-# Documentation Hub Configuration (v3.2.0+)
+# Installation Mode Selection (v3.13.0+)
 echo ""
+echo -e "${YELLOW}Installation Mode:${NC}"
+echo ""
+
+# Only prompt if mode wasn't set via command line flag
+if [ -z "$INSTALL_MODE" ]; then
+    echo "Choose how much functionality to install:"
+    echo ""
+    echo -e "  ${GREEN}1${NC}. Light (recommended) - Core documentation features"
+    echo "     Document AI sessions and publish to Confluence"
+    echo "     Simpler experience, fewer commands to learn"
+    echo ""
+    echo -e "  ${GREEN}2${NC}. Full - All features including advanced tools"
+    echo "     Agents, pattern analysis, tracing, data extraction"
+    echo "     For power users who want everything"
+    echo ""
+
+    read -p "Select mode (1-2) [1]: " mode_choice
+    mode_choice=${mode_choice:-1}
+
+    case "$mode_choice" in
+        2)
+            INSTALL_MODE="full"
+            echo -e "${CYAN}Full installation selected${NC}"
+            ;;
+        *)
+            INSTALL_MODE="light"
+            echo -e "${CYAN}Light installation selected${NC}"
+            ;;
+    esac
+else
+    echo -e "Installation mode: ${CYAN}$INSTALL_MODE${NC} (from command line)"
+fi
+
+echo ""
+echo -e "${BLUE}Note:${NC} You can change modes later with:"
+echo "  ${CYAN}ai-use-case enable-advanced${NC}   Enable all features"
+echo "  ${CYAN}ai-use-case disable-advanced${NC}  Hide advanced features"
+echo ""
+
+# Documentation Hub Configuration (v3.2.0+)
 echo -e "${YELLOW}Documentation Hub Configuration:${NC}"
 echo ""
 echo "The CLI uses a flexible hub system (v3.2.0+) with two modes:"
@@ -294,10 +352,92 @@ if [ "$RUN_CONFIG_AFTER" = true ]; then
     echo ""
 fi
 
+# Write installation mode to config (v3.13.0+)
+CONFIG_DIR="$HOME/.config/ai-use-case-cli"
+CONFIG_FILE="$CONFIG_DIR/config.json"
+
+# Ensure config directory exists
+mkdir -p "$CONFIG_DIR"
+
+# Determine advancedEnabled based on install mode
+ADVANCED_ENABLED="false"
+if [ "$INSTALL_MODE" = "full" ]; then
+    ADVANCED_ENABLED="true"
+fi
+
+# Update or create config with install mode
+if command -v jq &> /dev/null && [ -f "$CONFIG_FILE" ]; then
+    # Use jq if available to update existing config
+    TEMP_FILE=$(mktemp)
+    trap "rm -f '$TEMP_FILE'" EXIT
+
+    jq --arg mode "$INSTALL_MODE" --argjson advanced "$ADVANCED_ENABLED" \
+        '. + {installMode: $mode, advancedEnabled: $advanced}' "$CONFIG_FILE" > "$TEMP_FILE"
+
+    # Validate output is non-empty and valid JSON before moving
+    if [ -s "$TEMP_FILE" ] && jq empty "$TEMP_FILE" 2>/dev/null; then
+        mv "$TEMP_FILE" "$CONFIG_FILE"
+        trap - EXIT
+        echo -e "${GREEN}✓${NC} Installation mode saved to config"
+    else
+        trap - EXIT
+        rm -f "$TEMP_FILE"
+    fi
+elif [ -f "$CONFIG_FILE" ]; then
+    # Fallback: Update or add fields using sed if config exists
+    # Cross-platform sed -i (BSD/macOS vs GNU/Linux)
+
+    # Update installMode if present, else add it
+    if grep -q '"installMode"' "$CONFIG_FILE"; then
+        if [[ "$(uname)" == "Darwin" ]]; then
+            sed -i '' 's/"installMode": *"[^"]*"/"installMode": "'"$INSTALL_MODE"'"/' "$CONFIG_FILE"
+        else
+            sed -i 's/"installMode": *"[^"]*"/"installMode": "'"$INSTALL_MODE"'"/' "$CONFIG_FILE"
+        fi
+    else
+        if [[ "$(uname)" == "Darwin" ]]; then
+            sed -i '' 's/}$/,\n  "installMode": "'"$INSTALL_MODE"'"\n}/' "$CONFIG_FILE"
+        else
+            sed -i 's/}$/,\n  "installMode": "'"$INSTALL_MODE"'"\n}/' "$CONFIG_FILE"
+        fi
+    fi
+
+    # Update advancedEnabled if present, else add it
+    if grep -q '"advancedEnabled"' "$CONFIG_FILE"; then
+        if [[ "$(uname)" == "Darwin" ]]; then
+            sed -i '' 's/"advancedEnabled": *[^,}]*/"advancedEnabled": '"$ADVANCED_ENABLED"'/' "$CONFIG_FILE"
+        else
+            sed -i 's/"advancedEnabled": *[^,}]*/"advancedEnabled": '"$ADVANCED_ENABLED"'/' "$CONFIG_FILE"
+        fi
+    else
+        if [[ "$(uname)" == "Darwin" ]]; then
+            sed -i '' 's/}$/,\n  "advancedEnabled": '"$ADVANCED_ENABLED"'\n}/' "$CONFIG_FILE"
+        else
+            sed -i 's/}$/,\n  "advancedEnabled": '"$ADVANCED_ENABLED"'\n}/' "$CONFIG_FILE"
+        fi
+    fi
+
+    echo -e "${GREEN}✓${NC} Installation mode saved to config"
+else
+    # Create minimal config if none exists
+    cat > "$CONFIG_FILE" <<EOF
+{
+  "version": "1.0.0",
+  "hubMode": "local",
+  "hubPath": "$HOME/.local/share/ai-use-case-cli/hub",
+  "gitUrl": "",
+  "installMode": "$INSTALL_MODE",
+  "advancedEnabled": $ADVANCED_ENABLED
+}
+EOF
+    echo -e "${GREEN}✓${NC} Configuration created with $INSTALL_MODE mode"
+fi
+
 # Clear and show banner again with completion message
 clear
 print_banner
 echo -e "${GREEN}=== Installation Complete! ===${NC}"
+echo -e "Installation mode: ${CYAN}$INSTALL_MODE${NC}"
 echo ""
 echo -e "${YELLOW}Quick Start:${NC}"
 echo -e "  1. Reload your shell: ${CYAN}source ~/.bashrc${NC}"
@@ -308,33 +448,42 @@ echo ""
 echo -e "${YELLOW}Core Commands:${NC}"
 printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case --init" "Setup current project"
 printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case config show" "Show hub configuration"
-printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case config reconfigure" "Change hub mode (local/git)"
 printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case sync" "Sync use cases to hub"
 printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case search <term>" "Search use cases"
 printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case list" "List all registered projects"
-printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case check-updates" "Check for outdated projects"
 printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case stats" "View statistics"
-printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case extract [hours] [format]" "Extract session data"
-echo ""
-echo -e "${YELLOW}Advanced Commands:${NC}"
-printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case tracing init" "Initialize tracing (v3.6.0+)"
-printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case tracing configure" "Configure tracing server"
-printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case tracing status" "View tracing status"
-printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case view" "View hub in file explorer"
-printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case push" "Push hub changes (git mode)"
+printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case status" "Show CLI status"
 printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case publish-confluence" "Publish to Confluence"
-printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case uninstall" "Uninstall the CLI"
+
+# Show advanced commands only in full mode
+if [ "$INSTALL_MODE" = "full" ]; then
+    echo ""
+    echo -e "${YELLOW}Advanced Commands:${NC}"
+    printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case agents list" "Manage AI agents"
+    printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case review-quality <file>" "Review documentation quality"
+    printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case analyze-patterns" "Analyze documentation patterns"
+    printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case extract [hours] [format]" "Extract session data"
+    printf "  ${GREEN}%-40s${NC} %s\n" "ai-use-case tracing init" "Initialize tracing"
+else
+    echo ""
+    echo -e "${YELLOW}More Features:${NC}"
+    echo -e "  Run ${CYAN}ai-use-case enable-advanced${NC} to unlock:"
+    echo "  - AI agents for quality review and pattern analysis"
+    echo "  - Session data extraction for reporting"
+    echo "  - OpenTelemetry tracing integration"
+fi
+
 echo ""
-echo -e "${YELLOW}Claude Code Integration (Recommended):${NC}"
+echo -e "${YELLOW}Claude Code Integration:${NC}"
 printf "  ${CYAN}%-40s${NC} %s\n" "/use-case:document-session" "Document AI session (automatic)"
-printf "  ${CYAN}%-40s${NC} %s\n" "/use-case:setup-project" "Setup project"
+printf "  ${CYAN}%-40s${NC} %s\n" "/use-case:publish-confluence" "Publish to Confluence"
 printf "  ${CYAN}%-40s${NC} %s\n" "/use-case:sync-usecases" "Sync to hub"
-printf "  ${CYAN}%-40s${NC} %s\n" "/use-case:list-projects" "List projects"
-printf "  ${CYAN}%-40s${NC} %s\n" "/use-case:check-updates" "Check for updates"
+printf "  ${CYAN}%-40s${NC} %s\n" "/use-case:search-usecases" "Search use cases"
+printf "  ${CYAN}%-40s${NC} %s\n" "/use-case:quick-start" "Quick start guide"
 echo ""
 echo -e "${YELLOW}Next Steps:${NC}"
 echo -e "  • Run ${CYAN}ai-use-case --help${NC} for full usage guide"
+echo -e "  • Run ${CYAN}ai-use-case status${NC} to see your configuration"
 echo -e "  • Read ${CYAN}$INSTALL_DIR/README.md${NC} for detailed documentation"
-echo -e "  • Configure hub: ${CYAN}ai-use-case config show${NC}"
 echo ""
 echo -e "${BLUE}Happy documenting! 🎉${NC}"

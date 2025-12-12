@@ -102,7 +102,7 @@ Run: `ai-use-case document`
 1. **Two-Repository Architecture:**
    - CLI tools (ai-use-case-cli) - Commands and scripts
    - Documentation hub (ai-use-case-hub) - Central storage
-   - Hub location: `~/Documents/ai-use-case-hub` (or `$AI_USECASES_DIR`)
+   - Hub location: `~/.local/share/ai-use-case-cli/hub` (or `$AI_USECASES_DIR`)
 
 2. **Automatic Syncing:**
    - Happens on every git commit
@@ -147,9 +147,9 @@ git commit -m "Initial commit"
 The CLI will work even without the hub, but to enable syncing:
 
 ```bash
-cd ~/Documents
-git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git ai-use-case-hub
-export AI_USECASES_DIR="$HOME/Documents/ai-use-case-hub"
+# Hub is created automatically at ~/.local/share/ai-use-case-cli/hub
+# Or set a custom location:
+export AI_USECASES_DIR="$HOME/my-custom-hub-location"
 ```
 
 Or re-run the installer and answer 'Y' to set up the hub.

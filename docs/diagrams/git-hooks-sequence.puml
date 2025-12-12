@@ -13,7 +13,7 @@ participant "Git\nRepository" as Repo
 participant "post-commit\nHook" as PostCommit
 participant "git status" as GitStatus
 participant "sync-ai-use-cases.sh" as SyncScript
-database "Use Case Hub\nRepository" as Hub
+database "Use Case Hub" as Hub
 participant "Claude Code\nSession" as Claude
 participant "SessionEnd\nHook" as SessionEnd
 database ".usecase/session-stats/\nYYYY-MM-DD-HHMMSS.txt" as Stats
@@ -27,7 +27,7 @@ Git -> Git: Check for pre-commit hook
 Git -> PreCommit: Execute .git/hooks/pre-commit
 activate PreCommit
 
-PreCommit -> PreCommit: Get current branch name\n(git branch --show-current)
+PreCommit -> PreCommit: Get current branch name\n(git symbolic-ref --short HEAD)
 PreCommit -> PreCommit: Check if branch is "main" or "master"
 
 alt Branch is main or master
@@ -57,7 +57,7 @@ else Branch is feature/fix/docs/etc
   GitStatus --> PostCommit: List of changed files:\n  • src/feature.js\n  • .usecase/cases/feature-123.md\n  • tests/feature.test.js
   deactivate GitStatus
 
-  PostCommit -> PostCommit: Check if any files in\n.usecase/cases/ were modified
+  PostCommit -> PostCommit: Check if any .md files in\n.usecase/cases/ were modified
 
   alt .usecase/cases/ files changed
     PostCommit -> PostCommit: ✓ AI use case changes detected
@@ -179,7 +179,7 @@ activate SessionEnd
 
 SessionEnd -> SessionEnd: Capture session metadata:\n• Timestamp: 2025-12-08 23:30:45\n• Repository path\n• Current branch
 
-SessionEnd -> SessionEnd: git log --since="2 hours ago"\n--pretty=format:"%h %s"
+SessionEnd -> SessionEnd: git log --since="2 hours ago"\n--pretty=format:"  %h - %s (%ar)"
 note right of SessionEnd
   Captures recent commits
   from last 2 hours to

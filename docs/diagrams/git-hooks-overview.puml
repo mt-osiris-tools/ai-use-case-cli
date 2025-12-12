@@ -55,7 +55,6 @@ legend right
 
   **Installation:**
   Run: ./scripts/project/setup-project.sh
-  Or: ./scripts/install-dev-hooks.sh
 
   **Locations:**
   • .git/hooks/ (git hooks)

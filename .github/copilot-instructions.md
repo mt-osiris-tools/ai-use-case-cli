@@ -42,7 +42,7 @@ When Copilot crafts changes, ensure the workflow below stays intact:
 - **Script execution**: All shell scripts must remain executable (`chmod +x`) and compatible with Bash 4.0+
 - **Error handling**: Use `set -euo pipefail` for new shell scripts and guard against partial failures
 - **Input validation**: Validate inputs defensively; prefer explicit error messages over silent failures
-- **Environment variables**: Respect existing environment variables like `AI_USECASES_DIR` and default hub paths (`~/Documents/ai-use-case-hub`)
+- **Environment variables**: Respect existing environment variables like `AI_USECASES_DIR` and default hub paths (`~/.local/share/ai-use-case-cli/hub`)
 - **Git hooks**: When modifying git hooks, preserve bypass instructions (`--no-verify`) and clear user messaging
 - **Cross-platform compatibility**: Ensure POSIX-compatible shell patterns; scripts must run on macOS, Linux, and WSL
 - **Hub interaction**: Always use `ensure_hub_exists()` function when scripts need to interact with the documentation hub
@@ -149,7 +149,7 @@ When Copilot crafts changes, ensure the workflow below stays intact:
 ```bash
 # Robust error handling
 ensure_hub_exists() {
-    local hub_dir="${AI_USECASES_DIR:-$HOME/Documents/ai-use-case-hub}"
+    local hub_dir="${AI_USECASES_DIR:-$HOME/.local/share/ai-use-case-cli/hub}"
     if [[ ! -d "$hub_dir" ]]; then
         echo "Error: Hub directory not found at $hub_dir" >&2
         echo "Run 'ai-use-case setup' to initialize the hub" >&2
@@ -170,7 +170,7 @@ cd "$some_directory" 2>/dev/null
 echo "Error: Something went wrong"
 
 # Don't: Hard-coded paths
-cp file.txt /home/user/documents/
+cp file.txt /home/user/my-directory/
 ```
 
 ## CI/CD and Automation Considerations
