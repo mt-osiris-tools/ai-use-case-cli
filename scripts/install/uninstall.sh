@@ -46,16 +46,28 @@ fi
 if [ -z "$CLI_DIR" ] && [ -L "$HOME/.local/bin/ai-use-case" ]; then
     # Cross-platform readlink: macOS doesn't support -f flag
     if [[ "$(uname)" == "Darwin" ]]; then
-        # macOS: Use a while loop to resolve symlinks
+        # macOS: Use a while loop to resolve symlinks with infinite loop protection
         SYMLINK_TARGET="$HOME/.local/bin/ai-use-case"
-        while [ -L "$SYMLINK_TARGET" ]; do
+        MAX_SYMLINK_DEPTH=10
+        SYMLINK_DEPTH=0
+
+        while [ -L "$SYMLINK_TARGET" ] && [ $SYMLINK_DEPTH -lt $MAX_SYMLINK_DEPTH ]; do
             SYMLINK_DIR="$(dirname "$SYMLINK_TARGET")"
-            LINK_VALUE="$(readlink "$SYMLINK_TARGET")"
+            LINK_VALUE="$(readlink "$SYMLINK_TARGET" 2>/dev/null)"
+
+            # Break if readlink fails or returns empty
+            if [ -z "$LINK_VALUE" ]; then
+                SYMLINK_TARGET=""
+                break
+            fi
+
             # Handle relative symlinks: always resolve relative to the symlink's directory
             case "$LINK_VALUE" in
                 /*) SYMLINK_TARGET="$LINK_VALUE" ;;  # absolute path
                 *) SYMLINK_TARGET="$SYMLINK_DIR/$LINK_VALUE" ;;
             esac
+
+            SYMLINK_DEPTH=$((SYMLINK_DEPTH + 1))
         done
     else
         # Linux/WSL: Use readlink -f
@@ -87,9 +99,9 @@ if [ -n "$CLI_DIR" ] && { [ -d "$CLI_DIR/by-project" ] || [ -d "$CLI_DIR/by-date
     CLI_DIR=""
 fi
 
-# Additional safety: Check if path contains "hub" keyword
-if [ -n "$CLI_DIR" ] && [[ "$CLI_DIR" =~ hub ]]; then
-    echo -e "${YELLOW}⚠ Warning: Path contains 'hub' keyword: $CLI_DIR${NC}"
+# Additional safety: Check if path contains "hub" as a directory component (case-insensitive)
+if [ -n "$CLI_DIR" ] && [[ "$CLI_DIR" =~ (^|/)[Hh][Uu][Bb](/|$) ]]; then
+    echo -e "${YELLOW}⚠ Warning: Path contains 'hub' as a directory component: $CLI_DIR${NC}"
     echo -e "${YELLOW}Please verify this is the CLI directory and not the hub.${NC}"
     read -p "Is this the CLI directory? (y/N): " verify_cli
     if [[ ! "$verify_cli" =~ ^[Yy]$ ]]; then

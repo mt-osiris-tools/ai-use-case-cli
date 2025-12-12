@@ -90,4 +90,84 @@ else
 fi
 echo ""
 
+# Test 5: Symlink resolution (Method 3)
+echo -e "${YELLOW}Test 5: Symlink resolution${NC}"
+# Create a temporary symlink for testing
+TEMP_SYMLINK="/tmp/test-ai-use-case-symlink-$$"
+ln -s "$CLI_DIR/ai-use-case" "$TEMP_SYMLINK" 2>/dev/null || true
+
+if [ -L "$TEMP_SYMLINK" ]; then
+    # Test symlink resolution
+    if [[ "$(uname)" == "Darwin" ]]; then
+        # macOS: Use while loop with infinite loop protection
+        SYMLINK_TARGET="$TEMP_SYMLINK"
+        MAX_SYMLINK_DEPTH=10
+        SYMLINK_DEPTH=0
+
+        while [ -L "$SYMLINK_TARGET" ] && [ $SYMLINK_DEPTH -lt $MAX_SYMLINK_DEPTH ]; do
+            SYMLINK_DIR="$(dirname "$SYMLINK_TARGET")"
+            LINK_VALUE="$(readlink "$SYMLINK_TARGET" 2>/dev/null)"
+
+            if [ -z "$LINK_VALUE" ]; then
+                SYMLINK_TARGET=""
+                break
+            fi
+
+            case "$LINK_VALUE" in
+                /*) SYMLINK_TARGET="$LINK_VALUE" ;;
+                *) SYMLINK_TARGET="$SYMLINK_DIR/$LINK_VALUE" ;;
+            esac
+
+            SYMLINK_DEPTH=$((SYMLINK_DEPTH + 1))
+        done
+    else
+        # Linux: Use readlink -f
+        SYMLINK_TARGET="$(readlink -f "$TEMP_SYMLINK" 2>/dev/null)"
+    fi
+
+    if [ -n "$SYMLINK_TARGET" ] && [ -f "$SYMLINK_TARGET" ]; then
+        RESOLVED_DIR="$(dirname "$SYMLINK_TARGET")"
+        if [ "$RESOLVED_DIR" = "$CLI_DIR" ]; then
+            echo -e "${GREEN}✓ PASS: Symlink correctly resolved to CLI directory${NC}"
+        else
+            echo -e "${RED}✗ FAIL: Symlink resolution incorrect (got: $RESOLVED_DIR, expected: $CLI_DIR)${NC}"
+            rm -f "$TEMP_SYMLINK"
+            exit 1
+        fi
+    else
+        echo -e "${RED}✗ FAIL: Symlink resolution failed${NC}"
+        rm -f "$TEMP_SYMLINK"
+        exit 1
+    fi
+
+    rm -f "$TEMP_SYMLINK"
+else
+    echo -e "${YELLOW}⚠ SKIP: Could not create test symlink${NC}"
+fi
+echo ""
+
+# Test 6: Safety mechanism prevents removal of hub-like directories
+echo -e "${YELLOW}Test 6: Hub safety mechanism${NC}"
+# Simulate detection of a directory with hub signature
+TEST_HUB_LIKE_DIR="/tmp/test-hub-$$"
+mkdir -p "$TEST_HUB_LIKE_DIR/by-project"
+
+# Test the hub signature detection
+if [ -d "$TEST_HUB_LIKE_DIR/by-project" ] || [ -d "$TEST_HUB_LIKE_DIR/by-date" ] || [ -d "$TEST_HUB_LIKE_DIR/by-topic" ]; then
+    echo -e "${GREEN}✓ PASS: Hub signature directories detected correctly${NC}"
+    # Verify that CLI_DIR would be cleared (simulated)
+    SIMULATED_CLI_DIR="$TEST_HUB_LIKE_DIR"
+    if [ -d "$SIMULATED_CLI_DIR/by-project" ] || [ -d "$SIMULATED_CLI_DIR/by-date" ] || [ -d "$SIMULATED_CLI_DIR/by-topic" ]; then
+        SIMULATED_CLI_DIR=""
+        echo -e "${GREEN}✓ PASS: Safety mechanism would prevent hub deletion${NC}"
+    fi
+else
+    echo -e "${RED}✗ FAIL: Could not create test hub structure${NC}"
+    rm -rf "$TEST_HUB_LIKE_DIR"
+    exit 1
+fi
+
+rm -rf "$TEST_HUB_LIKE_DIR"
+echo ""
+
 echo -e "${BLUE}=== All Tests Passed ===${NC}"

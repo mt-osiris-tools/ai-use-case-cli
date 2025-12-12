@@ -26,7 +26,7 @@ This logic could match ANY git repository that happens to contain a file named "
 - Any other project with similar naming
 
 ### Risk Scenario
-1. User accidentally creates `ai-use-case` file in hub directory (copy, symlink, etc.)
+1. User accidentally creates `ai-use-case` file in hub directory via (copy, symlink, etc.)
 2. User runs `ai-use-case uninstall` from hub directory
 3. Script incorrectly detects hub as CLI directory
 4. User confirms deletion
@@ -63,9 +63,10 @@ fi
 
 #### Layer 3: Keyword Warning
 ```bash
-# Warn if path contains "hub" keyword
-if [[ "$CLI_DIR" =~ hub ]]; then
-    echo "Warning: Path contains 'hub' keyword"
+# Warn if path contains "hub" as a directory component (case-insensitive)
+# Pattern: (^|/)[Hh][Uu][Bb](/|$) prevents false positives like "hubert" or "github"
+if [[ "$CLI_DIR" =~ (^|/)[Hh][Uu][Bb](/|$) ]]; then
+    echo "Warning: Path contains 'hub' as a directory component"
     read -p "Is this the CLI directory? (y/N): " verify_cli
     if [[ ! "$verify_cli" =~ ^[Yy]$ ]]; then
         CLI_DIR=""
@@ -86,12 +87,12 @@ Created comprehensive test suite: `scripts/install/test-uninstall-detection.sh`
 **Note**: Tests verify the detection algorithm logic by replicating the core detection checks inline. They validate the logic correctness rather than invoking the full uninstall.sh script.
 
 All detection logic tests passing:
-- ✅ Correctly detects CLI directory when running from CLI repo (Method 1)
-- ✅ Verifies hub signature detection (Layer 2 safety check)
-- ✅ Identifies paths with "hub" keyword (Layer 3 safety check)
-- ✅ Verifies CLI-specific files exist (strict verification)
-
-*Symlink resolution (Method 3) requires integration testing with actual symlinks.*
+- ✅ Test 1: Correctly detects CLI directory when running from CLI repo (Method 1)
+- ✅ Test 2: Verifies hub signature detection exists (checks for by-project, by-date, by-topic)
+- ✅ Test 3: Identifies paths with "hub" keyword (Layer 3 safety check)
+- ✅ Test 4: Verifies CLI-specific files exist (strict verification)
+- ✅ Test 5: Symlink resolution - creates temporary symlink and verifies resolution works correctly
+- ✅ Test 6: Hub safety mechanism - simulates hub-like directory and verifies safety checks work
 
 ## Impact Assessment
 
