@@ -59,10 +59,10 @@ echo ""
 # Test 3: Handle directory with "hub" in name
 echo -e "${YELLOW}Test 3: Path contains 'hub' keyword check${NC}"
 TEST_PATH="$HUB_DIR"
-if [[ "$TEST_PATH" =~ hub ]]; then
-    echo -e "${GREEN}✓ PASS: Correctly identified path with 'hub' keyword${NC}"
+if [[ "$TEST_PATH" =~ (^|/)[Hh][Uu][Bb](/|$) ]]; then
+    echo -e "${GREEN}✓ PASS: Correctly identified path with 'hub' as directory component${NC}"
 else
-    echo -e "${RED}✗ FAIL: Should detect 'hub' in path${NC}"
+    echo -e "${RED}✗ FAIL: Should detect 'hub' as directory component in path${NC}"
     exit 1
 fi
 echo ""
