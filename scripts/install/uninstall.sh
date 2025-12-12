@@ -34,15 +34,33 @@ fi
 
 # Method 2: Check standard installation location
 if [ -z "$CLI_DIR" ] && [ -d "$HOME/.local/share/ai-use-case-cli" ]; then
-    # Verify it's actually a CLI installation
-    if [ -f "$HOME/.local/share/ai-use-case-cli/ai-use-case" ]; then
+    # Verify it's actually a CLI installation by checking for CLI-specific structure
+    if [ -f "$HOME/.local/share/ai-use-case-cli/ai-use-case" ] && \
+       [ -d "$HOME/.local/share/ai-use-case-cli/scripts/install" ] && \
+       [ -f "$HOME/.local/share/ai-use-case-cli/scripts/core/sync-ai-use-cases.sh" ]; then
         CLI_DIR="$HOME/.local/share/ai-use-case-cli"
     fi
 fi
 
 # Method 3: Try to determine from symlink (if it exists)
 if [ -z "$CLI_DIR" ] && [ -L "$HOME/.local/bin/ai-use-case" ]; then
-    SYMLINK_TARGET="$(readlink -f "$HOME/.local/bin/ai-use-case" 2>/dev/null)"
+    # Cross-platform readlink: macOS doesn't support -f flag
+    if [[ "$(uname)" == "Darwin" ]]; then
+        # macOS: Use a while loop to resolve symlinks
+        SYMLINK_TARGET="$HOME/.local/bin/ai-use-case"
+        while [ -L "$SYMLINK_TARGET" ]; do
+            SYMLINK_TARGET="$(readlink "$SYMLINK_TARGET")"
+            # Handle relative symlinks
+            case "$SYMLINK_TARGET" in
+                /*) ;;  # absolute path
+                *) SYMLINK_TARGET="$(dirname "$HOME/.local/bin/ai-use-case")/$SYMLINK_TARGET" ;;
+            esac
+        done
+    else
+        # Linux/WSL: Use readlink -f
+        SYMLINK_TARGET="$(readlink -f "$HOME/.local/bin/ai-use-case" 2>/dev/null)"
+    fi
+
     if [ -n "$SYMLINK_TARGET" ] && [ -f "$SYMLINK_TARGET" ]; then
         # Get the directory containing the ai-use-case script
         POTENTIAL_CLI_DIR="$(dirname "$SYMLINK_TARGET")"
@@ -61,7 +79,9 @@ if [ -n "$CLI_DIR" ]; then
         echo -e "${RED}│${NC}  ${RED}⚠ SAFETY CHECK FAILED${NC}                                  ${RED}│${NC}"
         echo -e "${RED}│${NC}                                                            ${RED}│${NC}"
         echo -e "${RED}│${NC}  Detected directory looks like the documentation hub!     ${RED}│${NC}"
-        echo -e "${RED}│${NC}  Refusing to remove: $CLI_DIR${NC}  ${RED}│${NC}"
+        echo -e "${RED}│${NC}                                                            ${RED}│${NC}"
+        echo -e "${RED}│${NC}  Refusing to remove:                                      ${RED}│${NC}"
+        echo -e "${RED}│${NC}  ${YELLOW}$CLI_DIR${NC}"
         echo -e "${RED}│${NC}                                                            ${RED}│${NC}"
         echo -e "${RED}│${NC}  ${YELLOW}The hub should NEVER be removed by this script.${NC}        ${RED}│${NC}"
         echo -e "${RED}╰────────────────────────────────────────────────────────────╯${NC}"
