@@ -25,6 +25,12 @@
 #   - show_tracing_config()                Display tracing config
 #   - configure_tracing()                  Interactive setup
 
+# Source guard - prevent multiple sourcing
+if [ -n "${_CONFIG_TRACING_SH_LOADED:-}" ]; then
+    return 0
+fi
+readonly _CONFIG_TRACING_SH_LOADED=1
+
 # Source dependencies
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../core/constants.sh"
@@ -187,14 +193,14 @@ set_tracing_config() {
     # Validate temp file before moving
     if [ ! -s "$temp_file" ]; then
         echo -e "${RED}Error: Failed to update configuration (empty result)${NC}" >&2
-        trap - EXIT
+        trap - EXIT INT TERM
         rm -f "$temp_file"
         return 1
     fi
 
     if ! jq empty "$temp_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to update configuration (invalid JSON)${NC}" >&2
-        trap - EXIT
+        trap - EXIT INT TERM
         rm -f "$temp_file"
         return 1
     fi
@@ -202,12 +208,12 @@ set_tracing_config() {
     # Atomic move
     if ! mv "$temp_file" "$tracing_config_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to save configuration${NC}" >&2
-        trap - EXIT
+        trap - EXIT INT TERM
         rm -f "$temp_file"
         return 1
     fi
 
-    trap - EXIT
+    trap - EXIT INT TERM
     echo "Updated tracing.$key = $value"
     return 0
 }

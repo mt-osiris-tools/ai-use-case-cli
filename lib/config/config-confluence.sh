@@ -27,6 +27,12 @@
 #   - Never commit config.json to version control
 #   - Tokens are hidden in display output
 
+# Source guard - prevent multiple sourcing
+if [ -n "${_CONFIG_CONFLUENCE_SH_LOADED:-}" ]; then
+    return 0
+fi
+readonly _CONFIG_CONFLUENCE_SH_LOADED=1
+
 # Source dependencies
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../core/constants.sh"
