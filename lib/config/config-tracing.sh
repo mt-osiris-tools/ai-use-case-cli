@@ -56,7 +56,7 @@ readonly DEFAULT_TRACING_CONFIG='{
 # Returns:
 #   0 on success, 1 on error
 init_tracing_config() {
-    local tracing_config_file="$CONFIG_DIR/tracing.json"
+    local tracing_config_file="$TRACING_CONFIG_FILE"
     local temp_file=$(mktemp)
 
     # Ensure config directory exists
@@ -102,7 +102,7 @@ init_tracing_config() {
 # Returns:
 #   JSON configuration (stdout)
 get_tracing_config() {
-    local tracing_config_file="$CONFIG_DIR/tracing.json"
+    local tracing_config_file="$TRACING_CONFIG_FILE"
 
     if [ -f "$tracing_config_file" ]; then
         cat "$tracing_config_file"
@@ -130,7 +130,7 @@ get_tracing_config() {
 set_tracing_config() {
     local key="$1"
     local value="$2"
-    local tracing_config_file="$CONFIG_DIR/tracing.json"
+    local tracing_config_file="$TRACING_CONFIG_FILE"
 
     ensure_config_dir
 
@@ -226,7 +226,7 @@ set_tracing_config() {
 # Returns:
 #   0 if valid or repaired successfully, 1 on error
 validate_and_repair_tracing_config() {
-    local tracing_config_file="$CONFIG_DIR/tracing.json"
+    local tracing_config_file="$TRACING_CONFIG_FILE"
 
     # Check if file exists
     if [ ! -f "$tracing_config_file" ]; then
@@ -269,7 +269,7 @@ validate_and_repair_tracing_config() {
 #   - AI_USECASE_TRACING_ENDPOINT
 #   - AI_USECASE_TRACING_SAMPLING
 show_tracing_config() {
-    local tracing_config_file="$CONFIG_DIR/tracing.json"
+    local tracing_config_file="$TRACING_CONFIG_FILE"
 
     echo -e "${BLUE}=== Tracing Configuration ===${NC}"
     echo ""
