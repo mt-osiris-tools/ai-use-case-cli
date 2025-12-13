@@ -225,6 +225,75 @@ System/External APIs
 - git (version control, hub operations)
 - Python 3.8+ (tracing functionality)
 
+## Integration Branch Workflow
+
+To safely integrate this large multi-phase refactor, we use a dedicated integration branch before merging to main.
+
+### Branch Strategy
+
+```
+Feature branches → integration/layered-architecture → main
+```
+
+**Integration Branch:** `integration/layered-architecture`
+- Created from: `main` (latest stable)
+- Purpose: Integrate all 8 phases before final merge to main
+- Benefits: Allows incremental development with integration testing
+
+### Workflow for Each Phase
+
+**1. Branch Creation**
+```bash
+# Start from integration branch (not main)
+git checkout integration/layered-architecture
+git pull
+git checkout -b feature/layered-architecture-phase<N>
+```
+
+**2. Development**
+- Implement phase according to plan
+- Follow backward compatibility requirements
+- Write/update tests
+- Update documentation
+
+**3. Pull Request**
+- Target: `integration/layered-architecture` (not `main`)
+- Title: `feat: Phase N - <Description>`
+- Include: Testing results, migration notes, rollback plan
+
+**4. Review & Merge**
+- Code review
+- Integration testing on the integration branch
+- Merge to `integration/layered-architecture`
+
+**5. Final Integration (After All Phases)**
+- Create PR: `integration/layered-architecture` → `main`
+- Comprehensive testing of all integrated phases
+- Final review and merge to main
+
+### Benefits
+
+✅ **Incremental Development** - Each phase developed and reviewed independently
+✅ **Integration Testing** - All phases tested together before main
+✅ **Main Stability** - Main branch remains stable during refactor
+✅ **Easy Rollback** - Can revert individual phases in integration branch
+✅ **Clear Progress** - Track phase completion in single integration branch
+
+### Phase Status Tracking
+
+| Phase | Status | PR | Merged to Integration |
+|-------|--------|----|-----------------------|
+| Phase 1: Foundation | In Review | #165 | ⏳ Pending |
+| Phase 2: Split config-manager.sh | Not Started | - | - |
+| Phase 3: Reorganize Commands | Not Started | - | - |
+| Phase 4: Split Large Files | Not Started | - | - |
+| Phase 5: Standardize Interfaces | Not Started | - | - |
+| Phase 6: CLI Refactor | Not Started | - | - |
+| Phase 7: Documentation | Not Started | - | - |
+| Phase 8: Cleanup | Not Started | - | - |
+
+---
+
 ## Implementation Phases
 
 ### Phase 1: Foundation (Weeks 1-2) - LOW RISK
