@@ -27,6 +27,12 @@
 #   - prompt_hub_mode()      Interactive hub configuration
 #   - show_hub_config()      Display hub configuration
 
+# Source guard - prevent multiple sourcing
+if [ -n "${_CONFIG_HUB_SH_LOADED:-}" ]; then
+    return 0
+fi
+readonly _CONFIG_HUB_SH_LOADED=1
+
 # Source dependencies
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../core/constants.sh"

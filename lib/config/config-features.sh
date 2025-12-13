@@ -26,6 +26,12 @@
 #   - is_advanced_enabled()      Check if advanced features enabled
 #   - set_advanced_enabled()     Toggle advanced features
 
+# Source guard - prevent multiple sourcing
+if [ -n "${_CONFIG_FEATURES_SH_LOADED:-}" ]; then
+    return 0
+fi
+readonly _CONFIG_FEATURES_SH_LOADED=1
+
 # Source dependencies
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../core/constants.sh"

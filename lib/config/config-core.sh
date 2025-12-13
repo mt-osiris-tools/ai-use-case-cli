@@ -22,6 +22,12 @@
 #   - get_config()               Reads configuration value
 #   - set_config()               Writes configuration value
 
+# Source guard - prevent multiple sourcing
+if [ -n "${_CONFIG_CORE_SH_LOADED:-}" ]; then
+    return 0
+fi
+readonly _CONFIG_CORE_SH_LOADED=1
+
 # Source dependencies
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../core/constants.sh"
