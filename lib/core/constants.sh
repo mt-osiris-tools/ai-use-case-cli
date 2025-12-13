@@ -13,6 +13,12 @@
 #
 # Note: This is a pure constants file with no functions or side effects.
 
+# Source guard - prevent multiple sourcing
+if [ -n "${_CONSTANTS_SH_LOADED:-}" ]; then
+    return 0
+fi
+readonly _CONSTANTS_SH_LOADED=1
+
 # ============================================================================
 # Color Codes - ANSI terminal colors for consistent output formatting
 # ============================================================================
