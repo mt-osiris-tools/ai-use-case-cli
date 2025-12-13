@@ -40,9 +40,9 @@ CLI_ROOT="${CLI_ROOT:-}"
 CONFIG_DIR="$HOME/.config/ai-use-case-cli"
 
 # Configuration files
-CONFIG_FILE="$CONFIG_DIR/config.json"
-TRACING_CONFIG_FILE="$CONFIG_DIR/tracing.json"
-AGENTS_CONFIG_FILE="$CONFIG_DIR/agents.json"
+readonly CONFIG_FILE="$CONFIG_DIR/config.json"
+readonly TRACING_CONFIG_FILE="$CONFIG_DIR/tracing.json"
+readonly AGENTS_CONFIG_FILE="$CONFIG_DIR/agents.json"
 
 # ============================================================================
 # Configuration Keys - JSON field names used in config files

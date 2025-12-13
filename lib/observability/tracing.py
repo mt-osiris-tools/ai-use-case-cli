@@ -98,7 +98,7 @@ class TracingManager:
         """Get CLI version from version.sh file."""
         try:
             cli_root = Path(__file__).parent.parent.parent
-            version_file = cli_root / 'scripts' / 'utils' / 'version.sh'
+            version_file = cli_root / 'lib' / 'core' / 'version.sh'
             if version_file.exists():
                 with open(version_file) as f:
                     content = f.read()
