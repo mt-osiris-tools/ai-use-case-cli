@@ -7,13 +7,25 @@
 
 set -e
 
-# Colors
-GREEN=$'\033[0;32m'
-BLUE=$'\033[0;34m'
-YELLOW=$'\033[1;33m'
-RED=$'\033[0;31m'
-CYAN=$'\033[0;36m'
-NC=$'\033[0m'
+# Detect if output is a TTY and colors should be enabled
+# Respects NO_COLOR environment variable (https://no-color.org/)
+if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+    # Colors enabled (TTY detected and NO_COLOR not set)
+    GREEN=$'\033[0;32m'
+    BLUE=$'\033[0;34m'
+    YELLOW=$'\033[1;33m'
+    RED=$'\033[0;31m'
+    CYAN=$'\033[0;36m'
+    NC=$'\033[0m'
+else
+    # Colors disabled (not a TTY, piped, redirected, or NO_COLOR set)
+    GREEN=''
+    BLUE=''
+    YELLOW=''
+    RED=''
+    CYAN=''
+    NC=''
+fi
 
 # Get script directory (resolve symlinks)
 SCRIPT_PATH="${BASH_SOURCE[0]}"
@@ -53,6 +65,25 @@ fi
 # Source feature registry for command classification
 if [ -f "$SCRIPT_DIR/scripts/utils/feature-registry.sh" ]; then
     source "$SCRIPT_DIR/scripts/utils/feature-registry.sh"
+fi
+
+# Re-apply color detection after sourcing scripts (in case they override)
+if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+    # Colors enabled (TTY detected and NO_COLOR not set)
+    GREEN=$'\033[0;32m'
+    BLUE=$'\033[0;34m'
+    YELLOW=$'\033[1;33m'
+    RED=$'\033[0;31m'
+    CYAN=$'\033[0;36m'
+    NC=$'\033[0m'
+else
+    # Colors disabled (not a TTY, piped, redirected, or NO_COLOR set)
+    GREEN=''
+    BLUE=''
+    YELLOW=''
+    RED=''
+    CYAN=''
+    NC=''
 fi
 
 # Check if advanced features are enabled (with backward compatibility)
