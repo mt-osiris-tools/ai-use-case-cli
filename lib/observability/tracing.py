@@ -95,9 +95,15 @@ class TracingManager:
         return default_config
     
     def _get_cli_version(self) -> str:
-        """Get CLI version from version.sh file."""
+        """Get CLI version from version.sh file.
+
+        Note: This assumes the file structure established in Phase 1:
+        lib/observability/tracing.py → lib/core/version.sh
+        If directory structure changes in future phases, update this path.
+        """
         try:
             cli_root = Path(__file__).parent.parent.parent
+            # Path dependency: Assumes version.sh is in lib/core/
             version_file = cli_root / 'lib' / 'core' / 'version.sh'
             if version_file.exists():
                 with open(version_file) as f:

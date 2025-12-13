@@ -22,6 +22,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 RED='\033[0;31m'
 CYAN='\033[0;36m'
+GRAY='\033[0;90m'
 BOLD='\033[1m'
 NC='\033[0m' # No Color
 
@@ -32,8 +33,11 @@ NC='\033[0m' # No Color
 # Default hub directory (can be overridden by AI_USECASES_DIR environment variable)
 readonly DEFAULT_HUB_DIR="$HOME/.local/share/ai-use-case-cli/hub"
 
-# CLI root directory (typically set at runtime)
-# Note: This is expected to be set by the main CLI script
+# CLI root directory (set at runtime by main CLI script or callers)
+# IMPORTANT: This must be set before sourcing this file if you need to reference
+# CLI installation paths. The main `ai-use-case` script sets this automatically.
+# For scripts that need CLI_ROOT, ensure it's set via environment or before sourcing.
+# Example: CLI_ROOT="/path/to/cli" source lib/core/constants.sh
 CLI_ROOT="${CLI_ROOT:-}"
 
 # Configuration directory (XDG compliant)
