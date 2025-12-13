@@ -12,10 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Codex CLI Integration**: Support for Codex-style CLI tools with slash commands
   - **Note**: This integration provides slash command prompts compatible with CLI tools that use
     the Codex CLI pattern (YAML frontmatter, `/prompts:` invocation). This does NOT use the
-    deprecated OpenAI Codex completion API, but rather provides project-local prompt files for
+    deprecated OpenAI Codex completion API, but rather provides user-global prompt files for
     compatible CLI coding assistants.
-  - **New Command**: `ai-use-case --setup-codex` to install Codex prompts into project
-  - **Codex Prompts**: Project-local `.codex/prompts/` directory with YAML frontmatter
+  - **New Command**: `ai-use-case --setup-codex` to install Codex prompts into user's home directory
+  - **Codex Prompts**: User-global `~/.codex/prompts/` directory with YAML frontmatter
     - `use-case-document-session.md` - Document AI sessions with hybrid parameters
     - `use-case-publish-confluence.md` - Publish to Confluence via REST API
   - **Hybrid Parameters**: Optional named parameters with interactive fallback
@@ -77,6 +77,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **docs/FEATURES.md** (NEW): Detailed feature descriptions with version history, comparison matrix, and use cases
 
 ### Changed
+
+- **BREAKING: Codex Prompts Now Global**: Codex-style CLI prompts are now installed in the home directory (`~/.codex/prompts/`) instead of project-local directories
+  - **Migration**: Project-local `.codex/prompts/` directories are no longer used and can be safely deleted
+  - **Benefit**: Prompts are now available globally across all projects
+  - **Affected Files**: `scripts/project/setup-codex.sh`, tests, and documentation updated
+  - **User Action Required**: Run `ai-use-case --setup-codex` again to install prompts in home directory, then delete old project-local `.codex/` folders
 
 - **README.md Streamlined**: Reduced from 526 to 322 lines (39% reduction) for better readability
   - Removed version-specific noise (v3.x.x+ annotations throughout)

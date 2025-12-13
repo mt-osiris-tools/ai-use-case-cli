@@ -33,8 +33,8 @@ PROJECT_PATH="$(cd "$PROJECT_PATH" && pwd)"
 
 # Define paths
 AI_TOOLS_COMMANDS="$PROJECT_PATH/.ai-tools/commands/use-case"
-CODEX_DIR="$PROJECT_PATH/.codex"
-CODEX_PROMPTS_DIR="$PROJECT_PATH/.codex/prompts"
+CODEX_DIR="$HOME/.codex"
+CODEX_PROMPTS_DIR="$HOME/.codex/prompts"
 CLI_CODEX_PROMPTS="$CLI_ROOT/.codex/prompts"
 
 echo -e "${BLUE}=== Setup Codex CLI Commands ===${NC}"
@@ -66,13 +66,13 @@ echo -e "${GREEN}✓${NC} Found $PROMPT_COUNT Codex prompt(s) in CLI"
 # Create .codex directory if needed
 if [ ! -d "$CODEX_DIR" ]; then
     mkdir -p "$CODEX_DIR"
-    echo -e "${GREEN}✓${NC} Created: .codex/"
+    echo -e "${GREEN}✓${NC} Created: ~/.codex/"
 fi
 
 # Create .codex/prompts directory if needed
 if [ ! -d "$CODEX_PROMPTS_DIR" ]; then
     mkdir -p "$CODEX_PROMPTS_DIR"
-    echo -e "${GREEN}✓${NC} Created: .codex/prompts/"
+    echo -e "${GREEN}✓${NC} Created: ~/.codex/prompts/"
 fi
 
 # Copy Codex prompt files (with frontmatter, can't use symlinks)
@@ -129,6 +129,11 @@ echo "Example usage:"
 echo "  /prompts:use-case-document-session"
 echo "  /prompts:use-case-publish-confluence FILE=myfile.md"
 echo ""
-echo -e "${YELLOW}Note:${NC} Codex prompts are project-local (.codex/prompts/)."
+echo -e "${YELLOW}Note:${NC} Codex prompts are installed in your home directory (~/.codex/prompts/)."
+echo "These prompts are available globally across all projects."
 echo "You may need to restart Codex CLI to detect new prompts."
+echo ""
+echo -e "${YELLOW}Migration guidance:${NC} If you previously ran setup-codex, you may have old project-local"
+echo ".codex/prompts/ directories that are no longer used. Delete them from your project roots"
+echo "to avoid confusion."
 echo ""
