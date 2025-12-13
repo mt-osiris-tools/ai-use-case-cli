@@ -66,13 +66,13 @@ echo -e "${GREEN}✓${NC} Found $PROMPT_COUNT Codex prompt(s) in CLI"
 # Create .codex directory if needed
 if [ ! -d "$CODEX_DIR" ]; then
     mkdir -p "$CODEX_DIR"
-    echo -e "${GREEN}✓${NC} Created: .codex/"
+    echo -e "${GREEN}✓${NC} Created: ~/.codex/"
 fi
 
 # Create .codex/prompts directory if needed
 if [ ! -d "$CODEX_PROMPTS_DIR" ]; then
     mkdir -p "$CODEX_PROMPTS_DIR"
-    echo -e "${GREEN}✓${NC} Created: .codex/prompts/"
+    echo -e "${GREEN}✓${NC} Created: ~/.codex/prompts/"
 fi
 
 # Copy Codex prompt files (with frontmatter, can't use symlinks)
