@@ -2,14 +2,15 @@
 # Progress Tracker Utility
 # Provides visual progress tracking for command execution
 #
-# Usage:
+# Usage (recommended - use new canonical path):
 #   source path/to/lib/observability/progress-tracker.sh
 #   progress_init "Task 1" "Task 2" "Task 3"
 #   progress_start "Task 1"
 #   progress_complete "Task 1"
 #   progress_summary
 #
-# Note: Backward compatible symlink exists at scripts/utils/progress-tracker.sh
+# Legacy path (deprecated, use new path above):
+#   source scripts/utils/progress-tracker.sh  # Symlink for backward compatibility
 #
 # Features:
 #   - Real-time task status tracking

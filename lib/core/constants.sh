@@ -37,7 +37,7 @@ readonly DEFAULT_HUB_DIR="$HOME/.local/share/ai-use-case-cli/hub"
 CLI_ROOT="${CLI_ROOT:-}"
 
 # Configuration directory (XDG compliant)
-CONFIG_DIR="$HOME/.config/ai-use-case-cli"
+readonly CONFIG_DIR="$HOME/.config/ai-use-case-cli"
 
 # Configuration files
 readonly CONFIG_FILE="$CONFIG_DIR/config.json"
