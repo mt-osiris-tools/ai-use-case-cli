@@ -682,19 +682,19 @@ EOF
     document)
         trace_event "deprecated_command" "command=document" "replacement=/use-case:document-session"
         # Document command removed in v3.0.0 - now uses Claude Code
-        printf '%b\n' "${YELLOW}╭────────────────────────────────────────────────────────────╮${NC}"
-        printf '%b\n' "${YELLOW}│${NC}  ${RED}⚠ COMMAND CHANGED${NC}                                      ${YELLOW}│${NC}"
-        printf '%b\n' "${YELLOW}│${NC}                                                            ${YELLOW}│${NC}"
-        printf '%b\n' "${YELLOW}│${NC}  The 'document' command now requires Claude Code for     ${YELLOW}│${NC}"
-        printf '%b\n' "${YELLOW}│${NC}  automatic context capture and documentation generation. ${YELLOW}│${NC}"
-        printf '%b\n' "${YELLOW}│${NC}                                                            ${YELLOW}│${NC}"
-        printf '%b\n' "${YELLOW}│${NC}  ${BLUE}Please use:${NC}                                            ${YELLOW}│${NC}"
-        printf '%b\n' "${YELLOW}│${NC}  ${GREEN}/use-case:document-session${NC}                            ${YELLOW}│${NC}"
-        printf '%b\n' "${YELLOW}│${NC}                                                            ${YELLOW}│${NC}"
-        printf '%b\n' "${YELLOW}│${NC}  This provides better AI-assisted documentation with     ${YELLOW}│${NC}"
-        printf '%b\n' "${YELLOW}│${NC}  automatic git history analysis and context awareness.   ${YELLOW}│${NC}"
-        printf '%b\n' "${YELLOW}╰────────────────────────────────────────────────────────────╯${NC}"
-        printf '\n'
+        echo -e "${YELLOW}╭────────────────────────────────────────────────────────────╮${NC}"
+        echo -e "${YELLOW}│${NC}  ${RED}⚠ COMMAND CHANGED${NC}                                      ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC}                                                            ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC}  The 'document' command now requires Claude Code for     ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC}  automatic context capture and documentation generation. ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC}                                                            ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC}  ${BLUE}Please use:${NC}                                            ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC}  ${GREEN}/use-case:document-session${NC}                            ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC}                                                            ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC}  This provides better AI-assisted documentation with     ${YELLOW}│${NC}"
+        echo -e "${YELLOW}│${NC}  automatic git history analysis and context awareness.   ${YELLOW}│${NC}"
+        echo -e "${YELLOW}╰────────────────────────────────────────────────────────────╯${NC}"
+        echo ""
         exit 1
         ;;
     *)
