@@ -133,7 +133,7 @@ echo -e "${YELLOW}Note:${NC} Codex prompts are installed in your home directory 
 echo "These prompts are available globally across all projects."
 echo "You may need to restart Codex CLI to detect new prompts."
 echo ""
-echo -e "${YELLOW}Migration guidance:${NC} If you previously ran setup-codex, you have old project-local"
+echo -e "${YELLOW}Migration guidance:${NC} If you previously ran setup-codex, you may have old project-local"
 echo ".codex/prompts/ directories that are no longer used. Delete them from your project roots"
 echo "to avoid confusion."
 echo ""
