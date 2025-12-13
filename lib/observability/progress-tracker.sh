@@ -18,13 +18,18 @@
 #   - Colored output for better UX
 #   - Summary report at completion
 
-# Colors
-PROGRESS_GREEN='\033[0;32m'
-PROGRESS_YELLOW='\033[1;33m'
-PROGRESS_BLUE='\033[0;34m'
-PROGRESS_CYAN='\033[0;36m'
-PROGRESS_GRAY='\033[0;90m'
-PROGRESS_NC='\033[0m'
+# Source centralized color constants
+# shellcheck disable=SC1091
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/../core/constants.sh"
+
+# Alias standardized color variables for backward compatibility
+PROGRESS_GREEN="$GREEN"
+PROGRESS_YELLOW="$YELLOW"
+PROGRESS_BLUE="$BLUE"
+PROGRESS_CYAN="$CYAN"
+PROGRESS_NC="$NC"
+PROGRESS_GRAY='\033[0;90m'  # Not yet in constants.sh
 
 # Symbols
 PROGRESS_TODO="[ ]"
