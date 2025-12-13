@@ -26,9 +26,12 @@ This CLI provides slash commands for AI coding assistants like Claude Code, Code
 - Commands are invoked as `/use-case:command-name`
 
 **Codex-Style CLI Integration:**
-- Codex-specific wrappers in `.codex/prompts/` with YAML frontmatter
+- Codex-specific wrappers installed in `~/.codex/prompts/` (home directory) with YAML frontmatter
+- Prompts are available globally across all projects
 - Uses hybrid parameters (optional with interactive fallback)
 - Commands are invoked as `/prompts:use-case-command-name`
+
+**Migration Note:** If you previously had project-local `.codex/prompts/` directories, they are no longer used. The new installation creates prompts in your home directory (`~/.codex/prompts/`) for global availability. You can safely delete any old `.codex/` folders from your project roots.
 
 ### Setup
 
@@ -50,7 +53,7 @@ ls .ai-tools/commands/use-case/     # Should list all available commands
 
 **Codex-Style CLI:**
 ```bash
-ls .codex/prompts/                  # Should list Codex prompt files
+ls ~/.codex/prompts/                # Should list Codex prompt files (in home directory)
 ```
 
 ## Core Commands
