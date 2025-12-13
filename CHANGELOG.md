@@ -244,6 +244,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **ANSI Escape Codes in Piped Output**: Fixed literal escape codes appearing when CLI output is piped or redirected
+  - Added TTY detection to automatically disable colors when stdout is not a terminal
+  - Colors now work correctly in terminals but appear as clean text when piped (e.g., `ai-use-case --help | cat`)
+  - Respects `NO_COLOR` environment variable standard (https://no-color.org/)
+  - Added `FORCE_COLOR` environment variable to override TTY detection (useful for testing)
+  - Updated `config-manager.sh` to only set colors if not already defined by parent script
+  - Updated test suite to use `FORCE_COLOR=1` for color-related tests
+  - Extracted color setup logic into reusable `setup_colors()` function to avoid duplication
+  - Improves user experience when copying help text, saving output to files, or using CLI in scripts
+
 - **Self-Update Color Rendering**: Fixed ANSI color codes displaying as literal text in `scripts/utils/self-update.sh`
   - Changed `echo` to `echo -e` at line 102 to properly interpret color escape sequences
   - Version display now correctly shows cyan-colored version number instead of `\033[0;36m3.11.0\033[0m`
