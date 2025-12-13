@@ -96,7 +96,7 @@ set_install_mode() {
     # Use jq if available for proper JSON handling, fallback to sed
     if command -v jq &> /dev/null; then
         local temp_file=$(mktemp)
-        trap "rm -f '$temp_file'" EXIT
+        trap "rm -f '$temp_file'" EXIT INT TERM
 
         # Add or update installMode field
         if grep -q '"installMode"' "$CONFIG_FILE"; then
@@ -226,7 +226,7 @@ set_advanced_enabled() {
     # Use jq if available for proper JSON handling
     if command -v jq &> /dev/null; then
         local temp_file=$(mktemp)
-        trap "rm -f '$temp_file'" EXIT
+        trap "rm -f '$temp_file'" EXIT INT TERM
 
         # Convert string to boolean for jq
         local bool_value=$( [ "$value" = "true" ] && echo "true" || echo "false" )

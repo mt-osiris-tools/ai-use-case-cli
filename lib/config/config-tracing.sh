@@ -58,6 +58,7 @@ readonly DEFAULT_TRACING_CONFIG='{
 init_tracing_config() {
     local tracing_config_file="$TRACING_CONFIG_FILE"
     local temp_file=$(mktemp)
+    trap "rm -f '$temp_file'" EXIT INT TERM
 
     # Ensure config directory exists
     ensure_config_dir
@@ -68,6 +69,7 @@ init_tracing_config() {
     # Validate the content
     if [ ! -s "$temp_file" ]; then
         echo -e "${RED}Error: Failed to create tracing configuration${NC}" >&2
+        trap - EXIT INT TERM
         rm -f "$temp_file"
         return 1
     fi
@@ -76,6 +78,7 @@ init_tracing_config() {
     if command -v jq &> /dev/null; then
         if ! jq empty "$temp_file" 2>/dev/null; then
             echo -e "${RED}Error: Invalid JSON in tracing configuration${NC}" >&2
+            trap - EXIT INT TERM
             rm -f "$temp_file"
             return 1
         fi
@@ -84,10 +87,12 @@ init_tracing_config() {
     # Atomic move (safer than cp)
     if ! mv "$temp_file" "$tracing_config_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to save tracing configuration${NC}" >&2
+        trap - EXIT INT TERM
         rm -f "$temp_file"
         return 1
     fi
 
+    trap - EXIT INT TERM
     echo -e "${GREEN}✓${NC} Tracing configuration initialized" >&2
     return 0
 }

@@ -152,7 +152,7 @@ configure_confluence() {
     fi
 
     local temp_file=$(mktemp)
-    trap "rm -f '$temp_file'" EXIT
+    trap "rm -f '$temp_file'" EXIT INT TERM
 
     # Add or update confluence section
     if [ ! -f "$CONFIG_FILE" ]; then
