@@ -7,14 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-
-- **BREAKING: Codex Prompts Now Global**: Codex-style CLI prompts are now installed in the home directory (`~/.codex/prompts/`) instead of project-local directories
-  - **Migration**: Project-local `.codex/prompts/` directories are no longer used and can be safely deleted
-  - **Benefit**: Prompts are now available globally across all projects
-  - **Affected Files**: `scripts/project/setup-codex.sh`, tests, and documentation updated
-  - **User Action Required**: Run `ai-use-case --setup-codex` again to install prompts in home directory, then delete old project-local `.codex/` folders
-
 ### Added
 
 - **Codex CLI Integration**: Support for Codex-style CLI tools with slash commands
@@ -85,6 +77,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **docs/FEATURES.md** (NEW): Detailed feature descriptions with version history, comparison matrix, and use cases
 
 ### Changed
+
+- **BREAKING: Codex Prompts Now Global**: Codex-style CLI prompts are now installed in the home directory (`~/.codex/prompts/`) instead of project-local directories
+  - **Migration**: Project-local `.codex/prompts/` directories are no longer used and can be safely deleted
+  - **Benefit**: Prompts are now available globally across all projects
+  - **Affected Files**: `scripts/project/setup-codex.sh`, tests, and documentation updated
+  - **User Action Required**: Run `ai-use-case --setup-codex` again to install prompts in home directory, then delete old project-local `.codex/` folders
 
 - **README.md Streamlined**: Reduced from 526 to 322 lines (39% reduction) for better readability
   - Removed version-specific noise (v3.x.x+ annotations throughout)
