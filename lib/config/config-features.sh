@@ -113,11 +113,11 @@ set_install_mode() {
 
         if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
             mv "$temp_file" "$CONFIG_FILE"
-            trap - EXIT
+            trap - EXIT INT TERM
         else
             echo -e "${RED}Error: Failed to update configuration${NC}" >&2
             rm -f "$temp_file"
-            trap - EXIT
+            trap - EXIT INT TERM
             return 1
         fi
     else
@@ -246,10 +246,10 @@ set_advanced_enabled() {
 
         if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
             mv "$temp_file" "$CONFIG_FILE"
-            trap - EXIT
+            trap - EXIT INT TERM
         else
             echo -e "${RED}Error: Failed to update configuration${NC}" >&2
-            trap - EXIT
+            trap - EXIT INT TERM
             rm -f "$temp_file"
             return 1
         fi

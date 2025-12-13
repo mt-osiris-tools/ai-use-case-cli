@@ -196,14 +196,14 @@ configure_confluence() {
     # Validate temp file
     if [ ! -s "$temp_file" ] || ! jq empty "$temp_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to update configuration${NC}" >&2
-        trap - EXIT
+        trap - EXIT INT TERM
         rm -f "$temp_file"
         return 1
     fi
 
     # Atomic move
     mv "$temp_file" "$CONFIG_FILE"
-    trap - EXIT
+    trap - EXIT INT TERM
 
     # Set restrictive permissions on config file (contains API token)
     chmod 600 "$CONFIG_FILE"
