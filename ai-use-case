@@ -682,21 +682,19 @@ EOF
     document)
         trace_event "deprecated_command" "command=document" "replacement=/use-case:document-session"
         # Document command removed in v3.0.0 - now uses Claude Code
-        cat <<EOF
-${YELLOW}╭────────────────────────────────────────────────────────────╮${NC}
-${YELLOW}│${NC}  ${RED}⚠ COMMAND CHANGED${NC}                                      ${YELLOW}│${NC}
-${YELLOW}│${NC}                                                            ${YELLOW}│${NC}
-${YELLOW}│${NC}  The 'document' command now requires Claude Code for     ${YELLOW}│${NC}
-${YELLOW}│${NC}  automatic context capture and documentation generation. ${YELLOW}│${NC}
-${YELLOW}│${NC}                                                            ${YELLOW}│${NC}
-${YELLOW}│${NC}  ${BLUE}Please use:${NC}                                            ${YELLOW}│${NC}
-${YELLOW}│${NC}  ${GREEN}/use-case:document-session${NC}                            ${YELLOW}│${NC}
-${YELLOW}│${NC}                                                            ${YELLOW}│${NC}
-${YELLOW}│${NC}  This provides better AI-assisted documentation with     ${YELLOW}│${NC}
-${YELLOW}│${NC}  automatic git history analysis and context awareness.   ${YELLOW}│${NC}
-${YELLOW}╰────────────────────────────────────────────────────────────╯${NC}
-
-EOF
+        printf '%b\n' "${YELLOW}╭────────────────────────────────────────────────────────────╮${NC}"
+        printf '%b\n' "${YELLOW}│${NC}  ${RED}⚠ COMMAND CHANGED${NC}                                      ${YELLOW}│${NC}"
+        printf '%b\n' "${YELLOW}│${NC}                                                            ${YELLOW}│${NC}"
+        printf '%b\n' "${YELLOW}│${NC}  The 'document' command now requires Claude Code for     ${YELLOW}│${NC}"
+        printf '%b\n' "${YELLOW}│${NC}  automatic context capture and documentation generation. ${YELLOW}│${NC}"
+        printf '%b\n' "${YELLOW}│${NC}                                                            ${YELLOW}│${NC}"
+        printf '%b\n' "${YELLOW}│${NC}  ${BLUE}Please use:${NC}                                            ${YELLOW}│${NC}"
+        printf '%b\n' "${YELLOW}│${NC}  ${GREEN}/use-case:document-session${NC}                            ${YELLOW}│${NC}"
+        printf '%b\n' "${YELLOW}│${NC}                                                            ${YELLOW}│${NC}"
+        printf '%b\n' "${YELLOW}│${NC}  This provides better AI-assisted documentation with     ${YELLOW}│${NC}"
+        printf '%b\n' "${YELLOW}│${NC}  automatic git history analysis and context awareness.   ${YELLOW}│${NC}"
+        printf '%b\n' "${YELLOW}╰────────────────────────────────────────────────────────────╯${NC}"
+        printf '\n'
         exit 1
         ;;
     *)
