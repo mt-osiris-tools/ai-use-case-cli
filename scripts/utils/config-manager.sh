@@ -6,14 +6,29 @@
 CONFIG_DIR="$HOME/.config/ai-use-case-cli"
 CONFIG_FILE="$CONFIG_DIR/config.json"
 
-# Colors for output
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-RED='\033[0;31m'
-CYAN='\033[0;36m'
-BOLD='\033[1m'
-NC='\033[0m' # No Color
+# Colors for output - only set if not already defined (allows parent script to control)
+# Respects NO_COLOR (https://no-color.org/) and FORCE_COLOR environment variables
+if [ -z "${GREEN:-}" ]; then
+    if ([ -t 1 ] || [ -n "${FORCE_COLOR:-}" ]) && [ -z "${NO_COLOR:-}" ]; then
+        # Colors enabled (TTY detected or FORCE_COLOR set, and NO_COLOR not set)
+        GREEN='\033[0;32m'
+        YELLOW='\033[1;33m'
+        BLUE='\033[0;34m'
+        RED='\033[0;31m'
+        CYAN='\033[0;36m'
+        BOLD='\033[1m'
+        NC='\033[0m'
+    else
+        # Colors disabled (not a TTY, piped, redirected, or NO_COLOR set)
+        GREEN=''
+        YELLOW=''
+        BLUE=''
+        RED=''
+        CYAN=''
+        BOLD=''
+        NC=''
+    fi
+fi
 
 # Default tracing configuration (single source of truth)
 readonly DEFAULT_TRACING_CONFIG='{

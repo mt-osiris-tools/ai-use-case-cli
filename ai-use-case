@@ -8,10 +8,10 @@
 set -e
 
 # Function to setup color variables based on TTY detection
-# Respects NO_COLOR environment variable (https://no-color.org/)
+# Respects NO_COLOR (https://no-color.org/) and FORCE_COLOR environment variables
 setup_colors() {
-    if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
-        # Colors enabled (TTY detected and NO_COLOR not set)
+    if ([ -t 1 ] || [ -n "${FORCE_COLOR:-}" ]) && [ -z "${NO_COLOR:-}" ]; then
+        # Colors enabled (TTY detected or FORCE_COLOR set, and NO_COLOR not set)
         GREEN=$'\033[0;32m'
         BLUE=$'\033[0;34m'
         YELLOW=$'\033[1;33m'
@@ -71,9 +71,6 @@ fi
 if [ -f "$SCRIPT_DIR/scripts/utils/feature-registry.sh" ]; then
     source "$SCRIPT_DIR/scripts/utils/feature-registry.sh"
 fi
-
-# Re-apply color detection after sourcing scripts (in case they override)
-setup_colors
 
 # Check if advanced features are enabled (with backward compatibility)
 check_advanced_enabled() {
