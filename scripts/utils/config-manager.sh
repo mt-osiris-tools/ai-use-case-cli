@@ -186,7 +186,7 @@ get_hub_mode() {
 # Get hub path
 get_hub_path() {
     # Check environment variable first (highest priority)
-    if [ -n "$AI_USECASES_DIR" ]; then
+    if [ -n "${AI_USECASES_DIR:-}" ]; then
         echo "$AI_USECASES_DIR"
         return 0
     fi
