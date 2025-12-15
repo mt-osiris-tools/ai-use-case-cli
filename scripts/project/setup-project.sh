@@ -484,7 +484,11 @@ else
     echo -e "${YELLOW}⚠${NC} AI tool commands not found in CLI installation"
 fi
 
-# Setup Codex integration (if Codex was selected)
+# Setup Codex integration (if Codex was selected, init mode only)
+# NOTE: Unlike Claude Code integration (which runs in both init and update modes to maintain
+# project-specific symlink structure), Codex setup is intentionally init-only because it's a
+# one-time global setup (installs prompts to ~/.codex/prompts/). Users who need to add or update
+# Codex integration later can run: ai-use-case --setup-codex
 if [[ "$SELECTED_AGENTS" == *"codex"* ]] && [ "$UPDATE_MODE" = false ]; then
     echo ""
     echo -e "${BLUE}Setting up Codex integration...${NC}"
