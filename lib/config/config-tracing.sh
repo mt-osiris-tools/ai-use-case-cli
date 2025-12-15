@@ -167,7 +167,7 @@ set_tracing_config() {
     fi
 
     local temp_file=$(mktemp)
-    # Setup cleanup trap (EXIT, INT, TERM to ensure cleanup on interruption/termination)
+    # Trap EXIT INT TERM to ensure cleanup on interruption/termination
     trap "rm -f '$temp_file'" EXIT INT TERM
 
     # Use --argjson for boolean/numeric keys, --arg for strings

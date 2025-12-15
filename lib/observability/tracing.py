@@ -99,20 +99,35 @@ class TracingManager:
 
         Note: This assumes the file structure established in Phase 1:
         lib/observability/tracing.py → lib/core/version.sh
-        If directory structure changes in future phases, update this path.
+
+        If the directory structure changes in future phases (see project CHANGELOG.md
+        or migration notes for phase details), update the path below to point to the
+        new location of version.sh. To verify correctness, ensure that version.sh
+        exists at the specified path, or consult the documentation in docs/HUB-FILES.md
+        and the project root for any updates to file locations.
         """
         try:
             cli_root = Path(__file__).parent.parent.parent
-            # Path dependency: Assumes version.sh is in lib/core/
+            # Path dependency: Assumes version.sh is in lib/core/. If this changes, update the path per the comment above.
             version_file = cli_root / 'lib' / 'core' / 'version.sh'
-            if version_file.exists():
-                with open(version_file) as f:
-                    content = f.read()
-                    for line in content.splitlines():
-                        if line.startswith('export CLI_VERSION='):
-                            return line.split('=')[1].strip('"')
-            return 'unknown'
-        except Exception:
+
+            if not version_file.exists():
+                print(f"Warning: version.sh not found at expected path: {version_file}", file=sys.stderr)
+                print(f"Falling back to 'unknown' version. Check installation or file structure.", file=sys.stderr)
+                return 'unknown'
+
+            with open(version_file) as f:
+                content = f.read()
+                for line in content.splitlines():
+                    if line.startswith('export CLI_VERSION='):
+                        return line.split('=')[1].strip('"')
+
+                # If we read the file but didn't find CLI_VERSION
+                print(f"Warning: Could not parse CLI_VERSION from {version_file}", file=sys.stderr)
+                return 'unknown'
+
+        except Exception as e:
+            print(f"Warning: Error reading version file: {e}", file=sys.stderr)
             return 'unknown'
     
     def _setup_tracing(self):

@@ -6,12 +6,13 @@
 # modules in lib/config/ as part of the layered architecture refactor.
 #
 # NEW CODE SHOULD SOURCE THE SPECIFIC MODULES DIRECTLY:
-#   source lib/core/constants.sh
-#   source lib/config/config-core.sh
-#   source lib/config/config-hub.sh
-#   source lib/config/config-features.sh
-#   source lib/config/config-tracing.sh
-#   source lib/config/config-confluence.sh
+#   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+#   source "$SCRIPT_DIR/../../lib/core/constants.sh"
+#   source "$SCRIPT_DIR/../../lib/config/config-core.sh"
+#   source "$SCRIPT_DIR/../../lib/config/config-hub.sh"
+#   source "$SCRIPT_DIR/../../lib/config/config-features.sh"
+#   source "$SCRIPT_DIR/../../lib/config/config-tracing.sh"
+#   source "$SCRIPT_DIR/../../lib/config/config-confluence.sh"
 #
 # This facade exists only for backward compatibility with existing scripts.
 #
