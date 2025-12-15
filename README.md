@@ -71,11 +71,19 @@ This creates:
 - `.usecase/cases/` directory for documentation
 - Git hooks for automatic syncing
 - Slash commands in `.ai-tools/commands/`
-- Claude Code compatibility via `.claude/commands/use-case/` symlink
+- Agent-specific integrations (Claude Code and/or Codex)
 
-Choose your hub mode:
+During initialization, you'll choose:
+
+**Hub mode:**
 - **Local Only** (default): Documentation stays on your machine
 - **Private Git**: Full version control with your repository
+
+**AI Agent(s):**
+- **Claude Code** (default): Creates `.claude/commands/use-case/` symlink
+- **Codex**: Installs prompts in `~/.codex/prompts/`
+- **Both**: Configures both Claude and Codex
+- **None**: Skip agent setup (configure later)
 
 ### 2. Work With AI
 
