@@ -396,7 +396,7 @@ git rev-parse --show-toplevel
 # Check for .usecase/cases directory
 if [ -d ".usecase/cases/" ]; then
     echo "✅ AI use cases directory exists"
-    count=$(ls -1 .usecase/cases/ 2>/dev/null | wc -l)
+    count=$(ls -1 .usecase/cases/*.md 2>/dev/null | wc -l)
     echo "Existing documentation files: $count"
 else
     echo "⚠️ Not set up - .usecase/cases/ directory not found"
