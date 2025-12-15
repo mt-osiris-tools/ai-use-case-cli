@@ -255,6 +255,27 @@ Publishes documentation as Confluence pages (requires Atlassian MCP server).
 
 **[More Examples →](docs/USAGE-GUIDE.md#workflow-details)**
 
+## Optional Dependencies
+
+### Markdown Linting (markdownlint-cli)
+
+For automatic markdown quality validation and fixing when publishing to Confluence:
+
+```bash
+# Install globally via npm
+npm install -g markdownlint-cli
+```
+
+**Benefits:**
+- Auto-fixes markdown formatting issues during publishing
+- Ensures consistent documentation quality
+- Reduces manual formatting fixes
+
+**Usage:**
+- The `publish-confluence` command automatically validates and fixes markdown files when markdownlint is installed
+- Use `--no-autofix` flag to skip automatic fixes: `./scripts/core/publish-confluence.sh --no-autofix file.md parent-url`
+- If not installed, the command will work normally with a warning message
+
 ## Troubleshooting
 
 ### CLI Command Not Found
