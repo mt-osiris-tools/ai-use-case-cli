@@ -123,10 +123,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `scripts/core/sync-ai-use-cases.sh:297-302` - By-topic symlink creation
   - **Impact**: Cleaner implementation with zero external dependencies beyond bash and ln
 
-- **Documentation Accuracy**: Fixed incorrect slash format in quick-start.prompt.md (PR #178 review)
-  - Claude Code commands now correctly show `/use-case:command` (colon) instead of `/use-case/command` (slash)
-  - Following old instructions would fail to match any command
-  - Affected lines: `.github/prompts/use-case/quick-start.prompt.md:91-95`
+- **Documentation Accuracy**: Ensured correct slash format in quick-start.prompt.md during development (PR #178)
+  - Claude Code commands use `/use-case:command` (colon) instead of `/use-case/command` (slash)
+  - Following old instructions would have failed to match any command, but the file was added with the correct format from the start
+  - File added in PR #178 with correct format: `.github/prompts/use-case/quick-start.prompt.md:91-95`
 
 ## [3.12.0] - 2025-12-07
 
