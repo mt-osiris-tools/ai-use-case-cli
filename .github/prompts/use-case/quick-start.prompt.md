@@ -60,15 +60,15 @@ ai-use-case --init
 Tell the user:
 - ✅ `.usecase/cases/` directory created in their project
 - ✅ Git post-commit hook installed for auto-syncing
-- ✅ Slash commands copied to `.ai-tools/commands/use-case/` (11 commands)
-- ✅ `.claude/commands/` symlink created for Claude Code discovery
+- ✅ GitHub Copilot prompts symlinked at `.github/prompts/use-case/` (5 prompts)
+- ✅ Slash commands copied to `.ai-tools/commands/use-case/` for Claude Code (11 commands, if Claude selected)
 - ✅ `.gitignore` patterns added for draft files
 - ✅ CLI tools ready for use
 
-**Slash Command Discovery:**
-- Commands stored in `.ai-tools/commands/use-case/` (AI-tool-agnostic)
-- Symlink at `.claude/commands/` enables Claude Code to find them
-- Verify: `ls -la .claude/commands` should show symlink → `../.ai-tools/commands`
+**GitHub Copilot Custom Prompts:**
+- Custom prompts symlinked at `.github/prompts/use-case/`
+- Accessible in Copilot Chat by typing `/use-case:`
+- Verify: `ls -la .github/prompts/use-case/` should show symlinks to CLI installation
 
 ### 7. Show Available Commands
 
@@ -80,7 +80,14 @@ CLI Commands:
 - `ai-use-case list` - List all projects
 - `ai-use-case view` - Open hub in file explorer
 
-Claude Code Slash Commands:
+GitHub Copilot Custom Prompts (in Copilot Chat):
+- `/use-case:document-session` - Document an AI session
+- `/use-case:setup-project` - Setup another project
+- `/use-case:sync-usecases` - Manual sync
+- `/use-case:search-usecases` - Search past use cases
+- `/use-case:quick-start` - Show this guide
+
+Claude Code Slash Commands (if Claude Code is installed):
 - `/use-case/document-session` - Document an AI session
 - `/use-case/setup-project` - Setup another project
 - `/use-case/sync-usecases` - Manual sync
@@ -119,10 +126,10 @@ Run: `ai-use-case document`
    - Captures time saved, tools used, results
 
 4. **AI Tool Integration:**
-   - Works with Claude Code
-   - Works with GitHub Copilot
+   - Works with GitHub Copilot (custom prompts)
+   - Works with Claude Code (slash commands)
    - Works with both together
-   - Documents which tool was used
+   - Supports multiple AI agents simultaneously
 
 ## Troubleshooting Common Issues
 

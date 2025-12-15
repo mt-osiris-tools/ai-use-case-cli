@@ -196,7 +196,7 @@ Use the AskUserQuestion tool to present initial options WITHOUT executing any ba
 
 **Only run this step if user selected "Current conversation" or "Both" in Step 0.2.**
 
-Analyze the current Claude Code conversation to determine if it's substantial enough for documentation:
+Analyze the current AI assistant conversation to determine if it's substantial enough for documentation:
 
 **Conversation Analysis Criteria:**
 - Check conversation length (number of user messages and AI responses)
@@ -578,7 +578,11 @@ Use the Read tool to read the template file from this path. This is your source 
 
 **Before generating documentation, capture real-time session statistics:**
 
-**IMPORTANT: How to run /cost command**
+**IMPORTANT: Gathering Session Statistics**
+
+> **Note:** The `/cost` command is only available when using Claude Code. GitHub Copilot users can skip this step.
+
+**For Claude Code Users:**
 
 The `/cost` command is a Claude Code built-in command that provides session statistics. You have two options to capture this data:
 
@@ -609,15 +613,21 @@ ls -lt .usecase/session-stats/ | head -5
 - Total code changes (lines added/removed)
 - Token usage breakdown (if available)
 
-**How to use the data:**
-- Populate the "Session Statistics (/cost Command)" section in the template
-- Use token counts to fill "Token Usage Summary"
-- Use cost data for "Cost Efficiency Analysis"
-- Include duration in "Time Analysis"
+**For GitHub Copilot Users:**
 
-**If /cost is not available:**
-- Continue with estimation based on conversation analysis
-- Note in documentation that exact statistics were not captured
+- Estimate session statistics (cost, duration, code changes, token usage) based on the available conversation and code diffs.
+- If auto-saved session statistics from a SessionEnd hook or other tooling are available, use those.
+- Clearly note in the documentation if exact statistics were not captured.
+
+**How to use the data:**
+- Populate the "Session Statistics" section in the template
+- Use token counts to fill "Token Usage Summary" (if available)
+- Use cost data for "Cost Efficiency Analysis" (if available)
+- Include duration in "Time Analysis" (estimate if needed)
+
+**If exact statistics are not available:**
+- Continue with estimation based on conversation analysis and git diffs
+- Note in documentation that statistics are estimated
 - Use the auto-saved session statistics from SessionEnd hook if available
 
 ### Step 7: Generate Complete Documentation
@@ -820,4 +830,4 @@ After selection, documentation generation is ALWAYS automatic. Do NOT:
 - Focus on query evolution, insights, and decision-making
 - No code changes required
 
-All demonstrate complete, professional documentation generated automatically by Claude Code.
+All demonstrate complete, professional documentation generated automatically by your AI assistant.
