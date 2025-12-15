@@ -10,10 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Markdown Linting Validation for Confluence Publishing**: Automatically validate and fix markdown formatting issues when publishing to Confluence
-  - **Auto-fix by default**: When `markdownlint-cli` is installed, the `publish-confluence` script automatically fixes common markdown linting issues (MD022, MD032, MD031, MD040, MD012, MD009)
+  - **Auto-fix by default**: When `markdownlint-cli` is installed, the `publish-confluence` script automatically fixes markdown linting issues using all default markdownlint rules
   - **New Flag**: `--no-autofix` option to skip automatic markdown fixes
   - **Graceful degradation**: Works seamlessly whether markdownlint is installed or not
-  - **Configuration file**: Added `.markdownlint.json` with project-standard linting rules
+  - **Configuration file**: Added `.markdownlint.json` with project-standard linting rules (disables line-length, inline-html, and first-line-heading checks while enabling all other standard rules)
   - **User-friendly messages**: Clear feedback when linting/fixing occurs or when markdownlint is not installed
   - **Documentation**: Updated README.md with optional dependency installation instructions
 
