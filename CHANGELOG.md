@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.13.0] - 2025-12-15
+
 ### Added
 
 - **GitHub Copilot Custom Prompts Integration**: Full support for GitHub Copilot custom prompts in VS Code
