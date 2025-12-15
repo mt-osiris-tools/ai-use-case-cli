@@ -18,7 +18,7 @@
 # 4. Commit with message: "chore: bump version to X.Y.Z"
 
 # Current CLI version
-export CLI_VERSION="3.12.0"
+export CLI_VERSION="3.13.0"
 
 # Version history (for reference)
 # 3.11.0 - 2025-12-07 - Template-based docs, AI-tool-agnostic refactoring, PR #135 integration
