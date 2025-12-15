@@ -50,6 +50,7 @@ API_TOKEN=""
 BASE_URL=""
 USER_EMAIL=""
 USE_REST_API=false
+AUTO_FIX_LINT=true
 
 # Show help
 show_help() {
@@ -70,6 +71,7 @@ ${YELLOW}Options:${NC}
   ${GREEN}--base-url <url>${NC}         Confluence base URL (or use config)
   ${GREEN}--email <email>${NC}          User email for API auth (or use config)
   ${GREEN}--dry-run${NC}                Show what would be published without doing it
+  ${GREEN}--no-autofix${NC}             Skip automatic markdown linting fixes
   ${GREEN}--help, -h${NC}               Show this help message
 
 ${YELLOW}Authentication Methods:${NC}
@@ -132,6 +134,10 @@ parse_args() {
                 ;;
             --dry-run)
                 DRY_RUN=true
+                shift
+                ;;
+            --no-autofix)
+                AUTO_FIX_LINT=false
                 shift
                 ;;
             --title)
@@ -207,6 +213,35 @@ validate_file() {
     fi
 
     echo -e "${GREEN}✓${NC} Markdown file found: $(basename "$MARKDOWN_FILE")"
+}
+
+# Validate and fix markdown linting issues
+validate_markdown_lint() {
+    # Check if markdownlint is installed
+    if ! command -v markdownlint &>/dev/null; then
+        echo -e "${YELLOW}ℹ${NC} markdownlint not installed - skipping markdown validation"
+        echo "  Install with: npm install -g markdownlint-cli"
+        return 0
+    fi
+
+    # Check if auto-fix is enabled
+    if [ "$AUTO_FIX_LINT" = true ]; then
+        echo -e "${CYAN}Fixing markdown linting issues...${NC}"
+        if markdownlint --fix "$MARKDOWN_FILE" 2>/dev/null; then
+            echo -e "${GREEN}✓${NC} Markdown linting validated and fixed"
+        else
+            echo -e "${YELLOW}⚠${NC}  Warning: Some markdown linting issues could not be auto-fixed"
+            echo "  Run 'markdownlint $MARKDOWN_FILE' to see remaining issues"
+        fi
+    else
+        echo -e "${CYAN}Checking markdown quality...${NC}"
+        if markdownlint "$MARKDOWN_FILE" 2>/dev/null; then
+            echo -e "${GREEN}✓${NC} Markdown linting passed"
+        else
+            echo -e "${YELLOW}⚠${NC}  Warning: Markdown linting issues found"
+            echo "  Run 'markdownlint --fix $MARKDOWN_FILE' to fix automatically"
+        fi
+    fi
 }
 
 # Extract title from filename
@@ -545,6 +580,9 @@ main() {
 
     # Validate file
     validate_file
+
+    # Validate and fix markdown linting
+    validate_markdown_lint
 
     # Parse URL
     parse_confluence_url "$PARENT_URL"
