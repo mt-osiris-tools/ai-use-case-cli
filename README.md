@@ -1,7 +1,7 @@
 <div align="center">
     <img src="./media/ai_use_case_cli_documentator_04.webp" alt="AI Use Case CLI - The Documenter" width="800"/>
     <h1>AI Use Case CLI</h1>
-    <h3><em><strong>v3.12.0</strong> - Document AI-assisted development workflows with ease.</em></h3>
+    <h3><em><strong>v3.13.0</strong> - Document AI-assisted development workflows with ease.</em></h3>
 </div>
 
 ---
@@ -71,11 +71,20 @@ This creates:
 - `.usecase/cases/` directory for documentation
 - Git hooks for automatic syncing
 - Slash commands in `.ai-tools/commands/`
-- Claude Code compatibility via `.claude/commands/use-case/` symlink
+- Agent-specific integrations (Claude Code, GitHub Copilot, and/or Codex)
 
-Choose your hub mode:
+During initialization, you'll choose:
+
+**Hub mode:**
 - **Local Only** (default): Documentation stays on your machine
 - **Private Git**: Full version control with your repository
+
+**AI Agent(s):**
+- **Claude Code** (default): Creates `.claude/commands/use-case/` symlink
+- **GitHub Copilot**: Creates `.github/prompts/use-case/` symlink for custom prompts
+- **Codex**: Installs prompts in `~/.codex/prompts/`
+- **Multiple**: Configure multiple agents together
+- **None**: Skip agent setup (configure later)
 
 ### 2. Work With AI
 
@@ -124,6 +133,7 @@ ai-use-case extract
 | `ai-use-case --init` | Setup project and configure hub |
 | `ai-use-case --init --update` | Update project installation |
 | `ai-use-case --link-claude` | Create Claude Code symlinks (after Claude setup) |
+| `ai-use-case --setup-copilot` | Setup GitHub Copilot custom prompts |
 | `ai-use-case --setup-codex` | Setup Codex-style CLI prompts |
 | `ai-use-case sync` | Manually sync to hub |
 | `ai-use-case search <term>` | Search use cases |
@@ -139,6 +149,20 @@ ai-use-case extract
 | `/use-case:sync-usecases` | Sync to hub |
 | `/use-case:search-usecases` | Search use cases |
 | `/use-case:publish-confluence` | Publish to Confluence |
+
+### Custom Prompts (GitHub Copilot)
+
+Type `/` in VS Code Copilot Chat to access these prompts:
+
+| Command | Description |
+|---------|-------------|
+| `/use-case:document-session` | Document current session |
+| `/use-case:setup-project` | Setup another project |
+| `/use-case:sync-usecases` | Sync to hub |
+| `/use-case:search-usecases` | Search use cases |
+| `/use-case:quick-start` | Quick start guide |
+
+Setup: `ai-use-case --setup-copilot`
 
 ### Slash Commands (Codex-Style CLI)
 
@@ -334,9 +358,9 @@ git submodule update --init --recursive
 
 ## Related Projects
 
-- [Claude Code](https://claude.com/code) - AI coding assistant integration
+- [Claude Code](https://claude.com/code) - AI coding assistant with slash commands
+- [GitHub Copilot](https://github.com/features/copilot) - AI pair programmer with custom prompts
 - Codex-style CLI tools - Various coding assistants with prompt-based workflows
-- [GitHub Copilot](https://github.com/features/copilot) - AI-powered code completion
 
 ## License
 
@@ -344,5 +368,5 @@ MIT License - see [LICENSE](./LICENSE) file for details
 
 ---
 
-**Version**: 3.12.0
-**Last Updated**: 2025-12-07
+**Version**: 3.13.0
+**Last Updated**: 2025-12-15

@@ -43,13 +43,50 @@ CLI="$(script_path ai-use-case)"
     assert_output --partial "Error"
 }
 
-@test "setup-project: requires git repository" {
+@test "setup-project: works without git repository when not required" {
+    local non_git_dir="${TEST_TEMP_DIR}/non-git-project"
+    mkdir -p "$non_git_dir"
+
+    # Default config has git not required
+    run bash "$SETUP_SCRIPT" "$non_git_dir"
+    assert_success
+    assert_output --partial "not a git repository"
+    assert_output --partial "git features will be disabled"
+}
+
+@test "setup-project: fails without git when git is required" {
+    local non_git_dir="${TEST_TEMP_DIR}/non-git-project"
+    mkdir -p "$non_git_dir"
+
+    # Set git as required
+    bash "$(script_path scripts/utils/config-manager.sh)" set-git-required true
+
+    run bash "$SETUP_SCRIPT" "$non_git_dir"
+    assert_failure
+    assert_output --partial "not a git repository"
+    assert_output --partial "Git is required"
+
+    # Reset to default
+    bash "$(script_path scripts/utils/config-manager.sh)" set-git-required false
+}
+
+@test "setup-project: skips git hooks for non-git projects" {
     local non_git_dir="${TEST_TEMP_DIR}/non-git-project"
     mkdir -p "$non_git_dir"
 
     run bash "$SETUP_SCRIPT" "$non_git_dir"
-    assert_failure
-    assert_output --partial "git"
+    assert_success
+    assert_output --partial "Skipping git hooks"
+    assert_dir_not_exists "${non_git_dir}/.git"
+}
+
+@test "setup-project: skips .gitignore for non-git projects" {
+    local non_git_dir="${TEST_TEMP_DIR}/non-git-project"
+    mkdir -p "$non_git_dir"
+
+    run bash "$SETUP_SCRIPT" "$non_git_dir"
+    assert_success
+    assert_output --partial "Skipping .gitignore"
 }
 
 # ============================================
@@ -231,13 +268,13 @@ CLI="$(script_path ai-use-case)"
 # Error Handling Tests
 # ============================================
 
-@test "setup-project: shows helpful error for non-git directory" {
+@test "setup-project: works with non-git directory by default" {
     local non_git_dir="${TEST_TEMP_DIR}/not-a-repo"
     mkdir -p "$non_git_dir"
 
     run bash "$SETUP_SCRIPT" "$non_git_dir"
-    assert_failure
-    assert_output --partial "git"
+    assert_success
+    assert_output --partial "not a git repository"
 }
 
 @test "setup-project: error message includes path" {

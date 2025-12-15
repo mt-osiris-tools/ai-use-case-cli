@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.13.0] - 2025-12-15
+
 ### Added
 
 - **Phase 4: Session Selector Agent** - Intelligent session analysis and prioritization for documentation
@@ -23,16 +25,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Documentation**: Updated COMMANDS.md with detailed --intelligent flag usage guide and examples
   - **Documentation**: Updated agents framework README with Phase 4 implementation details
 
-## [3.13.0] - 2025-12-15
-### Added
+- **GitHub Copilot Custom Prompts Integration**: Full support for GitHub Copilot custom prompts in VS Code
+  - **New Command**: `ai-use-case --setup-copilot` to configure GitHub Copilot custom prompts
+  - **Custom Prompts**: Workspace-specific `.github/prompts/use-case/` directory with 5 core prompts:
+    - `document-session.prompt.md` - Document AI coding sessions automatically
+    - `setup-project.prompt.md` - Setup project for documentation
+    - `sync-usecases.prompt.md` - Sync use cases from project to hub
+    - `search-usecases.prompt.md` - Search documented use cases
+    - `quick-start.prompt.md` - Quick start guide for first-time users
+  - **Symlink Architecture**: Project prompts symlink to CLI installation for automatic updates
+  - **Agent Selection**: GitHub Copilot added to agent selection menu during `--init`
+  - **Multiple Agent Support**: Enhanced agent selection to support multiple simultaneous agents (Claude + Copilot + Codex)
+  - **Setup Script**: `scripts/project/setup-copilot.sh` handles prompt symlink creation
+  - **Documentation**: New `docs/agents/copilot/GUIDE.md` with comprehensive setup and usage instructions
+  - **YAML Frontmatter**: All prompts include description metadata for discoverability in VS Code
 
 - **Codex CLI Integration**: Support for Codex-style CLI tools with slash commands
   - **Note**: This integration provides slash command prompts compatible with CLI tools that use
     the Codex CLI pattern (YAML frontmatter, `/prompts:` invocation). This does NOT use the
-    deprecated OpenAI Codex completion API, but rather provides project-local prompt files for
+    deprecated OpenAI Codex completion API, but rather provides user-global prompt files for
     compatible CLI coding assistants.
-  - **New Command**: `ai-use-case --setup-codex` to install Codex prompts into project
-  - **Codex Prompts**: Project-local `.codex/prompts/` directory with YAML frontmatter
+  - **New Command**: `ai-use-case --setup-codex` to install Codex prompts into user's home directory
+  - **Codex Prompts**: User-global `~/.codex/prompts/` directory with YAML frontmatter
     - `use-case-document-session.md` - Document AI sessions with hybrid parameters
     - `use-case-publish-confluence.md` - Publish to Confluence via REST API
   - **Hybrid Parameters**: Optional named parameters with interactive fallback
@@ -95,6 +109,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **BREAKING: Codex Prompts Now Global**: Codex-style CLI prompts are now installed in the home directory (`~/.codex/prompts/`) instead of project-local directories
+  - **Migration**: Project-local `.codex/prompts/` directories are no longer used and can be safely deleted
+  - **Benefit**: Prompts are now available globally across all projects
+  - **Affected Files**: `scripts/project/setup-codex.sh`, tests, and documentation updated
+  - **User Action Required**: Run `ai-use-case --setup-codex` again to install prompts in home directory, then delete old project-local `.codex/` folders
+
 - **README.md Streamlined**: Reduced from 526 to 322 lines (39% reduction) for better readability
   - Removed version-specific noise (v3.x.x+ annotations throughout)
   - Condensed features list from 13 to 8 high-level points
@@ -105,6 +125,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CONTRIBUTING.md**: Updated documentation references to include new guide structure
   - Added references to USAGE-GUIDE.md, CONFIGURATION.md, and FEATURES.md
   - Updated version consistency table with new documentation files
+
+### Fixed
+
+- **Symlink Creation - Absolute Paths**: Simplified symlink creation by using absolute paths instead of Python-based relative paths
+  - **Issue**: Initial implementation used Python (`python3 -c "import os; print(os.path.relpath(...))"`) for cross-platform relative path calculation to avoid macOS `realpath` unavailability
+  - **Decision**: Switched to absolute paths for simplicity - no external dependencies required
+  - **Trade-off**: Symlinks break if CLI installation moves, but user can re-run setup command (rare scenario)
+  - **Benefit**: No Python dependency, simpler code, works on all platforms without additional tools
+  - **Affected files**:
+    - `scripts/project/setup-copilot.sh:78-80` - Copilot prompt symlink creation
+    - `scripts/core/sync-ai-use-cases.sh:275-280` - By-date symlink creation
+    - `scripts/core/sync-ai-use-cases.sh:297-302` - By-topic symlink creation
+  - **Impact**: Cleaner implementation with zero external dependencies beyond bash and ln
+
+- **Documentation Accuracy**: Ensured correct slash format in quick-start.prompt.md during development (PR #178)
+  - Claude Code commands use `/use-case:command` (colon) instead of `/use-case/command` (slash)
+  - Following old instructions would have failed to match any command, but the file was added with the correct format from the start
+  - File added in PR #178 with correct format: `.github/prompts/use-case/quick-start.prompt.md:91-95`
 
 ## [3.12.0] - 2025-12-07
 
@@ -254,6 +292,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Diagrams now accurately represent v3.11.0 architecture with Agent Framework (Phases 1 & 2)
 
 ### Fixed
+
+- **ANSI Escape Codes in Piped Output**: Fixed literal escape codes appearing when CLI output is piped or redirected
+  - Added TTY detection to automatically disable colors when stdout is not a terminal
+  - Colors now work correctly in terminals but appear as clean text when piped (e.g., `ai-use-case --help | cat`)
+  - Respects `NO_COLOR` environment variable standard (https://no-color.org/)
+  - Added `FORCE_COLOR` environment variable to override TTY detection (useful for testing)
+  - Updated `config-manager.sh` to only set colors if not already defined by parent script
+  - Updated test suite to use `FORCE_COLOR=1` for color-related tests
+  - Extracted color setup logic into reusable `setup_colors()` function to avoid duplication
+  - Improves user experience when copying help text, saving output to files, or using CLI in scripts
 
 - **Self-Update Color Rendering**: Fixed ANSI color codes displaying as literal text in `scripts/utils/self-update.sh`
   - Changed `echo` to `echo -e` at line 102 to properly interpret color escape sequences

@@ -58,6 +58,9 @@ setup_test_environment() {
     # Disable tracing during tests (avoid side effects)
     export AI_USECASE_TRACING_ENABLED=false
 
+    # Force color output for tests (since tests don't run in a TTY)
+    export FORCE_COLOR=1
+
     # Set AI_USECASES_DIR to test hub (don't unset - scripts may use set -u)
     export AI_USECASES_DIR="$TEST_HUB_DIR"
 }
@@ -141,7 +144,8 @@ create_test_config() {
   "version": "1.0.0",
   "hubMode": "${mode}",
   "hubPath": "${hub_path}",
-  "gitUrl": "${git_url}"
+  "gitUrl": "${git_url}",
+  "gitRequired": false
 }
 EOF
     else
@@ -149,7 +153,8 @@ EOF
 {
   "version": "1.0.0",
   "hubMode": "${mode}",
-  "hubPath": "${hub_path}"
+  "hubPath": "${hub_path}",
+  "gitRequired": false
 }
 EOF
     fi

@@ -171,7 +171,7 @@ ensure_hub_exists() {
     local default_hub="$HOME/.local/share/ai-use-case-cli/hub"
 
     # Check if AI_USECASES_DIR is set
-    if [ -n "$AI_USECASES_DIR" ]; then
+    if [ -n "${AI_USECASES_DIR:-}" ]; then
         hub_dir="$AI_USECASES_DIR"
     else
         hub_dir="$default_hub"
