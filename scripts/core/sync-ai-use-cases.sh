@@ -272,14 +272,12 @@ while IFS= read -r USE_CASE_DIR; do
             # Create symlink (with project prefix to avoid name conflicts)
             SYMLINK_PATH="$DATE_DIR/${PROJECT_NAME}_${FILENAME}"
             if [ ! -L "$SYMLINK_PATH" ] || [ ! -e "$SYMLINK_PATH" ]; then
-                # Create relative symlink
-                if REL_PATH=$(realpath --relative-to="$DATE_DIR" "$TARGET_FILE" 2>/dev/null); then
-                    trace_file_operation "symlink_create" "$SYMLINK_PATH"
-                    ln -sf "$REL_PATH" "$SYMLINK_PATH" 2>/dev/null || {
-                        trace_event "symlink_error" "type=date" "file=$FILENAME" "error=create_failed"
-                        echo -e "${YELLOW}⚠ Warning${NC}: Failed to create date symlink for $FILENAME"
-                    }
-                fi
+                # Create absolute path symlink (simpler and works on all platforms)
+                trace_file_operation "symlink_create" "$SYMLINK_PATH"
+                ln -sf "$TARGET_FILE" "$SYMLINK_PATH" 2>/dev/null || {
+                    trace_event "symlink_error" "type=date" "file=$FILENAME" "error=create_failed"
+                    echo -e "${YELLOW}⚠ Warning${NC}: Failed to create date symlink for $FILENAME"
+                }
             fi
         fi
 
@@ -296,14 +294,12 @@ while IFS= read -r USE_CASE_DIR; do
             # Create symlink (with project prefix to avoid name conflicts)
             SYMLINK_PATH="$TOPIC_DIR/${PROJECT_NAME}_${FILENAME}"
             if [ ! -L "$SYMLINK_PATH" ] || [ ! -e "$SYMLINK_PATH" ]; then
-                # Create relative symlink
-                if REL_PATH=$(realpath --relative-to="$TOPIC_DIR" "$TARGET_FILE" 2>/dev/null); then
-                    trace_file_operation "symlink_create" "$SYMLINK_PATH"
-                    ln -sf "$REL_PATH" "$SYMLINK_PATH" 2>/dev/null || {
-                        trace_event "symlink_error" "type=topic" "file=$FILENAME" "topic=$TOPIC_SLUG" "error=create_failed"
-                        echo -e "${YELLOW}⚠ Warning${NC}: Failed to create topic symlink for $FILENAME"
-                    }
-                fi
+                # Create absolute path symlink (simpler and works on all platforms)
+                trace_file_operation "symlink_create" "$SYMLINK_PATH"
+                ln -sf "$TARGET_FILE" "$SYMLINK_PATH" 2>/dev/null || {
+                    trace_event "symlink_error" "type=topic" "file=$FILENAME" "topic=$TOPIC_SLUG" "error=create_failed"
+                    echo -e "${YELLOW}⚠ Warning${NC}: Failed to create topic symlink for $FILENAME"
+                }
             fi
         fi
 

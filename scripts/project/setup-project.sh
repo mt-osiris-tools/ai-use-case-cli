@@ -505,6 +505,27 @@ if [[ "$SELECTED_AGENTS" == *"codex"* ]] && [ "$UPDATE_MODE" = false ]; then
     fi
 fi
 
+# Setup Copilot integration (if Copilot was selected, init mode only)
+# NOTE: Unlike Codex (which copies files globally), Copilot setup uses workspace-specific symlinks.
+# The symlinks point to CLI installation, so updates automatically propagate. This is init-only
+# because symlinks remain stable across CLI updates. Users who need to add Copilot integration
+# later can run: ai-use-case --setup-copilot
+if [[ "$SELECTED_AGENTS" == *"copilot"* ]] && [ "$UPDATE_MODE" = false ]; then
+    echo ""
+    echo -e "${BLUE}Setting up GitHub Copilot integration...${NC}"
+    SETUP_COPILOT_SCRIPT="$SCRIPT_DIR/setup-copilot.sh"
+    if [ -f "$SETUP_COPILOT_SCRIPT" ]; then
+        if bash "$SETUP_COPILOT_SCRIPT" "$PROJECT_PATH"; then
+            echo -e "${GREEN}✓${NC} GitHub Copilot integration configured"
+        else
+            echo -e "${YELLOW}⚠${NC} Copilot integration setup encountered issues"
+            echo -e "${BLUE}ℹ${NC} You can run it manually later: ${GREEN}ai-use-case --setup-copilot${NC}"
+        fi
+    else
+        echo -e "${RED}Error: Copilot setup script not found: $SETUP_COPILOT_SCRIPT${NC}"
+    fi
+fi
+
 if [ "$PROGRESS_ENABLED" = true ]; then
     if [ "$UPDATE_MODE" = true ]; then
         progress_complete "Update AI tool slash commands"
@@ -771,12 +792,20 @@ if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
     echo "  ai-use-case search <term> # Search use cases"
     echo ""
     if [ -d "$AI_COMMANDS_DIR" ]; then
-        echo "AI tool slash commands (Claude Code, GitHub Copilot, etc.):"
-        echo "  /use-case:document-session    # Document AI session automatically"
-        echo "  /use-case:setup-project       # Setup another project"
-        echo "  /use-case:sync-usecases       # Sync to hub"
-        echo "  /use-case:search-usecases     # Search past use cases"
-        echo "  /use-case:publish-confluence  # Publish to Confluence"
+        echo "AI tool slash commands:"
+        echo "  Claude Code:"
+        echo "    /use-case:document-session    # Document AI session automatically"
+        echo "    /use-case:setup-project       # Setup another project"
+        echo "    /use-case:sync-usecases       # Sync to hub"
+        echo "    /use-case:search-usecases     # Search past use cases"
+        echo "    /use-case:publish-confluence  # Publish to Confluence"
+        echo ""
+        echo "  GitHub Copilot (in VS Code Copilot Chat - type /):"
+        echo "    /use-case:document-session    # Document AI session automatically"
+        echo "    /use-case:setup-project       # Setup another project"
+        echo "    /use-case:sync-usecases       # Sync to hub"
+        echo "    /use-case:search-usecases     # Search past use cases"
+        echo "    /use-case:quick-start         # Quick start guide"
         echo ""
     fi
     echo "View synced: ls $CENTRAL_DIR/by-project/$PROJECT_NAME/"

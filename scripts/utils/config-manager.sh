@@ -560,7 +560,7 @@ prompt_hub_mode() {
 }
 
 # Interactive agent selection for project setup
-# Returns: Space-separated list of selected agents (e.g., "claude", "codex", "claude codex", or "")
+# Returns: Space-separated list of selected agents (e.g., "claude", "copilot", "codex", "claude copilot", or "")
 prompt_agent_selection() {
     echo -e "${BLUE}=== AI Agent Configuration ===${NC}" >&2
     echo "" >&2
@@ -570,19 +570,23 @@ prompt_agent_selection() {
     echo "     Integrates with Claude Code CLI via slash commands" >&2
     echo "     Commands available in .claude/commands/use-case/" >&2
     echo "" >&2
-    echo -e "  ${GREEN}2${NC}. Codex" >&2
+    echo -e "  ${GREEN}2${NC}. GitHub Copilot" >&2
+    echo "     Integrates with GitHub Copilot via custom prompts" >&2
+    echo "     Prompts available in .github/prompts/use-case/" >&2
+    echo "" >&2
+    echo -e "  ${GREEN}3${NC}. Codex" >&2
     echo "     Integrates with Codex-style CLIs via prompts" >&2
     echo "     Prompts installed globally in ~/.codex/prompts/" >&2
     echo "" >&2
-    echo -e "  ${GREEN}3${NC}. Both Claude and Codex" >&2
-    echo "     Configure integration for both agents" >&2
+    echo -e "  ${GREEN}4${NC}. Multiple agents" >&2
+    echo "     Configure integration for multiple agents" >&2
     echo "" >&2
-    echo -e "  ${GREEN}4${NC}. None" >&2
+    echo -e "  ${GREEN}5${NC}. None" >&2
     echo "     Skip agent configuration (you can configure later)" >&2
     echo "" >&2
 
     while true; do
-        read -p "Select option (1-4) [1]: " choice
+        read -p "Select option (1-5) [1]: " choice
         choice=${choice:-1}
 
         case $choice in
@@ -592,22 +596,59 @@ prompt_agent_selection() {
                 return 0
                 ;;
             2)
+                echo -e "${BLUE}GitHub Copilot selected${NC}" >&2
+                echo "copilot"
+                return 0
+                ;;
+            3)
                 echo -e "${BLUE}Codex selected${NC}" >&2
                 echo "codex"
                 return 0
                 ;;
-            3)
-                echo -e "${BLUE}Both Claude Code and Codex selected${NC}" >&2
-                echo "claude codex"
+            4)
+                # Multiple selection submenu
+                echo "" >&2
+                echo -e "${BLUE}=== Multiple Agent Selection ===${NC}" >&2
+                echo "" >&2
+                echo "Select agents to configure (separate with spaces):" >&2
+                echo -e "  ${GREEN}1${NC}. Claude Code" >&2
+                echo -e "  ${GREEN}2${NC}. GitHub Copilot" >&2
+                echo -e "  ${GREEN}3${NC}. Codex" >&2
+                echo "" >&2
+
+                read -p "Enter selections (e.g., '1 2' for Claude and Copilot): " selections
+
+                result=""
+                for sel in $selections; do
+                    case $sel in
+                        1) result="$result claude" ;;
+                        2) result="$result copilot" ;;
+                        3) result="$result codex" ;;
+                        *)
+                            echo -e "${YELLOW}Warning: Skipping invalid selection '$sel'${NC}" >&2
+                            ;;
+                    esac
+                done
+
+                # Trim leading/trailing whitespace
+                result=$(echo "$result" | xargs)
+
+                if [ -z "$result" ]; then
+                    echo -e "${RED}No valid agents selected. Please try again.${NC}" >&2
+                    continue
+                fi
+
+                echo -e "${BLUE}Selected agents: $result${NC}" >&2
+                echo "$result"
                 return 0
                 ;;
-            4)
+            5)
                 echo -e "${BLUE}No agent configuration selected${NC}" >&2
                 echo ""
                 return 0
                 ;;
             *)
-                echo -e "${RED}Invalid option. Please select 1-4.${NC}" >&2
+                echo -e "${RED}Invalid option. Please select 1-5.${NC}" >&2
                 ;;
         esac
     done

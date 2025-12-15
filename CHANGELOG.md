@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **GitHub Copilot Custom Prompts Integration**: Full support for GitHub Copilot custom prompts in VS Code
+  - **New Command**: `ai-use-case --setup-copilot` to configure GitHub Copilot custom prompts
+  - **Custom Prompts**: Workspace-specific `.github/prompts/use-case/` directory with 5 core prompts:
+    - `document-session.prompt.md` - Document AI coding sessions automatically
+    - `setup-project.prompt.md` - Setup project for documentation
+    - `sync-usecases.prompt.md` - Sync use cases from project to hub
+    - `search-usecases.prompt.md` - Search documented use cases
+    - `quick-start.prompt.md` - Quick start guide for first-time users
+  - **Symlink Architecture**: Project prompts symlink to CLI installation for automatic updates
+  - **Agent Selection**: GitHub Copilot added to agent selection menu during `--init`
+  - **Multiple Agent Support**: Enhanced agent selection to support multiple simultaneous agents (Claude + Copilot + Codex)
+  - **Setup Script**: `scripts/project/setup-copilot.sh` handles prompt symlink creation
+  - **Documentation**: New `docs/agents/copilot/GUIDE.md` with comprehensive setup and usage instructions
+  - **YAML Frontmatter**: All prompts include description metadata for discoverability in VS Code
+
 - **Codex CLI Integration**: Support for Codex-style CLI tools with slash commands
   - **Note**: This integration provides slash command prompts compatible with CLI tools that use
     the Codex CLI pattern (YAML frontmatter, `/prompts:` invocation). This does NOT use the
@@ -94,6 +109,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CONTRIBUTING.md**: Updated documentation references to include new guide structure
   - Added references to USAGE-GUIDE.md, CONFIGURATION.md, and FEATURES.md
   - Updated version consistency table with new documentation files
+
+### Fixed
+
+- **Symlink Creation - Absolute Paths**: Simplified symlink creation by using absolute paths instead of Python-based relative paths
+  - **Issue**: Initial implementation used Python (`python3 -c "import os; print(os.path.relpath(...))"`) for cross-platform relative path calculation to avoid macOS `realpath` unavailability
+  - **Decision**: Switched to absolute paths for simplicity - no external dependencies required
+  - **Trade-off**: Symlinks break if CLI installation moves, but user can re-run setup command (rare scenario)
+  - **Benefit**: No Python dependency, simpler code, works on all platforms without additional tools
+  - **Affected files**:
+    - `scripts/project/setup-copilot.sh:78-80` - Copilot prompt symlink creation
+    - `scripts/core/sync-ai-use-cases.sh:275-280` - By-date symlink creation
+    - `scripts/core/sync-ai-use-cases.sh:297-302` - By-topic symlink creation
+  - **Impact**: Cleaner implementation with zero external dependencies beyond bash and ln
+
+- **Documentation Accuracy**: Ensured correct slash format in quick-start.prompt.md during development (PR #178)
+  - Claude Code commands use `/use-case:command` (colon) instead of `/use-case/command` (slash)
+  - Following old instructions would have failed to match any command, but the file was added with the correct format from the start
+  - File added in PR #178 with correct format: `.github/prompts/use-case/quick-start.prompt.md:91-95`
 
 ## [3.12.0] - 2025-12-07
 
