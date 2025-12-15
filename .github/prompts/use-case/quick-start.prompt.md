@@ -88,11 +88,11 @@ GitHub Copilot Custom Prompts (in Copilot Chat):
 - `/use-case:quick-start` - Show this guide
 
 Claude Code Slash Commands (if Claude Code is installed):
-- `/use-case/document-session` - Document an AI session
-- `/use-case/setup-project` - Setup another project
-- `/use-case/sync-usecases` - Manual sync
-- `/use-case/search-usecases` - Search past use cases
-- `/use-case/publish-confluence` - Publish to Confluence
+- `/use-case:document-session` - Document an AI session
+- `/use-case:setup-project` - Setup another project
+- `/use-case:sync-usecases` - Manual sync
+- `/use-case:search-usecases` - Search past use cases
+- `/use-case:publish-confluence` - Publish to Confluence
 
 VS Code Extension:
 - `Ctrl+Alt+D` / `Cmd+Alt+D` - Document session

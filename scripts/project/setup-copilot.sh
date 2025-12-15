@@ -77,7 +77,8 @@ fi
 
 # Calculate relative path from .github/prompts/ to CLI installation
 # This ensures the symlink works regardless of where the project is located
-RELATIVE_PATH=$(realpath --relative-to="$GITHUB_PROMPTS_DIR" "$CLI_COPILOT_PROMPTS")
+# Using Python for cross-platform compatibility (macOS doesn't have realpath by default)
+RELATIVE_PATH=$(python3 -c "import os; print(os.path.relpath('$CLI_COPILOT_PROMPTS', '$GITHUB_PROMPTS_DIR'))")
 
 # Create or verify use-case symlink
 echo ""
