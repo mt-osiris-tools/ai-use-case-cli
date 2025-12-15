@@ -396,7 +396,15 @@ curl -s https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/s
 Check if we're in a git repository with AI use cases configured:
 ```bash
 git rev-parse --show-toplevel
-ls -la .usecase/cases/ 2>/dev/null || echo "Not set up"
+
+# Check for .usecase/cases directory
+if [ -d ".usecase/cases/" ]; then
+    echo "✅ AI use cases directory exists"
+    count=$(ls -1 .usecase/cases/ 2>/dev/null | wc -l)
+    echo "Existing documentation files: $count"
+else
+    echo "⚠️ Not set up - .usecase/cases/ directory not found"
+fi
 ```
 
 If not set up, offer to run: `ai-use-case --init`
