@@ -488,128 +488,128 @@ if [ "$GIT_AVAILABLE" = true ]; then
         fi
     fi
     GIT_HOOKS_DIR="$PROJECT_PATH/.git/hooks"
-POST_COMMIT_HOOK="$GIT_HOOKS_DIR/post-commit"
-PRE_COMMIT_HOOK="$GIT_HOOKS_DIR/pre-commit"
+    POST_COMMIT_HOOK="$GIT_HOOKS_DIR/post-commit"
+    PRE_COMMIT_HOOK="$GIT_HOOKS_DIR/pre-commit"
 
-# Verify hook sources exist
-if [ ! -f "$POST_COMMIT_HOOK_SOURCE" ]; then
-    echo -e "${RED}Error: Hook source not found: $POST_COMMIT_HOOK_SOURCE${NC}"
-    exit 1
-fi
-
-if [ ! -f "$PRE_COMMIT_HOOK_SOURCE" ]; then
-    echo -e "${RED}Error: Hook source not found: $PRE_COMMIT_HOOK_SOURCE${NC}"
-    exit 1
-fi
-
-# Install post-commit hook
-if [ -f "$POST_COMMIT_HOOK" ]; then
-    # Check if our hook is already installed
-    if grep -q "AI Use Cases" "$POST_COMMIT_HOOK"; then
-        if [ "$UPDATE_MODE" = true ]; then
-            # Check if existing hook is identical to our source (no customizations)
-            if cmp -s "$POST_COMMIT_HOOK" "$POST_COMMIT_HOOK_SOURCE"; then
-                # Safe to replace - hook contains only our code
-                cp "$POST_COMMIT_HOOK_SOURCE" "$POST_COMMIT_HOOK"
-                chmod +x "$POST_COMMIT_HOOK"
-                echo -e "${GREEN}✓${NC} Git post-commit hook updated"
-            else
-                # Hook has customizations - do not overwrite
-                echo -e "${YELLOW}⚠${NC} Git post-commit hook contains customizations"
-                echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes"
-                echo -e "${BLUE}ℹ${NC} To manually update: compare your hook with $POST_COMMIT_HOOK_SOURCE"
-            fi
-        else
-            echo -e "${YELLOW}⚠${NC} Git post-commit hook already installed (use --update to refresh)"
-        fi
-    else
-        # Append our hook to existing hook
-        echo -e "${BLUE}ℹ${NC} Existing post-commit hook detected - appending our hook"
-        echo "" >> "$POST_COMMIT_HOOK"
-        cat "$POST_COMMIT_HOOK_SOURCE" >> "$POST_COMMIT_HOOK"
-        echo -e "${GREEN}✓${NC} Git post-commit hook appended to existing hook"
+    # Verify hook sources exist
+    if [ ! -f "$POST_COMMIT_HOOK_SOURCE" ]; then
+        echo -e "${RED}Error: Hook source not found: $POST_COMMIT_HOOK_SOURCE${NC}"
+        exit 1
     fi
-else
-    # Install fresh hook
-    cp "$POST_COMMIT_HOOK_SOURCE" "$POST_COMMIT_HOOK"
-    chmod +x "$POST_COMMIT_HOOK"
-    echo -e "${GREEN}✓${NC} Git post-commit hook installed"
-fi
 
-# Install pre-commit hook
-if [ -f "$PRE_COMMIT_HOOK" ]; then
-    # Check if our hook is already installed
-    if grep -q "Branch Protection" "$PRE_COMMIT_HOOK"; then
-        if [ "$UPDATE_MODE" = true ]; then
-            # Check if existing hook is identical to our source (no customizations)
-            if cmp -s "$PRE_COMMIT_HOOK" "$PRE_COMMIT_HOOK_SOURCE"; then
-                # Safe to replace - hook contains only our code
-                cp "$PRE_COMMIT_HOOK_SOURCE" "$PRE_COMMIT_HOOK"
-                chmod +x "$PRE_COMMIT_HOOK"
-                echo -e "${GREEN}✓${NC} Git pre-commit hook updated"
-            else
-                # Hook has customizations - do not overwrite
-                echo -e "${YELLOW}⚠${NC} Git pre-commit hook contains customizations"
-                echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes"
-                echo -e "${BLUE}ℹ${NC} To manually update: compare your hook with $PRE_COMMIT_HOOK_SOURCE"
-            fi
-        else
-            echo -e "${YELLOW}⚠${NC} Git pre-commit hook already installed (use --update to refresh)"
-        fi
-    else
-        # Append our hook to existing hook
-        echo -e "${BLUE}ℹ${NC} Existing pre-commit hook detected - appending our hook"
-        echo "" >> "$PRE_COMMIT_HOOK"
-        cat "$PRE_COMMIT_HOOK_SOURCE" >> "$PRE_COMMIT_HOOK"
-        echo -e "${GREEN}✓${NC} Git pre-commit hook appended to existing hook"
+    if [ ! -f "$PRE_COMMIT_HOOK_SOURCE" ]; then
+        echo -e "${RED}Error: Hook source not found: $PRE_COMMIT_HOOK_SOURCE${NC}"
+        exit 1
     fi
-else
-    # Install fresh hook
-    cp "$PRE_COMMIT_HOOK_SOURCE" "$PRE_COMMIT_HOOK"
-    chmod +x "$PRE_COMMIT_HOOK"
-    echo -e "${GREEN}✓${NC} Git pre-commit hook installed (prevents direct commits to main)"
-fi
 
-# Install Claude Code SessionEnd hook
-CLAUDE_HOOKS_DIR=".claude/hooks"
-mkdir -p "$CLAUDE_HOOKS_DIR"
-SESSION_END_HOOK="$CLAUDE_HOOKS_DIR/SessionEnd"
-
-if [ -f "$SESSION_END_HOOK_SOURCE" ]; then
-    if [ -f "$SESSION_END_HOOK" ]; then
-        # Check if existing hook matches our template
-        if cmp -s "$SESSION_END_HOOK" "$SESSION_END_HOOK_SOURCE"; then
-            if [ "$VERBOSE" = true ]; then
-                echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook already up-to-date"
-            fi
-        else
-            # Backup existing hook if it has customizations
+    # Install post-commit hook
+    if [ -f "$POST_COMMIT_HOOK" ]; then
+        # Check if our hook is already installed
+        if grep -q "AI Use Cases" "$POST_COMMIT_HOOK"; then
             if [ "$UPDATE_MODE" = true ]; then
-                echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook contains customizations"
-                echo -e "  ${YELLOW}→${NC} Backup created at: $SESSION_END_HOOK.backup"
-                cp "$SESSION_END_HOOK" "$SESSION_END_HOOK.backup"
-                cp "$SESSION_END_HOOK_SOURCE" "$SESSION_END_HOOK"
-                chmod +x "$SESSION_END_HOOK"
-                echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook updated"
+                # Check if existing hook is identical to our source (no customizations)
+                if cmp -s "$POST_COMMIT_HOOK" "$POST_COMMIT_HOOK_SOURCE"; then
+                    # Safe to replace - hook contains only our code
+                    cp "$POST_COMMIT_HOOK_SOURCE" "$POST_COMMIT_HOOK"
+                    chmod +x "$POST_COMMIT_HOOK"
+                    echo -e "${GREEN}✓${NC} Git post-commit hook updated"
+                else
+                    # Hook has customizations - do not overwrite
+                    echo -e "${YELLOW}⚠${NC} Git post-commit hook contains customizations"
+                    echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes"
+                    echo -e "${BLUE}ℹ${NC} To manually update: compare your hook with $POST_COMMIT_HOOK_SOURCE"
+                fi
             else
-                echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook differs from template"
+                echo -e "${YELLOW}⚠${NC} Git post-commit hook already installed (use --update to refresh)"
             fi
+        else
+            # Append our hook to existing hook
+            echo -e "${BLUE}ℹ${NC} Existing post-commit hook detected - appending our hook"
+            echo "" >> "$POST_COMMIT_HOOK"
+            cat "$POST_COMMIT_HOOK_SOURCE" >> "$POST_COMMIT_HOOK"
+            echo -e "${GREEN}✓${NC} Git post-commit hook appended to existing hook"
         fi
     else
         # Install fresh hook
-        cp "$SESSION_END_HOOK_SOURCE" "$SESSION_END_HOOK"
-        chmod +x "$SESSION_END_HOOK"
-        echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook installed"
+        cp "$POST_COMMIT_HOOK_SOURCE" "$POST_COMMIT_HOOK"
+        chmod +x "$POST_COMMIT_HOOK"
+        echo -e "${GREEN}✓${NC} Git post-commit hook installed"
     fi
-else
-    if [ "$VERBOSE" = true ]; then
-        echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook source not found: $SESSION_END_HOOK_SOURCE"
-        echo -e "  ${BLUE}ℹ${NC} This feature may not be available in your CLI version"
-    fi
-fi
 
-# Create session stats directory
-mkdir -p ".usecase/session-stats"
+    # Install pre-commit hook
+    if [ -f "$PRE_COMMIT_HOOK" ]; then
+        # Check if our hook is already installed
+        if grep -q "Branch Protection" "$PRE_COMMIT_HOOK"; then
+            if [ "$UPDATE_MODE" = true ]; then
+                # Check if existing hook is identical to our source (no customizations)
+                if cmp -s "$PRE_COMMIT_HOOK" "$PRE_COMMIT_HOOK_SOURCE"; then
+                    # Safe to replace - hook contains only our code
+                    cp "$PRE_COMMIT_HOOK_SOURCE" "$PRE_COMMIT_HOOK"
+                    chmod +x "$PRE_COMMIT_HOOK"
+                    echo -e "${GREEN}✓${NC} Git pre-commit hook updated"
+                else
+                    # Hook has customizations - do not overwrite
+                    echo -e "${YELLOW}⚠${NC} Git pre-commit hook contains customizations"
+                    echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes"
+                    echo -e "${BLUE}ℹ${NC} To manually update: compare your hook with $PRE_COMMIT_HOOK_SOURCE"
+                fi
+            else
+                echo -e "${YELLOW}⚠${NC} Git pre-commit hook already installed (use --update to refresh)"
+            fi
+        else
+            # Append our hook to existing hook
+            echo -e "${BLUE}ℹ${NC} Existing pre-commit hook detected - appending our hook"
+            echo "" >> "$PRE_COMMIT_HOOK"
+            cat "$PRE_COMMIT_HOOK_SOURCE" >> "$PRE_COMMIT_HOOK"
+            echo -e "${GREEN}✓${NC} Git pre-commit hook appended to existing hook"
+        fi
+    else
+        # Install fresh hook
+        cp "$PRE_COMMIT_HOOK_SOURCE" "$PRE_COMMIT_HOOK"
+        chmod +x "$PRE_COMMIT_HOOK"
+        echo -e "${GREEN}✓${NC} Git pre-commit hook installed (prevents direct commits to main)"
+    fi
+
+    # Install Claude Code SessionEnd hook
+    CLAUDE_HOOKS_DIR=".claude/hooks"
+    mkdir -p "$CLAUDE_HOOKS_DIR"
+    SESSION_END_HOOK="$CLAUDE_HOOKS_DIR/SessionEnd"
+
+    if [ -f "$SESSION_END_HOOK_SOURCE" ]; then
+        if [ -f "$SESSION_END_HOOK" ]; then
+            # Check if existing hook matches our template
+            if cmp -s "$SESSION_END_HOOK" "$SESSION_END_HOOK_SOURCE"; then
+                if [ "$VERBOSE" = true ]; then
+                    echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook already up-to-date"
+                fi
+            else
+                # Backup existing hook if it has customizations
+                if [ "$UPDATE_MODE" = true ]; then
+                    echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook contains customizations"
+                    echo -e "  ${YELLOW}→${NC} Backup created at: $SESSION_END_HOOK.backup"
+                    cp "$SESSION_END_HOOK" "$SESSION_END_HOOK.backup"
+                    cp "$SESSION_END_HOOK_SOURCE" "$SESSION_END_HOOK"
+                    chmod +x "$SESSION_END_HOOK"
+                    echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook updated"
+                else
+                    echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook differs from template"
+                fi
+            fi
+        else
+            # Install fresh hook
+            cp "$SESSION_END_HOOK_SOURCE" "$SESSION_END_HOOK"
+            chmod +x "$SESSION_END_HOOK"
+            echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook installed"
+        fi
+    else
+        if [ "$VERBOSE" = true ]; then
+            echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook source not found: $SESSION_END_HOOK_SOURCE"
+            echo -e "  ${BLUE}ℹ${NC} This feature may not be available in your CLI version"
+        fi
+    fi
+
+    # Create session stats directory
+    mkdir -p ".usecase/session-stats"
 
     if [ "$PROGRESS_ENABLED" = true ]; then
         if [ "$UPDATE_MODE" = true ]; then
@@ -678,14 +678,14 @@ if [ "$GIT_AVAILABLE" = true ]; then
     fi
 
     # Add new patterns if not present
-        if ! grep -q "^# Use Case Documentation" "$GITIGNORE"; then
-            echo "" >> "$GITIGNORE"
-            echo "# Use Case Documentation" >> "$GITIGNORE"
-            echo ".usecase/" >> "$GITIGNORE"
-            echo -e "${GREEN}✓${NC} Added .usecase/ to .gitignore"
-        else
-            echo -e "${YELLOW}⚠${NC} .gitignore already configured"
-        fi
+    if ! grep -q "^# Use Case Documentation" "$GITIGNORE"; then
+        echo "" >> "$GITIGNORE"
+        echo "# Use Case Documentation" >> "$GITIGNORE"
+        echo ".usecase/" >> "$GITIGNORE"
+        echo -e "${GREEN}✓${NC} Added .usecase/ to .gitignore"
+    else
+        echo -e "${YELLOW}⚠${NC} .gitignore already configured"
+    fi
     fi
 
     [ "$PROGRESS_ENABLED" = true ] && [ "$UPDATE_MODE" = false ] && progress_complete "Configure .gitignore"
