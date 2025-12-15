@@ -99,6 +99,7 @@ init_config() {
     local hub_mode="${1:-local}"
     local hub_path="${2:-}"
     local git_url="${3:-}"
+    local git_required="${4:-false}"
 
     ensure_config_dir
 
@@ -112,7 +113,8 @@ init_config() {
   "version": "1.0.0",
   "hubMode": "$hub_mode",
   "hubPath": "$hub_path",
-  "gitUrl": "$git_url"
+  "gitUrl": "$git_url",
+  "gitRequired": $git_required
 }
 EOF
 
@@ -229,6 +231,91 @@ is_git_mode() {
     [ "$mode" = "private-git" ]
 }
 
+# Get git required status
+get_git_required() {
+    if [ ! -f "$CONFIG_FILE" ]; then
+        echo "false"
+        return 0
+    fi
+
+    # Parse gitRequired field (boolean, not quoted in JSON)
+    local git_required=$(grep "\"gitRequired\"" "$CONFIG_FILE" | sed 's/.*: *\([^,}]*\).*/\1/' | tr -d ' ')
+
+    # Default to false if not set
+    if [ -z "$git_required" ] || [ "$git_required" = "null" ]; then
+        echo "false"
+    else
+        echo "$git_required"
+    fi
+}
+
+# Check if git is required for projects
+is_git_required() {
+    local required=$(get_git_required)
+    [ "$required" = "true" ]
+}
+
+# Set git required status
+set_git_required() {
+    local value="$1"
+
+    if [ "$value" != "true" ] && [ "$value" != "false" ]; then
+        echo -e "${RED}Error: Invalid value. Use 'true' or 'false'${NC}" >&2
+        return 1
+    fi
+
+    # Check if config file exists
+    if [ ! -f "$CONFIG_FILE" ]; then
+        echo -e "${RED}Error: Configuration file not found${NC}" >&2
+        return 1
+    fi
+
+    # Use jq if available for proper JSON handling
+    if command -v jq &> /dev/null; then
+        local temp_file=$(mktemp)
+        trap "rm -f '$temp_file'" EXIT INT TERM
+
+        # Convert string to boolean for jq
+        local bool_value=$( [ "$value" = "true" ] && echo "true" || echo "false" )
+
+        # Add or update gitRequired field
+        if grep -q '"gitRequired"' "$CONFIG_FILE"; then
+            jq --argjson required "$bool_value" '.gitRequired = $required' "$CONFIG_FILE" > "$temp_file"
+        else
+            jq --argjson required "$bool_value" '. + {gitRequired: $required}' "$CONFIG_FILE" > "$temp_file"
+        fi
+
+        if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
+            mv "$temp_file" "$CONFIG_FILE"
+            trap - EXIT INT TERM
+        else
+            echo -e "${RED}Error: Failed to update configuration${NC}" >&2
+            trap - EXIT INT TERM
+            rm -f "$temp_file"
+            return 1
+        fi
+    else
+        # Fallback: simple sed-based update
+        # Cross-platform sed -i (BSD/macOS vs GNU/Linux)
+        if grep -q '"gitRequired"' "$CONFIG_FILE"; then
+            if [[ "$(uname)" == "Darwin" ]]; then
+                sed -i '' "s|\"gitRequired\": [^,}]*|\"gitRequired\": $value|" "$CONFIG_FILE"
+            else
+                sed -i "s|\"gitRequired\": [^,}]*|\"gitRequired\": $value|" "$CONFIG_FILE"
+            fi
+        else
+            # Add field before closing brace
+            if [[ "$(uname)" == "Darwin" ]]; then
+                sed -i '' "s|}$|,\n  \"gitRequired\": $value\n}|" "$CONFIG_FILE"
+            else
+                sed -i "s|}$|,\n  \"gitRequired\": $value\n}|" "$CONFIG_FILE"
+            fi
+        fi
+    fi
+
+    echo -e "${GREEN}✓${NC} Git requirement: $( [ "$value" = "true" ] && echo "enabled" || echo "disabled" )"
+}
+
 # Get installation mode (light or full)
 get_install_mode() {
     local mode=$(get_config "installMode")
@@ -294,7 +381,7 @@ set_install_mode() {
     # Use jq if available for proper JSON handling, fallback to sed
     if command -v jq &> /dev/null; then
         local temp_file=$(mktemp)
-        trap "rm -f '$temp_file'" EXIT
+        trap "rm -f '$temp_file'" EXIT INT TERM
 
         # Add or update installMode field
         if grep -q '"installMode"' "$CONFIG_FILE"; then
@@ -305,11 +392,11 @@ set_install_mode() {
 
         if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
             mv "$temp_file" "$CONFIG_FILE"
-            trap - EXIT
+            trap - EXIT INT TERM
         else
             echo -e "${RED}Error: Failed to update configuration${NC}" >&2
             rm -f "$temp_file"
-            trap - EXIT
+            trap - EXIT INT TERM
             return 1
         fi
     else
@@ -352,7 +439,7 @@ set_advanced_enabled() {
     # Use jq if available for proper JSON handling
     if command -v jq &> /dev/null; then
         local temp_file=$(mktemp)
-        trap "rm -f '$temp_file'" EXIT
+        trap "rm -f '$temp_file'" EXIT INT TERM
 
         # Convert string to boolean for jq
         local bool_value=$( [ "$value" = "true" ] && echo "true" || echo "false" )
@@ -366,10 +453,10 @@ set_advanced_enabled() {
 
         if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
             mv "$temp_file" "$CONFIG_FILE"
-            trap - EXIT
+            trap - EXIT INT TERM
         else
             echo -e "${RED}Error: Failed to update configuration${NC}" >&2
-            trap - EXIT
+            trap - EXIT INT TERM
             rm -f "$temp_file"
             return 1
         fi
@@ -482,11 +569,18 @@ show_config() {
 
     echo -e "${BLUE}=== Current Configuration ===${NC}"
     echo ""
-    echo -e "Hub Mode:  ${GREEN}$(get_hub_mode)${NC}"
-    echo -e "Hub Path:  ${CYAN}$(get_hub_path)${NC}"
+    echo -e "Hub Mode:      ${GREEN}$(get_hub_mode)${NC}"
+    echo -e "Hub Path:      ${CYAN}$(get_hub_path)${NC}"
 
     if is_git_mode; then
-        echo -e "Git URL:   ${CYAN}$(get_git_url)${NC}"
+        echo -e "Git URL:       ${CYAN}$(get_git_url)${NC}"
+    fi
+
+    local git_req=$(get_git_required)
+    if [ "$git_req" = "true" ]; then
+        echo -e "Git Required:  ${GREEN}Yes${NC} (projects must be git repositories)"
+    else
+        echo -e "Git Required:  ${YELLOW}No${NC} (projects can be non-git directories)"
     fi
 
     echo ""
@@ -602,8 +696,8 @@ set_tracing_config() {
     fi
 
     local temp_file=$(mktemp)
-    # Setup cleanup trap (EXIT only to avoid firing on every function return)
-    trap "rm -f '$temp_file'" EXIT
+    # Setup cleanup trap
+    trap "rm -f '$temp_file'" EXIT INT TERM
 
     # Use --argjson for boolean/numeric keys, --arg for strings
     case "$key" in
@@ -628,14 +722,14 @@ set_tracing_config() {
     # Validate temp file before moving
     if [ ! -s "$temp_file" ]; then
         echo -e "${RED}Error: Failed to update configuration (empty result)${NC}" >&2
-        trap - EXIT
+        trap - EXIT INT TERM
         rm -f "$temp_file"
         return 1
     fi
 
     if ! jq empty "$temp_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to update configuration (invalid JSON)${NC}" >&2
-        trap - EXIT
+        trap - EXIT INT TERM
         rm -f "$temp_file"
         return 1
     fi
@@ -643,12 +737,12 @@ set_tracing_config() {
     # Atomic move
     if ! mv "$temp_file" "$tracing_config_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to save configuration${NC}" >&2
-        trap - EXIT
+        trap - EXIT INT TERM
         rm -f "$temp_file"
         return 1
     fi
 
-    trap - EXIT
+    trap - EXIT INT TERM
     echo "Updated tracing.$key = $value"
     return 0
 }
@@ -819,10 +913,10 @@ configure_confluence() {
         echo "Install jq: sudo apt-get install jq  # or appropriate package manager" >&2
         return 1
     fi
-    
+
     local temp_file=$(mktemp)
-    trap "rm -f '$temp_file'" EXIT
-    
+    trap "rm -f '$temp_file'" EXIT INT TERM
+
     # Add or update confluence section
     if [ ! -f "$CONFIG_FILE" ]; then
         # Create new config with confluence section
@@ -855,18 +949,18 @@ configure_confluence() {
                 authMethod: "api-token"
             }' "$CONFIG_FILE" > "$temp_file"
     fi
-    
+
     # Validate temp file
     if [ ! -s "$temp_file" ] || ! jq empty "$temp_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to update configuration${NC}" >&2
-        trap - EXIT
+        trap - EXIT INT TERM
         rm -f "$temp_file"
         return 1
     fi
-    
+
     # Atomic move
     mv "$temp_file" "$CONFIG_FILE"
-    trap - EXIT
+    trap - EXIT INT TERM
     
     # Set restrictive permissions on config file (contains API token)
     chmod 600 "$CONFIG_FILE"
@@ -1035,6 +1129,21 @@ if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
                 exit 1
             fi
             ;;
+        git-required)
+            get_git_required
+            ;;
+        is-git-required)
+            if is_git_required; then
+                echo "yes"
+                exit 0
+            else
+                echo "no"
+                exit 1
+            fi
+            ;;
+        set-git-required)
+            set_git_required "${2:-}"
+            ;;
         --help|-h)
             cat <<EOF
 Configuration Manager for AI Use Case CLI
@@ -1049,6 +1158,9 @@ Commands:
   path                    Get hub path
   url                     Get git URL
   is-git                  Check if git mode is enabled
+  git-required            Get git required status
+  is-git-required         Check if git is required for projects
+  set-git-required <bool> Set git required status (true/false)
   get <key>               Get configuration value
   set <key> <val>         Set configuration value
   confluence <subcommand> Manage Confluence integration
@@ -1065,6 +1177,7 @@ Examples:
   $(basename "$0") init
   $(basename "$0") show
   $(basename "$0") mode
+  $(basename "$0") set-git-required true
   $(basename "$0") confluence configure
   $(basename "$0") confluence show
 EOF
