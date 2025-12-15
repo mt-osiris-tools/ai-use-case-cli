@@ -200,6 +200,7 @@ For AI-assisted documentation with automatic context capture:
                             # - Auto-generates complete documentation
                             # - NO placeholders
                             # - v3.9.0+: Real-time TodoWrite progress tracking
+                            # - v3.14.0+: --intelligent flag for AI-powered prioritization
 
 /use-case:setup-project      # Setup project (alternative to --init)
 /use-case:sync-usecases      # Sync to hub (alternative to sync)
@@ -222,6 +223,66 @@ For AI-assisted documentation with automatic context capture:
                             # - Project or hub-wide analysis
                             # - Trend visualization
                             # - Prioritized recommendations
+```
+
+### Intelligent Session Selection (v3.14.0+)
+
+The `document-session` command supports an `--intelligent` flag that uses AI to analyze and prioritize sessions before documentation.
+
+**Usage:**
+```
+/use-case:document-session --intelligent
+```
+
+**What it does:**
+- Analyzes all PRs, commits, and conversations
+- Assigns priority scores (0-10) to each session
+- Groups sessions by priority level (HIGH/MEDIUM/LOW)
+- Provides reasoning for each score
+- Pre-extracts metadata (complexity, time saved, technologies)
+- Recommends which sessions to document first
+
+**Benefits:**
+- **Better prioritization**: See which work is most valuable to document
+- **Clear guidance**: HIGH/MEDIUM/LOW labels with recommendations
+- **Faster documentation**: Metadata pre-extracted (ticket, complexity, time saved)
+- **Informed decisions**: Understand why each session matters
+
+**Trade-offs:**
+- **Slower**: Adds 15-30 seconds for AI analysis
+- **Token cost**: Uses ~500-1000 tokens per invocation
+- **Requires Claude Code**: Uses Task tool with session-selector agent
+
+**When to use:**
+- You have multiple PRs/commits to choose from
+- You want guidance on what's most valuable to document
+- You want pre-populated metadata for faster documentation
+- You're documenting after a sprint with many changes
+
+**When to skip:**
+- You already know exactly what to document
+- You want the fastest possible workflow
+- You're documenting immediately after a single PR
+- You don't need prioritization guidance
+
+**Example output:**
+```
+Analyzing sessions... ✓ Analysis complete
+
+Found 5 sessions (2 HIGH, 2 MEDIUM, 1 LOW)
+
+HIGH PRIORITY (Strongly recommend):
+  🌟 [9.2] PR #123: Add JWT authentication system
+      → 8 files changed, introduces authentication pattern
+      → Estimated complexity: High (4-6h saved)
+      → Recommendation: Document first - introduces reusable pattern
+
+MEDIUM PRIORITY (Consider documenting):
+  ⭐ [6.5] PR #120: Refactor database queries
+      → 4 files changed, performance improvements
+      → Recommendation: Document if time allows
+
+(Recommendation: Start with PR #123 - highest value)
 ```
 
 ## Direct Script Access (Advanced)

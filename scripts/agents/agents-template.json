@@ -63,7 +63,7 @@
       "name": "Session Selector Agent",
       "description": "Intelligently analyzes and prioritizes sessions for documentation",
       "subagent_type": "use-case-session-selector-agent",
-      "enabled": false,
+      "enabled": true,
       "version": "1.0.0",
       "capabilities": [
         "pr-analysis",
