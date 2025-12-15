@@ -278,8 +278,8 @@ while IFS= read -r USE_CASE_DIR; do
                     trace_event "symlink_error" "type=date" "file=$FILENAME" "error=create_failed"
                     echo -e "${YELLOW}⚠ Warning${NC}: Failed to create date symlink for $FILENAME"
                 }
-            fi # End: if symlink doesn't exist
-        fi # End: if filename matches date pattern
+            fi
+        fi
 
         # Extract topics from filename (after date and ticket)
         # Format: YYYY-Www-MM-DD_TICKET-XXXXX_topic-words.md
@@ -300,8 +300,8 @@ while IFS= read -r USE_CASE_DIR; do
                     trace_event "symlink_error" "type=topic" "file=$FILENAME" "topic=$TOPIC_SLUG" "error=create_failed"
                     echo -e "${YELLOW}⚠ Warning${NC}: Failed to create topic symlink for $FILENAME"
                 }
-            fi # End: if symlink doesn't exist
-        fi # End: if filename matches topic pattern
+            fi
+        fi
 
         SYNC_COUNT=$((SYNC_COUNT + 1))
     done < <(find "$USE_CASE_DIR" -type f -name "*.md")
