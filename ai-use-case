@@ -120,6 +120,7 @@ ${YELLOW}USAGE${NC}
 ${YELLOW}COMMANDS${NC}
   ${GREEN}--init, init [--update]${NC}   Setup current project (use --update to refresh)
   ${GREEN}--link-claude${NC}             Create Claude Code symlinks (after Claude setup)
+  ${GREEN}--setup-copilot${NC}           Setup GitHub Copilot custom prompts (after Copilot setup)
   ${GREEN}--setup-codex${NC}             Setup Codex-style CLI prompts (after Codex setup)
   ${GREEN}config [show|reconfigure]${NC} Show or reconfigure hub settings
   ${GREEN}sync${NC}                      Sync use cases from project to hub
@@ -187,6 +188,12 @@ EOF
     cat <<EOF
 
 ${YELLOW}CODEX-STYLE CLI INTEGRATION${NC}
+  For GitHub Copilot in VS Code (type / in Copilot Chat):
+  ${GREEN}/use-case:document-session${NC}   Document AI session
+  ${GREEN}/use-case:setup-project${NC}      Setup another project
+  ${GREEN}/use-case:sync-usecases${NC}      Sync to hub
+  Setup: ${CYAN}ai-use-case --setup-copilot${NC}
+
   For Codex-style CLI tools with hybrid parameter support:
   ${GREEN}/prompts:use-case-document-session${NC}   Document AI session
   ${GREEN}/prompts:use-case-publish-confluence${NC} Publish to Confluence
@@ -196,6 +203,7 @@ ${YELLOW}EXAMPLES${NC}
   ai-use-case --init              # Setup current project
   ai-use-case --init --update     # Update project installation
   ai-use-case --link-claude       # Create Claude Code symlinks
+  ai-use-case --setup-copilot     # Setup GitHub Copilot custom prompts
   ai-use-case --setup-codex       # Setup Codex CLI prompts
   ai-use-case config show         # Show current hub configuration
   ai-use-case sync                # Sync use cases to hub
@@ -254,6 +262,17 @@ case "${1:-}" in
         else
             trace_event "error" "command=link-claude" "error=script_not_found" "script=link-claude.sh"
             echo -e "${RED}Error: link-claude.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    --setup-copilot|setup-copilot)
+        trace_event "command_start" "command=setup-copilot" "working_dir=$(pwd)"
+        echo -e "${BLUE}Setting up GitHub Copilot custom prompts...${NC}"
+        if [ -f "$SCRIPT_DIR/scripts/project/setup-copilot.sh" ]; then
+            trace_run "setup-copilot" bash "$SCRIPT_DIR/scripts/project/setup-copilot.sh" .
+        else
+            trace_event "error" "command=setup-copilot" "error=script_not_found" "script=setup-copilot.sh"
+            echo -e "${RED}Error: setup-copilot.sh not found${NC}"
             exit 1
         fi
         ;;

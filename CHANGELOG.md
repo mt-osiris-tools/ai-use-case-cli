@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **GitHub Copilot Custom Prompts Integration**: Full support for GitHub Copilot custom prompts in VS Code
+  - **New Command**: `ai-use-case --setup-copilot` to configure GitHub Copilot custom prompts
+  - **Custom Prompts**: Workspace-specific `.github/prompts/use-case/` directory with 5 core prompts:
+    - `document-session.prompt.md` - Document AI coding sessions automatically
+    - `setup-project.prompt.md` - Setup project for documentation
+    - `sync-usecases.prompt.md` - Sync use cases from project to hub
+    - `search-usecases.prompt.md` - Search documented use cases
+    - `quick-start.prompt.md` - Quick start guide for first-time users
+  - **Symlink Architecture**: Project prompts symlink to CLI installation for automatic updates
+  - **Agent Selection**: GitHub Copilot added to agent selection menu during `--init`
+  - **Multiple Agent Support**: Enhanced agent selection to support multiple simultaneous agents (Claude + Copilot + Codex)
+  - **Setup Script**: `scripts/project/setup-copilot.sh` handles prompt symlink creation
+  - **Documentation**: New `docs/agents/copilot/GUIDE.md` with comprehensive setup and usage instructions
+  - **YAML Frontmatter**: All prompts include description metadata for discoverability in VS Code
+
 - **Codex CLI Integration**: Support for Codex-style CLI tools with slash commands
   - **Note**: This integration provides slash command prompts compatible with CLI tools that use
     the Codex CLI pattern (YAML frontmatter, `/prompts:` invocation). This does NOT use the
