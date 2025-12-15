@@ -144,7 +144,8 @@ create_test_config() {
   "version": "1.0.0",
   "hubMode": "${mode}",
   "hubPath": "${hub_path}",
-  "gitUrl": "${git_url}"
+  "gitUrl": "${git_url}",
+  "gitRequired": false
 }
 EOF
     else
@@ -152,7 +153,8 @@ EOF
 {
   "version": "1.0.0",
   "hubMode": "${mode}",
-  "hubPath": "${hub_path}"
+  "hubPath": "${hub_path}",
+  "gitRequired": false
 }
 EOF
     fi
