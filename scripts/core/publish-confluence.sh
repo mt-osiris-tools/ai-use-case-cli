@@ -218,7 +218,7 @@ validate_file() {
 # Validate and fix markdown linting issues
 validate_markdown_lint() {
     # Check if markdownlint is installed
-    if ! command -v markdownlint &>/dev/null; then
+    if ! command -v markdownlint >/dev/null; then
         echo -e "${YELLOW}ℹ${NC} markdownlint not installed - skipping markdown validation"
         echo "  Install with: npm install -g markdownlint-cli"
         return 0
@@ -227,7 +227,7 @@ validate_markdown_lint() {
     # Check if auto-fix is enabled
     if [ "$AUTO_FIX_LINT" = true ]; then
         echo -e "${CYAN}Fixing markdown linting issues (modifying source file)...${NC}"
-        if markdownlint --fix "$MARKDOWN_FILE" 2>/dev/null; then
+        if markdownlint --fix "$MARKDOWN_FILE"; then
             echo -e "${GREEN}✓${NC} Markdown linting validated and fixed"
         else
             echo -e "${YELLOW}⚠${NC}  Warning: Some markdown linting issues could not be auto-fixed"
@@ -235,7 +235,7 @@ validate_markdown_lint() {
         fi
     else
         echo -e "${CYAN}Checking markdown quality...${NC}"
-        if markdownlint "$MARKDOWN_FILE" 2>/dev/null; then
+        if markdownlint "$MARKDOWN_FILE"; then
             echo -e "${GREEN}✓${NC} Markdown linting passed"
         else
             echo -e "${YELLOW}⚠${NC}  Warning: Markdown linting issues found"
