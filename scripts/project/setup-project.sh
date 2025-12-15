@@ -628,8 +628,8 @@ if [ -f "$GITIGNORE" ]; then
     if ! grep -q "^# Use Case Documentation" "$GITIGNORE"; then
         echo "" >> "$GITIGNORE"
         echo "# Use Case Documentation" >> "$GITIGNORE"
-        echo ".usecase/cases/" >> "$GITIGNORE"
-        echo -e "${GREEN}✓${NC} Added .usecase/cases/ to .gitignore"
+        echo ".usecase/" >> "$GITIGNORE"
+        echo -e "${GREEN}✓${NC} Added .usecase/ to .gitignore"
     else
         echo -e "${YELLOW}⚠${NC} .gitignore already configured"
     fi
