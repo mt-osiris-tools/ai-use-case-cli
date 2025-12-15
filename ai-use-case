@@ -368,9 +368,11 @@ case "${1:-}" in
         fi
         ;;
     publish-confluence)
-        trace_event "command_start" "command=publish-confluence" "arg=${2:-}"
+        trace_event "command_start" "command=publish-confluence" "args=$*"
         if [ -f "$SCRIPT_DIR/scripts/core/publish-confluence.sh" ]; then
-            trace_run "publish-confluence" bash "$SCRIPT_DIR/scripts/core/publish-confluence.sh" "${2:-}"
+            # Pass all arguments to the script
+            shift
+            trace_run "publish-confluence" bash "$SCRIPT_DIR/scripts/core/publish-confluence.sh" "$@"
         else
             trace_event "error" "command=publish-confluence" "error=script_not_found" "script=publish-confluence.sh"
             echo -e "${RED}Error: publish-confluence.sh not found${NC}"
