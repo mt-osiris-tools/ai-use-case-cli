@@ -218,7 +218,7 @@ validate_file() {
 # Validate and fix markdown linting issues
 validate_markdown_lint() {
     # Check if markdownlint is installed
-    if ! command -v markdownlint >/dev/null; then
+    if ! command -v markdownlint >/dev/null 2>&1; then
         echo -e "${YELLOW}ℹ${NC} markdownlint not installed - skipping markdown validation"
         echo "  Install with: npm install -g markdownlint-cli"
         return 0
