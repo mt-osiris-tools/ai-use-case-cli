@@ -1,7 +1,7 @@
 #!/bin/bash
 # AI Use Case CLI - Uninstall Script
 
-set -e
+set -euo pipefail
 
 # Colors
 GREEN='\033[0;32m'
@@ -119,6 +119,7 @@ echo ""
 echo "This will:"
 echo "  - Remove symlink from ~/.local/bin/"
 echo "  - Optionally remove the CLI tools directory"
+echo "  - Optionally remove the configuration directory (~/.config/ai-use-case-cli/)"
 echo "  - Optionally clean up shell profile entries"
 echo ""
 echo -e "${YELLOW}Note: This only removes CLI tools. The documentation hub"
@@ -145,6 +146,21 @@ if [ -n "$CLI_DIR" ] && [ -d "$CLI_DIR" ]; then
     fi
 else
     echo -e "${YELLOW}⚠${NC} CLI tools directory not found"
+fi
+
+# Ask about config directory cleanup
+CONFIG_DIR="$HOME/.config/ai-use-case-cli"
+if [ -d "$CONFIG_DIR" ]; then
+    echo ""
+    read -p "Remove configuration directory ($CONFIG_DIR)? (y/N): " remove_config
+    if [[ "$remove_config" =~ ^[Yy]$ ]]; then
+        rm -rf "$CONFIG_DIR"
+        echo -e "${GREEN}✓${NC} Removed configuration directory"
+    else
+        echo "Keeping configuration at: $CONFIG_DIR"
+    fi
+else
+    echo -e "${YELLOW}⚠${NC} Configuration directory not found"
 fi
 
 # Ask about shell profile cleanup
@@ -193,11 +209,13 @@ echo -e "${GREEN}=== Uninstall Complete ===${NC}"
 echo ""
 echo "The AI Use Case CLI has been uninstalled."
 echo ""
-echo -e "${YELLOW}What remains:${NC}"
+echo -e "${YELLOW}What may remain:${NC}"
+echo "  - Configuration at ~/.config/ai-use-case-cli/ (if not removed)"
 echo "  - Documentation hub at ~/.local/share/ai-use-case-cli/hub (if installed)"
 echo "  - Project-level setups (docs/ai-use-cases/ and git hooks in your projects)"
 echo ""
-echo "To remove the documentation hub separately:"
-echo "  rm -rf ~/.local/share/ai-use-case-cli/hub"
+echo "To remove remaining components manually:"
+echo "  Configuration: rm -rf ~/.config/ai-use-case-cli"
+echo "  Hub: rm -rf ~/.local/share/ai-use-case-cli/hub"
 echo ""
 echo "To reinstall CLI: https://github.com/mt-osiris-tools/ai-use-case-cli"
