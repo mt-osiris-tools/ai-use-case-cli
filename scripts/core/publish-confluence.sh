@@ -226,7 +226,7 @@ validate_markdown_lint() {
 
     # Check if auto-fix is enabled
     if [ "$AUTO_FIX_LINT" = true ]; then
-        echo -e "${CYAN}Fixing markdown linting issues...${NC}"
+        echo -e "${CYAN}Fixing markdown linting issues (modifying source file)...${NC}"
         if markdownlint --fix "$MARKDOWN_FILE" 2>/dev/null; then
             echo -e "${GREEN}✓${NC} Markdown linting validated and fixed"
         else
