@@ -248,6 +248,14 @@ fi
 
 [ "$PROGRESS_ENABLED" = true ] && progress_complete "Validate project structure"
 
+# Prompt for agent selection (only in non-update mode)
+SELECTED_AGENTS=""
+if [ "$UPDATE_MODE" = false ]; then
+    echo ""
+    SELECTED_AGENTS=$(prompt_agent_selection)
+    echo ""
+fi
+
 # Check for old structure and migrate if needed
 [ "$PROGRESS_ENABLED" = true ] && [ "$UPDATE_MODE" = false ] && progress_start "Setup use case directory"
 OLD_USECASES_DIR="$PROJECT_PATH/docs/ai-use-cases"
@@ -416,16 +424,17 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
         echo -e "${YELLOW}⚠${NC} AI tool slash commands already installed (use --update to refresh)"
     fi
 
-    # Create symlink for Claude Code compatibility
+    # Create symlink for Claude Code compatibility (if Claude was selected)
     # Claude Code only discovers commands in .claude/commands/, not .ai-tools/commands/
     # We symlink only the use-case subdirectory to preserve any custom user commands
-    CLAUDE_DIR="$PROJECT_PATH/.claude"
-    CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
-    CLAUDE_USECASE_SYMLINK="$CLAUDE_COMMANDS_DIR/use-case"
-    EXPECTED_LINK_TARGET="../../.ai-tools/commands/use-case"
+    if [[ "$SELECTED_AGENTS" == *"claude"* ]] || [ "$UPDATE_MODE" = true ]; then
+        CLAUDE_DIR="$PROJECT_PATH/.claude"
+        CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
+        CLAUDE_USECASE_SYMLINK="$CLAUDE_COMMANDS_DIR/use-case"
+        EXPECTED_LINK_TARGET="../../.ai-tools/commands/use-case"
 
-    # Check if .claude folder exists before creating symlinks
-    if [ -d "$CLAUDE_DIR" ] || [ -L "$CLAUDE_COMMANDS_DIR" ]; then
+        # Check if .claude folder exists before creating symlinks
+        if [ -d "$CLAUDE_DIR" ] || [ -L "$CLAUDE_COMMANDS_DIR" ]; then
         # Migrate from old full-directory symlink structure (if needed)
         if [ -L "$CLAUDE_COMMANDS_DIR" ]; then
             OLD_TARGET=$(readlink "$CLAUDE_COMMANDS_DIR")
@@ -462,13 +471,34 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
                 echo -e "${YELLOW}⚠${NC} Claude Code symlink points to: $LINK_TARGET (expected: $EXPECTED_LINK_TARGET)"
             fi
         fi
+        else
+            # .claude folder doesn't exist - skip symlink creation and inform user
+            echo -e "${BLUE}ℹ${NC} .claude folder not found - skipping Claude Code symlink creation"
+            echo -e "${BLUE}ℹ${NC} Run '${GREEN}ai-use-case --link-claude${NC}' after setting up Claude Code to create symlinks"
+        fi
     else
-        # .claude folder doesn't exist - skip symlink creation and inform user
-        echo -e "${BLUE}ℹ${NC} .claude folder not found - skipping Claude Code symlink creation"
-        echo -e "${BLUE}ℹ${NC} Run '${GREEN}ai-use-case --link-claude${NC}' after setting up Claude Code to create symlinks"
+        echo -e "${BLUE}ℹ${NC} Claude Code not selected - skipping Claude Code integration"
+        echo -e "${BLUE}ℹ${NC} To add Claude Code later, run: ${GREEN}ai-use-case --link-claude${NC}"
     fi
 else
     echo -e "${YELLOW}⚠${NC} AI tool commands not found in CLI installation"
+fi
+
+# Setup Codex integration (if Codex was selected)
+if [[ "$SELECTED_AGENTS" == *"codex"* ]] && [ "$UPDATE_MODE" = false ]; then
+    echo ""
+    echo -e "${BLUE}Setting up Codex integration...${NC}"
+    SETUP_CODEX_SCRIPT="$SCRIPT_DIR/setup-codex.sh"
+    if [ -f "$SETUP_CODEX_SCRIPT" ]; then
+        if bash "$SETUP_CODEX_SCRIPT" "$PROJECT_PATH"; then
+            echo -e "${GREEN}✓${NC} Codex integration configured"
+        else
+            echo -e "${YELLOW}⚠${NC} Codex integration setup encountered issues"
+            echo -e "${BLUE}ℹ${NC} You can run it manually later: ${GREEN}ai-use-case --setup-codex${NC}"
+        fi
+    else
+        echo -e "${RED}Error: Codex setup script not found: $SETUP_CODEX_SCRIPT${NC}"
+    fi
 fi
 
 if [ "$PROGRESS_ENABLED" = true ]; then

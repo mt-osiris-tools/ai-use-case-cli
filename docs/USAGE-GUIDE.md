@@ -36,10 +36,18 @@ This CLI provides slash commands for AI coding assistants like Claude Code, Code
 ### Setup
 
 ```bash
-# Claude Code (automatic with --init)
+# Initialize project (includes agent selection)
 ai-use-case --init
+```
 
-# Codex-style CLI tools (separate setup)
+During `--init`, you'll be prompted to choose which AI agent(s) to configure:
+- **Claude Code** (default): Automatic symlink setup in `.claude/commands/use-case/`
+- **Codex**: Installs prompts globally in `~/.codex/prompts/`
+- **Both**: Configures both Claude Code and Codex
+- **None**: Skip agent configuration (can be configured later)
+
+You can also set up Codex separately after initialization:
+```bash
 ai-use-case --setup-codex
 ```
 
