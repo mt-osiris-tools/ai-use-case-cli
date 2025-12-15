@@ -273,7 +273,7 @@ set_git_required() {
     # Use jq if available for proper JSON handling
     if command -v jq &> /dev/null; then
         local temp_file=$(mktemp)
-        trap "rm -f '$temp_file'" EXIT
+        trap "rm -f '$temp_file'" EXIT INT TERM
 
         # Convert string to boolean for jq
         local bool_value=$( [ "$value" = "true" ] && echo "true" || echo "false" )
@@ -287,10 +287,10 @@ set_git_required() {
 
         if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
             mv "$temp_file" "$CONFIG_FILE"
-            trap - EXIT
+            trap - EXIT INT TERM
         else
             echo -e "${RED}Error: Failed to update configuration${NC}" >&2
-            trap - EXIT
+            trap - EXIT INT TERM
             rm -f "$temp_file"
             return 1
         fi
@@ -381,7 +381,7 @@ set_install_mode() {
     # Use jq if available for proper JSON handling, fallback to sed
     if command -v jq &> /dev/null; then
         local temp_file=$(mktemp)
-        trap "rm -f '$temp_file'" EXIT
+        trap "rm -f '$temp_file'" EXIT INT TERM
 
         # Add or update installMode field
         if grep -q '"installMode"' "$CONFIG_FILE"; then
@@ -392,11 +392,11 @@ set_install_mode() {
 
         if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
             mv "$temp_file" "$CONFIG_FILE"
-            trap - EXIT
+            trap - EXIT INT TERM
         else
             echo -e "${RED}Error: Failed to update configuration${NC}" >&2
             rm -f "$temp_file"
-            trap - EXIT
+            trap - EXIT INT TERM
             return 1
         fi
     else
@@ -439,7 +439,7 @@ set_advanced_enabled() {
     # Use jq if available for proper JSON handling
     if command -v jq &> /dev/null; then
         local temp_file=$(mktemp)
-        trap "rm -f '$temp_file'" EXIT
+        trap "rm -f '$temp_file'" EXIT INT TERM
 
         # Convert string to boolean for jq
         local bool_value=$( [ "$value" = "true" ] && echo "true" || echo "false" )
@@ -453,10 +453,10 @@ set_advanced_enabled() {
 
         if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
             mv "$temp_file" "$CONFIG_FILE"
-            trap - EXIT
+            trap - EXIT INT TERM
         else
             echo -e "${RED}Error: Failed to update configuration${NC}" >&2
-            trap - EXIT
+            trap - EXIT INT TERM
             rm -f "$temp_file"
             return 1
         fi
@@ -696,8 +696,8 @@ set_tracing_config() {
     fi
 
     local temp_file=$(mktemp)
-    # Setup cleanup trap (EXIT only to avoid firing on every function return)
-    trap "rm -f '$temp_file'" EXIT
+    # Setup cleanup trap
+    trap "rm -f '$temp_file'" EXIT INT TERM
 
     # Use --argjson for boolean/numeric keys, --arg for strings
     case "$key" in
@@ -722,14 +722,14 @@ set_tracing_config() {
     # Validate temp file before moving
     if [ ! -s "$temp_file" ]; then
         echo -e "${RED}Error: Failed to update configuration (empty result)${NC}" >&2
-        trap - EXIT
+        trap - EXIT INT TERM
         rm -f "$temp_file"
         return 1
     fi
 
     if ! jq empty "$temp_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to update configuration (invalid JSON)${NC}" >&2
-        trap - EXIT
+        trap - EXIT INT TERM
         rm -f "$temp_file"
         return 1
     fi
@@ -737,12 +737,12 @@ set_tracing_config() {
     # Atomic move
     if ! mv "$temp_file" "$tracing_config_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to save configuration${NC}" >&2
-        trap - EXIT
+        trap - EXIT INT TERM
         rm -f "$temp_file"
         return 1
     fi
 
-    trap - EXIT
+    trap - EXIT INT TERM
     echo "Updated tracing.$key = $value"
     return 0
 }
@@ -913,10 +913,10 @@ configure_confluence() {
         echo "Install jq: sudo apt-get install jq  # or appropriate package manager" >&2
         return 1
     fi
-    
+
     local temp_file=$(mktemp)
-    trap "rm -f '$temp_file'" EXIT
-    
+    trap "rm -f '$temp_file'" EXIT INT TERM
+
     # Add or update confluence section
     if [ ! -f "$CONFIG_FILE" ]; then
         # Create new config with confluence section
@@ -949,18 +949,18 @@ configure_confluence() {
                 authMethod: "api-token"
             }' "$CONFIG_FILE" > "$temp_file"
     fi
-    
+
     # Validate temp file
     if [ ! -s "$temp_file" ] || ! jq empty "$temp_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to update configuration${NC}" >&2
-        trap - EXIT
+        trap - EXIT INT TERM
         rm -f "$temp_file"
         return 1
     fi
-    
+
     # Atomic move
     mv "$temp_file" "$CONFIG_FILE"
-    trap - EXIT
+    trap - EXIT INT TERM
     
     # Set restrictive permissions on config file (contains API token)
     chmod 600 "$CONFIG_FILE"
