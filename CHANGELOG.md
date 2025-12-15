@@ -110,6 +110,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added references to USAGE-GUIDE.md, CONFIGURATION.md, and FEATURES.md
   - Updated version consistency table with new documentation files
 
+### Fixed
+
+- **Symlink Creation - Absolute Paths**: Simplified symlink creation by using absolute paths instead of Python-based relative paths
+  - **Issue**: Initial implementation used Python (`python3 -c "import os; print(os.path.relpath(...))"`) for cross-platform relative path calculation to avoid macOS `realpath` unavailability
+  - **Decision**: Switched to absolute paths for simplicity - no external dependencies required
+  - **Trade-off**: Symlinks break if CLI installation moves, but user can re-run setup command (rare scenario)
+  - **Benefit**: No Python dependency, simpler code, works on all platforms without additional tools
+  - **Affected files**:
+    - `scripts/project/setup-copilot.sh:78-80` - Copilot prompt symlink creation
+    - `scripts/core/sync-ai-use-cases.sh:275-280` - By-date symlink creation
+    - `scripts/core/sync-ai-use-cases.sh:297-302` - By-topic symlink creation
+  - **Impact**: Cleaner implementation with zero external dependencies beyond bash and ln
+
+- **Documentation Accuracy**: Fixed incorrect slash format in quick-start.prompt.md (PR #178 review)
+  - Claude Code commands now correctly show `/use-case:command` (colon) instead of `/use-case/command` (slash)
+  - Following old instructions would fail to match any command
+  - Affected lines: `.github/prompts/use-case/quick-start.prompt.md:91-95`
+
 ## [3.12.0] - 2025-12-07
 
 ### Added

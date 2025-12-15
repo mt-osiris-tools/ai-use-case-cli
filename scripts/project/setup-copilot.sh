@@ -75,10 +75,9 @@ if [ ! -d "$GITHUB_PROMPTS_DIR" ]; then
     echo -e "${GREEN}✓${NC} Created: .github/prompts/"
 fi
 
-# Calculate relative path from .github/prompts/ to CLI installation
-# This ensures the symlink works regardless of where the project is located
-# Using Python for cross-platform compatibility (macOS doesn't have realpath by default)
-RELATIVE_PATH=$(python3 -c "import os; print(os.path.relpath('$CLI_COPILOT_PROMPTS', '$GITHUB_PROMPTS_DIR'))")
+# Use absolute path for symlink (simpler and works on all platforms)
+# If CLI installation moves, user can re-run: ai-use-case --setup-copilot
+SYMLINK_TARGET="$CLI_COPILOT_PROMPTS"
 
 # Create or verify use-case symlink
 echo ""
@@ -86,16 +85,16 @@ echo "Setting up Copilot prompts symlink..."
 
 if [ ! -e "$COPILOT_PROMPTS_DIR" ]; then
     # Create new symlink
-    ln -s "$RELATIVE_PATH" "$COPILOT_PROMPTS_DIR"
-    echo -e "${GREEN}✓${NC} Created symlink: .github/prompts/use-case → $RELATIVE_PATH"
+    ln -s "$SYMLINK_TARGET" "$COPILOT_PROMPTS_DIR"
+    echo -e "${GREEN}✓${NC} Created symlink: .github/prompts/use-case → $SYMLINK_TARGET"
 elif [ -L "$COPILOT_PROMPTS_DIR" ]; then
     # Symlink exists, verify it points to the right place
     LINK_TARGET=$(readlink "$COPILOT_PROMPTS_DIR")
-    if [ "$LINK_TARGET" = "$RELATIVE_PATH" ]; then
+    if [ "$LINK_TARGET" = "$SYMLINK_TARGET" ]; then
         echo -e "${GREEN}✓${NC} Symlink already configured correctly"
     else
         echo -e "${YELLOW}⚠${NC} Symlink exists but points to: $LINK_TARGET"
-        echo -e "${YELLOW}⚠${NC} Expected: $RELATIVE_PATH"
+        echo -e "${YELLOW}⚠${NC} Expected: $SYMLINK_TARGET"
         echo ""
         echo "To update, remove the old symlink and re-run this script:"
         echo "  rm $COPILOT_PROMPTS_DIR"
