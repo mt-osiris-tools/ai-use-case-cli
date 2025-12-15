@@ -59,9 +59,9 @@ if [ ! -d "$CLI_COPILOT_PROMPTS" ]; then
     exit 1
 fi
 
-# Count available Copilot prompts
-PROMPT_COUNT=$(find "$CLI_COPILOT_PROMPTS" -name "*.prompt.md" -type f 2>/dev/null | wc -l)
-echo -e "${GREEN}✓${NC} Found $PROMPT_COUNT Copilot prompt(s) in CLI"
+# Count available Copilot prompts (with valid YAML frontmatter)
+PROMPT_COUNT=$(find "$CLI_COPILOT_PROMPTS" -name "*.prompt.md" -type f 2>/dev/null | xargs -r awk 'NR==1 && $0=="---"{print FILENAME}' | wc -l)
+echo -e "${GREEN}✓${NC} Found $PROMPT_COUNT Copilot prompt(s) in CLI (with valid YAML frontmatter)"
 
 # Create .github directory if needed
 if [ ! -d "$PROJECT_PATH/.github" ]; then

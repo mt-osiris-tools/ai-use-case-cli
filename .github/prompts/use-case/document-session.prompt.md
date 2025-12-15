@@ -580,7 +580,7 @@ Use the Read tool to read the template file from this path. This is your source 
 
 **IMPORTANT: Gathering Session Statistics**
 
-> **Note:** The `/cost` command is only available when using Claude Code. GitHub Copilot users can skip this step.
+> **Note:** Session statistics gathering via `/cost` is not available in GitHub Copilot. You can skip this step.
 
 **For Claude Code Users:**
 
@@ -830,4 +830,4 @@ After selection, documentation generation is ALWAYS automatic. Do NOT:
 - Focus on query evolution, insights, and decision-making
 - No code changes required
 
-All demonstrate complete, professional documentation generated automatically by your AI assistant.
+All demonstrate complete, professional documentation generated automatically by GitHub Copilot.

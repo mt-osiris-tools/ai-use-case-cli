@@ -24,7 +24,7 @@ ai-use-case search <search-term>
 # Use the search script (recommended)
 ai-use-case search authentication
 
-# Or search manually (use ${AI_USECASES_DIR:-~/.local/share/ai-use-case-cli/hub} to substitute the hub path):
+# Or search manually. The following commands use shell parameter expansion: ${AI_USECASES_DIR:-~/.local/share/ai-use-case-cli/hub} will use the AI_USECASES_DIR environment variable if set, or default to ~/.local/share/ai-use-case-cli/hub.
 # Search filenames
 find ${AI_USECASES_DIR:-~/.local/share/ai-use-case-cli/hub}/by-project -name "*keyword*" -type f
 
