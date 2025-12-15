@@ -415,8 +415,17 @@ For each PR in the input:
    - Logical progression
 
 7. **Assign priority score (0-10):**
-   - Weight each factor appropriately
-   - Calculate weighted average
+   - Weight each factor appropriately using the defined percentages
+   - Calculate weighted average using the formula:
+     ```
+     Final Score = (Complexity × 0.30) + (Novelty × 0.25) + (Reusability × 0.20) + (Impact × 0.15) + (Quality × 0.10)
+     ```
+   - Example: If Complexity=8, Novelty=7, Reusability=9, Impact=8, Quality=7:
+     ```
+     Final Score = (8 × 0.30) + (7 × 0.25) + (9 × 0.20) + (8 × 0.15) + (7 × 0.10)
+                 = 2.4 + 1.75 + 1.8 + 1.2 + 0.7
+                 = 7.85 → 7.9 (rounded to one decimal place)
+     ```
    - Round to one decimal place
 
 8. **Generate reasoning:**
