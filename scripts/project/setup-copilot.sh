@@ -112,6 +112,66 @@ else
     echo -e "${YELLOW}⚠${NC} Please remove it and re-run this script"
 fi
 
+# Configure VS Code settings for Copilot custom prompts
+echo ""
+echo "Configuring VS Code settings..."
+VSCODE_DIR="$PROJECT_PATH/.vscode"
+VSCODE_SETTINGS="$VSCODE_DIR/settings.json"
+
+# Create .vscode directory if needed
+if [ ! -d "$VSCODE_DIR" ]; then
+    mkdir -p "$VSCODE_DIR"
+    echo -e "${GREEN}✓${NC} Created: .vscode/"
+fi
+
+# Function to update or create settings.json
+if [ ! -f "$VSCODE_SETTINGS" ]; then
+    # Create new settings.json with required Copilot settings
+    cat > "$VSCODE_SETTINGS" <<'EOF'
+{
+  "chat.promptFiles": true,
+  "chat.promptFilesLocations": {
+    ".github/prompts": true
+  }
+}
+EOF
+    echo -e "${GREEN}✓${NC} Created: .vscode/settings.json with Copilot settings"
+else
+    # Settings file exists - try to update it
+    if command -v jq >/dev/null 2>&1; then
+        # Use jq to safely merge settings
+        TEMP_SETTINGS=$(mktemp)
+        trap "rm -f '$TEMP_SETTINGS'" EXIT
+
+        if jq '. + {"chat.promptFiles": true} | .["chat.promptFilesLocations"] = (.["chat.promptFilesLocations"] // {}) + {".github/prompts": true}' "$VSCODE_SETTINGS" > "$TEMP_SETTINGS" 2>/dev/null && [ -s "$TEMP_SETTINGS" ]; then
+            mv "$TEMP_SETTINGS" "$VSCODE_SETTINGS"
+            trap - EXIT
+            echo -e "${GREEN}✓${NC} Updated: .vscode/settings.json with Copilot settings"
+        else
+            trap - EXIT
+            rm -f "$TEMP_SETTINGS"
+            echo -e "${YELLOW}⚠${NC} Could not auto-update .vscode/settings.json (invalid JSON)"
+            echo -e "${YELLOW}⚠${NC} Please manually add these settings:"
+            echo '  "chat.promptFiles": true,'
+            echo '  "chat.promptFilesLocations": {'
+            echo '    ".github/prompts": true'
+            echo '  }'
+        fi
+    else
+        # jq not available - check if settings already exist
+        if grep -q '"chat.promptFiles"' "$VSCODE_SETTINGS" 2>/dev/null; then
+            echo -e "${GREEN}✓${NC} VS Code settings already configured"
+        else
+            echo -e "${YELLOW}⚠${NC} VS Code settings file exists but jq not available"
+            echo -e "${YELLOW}⚠${NC} Please manually add these settings to .vscode/settings.json:"
+            echo '  "chat.promptFiles": true,'
+            echo '  "chat.promptFilesLocations": {'
+            echo '    ".github/prompts": true'
+            echo '  }'
+        fi
+    fi
+fi
+
 echo ""
 echo -e "${GREEN}=== Setup Complete! ===${NC}"
 echo ""
@@ -142,5 +202,7 @@ echo "  3. Follow the interactive prompts"
 echo ""
 echo -e "${YELLOW}Note:${NC} Copilot prompts are workspace-specific (.github/prompts/)."
 echo "Symlinks ensure prompts auto-update when CLI is updated."
-echo "You may need to reload VS Code window to detect new prompts."
+echo ""
+echo -e "${YELLOW}Important:${NC} Reload VS Code window (Ctrl+Shift+P → 'Reload Window')"
+echo "to activate the new settings and detect custom prompts."
 echo ""
