@@ -444,7 +444,7 @@ Provide your analysis in the following JSON structure:
 1. Scan for "requires", "depends on", "prerequisite" language
 2. Look for foundational work mentions
 3. Check logical dependencies (frontend needs API)
-4. Assign confidence: 0.85+ if explicit, 0.75+ if implied
+4. Assign confidence: 0.75+ (explicit or implied)
 
 **Alternative Detection:**
 1. Look for comparative language ("vs", "instead of", "alternative to")

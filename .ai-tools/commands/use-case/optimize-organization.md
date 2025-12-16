@@ -31,14 +31,19 @@ When the user invokes this command, you will analyze the organizational structur
 
 1. **Find all documents:**
    - Scan `by-project/` directory recursively
-   - Find all `.md` files matching pattern: `YYYY-Wxx-MM-DD_TICKET-XXX_topic-slug.md`
-     - YYYY = year (4 digits)
-     - Wxx = literal capital W followed by week number (2 digits, e.g., W49)
-     - MM = month (2 digits)
-     - DD = day (2 digits)
-     - All date components are separated by dashes: `YYYY-Wxx-MM-DD`
-     - Followed by underscore, then ticket ID (e.g., `TICKET-001`), another underscore, and topic slug (e.g., `jwt-implementation`), ending with `.md`
-     - Full example: `2025-W49-12-01_TICKET-001_jwt-implementation.md`
+   - Find all `.md` files matching these patterns:
+     - **Implementation sessions:** `YYYY-Wxx-MM-DD_TICKET-XXX_topic-slug.md`
+     - **Research sessions:** `YYYY-Wxx-MM-DD_RESEARCH-XXX_description.md`
+     - Pattern components:
+       - YYYY = year (4 digits)
+       - Wxx = literal capital W followed by week number (2 digits, e.g., W49)
+       - MM = month (2 digits)
+       - DD = day (2 digits)
+       - All date components are separated by dashes: `YYYY-Wxx-MM-DD`
+       - Followed by underscore, then ticket ID (e.g., `TICKET-001`) or research marker (`RESEARCH-XXX`), another underscore, and topic/description slug, ending with `.md`
+     - Examples:
+       - Implementation: `2025-W49-12-01_TICKET-001_jwt-implementation.md`
+       - Research: `2025-W49-12-01_RESEARCH-001_evaluate-auth-approaches.md`
    - Build list of documents with metadata
 
 2. **Extract metadata from each document:**
@@ -49,12 +54,14 @@ When the user invokes this command, you will analyze the organizational structur
      const filepath = file;
      const content = await fs.readFile(file, 'utf-8');
 
-     // Parse filename: YYYY-Wxx-MM-DD_TICKET-XXX_topic-slug.md
-     // Example: 2025-W49-12-01_TICKET-001_topic-slug.md
-     // Captures: (year)-(Wxx)-(month)-(day)_(ticket)_(topicSlug).md
+     // Parse filename: YYYY-Wxx-MM-DD_{TICKET|RESEARCH}-XXX_topic-slug.md
+     // Examples:
+     //   - Implementation: 2025-W49-12-01_TICKET-001_jwt-implementation.md
+     //   - Research: 2025-W49-12-01_RESEARCH-001_evaluate-auth-approaches.md
+     // Captures: (year)-(Wxx)-(month)-(day)_(ticket|research-id)_(topicSlug).md
      const match = filename.match(/^(\d{4})-(W\d{2})-(\d{2})-(\d{2})_([A-Z]+-\d+)_(.+)\.md$/);
      if (match) {
-       const [_, year, week, month, day, ticket, topicSlug] = match;
+       const [_, year, week, month, day, ticketOrResearch, topicSlug] = match;
 
        // Extract frontmatter
        const frontmatterMatch = content.match(/^\*\*Date:\*\* (.+)$/m);
@@ -68,7 +75,7 @@ When the user invokes this command, you will analyze the organizational structur
          filepath,
          date: `${year}-${month}-${day}`,
          week: week,
-         ticket,
+         ticket: ticketOrResearch,
          topic_slug: topicSlug,
          frontmatter: {
            ai_tool: toolMatch ? toolMatch[1] : null,
