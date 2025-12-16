@@ -30,9 +30,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **User Experience**: Users are now prompted during initialization to choose which AI agents to integrate with their project
 
 - **Codex Prompt Parameter Parsing**: Fixed internal bash variables appearing as user-facing parameters in Codex CLI
-  - Changed internal variables from `$UPPERCASE` to lowercase without `$` prefix to prevent Codex from parsing them as parameters
-  - Only `SCAN_TYPE` and `SESSION_TYPE` now appear as parameters (as intended)
-  - Removed spurious `USER_EMAIL`, `GH_USERNAME`, and `LATEST_USER_COMMIT` from parameter list
+  - Changed parameter references in documentation from `$UPPERCASE` to `UPPERCASE` (removed $ prefix) to prevent Codex from displaying them as parameters
+  - Changed internal bash variables in code blocks from `$UPPERCASE` to lowercase with `$` prefix (e.g., `$USER_EMAIL` → `$user_email`)
+  - Applied consistent parameter naming to both Codex prompt files (`use-case-document-session.md` and `use-case-publish-confluence.md`)
+  - Only intended parameters now appear: `SCAN_TYPE` and `SESSION_TYPE` for document-session; `FILE`, `PARENT_URL`, and `DRY_RUN` for publish-confluence
+  - Removed spurious parameters: `USER_EMAIL`, `GH_USERNAME`, and `LATEST_USER_COMMIT` from parameter list
   - Enhanced template usage instructions with explicit "MUST use templates" guidance
   - Emphasized complete documentation requirements (no placeholders or TODO text)
 
