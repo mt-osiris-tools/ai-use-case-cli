@@ -33,10 +33,10 @@ if [ -n "${_CONFIG_HUB_SH_LOADED:-}" ]; then
 fi
 readonly _CONFIG_HUB_SH_LOADED=1
 
-# Source dependencies
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../core/constants.sh"
-source "$SCRIPT_DIR/config-core.sh"
+# Source dependencies (use local variable to avoid collision with caller's SCRIPT_DIR)
+_LIB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_LIB_SCRIPT_DIR/../core/constants.sh"
+source "$_LIB_SCRIPT_DIR/config-core.sh"
 
 # ============================================================================
 # Hub Configuration Queries
@@ -77,8 +77,8 @@ get_hub_mode() {
 #   Hub directory path (stdout)
 get_hub_path() {
     # Check environment variable first (highest priority)
-    if [ -n "$AI_USECASES_DIR" ]; then
-        echo "$AI_USECASES_DIR"
+    if [ -n "${AI_USECASES_DIR:-}" ]; then
+        echo "${AI_USECASES_DIR}"
         return 0
     fi
 
