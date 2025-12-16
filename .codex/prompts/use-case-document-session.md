@@ -208,7 +208,7 @@ git status --short
 
 **IMPORTANT**: You MUST use the templates to generate the documentation. Do not create documentation from scratch.
 
-**Use the Read tool** to silently load the appropriate template (do NOT use bash cat which displays output to the user):
+**IMPORTANT: Use the Read tool** to silently load the appropriate template (do NOT use bash cat which displays output to the user):
 
 **For Implementation Sessions:**
 - Use the Read tool with path: `${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE.md`
