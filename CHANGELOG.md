@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **AI Tool Prompt Template Display**: Fixed template being displayed to user instead of used internally
+  - **Root Cause**: AI tool prompt files (Codex, Claude Code, GitHub Copilot) instructed AI to use bash `cat` commands to read templates, causing the full template content to be displayed in the terminal
+  - **Impact**: When running `/use-case:document-session` in Codex or other AI tools, users saw the entire documentation template printed to screen instead of it being used internally to generate documentation
+  - **Solution**: Replaced bash `cat` command instructions with explicit directions to use the Read tool, which loads files internally without displaying them
+  - **Files Updated**:
+    - `.codex/prompts/use-case-document-session.md`
+    - `.ai-tools/commands/use-case/document-session.md`
+    - `.github/prompts/use-case/document-session.prompt.md`
+  - **User Experience**: Templates are now loaded silently and used as structural guides, resulting in clean documentation generation without template spam
+
 - **ANSI Color Code Rendering**: Fixed literal escape sequences displaying in terminal output
   - **Root Cause**: Color codes in `lib/core/constants.sh` were defined using incorrect bash syntax (`'\033[0;32m'` instead of `$'\033[0;32m'`)
   - **Impact**: Terminal output showed literal `\033[0;34m` escape codes instead of rendered colors
