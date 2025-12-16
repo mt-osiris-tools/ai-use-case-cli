@@ -294,19 +294,19 @@ Your task instructions here...
    Ctrl+Shift+P → "Developer: Reload Window"
    ```
 
-2. **Verify Symlink**:
+3. **Verify Symlink**:
    ```bash
    ls -la .github/prompts/use-case
    # Should show: use-case -> ../../../../.../.github/prompts/use-case
    ```
 
-3. **Check CLI Installation**:
+4. **Check CLI Installation**:
    ```bash
    ls ~/.local/share/ai-use-case-cli/.github/prompts/use-case/
    # Should show 5 .prompt.md files
    ```
 
-4. **Re-run Setup**:
+5. **Re-run Setup**:
    ```bash
    ai-use-case --setup-copilot
    ```
