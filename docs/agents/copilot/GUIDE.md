@@ -75,12 +75,19 @@ your-project/
 │           ├── sync-usecases.prompt.md
 │           ├── search-usecases.prompt.md
 │           └── quick-start.prompt.md
+└── .vscode/
+    └── settings.json              # Copilot configuration
 ```
 
 **Symlink Architecture**:
 - Project prompts symlink to `~/.local/share/ai-use-case-cli/.github/prompts/use-case/`
 - CLI updates automatically propagate to all projects
 - No manual file copying required
+
+**VS Code Configuration**:
+- `.vscode/settings.json` is created/updated with required Copilot settings
+- Enables custom prompts via `chat.promptFiles: true`
+- Configures prompt location via `chat.promptFilesLocations`
 
 ## Available Prompts
 
@@ -261,7 +268,28 @@ Your task instructions here...
 
 **Solutions**:
 
-1. **Reload VS Code Window**:
+1. **Verify VS Code Settings** (Most Common Issue):
+
+   GitHub Copilot requires VS Code settings to enable custom prompts.
+
+   Check if `.vscode/settings.json` contains:
+   ```json
+   {
+     "chat.promptFiles": true,
+     "chat.promptFilesLocations": {
+       ".github/prompts": true
+     }
+   }
+   ```
+
+   **Auto-fix**: Re-run setup to auto-configure:
+   ```bash
+   ai-use-case --setup-copilot
+   ```
+
+   **Manual fix**: Add the above settings to `.vscode/settings.json`
+
+2. **Reload VS Code Window**:
    ```
    Ctrl+Shift+P → "Developer: Reload Window"
    ```
