@@ -31,11 +31,14 @@ When the user invokes this command, you will analyze the organizational structur
 
 1. **Find all documents:**
    - Scan `by-project/` directory recursively
-   - Find all `.md` files matching pattern: `YYYY-Wxx-MM-DD_TICKET-XXX_*.md`
+   - Find all `.md` files matching pattern: `YYYY-Wxx-MM-DD_TICKET-XXX_topic-slug.md`
      - YYYY = year (4 digits)
      - Wxx = literal capital W followed by week number (2 digits, e.g., W49)
      - MM = month (2 digits)
      - DD = day (2 digits)
+     - All date components are separated by dashes: `YYYY-Wxx-MM-DD`
+     - Followed by underscore, then ticket ID (e.g., `TICKET-001`), another underscore, and topic slug (e.g., `jwt-implementation`), ending with `.md`
+     - Full example: `2025-W49-12-01_TICKET-001_jwt-implementation.md`
    - Build list of documents with metadata
 
 2. **Extract metadata from each document:**

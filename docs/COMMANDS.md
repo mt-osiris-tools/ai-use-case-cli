@@ -363,26 +363,28 @@ What would you like to do?
 
 **Recommendation Types:**
 
-**MERGE Topics** (Confidence: 0.90+)
+Note: Confidence thresholds shown are for HIGH priority recommendations. The agent can also recommend changes at MEDIUM/LOW priority with lower confidence (minimum 0.7 threshold applies to all recommendations).
+
+**MERGE Topics** (HIGH priority: Confidence 0.90+; MEDIUM/LOW: lower confidence possible)
 - Example: `auth` + `authentication` + `jwt-auth` → `authentication`
 - When: Multiple topics covering same domain with 80%+ overlap
 - Impact: Consolidates fragmented knowledge
 
-**SPLIT Topics** (Confidence: 0.85+)
+**SPLIT Topics** (HIGH priority: Confidence 0.85+; MEDIUM/LOW: lower confidence possible)
 - Example: `database-work` → `database-migrations` + `database-optimization` + `database-schema`
 - When: Large topic (20+ docs) with low similarity (< 0.5)
 - Impact: Better organization by intent
 
-**RENAME Topics** (Confidence: 0.80+)
+**RENAME Topics** (HIGH priority: Confidence 0.80+; MEDIUM/LOW: lower confidence possible)
 - Example: `api-stuff` → `api-development`
 - When: Topic name is vague or doesn't match content
 - Impact: Better searchability
 
-**ADD Relationships** (Confidence: 0.75+)
-- Sequential: TICKET-001 → TICKET-002 (builds upon)
-- Technical: Similar technologies/patterns
-- Prerequisite: Frontend needs backend API
-- Alternative: OAuth vs JWT (different solutions)
+**ADD Relationships** (HIGH priority: Confidence 0.75-0.8+; MEDIUM/LOW: lower confidence possible, minimum 0.7)
+- Sequential: TICKET-001 → TICKET-002 (builds upon, requires 0.8+)
+- Technical: Similar technologies/patterns (requires 0.7+)
+- Prerequisite: Frontend needs backend API (requires 0.75+)
+- Alternative: OAuth vs JWT (different solutions, requires 0.7+)
 - Impact: Makes knowledge connections explicit
 
 **When to use:**
