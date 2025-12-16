@@ -48,6 +48,9 @@ else
     NC=''
 fi
 
+# Make color variables readonly to prevent accidental modification
+readonly GREEN YELLOW BLUE RED CYAN GRAY BOLD NC
+
 # ============================================================================
 # Default Paths - Standard locations for config, data, and hub
 # ============================================================================
