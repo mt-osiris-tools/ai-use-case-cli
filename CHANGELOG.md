@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Enhanced CLAUDE.md Documentation**: Comprehensive guidance for Claude Code instances working in this repository
+  - **Project Overview**: Clear explanation of CLI structure, shell scripts, git hooks, slash commands, and library modules
+  - **Essential Commands**: Testing and development commands with examples
+  - **Code Architecture**: Repository structure, main CLI flow, dual-repository architecture, configuration system, and script patterns
+  - **Critical Development Rules**: Branch workflow, version management, documentation revision rules, shell script standards, and security guidelines
+  - **Session Documentation Types**: Implementation vs research sessions with formats and templates
+  - **Advanced Features**: Gating, cross-platform compatibility, and integration points
+  - **Common Development Tasks**: Step-by-step guides for adding commands, modifying hub interaction, and adding feature flags
+  - **Anti-Patterns**: Clear DO/DON'T examples for best practices
+
 - **Markdown Linting Validation for Confluence Publishing**: Automatically validate and fix markdown formatting issues when publishing to Confluence
   - **Auto-fix by default**: When `markdownlint-cli` is installed, the `publish-confluence` script automatically fixes markdown linting issues using all default markdownlint rules
   - **New Flag**: `--no-autofix` option to skip automatic markdown fixes
