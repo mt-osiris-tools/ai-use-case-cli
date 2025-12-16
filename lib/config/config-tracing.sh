@@ -35,6 +35,7 @@ readonly _CONFIG_TRACING_SH_LOADED=1
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../core/constants.sh"
 source "$SCRIPT_DIR/config-core.sh"
+source "$SCRIPT_DIR/../utils/file-utils.sh"
 
 # ============================================================================
 # Tracing Configuration Constants
@@ -167,12 +168,7 @@ set_tracing_config() {
     fi
 
     local temp_file=$(mktemp)
-
-    # Ensure temp file is cleaned up on exit or interruption
-    cleanup_temp_file() {
-        [ -f "$temp_file" ] && rm -f "$temp_file"
-    }
-    trap cleanup_temp_file EXIT INT TERM
+    setup_temp_file_cleanup "$temp_file"
 
     # Use --argjson for boolean/numeric keys, --arg for strings
     case "$key" in
@@ -197,29 +193,25 @@ set_tracing_config() {
     # Validate temp file before moving
     if [ ! -s "$temp_file" ]; then
         echo -e "${RED}Error: Failed to update configuration (empty result)${NC}" >&2
-        trap - EXIT INT TERM
-        unset -f cleanup_temp_file
+        teardown_temp_file_cleanup
         return 1
     fi
 
     if ! jq empty "$temp_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to update configuration (invalid JSON)${NC}" >&2
-        trap - EXIT INT TERM
-        unset -f cleanup_temp_file
+        teardown_temp_file_cleanup
         return 1
     fi
 
     # Atomic move
     if ! mv "$temp_file" "$tracing_config_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to save configuration${NC}" >&2
-        trap - EXIT INT TERM
-        unset -f cleanup_temp_file
+        teardown_temp_file_cleanup
         return 1
     fi
 
     # Remove trap and cleanup function
-    trap - EXIT INT TERM
-    unset -f cleanup_temp_file
+    teardown_temp_file_cleanup
 
     echo "Updated tracing.$key = $value"
     return 0

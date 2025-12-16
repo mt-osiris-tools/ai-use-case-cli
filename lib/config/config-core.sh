@@ -31,6 +31,7 @@ readonly _CONFIG_CORE_SH_LOADED=1
 # Source dependencies
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../core/constants.sh"
+source "$SCRIPT_DIR/../utils/file-utils.sh"
 
 # ============================================================================
 # Directory Management
@@ -216,12 +217,7 @@ set_config() {
     # Create temporary file in config dir for atomic update
     local temp_file
     temp_file="$(mktemp "$CONFIG_DIR/config.json.tmp.XXXXXX")"
-
-    # Ensure temp file is cleaned up on exit or interruption
-    cleanup_temp_file() {
-        [ -f "$temp_file" ] && rm -f "$temp_file"
-    }
-    trap cleanup_temp_file EXIT INT TERM
+    setup_temp_file_cleanup "$temp_file"
 
     # Simple JSON update (works for simple structure)
     sed "s|\"$key\": \"[^\"]*\"|\"$key\": \"$value\"|" "$CONFIG_FILE" > "$temp_file"
@@ -230,8 +226,7 @@ set_config() {
     mv "$temp_file" "$CONFIG_FILE"
 
     # Remove trap and cleanup function
-    trap - EXIT INT TERM
-    unset -f cleanup_temp_file
+    teardown_temp_file_cleanup
 
     echo -e "${GREEN}✓${NC} Configuration updated: $key = $value"
 }

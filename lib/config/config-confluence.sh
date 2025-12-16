@@ -37,6 +37,7 @@ readonly _CONFIG_CONFLUENCE_SH_LOADED=1
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../core/constants.sh"
 source "$SCRIPT_DIR/config-core.sh"
+source "$SCRIPT_DIR/../utils/file-utils.sh"
 
 # ============================================================================
 # Interactive Configuration
@@ -158,12 +159,7 @@ configure_confluence() {
     fi
 
     local temp_file=$(mktemp)
-
-    # Ensure temp file is cleaned up on exit or interruption
-    cleanup_temp_file() {
-        [ -f "$temp_file" ] && rm -f "$temp_file"
-    }
-    trap cleanup_temp_file EXIT INT TERM
+    setup_temp_file_cleanup "$temp_file"
 
     # Add or update confluence section
     if [ ! -f "$CONFIG_FILE" ]; then
@@ -201,8 +197,7 @@ configure_confluence() {
     # Validate temp file
     if [ ! -s "$temp_file" ] || ! jq empty "$temp_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to update configuration${NC}" >&2
-        trap - EXIT INT TERM
-        unset -f cleanup_temp_file
+        teardown_temp_file_cleanup
         return 1
     fi
 
@@ -210,8 +205,7 @@ configure_confluence() {
     mv "$temp_file" "$CONFIG_FILE"
 
     # Remove trap and cleanup function
-    trap - EXIT INT TERM
-    unset -f cleanup_temp_file
+    teardown_temp_file_cleanup
 
     # Set restrictive permissions on config file (contains API token)
     chmod 600 "$CONFIG_FILE"
