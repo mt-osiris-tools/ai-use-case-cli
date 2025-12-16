@@ -23,6 +23,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Documentation**: Updated COMMANDS.md with detailed --intelligent flag usage guide and examples
   - **Documentation**: Updated agents framework README with Phase 4 implementation details
 
+- **Phase 5: Organization Intelligence Agent** - Hub organization analysis and optimization for better discoverability
+  - **New Agent**: Organization Optimizer Agent (`use-case-organization-agent`) for analyzing hub structure and suggesting improvements
+  - **New Command**: `/use-case:optimize-organization` slash command for interactive hub optimization
+  - **Topic Analysis**: Suggests topic merges, splits, and renames based on content similarity and organization patterns
+  - **Relationship Mapping**: Identifies related documents (sequential, technical similarity, prerequisite, alternative approaches)
+  - **Metadata Storage**: `.meta/` directory for relationships graph and audit logs
+  - **Dry-Run Workflow**: Preview recommendations before applying (always requires user confirmation)
+  - **Confidence Scoring**: 0.7-1.0 scale with threshold filtering ensures high-quality recommendations
+  - **Smart Symlink Updates**: Reorganize topics without modifying source files (preserves git history)
+  - **Audit Trail**: Complete history in `.meta/optimization-history.json` for all applied changes
+  - **Hub Health Scoring**: Overall organization score (0-10) with breakdown by category
+  - **Agent Prompt**: Comprehensive analysis methodology with 4-step process (inventory, content analysis, topic clustering, relationship detection)
+  - **Agent Registry**: Organization optimizer agent enabled by default in agent registry template
+  - **Documentation**: Updated COMMANDS.md with detailed optimization workflow and examples
+  - **Documentation**: Updated agents framework README with Phase 5 implementation details
+  - **Phase 5.1 Roadmap**: Tags system, search optimization, and CLI wrapper deferred to Phase 5.1
+
 ## [3.13.0] - 2025-12-15
 ### Added
 

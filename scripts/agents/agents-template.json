@@ -91,7 +91,7 @@
       "name": "Organization Intelligence Agent",
       "description": "Analyzes hub organization and suggests improvements",
       "subagent_type": "use-case-organization-agent",
-      "enabled": false,
+      "enabled": true,
       "version": "1.0.0",
       "capabilities": [
         "topic-analysis",
