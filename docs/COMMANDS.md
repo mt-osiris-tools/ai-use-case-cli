@@ -363,8 +363,6 @@ What would you like to do?
 
 **Recommendation Types:**
 
-Note: Confidence thresholds shown are for HIGH priority recommendations. The agent can also recommend changes at MEDIUM/LOW priority with lower confidence (minimum 0.7 threshold applies to all recommendations).
-
 **MERGE Topics** (HIGH priority: Confidence 0.90+; MEDIUM/LOW: lower confidence possible)
 - Example: `auth` + `authentication` + `jwt-auth` → `authentication`
 - When: Multiple topics covering same domain with 80%+ overlap
@@ -386,6 +384,8 @@ Note: Confidence thresholds shown are for HIGH priority recommendations. The age
 - Prerequisite: Frontend needs backend API (requires 0.75+)
 - Alternative: OAuth vs JWT (different solutions, requires 0.7+)
 - Impact: Makes knowledge connections explicit
+
+**Note:** Confidence thresholds shown above are for HIGH priority recommendations. The agent can also recommend changes at MEDIUM/LOW priority with lower confidence (minimum 0.7 threshold applies to all recommendations).
 
 **When to use:**
 - Hub has 20+ documents (analysis works best with more data)

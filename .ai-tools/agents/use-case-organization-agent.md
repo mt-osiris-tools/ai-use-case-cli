@@ -53,7 +53,7 @@ You are a specialized AI agent that analyzes the organizational structure of AI 
 The agent identifies four types of relationships:
 
 **1. Sequential Relationships**
-- **Confidence threshold:** Minimum 0.8 (relationships below 0.8 are not considered). Assign 0.9+ for explicit references with direct ticket mentions, representing higher confidence within the acceptable range.
+- **Confidence threshold:** Minimum 0.8 (relationships below 0.8 are not considered). Use range 0.8-0.89 for strong evidence without explicit references, and 0.9+ for explicit references with direct ticket mentions.
 - **Detection:** Ticket references in content, follow-up work mentions, "builds on" language
 - **Example:** "This implements refresh tokens building on the JWT authentication from AUTH-001"
 
