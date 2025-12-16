@@ -34,16 +34,16 @@
 # Module Loading
 # ============================================================================
 
-# Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Get script directory (use local variable to avoid collision with caller's SCRIPT_DIR)
+_CONFIG_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Source all configuration modules
-source "$SCRIPT_DIR/../../lib/core/constants.sh"
-source "$SCRIPT_DIR/../../lib/config/config-core.sh"
-source "$SCRIPT_DIR/../../lib/config/config-hub.sh"
-source "$SCRIPT_DIR/../../lib/config/config-features.sh"
-source "$SCRIPT_DIR/../../lib/config/config-tracing.sh"
-source "$SCRIPT_DIR/../../lib/config/config-confluence.sh"
+source "$_CONFIG_SCRIPT_DIR/../../lib/core/constants.sh"
+source "$_CONFIG_SCRIPT_DIR/../../lib/config/config-core.sh"
+source "$_CONFIG_SCRIPT_DIR/../../lib/config/config-hub.sh"
+source "$_CONFIG_SCRIPT_DIR/../../lib/config/config-features.sh"
+source "$_CONFIG_SCRIPT_DIR/../../lib/config/config-tracing.sh"
+source "$_CONFIG_SCRIPT_DIR/../../lib/config/config-confluence.sh"
 
 # ============================================================================
 # Backward Compatibility Wrappers

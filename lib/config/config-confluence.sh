@@ -33,11 +33,11 @@ if [ -n "${_CONFIG_CONFLUENCE_SH_LOADED:-}" ]; then
 fi
 readonly _CONFIG_CONFLUENCE_SH_LOADED=1
 
-# Source dependencies
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../core/constants.sh"
-source "$SCRIPT_DIR/config-core.sh"
-source "$SCRIPT_DIR/../utils/file-utils.sh"
+# Source dependencies (use local variable to avoid collision with caller's SCRIPT_DIR)
+_LIB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_LIB_SCRIPT_DIR/../core/constants.sh"
+source "$_LIB_SCRIPT_DIR/config-core.sh"
+source "$_LIB_SCRIPT_DIR/../utils/file-utils.sh"
 
 # ============================================================================
 # Interactive Configuration

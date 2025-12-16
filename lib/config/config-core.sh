@@ -28,10 +28,10 @@ if [ -n "${_CONFIG_CORE_SH_LOADED:-}" ]; then
 fi
 readonly _CONFIG_CORE_SH_LOADED=1
 
-# Source dependencies
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../core/constants.sh"
-source "$SCRIPT_DIR/../utils/file-utils.sh"
+# Source dependencies (use local variable to avoid collision with caller's SCRIPT_DIR)
+_LIB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_LIB_SCRIPT_DIR/../core/constants.sh"
+source "$_LIB_SCRIPT_DIR/../utils/file-utils.sh"
 
 # ============================================================================
 # Directory Management

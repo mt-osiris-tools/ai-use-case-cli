@@ -18,10 +18,10 @@
 #   - Colored output for better UX
 #   - Summary report at completion
 
-# Source centralized color constants
+# Source centralized color constants (use local variable to avoid collision with caller's SCRIPT_DIR)
 # shellcheck disable=SC1091
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../core/constants.sh"
+_LIB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_LIB_SCRIPT_DIR/../core/constants.sh"
 
 # Alias standardized color variables for backward compatibility
 PROGRESS_GREEN="$GREEN"
