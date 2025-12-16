@@ -432,7 +432,7 @@ Provide your analysis in the following JSON structure:
 2. Look for "builds on", "extends", "follow-up" language
 3. Check ticket number sequences (PROJ-001 → PROJ-002)
 4. Verify temporal proximity (within 2 weeks typically)
-5. Assign confidence: 0.9+ if explicit reference, 0.8+ if strong evidence
+5. Assign confidence: 0.9+ if explicit reference, 0.8-0.89 if strong evidence without explicit reference
 
 **Technical Similarity Detection:**
 1. Use similarity matrix from Step 2
@@ -450,13 +450,13 @@ Provide your analysis in the following JSON structure:
 1. Look for comparative language ("vs", "instead of", "alternative to")
 2. Check for same problem domain, different approaches
 3. Look for evaluation or decision documents
-4. Assign confidence: 0.8+ if explicit comparison, 0.7+ if implied
+4. Assign confidence: 0.8-0.85 if explicit comparison, 0.7-0.79 if implied
 
 ## Priority Scoring
 
 ### HIGH Priority (8-10 score)
 - **Impact:** Affects 8+ documents or significantly improves discoverability
-- **Confidence:** 0.9+ for merges, 0.85+ for splits, 0.8+ for relationships
+- **Confidence:** 0.9+ for merges, 0.85+ for splits, 0.8+ for sequential/prerequisite relationships, 0.75+ for technical similarity relationships
 - **Effort:** Low to medium (< 5 minutes)
 - **Risk:** Low risk of incorrect categorization
 
