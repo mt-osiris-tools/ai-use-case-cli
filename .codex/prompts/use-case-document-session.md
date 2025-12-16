@@ -208,20 +208,15 @@ git status --short
 
 **IMPORTANT**: You MUST use the templates to generate the documentation. Do not create documentation from scratch.
 
-Templates are located in the CLI installation directory (default: `~/.local/share/ai-use-case-cli/docs/`):
+**IMPORTANT: Use the Read tool** to silently load the appropriate template (do NOT use bash cat which displays output to the user):
 
-```bash
-# Get CLI root from ai-use-case script location
-cli_root=$(dirname "$(dirname "$(which ai-use-case)")")/share/ai-use-case-cli
+**For Implementation Sessions:**
+- Use the Read tool with path: `${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE.md`
 
-# For Implementation sessions, read this template:
-cat "${cli_root}/docs/TEMPLATE.md"
+**For Research Sessions:**
+- Use the Read tool with path: `${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE-RESEARCH.md`
 
-# For Research sessions, read this template:
-cat "${cli_root}/docs/TEMPLATE-RESEARCH.md"
-```
-
-**Note**: Templates are only stored in the CLI installation directory. If the above path doesn't work, the CLI may be installed in a non-standard location - check with `which ai-use-case` to find the installation path.
+**Note**: The environment variable `AI_USECASES_CLI_ROOT` allows users to install the CLI in custom locations. If not set, it defaults to `~/.local/share/ai-use-case-cli`. The Read tool loads files internally without displaying them to the user.
 
 ### Step 10: Generate Documentation
 
