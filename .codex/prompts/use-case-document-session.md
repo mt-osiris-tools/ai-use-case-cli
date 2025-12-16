@@ -212,13 +212,11 @@ git status --short
 
 **For Implementation Sessions:**
 - Use the Read tool with path: `${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE.md`
-- If `AI_USECASES_CLI_ROOT` environment variable is set, use that path, otherwise use the default: `~/.local/share/ai-use-case-cli/docs/TEMPLATE.md`
 
 **For Research Sessions:**
 - Use the Read tool with path: `${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE-RESEARCH.md`
-- If `AI_USECASES_CLI_ROOT` environment variable is set, use that path, otherwise use the default: `~/.local/share/ai-use-case-cli/docs/TEMPLATE-RESEARCH.md`
 
-**Note**: The Read tool loads the file internally without displaying it to the user. This is the correct approach - the template is your guide for structure, not something to show the user.
+**Note**: The environment variable `AI_USECASES_CLI_ROOT` allows users to install the CLI in custom locations. If not set, it defaults to `~/.local/share/ai-use-case-cli`. The Read tool loads files internally without displaying them to the user.
 
 ### Step 10: Generate Documentation
 
