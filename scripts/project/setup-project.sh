@@ -110,6 +110,95 @@ ensure_hub_exists() {
     echo "$hub_dir"
 }
 
+# Prompt for AI agent selection
+# Returns space-separated list of selected agents (e.g., "claude copilot")
+prompt_agent_selection() {
+    echo -e "${BLUE}=== AI Agent Integration ===${NC}" >&2
+    echo "" >&2
+    echo "Which AI agents would you like to integrate with this project?" >&2
+    echo "" >&2
+    echo -e "  ${GREEN}1${NC}. Claude Code" >&2
+    echo "     AI-powered coding assistant with slash commands" >&2
+    echo "     Integrates via .claude/commands/ directory" >&2
+    echo "" >&2
+    echo -e "  ${GREEN}2${NC}. GitHub Copilot" >&2
+    echo "     GitHub's AI pair programmer" >&2
+    echo "     Integrates via .github/prompts/ directory" >&2
+    echo "" >&2
+    echo -e "  ${GREEN}3${NC}. Codex" >&2
+    echo "     AI coding assistant" >&2
+    echo "     Installs prompts to ~/.codex/prompts/" >&2
+    echo "" >&2
+    echo -e "  ${GREEN}A${NC}. All agents" >&2
+    echo "" >&2
+    echo -e "  ${GREEN}N${NC}. None (skip agent integration)" >&2
+    echo "" >&2
+
+    while true; do
+        read -p "Select agents (1, 2, 3, A, N) or comma-separated (e.g., 1,2) [A]: " choice
+        choice=${choice:-A}
+
+        # Convert to uppercase and remove whitespace
+        choice=$(echo "$choice" | tr '[:lower:]' '[:upper:]' | tr -d ' ')
+
+        local selected=""
+
+        case $choice in
+            A)
+                selected="claude copilot codex"
+                echo -e "${BLUE}Selected: All agents${NC}" >&2
+                ;;
+            N)
+                selected=""
+                echo -e "${BLUE}Selected: None${NC}" >&2
+                ;;
+            1)
+                selected="claude"
+                echo -e "${BLUE}Selected: Claude Code${NC}" >&2
+                ;;
+            2)
+                selected="copilot"
+                echo -e "${BLUE}Selected: GitHub Copilot${NC}" >&2
+                ;;
+            3)
+                selected="codex"
+                echo -e "${BLUE}Selected: Codex${NC}" >&2
+                ;;
+            *,*)
+                # Handle comma-separated values
+                IFS=',' read -ra AGENTS <<< "$choice"
+                for agent in "${AGENTS[@]}"; do
+                    case $agent in
+                        1)
+                            selected="$selected claude"
+                            ;;
+                        2)
+                            selected="$selected copilot"
+                            ;;
+                        3)
+                            selected="$selected codex"
+                            ;;
+                        *)
+                            echo -e "${RED}Invalid option: $agent${NC}" >&2
+                            continue 2
+                            ;;
+                    esac
+                done
+                # Remove leading/trailing spaces
+                selected=$(echo "$selected" | xargs)
+                echo -e "${BLUE}Selected: $selected${NC}" >&2
+                ;;
+            *)
+                echo -e "${RED}Invalid choice. Please select 1, 2, 3, A, N, or comma-separated values.${NC}" >&2
+                continue
+                ;;
+        esac
+
+        echo "$selected"
+        return 0
+    done
+}
+
 # Configuration - Auto-detect locations
 # SCRIPT_DIR = Script's parent directory (scripts/project) - already set above
 # CLI_ROOT = CLI installation root directory (for scripts and hooks)

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Missing prompt_agent_selection Function**: Fixed "command not found" error during project initialization
+  - **Root Cause**: The `setup-project.sh` script called `prompt_agent_selection()` function at line 255, but the function was never implemented
+  - **Impact**: `ai-use-case init` command failed with error message: `prompt_agent_selection: command not found`
+  - **Solution**: Implemented the missing function with interactive prompt for AI agent selection (Claude Code, GitHub Copilot, Codex)
+  - **Features**: Supports single selection, multiple selection (comma-separated), select all, or skip agent integration
+  - **User Experience**: Users are now prompted during initialization to choose which AI agents to integrate with their project
+
 ### Added
 
 - **Enhanced CLAUDE.md Documentation**: Comprehensive guidance for Claude Code instances working in this repository
