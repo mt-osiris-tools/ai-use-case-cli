@@ -311,7 +311,7 @@ ai-use-case analyze-patterns --period 6months
 **Features:**
 - Analyzes 100+ documents in < 2 minutes
 - Detects topic organization issues (fragmentation, overly broad topics)
-- Maps relationships between documents with 0.7+ confidence
+- Maps relationships between documents with 0.7–0.8+ confidence depending on type (0.8+ for sequential, 0.75+ for prerequisites, 0.7+ for technical similarity and alternatives)
 - Dry-run first workflow (always requires user confirmation)
 - Symlink-only updates (preserves git history)
 - Complete audit trail in `.meta/optimization-history.json`

@@ -33,8 +33,7 @@ When the user invokes this command, you will analyze the organizational structur
    - Scan `by-project/` directory recursively
    - Find all `.md` files matching pattern: `YYYY-Wxx-MM-DD_TICKET-XXX_*.md`
      - YYYY = year (4 digits)
-     - W = literal capital W
-     - xx = week number (2 digits, e.g., W49)
+     - Wxx = literal capital W followed by week number (2 digits, e.g., W49)
      - MM = month (2 digits)
      - DD = day (2 digits)
    - Build list of documents with metadata
@@ -49,8 +48,8 @@ When the user invokes this command, you will analyze the organizational structur
 
      // Parse filename: YYYY-Wxx-MM-DD_TICKET-XXX_topic-slug.md
      // Example: 2025-W49-12-01_TICKET-001_topic-slug.md
-     // Captures: (year)-(W)(week)-(month)-(day)_(ticket)_(topicSlug).md
-     const match = filename.match(/^(\d{4})-W(\d{2})-(\d{2})-(\d{2})_([A-Z]+-\d+)_(.+)\.md$/);
+     // Captures: (year)-(Wxx)-(month)-(day)_(ticket)_(topicSlug).md
+     const match = filename.match(/^(\d{4})-(W\d{2})-(\d{2})-(\d{2})_([A-Z]+-\d+)_(.+)\.md$/);
      if (match) {
        const [_, year, week, month, day, ticket, topicSlug] = match;
 
@@ -65,7 +64,7 @@ When the user invokes this command, you will analyze the organizational structur
          filename,
          filepath,
          date: `${year}-${month}-${day}`,
-         week: `W${week}`,
+         week: week,
          ticket,
          topic_slug: topicSlug,
          frontmatter: {
@@ -222,7 +221,7 @@ Generate detailed markdown report grouped by priority:
 # Organization Optimization Recommendations
 
 ## Hub: ~/.local/share/ai-use-case-cli/hub
-**Analyzed:** 127 documents across 12 projects
+**Documents:** 127 documents across 12 projects
 **Generated:** 2025-12-15 14:30:00
 
 ---
@@ -365,10 +364,10 @@ You're about to apply 8 HIGH priority recommendations:
 Changes:
 - Merge 3 topic groups (8 symlinks moved)
 - Split 1 large topic (15 symlinks reorganized)
-- Add 22 relationships to .meta/relationships.json
 - Rename 1 topic directory
 
-Files affected: 23 symlinks
+Symlinks affected: 23 symlinks updated
+Metadata changes: 22 relationships added to .meta/relationships.json
 Source files: Unchanged (preserves git history)
 Estimated time: 2-3 minutes
 
