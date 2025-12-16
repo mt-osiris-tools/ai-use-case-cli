@@ -67,8 +67,10 @@ Tell the user:
 
 **GitHub Copilot Custom Prompts:**
 - Custom prompts symlinked at `.github/prompts/use-case/`
+- VS Code settings configured at `.vscode/settings.json` (enables custom prompts)
 - Accessible in Copilot Chat by typing `/use-case:`
 - Verify: `ls -la .github/prompts/use-case/` should show symlinks to CLI installation
+- **Important**: Reload VS Code window to activate prompts
 
 ### 7. Show Available Commands
 
@@ -164,6 +166,32 @@ export AI_USECASES_DIR="$HOME/my-custom-hub-location"
 ```
 
 Or re-run the installer and answer 'Y' to set up the hub.
+
+### GitHub Copilot prompts not appearing
+
+GitHub Copilot requires VS Code settings to enable custom prompts:
+
+```bash
+# Verify settings exist
+cat .vscode/settings.json
+```
+
+Required settings:
+```json
+{
+  "chat.promptFiles": true,
+  "chat.promptFilesLocations": {
+    ".github/prompts": true
+  }
+}
+```
+
+**Fix**: Re-run setup to auto-configure:
+```bash
+ai-use-case --setup-copilot
+```
+
+**Manual fix**: Add the above settings to `.vscode/settings.json`, then reload VS Code window.
 
 ### VS Code extension not working
 

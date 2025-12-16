@@ -81,7 +81,7 @@ During initialization, you'll choose:
 
 **AI Agent(s):**
 - **Claude Code** (default): Creates `.claude/commands/use-case/` symlink
-- **GitHub Copilot**: Creates `.github/prompts/use-case/` symlink for custom prompts
+- **GitHub Copilot**: Creates `.github/prompts/use-case/` symlink + `.vscode/settings.json` config
 - **Codex**: Installs prompts in `~/.codex/prompts/`
 - **Multiple**: Configure multiple agents together
 - **None**: Skip agent setup (configure later)
@@ -133,7 +133,7 @@ ai-use-case extract
 | `ai-use-case --init` | Setup project and configure hub |
 | `ai-use-case --init --update` | Update project installation |
 | `ai-use-case --link-claude` | Create Claude Code symlinks (after Claude setup) |
-| `ai-use-case --setup-copilot` | Setup GitHub Copilot custom prompts |
+| `ai-use-case --setup-copilot` | Setup GitHub Copilot custom prompts + VS Code settings |
 | `ai-use-case --setup-codex` | Setup Codex-style CLI prompts |
 | `ai-use-case sync` | Manually sync to hub |
 | `ai-use-case search <term>` | Search use cases |
@@ -163,6 +163,8 @@ Type `/` in VS Code Copilot Chat to access these prompts:
 | `/use-case:quick-start` | Quick start guide |
 
 Setup: `ai-use-case --setup-copilot`
+
+**Note**: Setup automatically configures `.vscode/settings.json` with required Copilot settings (`chat.promptFiles: true`). Reload VS Code window after setup.
 
 ### Slash Commands (Codex-Style CLI)
 

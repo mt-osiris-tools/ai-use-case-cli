@@ -38,6 +38,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Enhanced template usage instructions with explicit "MUST use templates" guidance
   - Emphasized complete documentation requirements (no placeholders or TODO text)
 
+- **GitHub Copilot Custom Prompts Not Working in VS Code**: Fixed missing VS Code settings configuration
+  - **Root Cause**: The `--setup-copilot` command only created `.github/prompts/` directory structure but did not configure required VS Code settings
+  - **Impact**: GitHub Copilot custom prompts (e.g., `/use-case:document-session`) did not appear in VS Code Copilot Chat, even though prompt files were present
+  - **Why It Failed**: GitHub Copilot requires explicit VS Code settings (`chat.promptFiles: true` and `chat.promptFilesLocations`) to enable custom prompts - merely having `.prompt.md` files in `.github/prompts/` is insufficient
+  - **Solution**: Updated `scripts/project/setup-copilot.sh` to automatically create/update `.vscode/settings.json` with required Copilot settings
+  - **Implementation Details**:
+    - Creates `.vscode/settings.json` if it doesn't exist (with required settings)
+    - If settings file exists, uses `jq` (when available) to safely merge settings without overwriting existing configuration
+    - Falls back to manual instructions if `jq` is not available or JSON parsing fails
+    - Detects if settings are already configured to avoid redundant updates
+    - Provides clear feedback at each step (created, updated, already configured, or manual action needed)
+  - **Updated Documentation**:
+    - `docs/agents/copilot/GUIDE.md`: Added "Verify VS Code Settings" as first troubleshooting step with auto-fix and manual fix instructions
+    - Updated "What Gets Set Up" section to include `.vscode/settings.json` in file tree and explain VS Code configuration
+    - `.github/prompts/use-case/quick-start.prompt.md`: Added "GitHub Copilot prompts not appearing" troubleshooting section
+    - Updated setup completion messages to emphasize reloading VS Code window
+  - **User Experience**: GitHub Copilot custom prompts now work out-of-the-box after running `ai-use-case --setup-copilot` (or `ai-use-case --init` with Copilot selected)
+
 ### Added
 
 - **Enhanced CLAUDE.md Documentation**: Comprehensive guidance for Claude Code instances working in this repository
