@@ -20,10 +20,30 @@
 
 # Source centralized color constants (use local variable to avoid collision with caller's SCRIPT_DIR)
 # shellcheck disable=SC1091
-# Resolve symlinks to get the real script location for proper relative path resolution
+# POSIX-compatible symlink resolution (works on macOS, Linux, WSL)
 _LIB_SCRIPT_SOURCE="${BASH_SOURCE[0]}"
 if [ -L "$_LIB_SCRIPT_SOURCE" ]; then
-    _LIB_SCRIPT_SOURCE="$(readlink -f "$_LIB_SCRIPT_SOURCE")"
+    # Try realpath first (available on most modern systems)
+    if command -v realpath >/dev/null 2>&1; then
+        _LIB_SCRIPT_SOURCE="$(realpath "$_LIB_SCRIPT_SOURCE")"
+    else
+        # Fallback: POSIX-compatible symlink resolution
+        # Save current directory
+        _ORIG_PWD="$PWD"
+        cd "$(dirname "$_LIB_SCRIPT_SOURCE")" || exit 1
+        _LIB_SCRIPT_SOURCE="$(basename "$_LIB_SCRIPT_SOURCE")"
+        # Follow symlinks until we find the real file
+        while [ -L "$_LIB_SCRIPT_SOURCE" ]; do
+            _LIB_SCRIPT_SOURCE="$(readlink "$_LIB_SCRIPT_SOURCE")"
+            cd "$(dirname "$_LIB_SCRIPT_SOURCE")" || exit 1
+            _LIB_SCRIPT_SOURCE="$(basename "$_LIB_SCRIPT_SOURCE")"
+        done
+        # Get the physical directory and append the filename
+        _LIB_SCRIPT_SOURCE="$(pwd -P)/$_LIB_SCRIPT_SOURCE"
+        # Restore original directory
+        cd "$_ORIG_PWD" || exit 1
+        unset _ORIG_PWD
+    fi
 fi
 _LIB_SCRIPT_DIR="$(cd "$(dirname "$_LIB_SCRIPT_SOURCE")" && pwd)"
 source "$_LIB_SCRIPT_DIR/../core/constants.sh"
