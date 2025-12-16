@@ -20,7 +20,12 @@
 
 # Source centralized color constants (use local variable to avoid collision with caller's SCRIPT_DIR)
 # shellcheck disable=SC1091
-_LIB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Resolve symlinks to get the real script location for proper relative path resolution
+_LIB_SCRIPT_SOURCE="${BASH_SOURCE[0]}"
+if [ -L "$_LIB_SCRIPT_SOURCE" ]; then
+    _LIB_SCRIPT_SOURCE="$(readlink -f "$_LIB_SCRIPT_SOURCE")"
+fi
+_LIB_SCRIPT_DIR="$(cd "$(dirname "$_LIB_SCRIPT_SOURCE")" && pwd)"
 source "$_LIB_SCRIPT_DIR/../core/constants.sh"
 
 # Alias standardized color variables for backward compatibility
