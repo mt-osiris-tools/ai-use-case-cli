@@ -9,11 +9,11 @@ argument-hint: [FILE=<markdown-file>] [PARENT_URL=<confluence-url>] [DRY_RUN=tru
 
 ## Parameters
 
-- **$FILE** (optional): Path to the markdown file to publish
+- **FILE** (optional): Path to the markdown file to publish
   - If not provided, prompt the user to select from `.usecase/cases/`
-- **$PARENT_URL** (optional): Confluence parent page URL
+- **PARENT_URL** (optional): Confluence parent page URL
   - If not provided, prompt the user for the URL
-- **$DRY_RUN** (optional): Set to "true" for preview mode without publishing
+- **DRY_RUN** (optional): Set to "true" for preview mode without publishing
 
 ## Your Task
 
@@ -23,29 +23,29 @@ Publish an AI use case documentation file to Confluence as a child page under th
 
 Before proceeding, verify:
 1. User has provided or will provide:
-   - Markdown file path ($FILE or interactive selection)
-   - Confluence parent page URL ($PARENT_URL or interactive input)
+   - Markdown file path (FILE parameter or interactive selection)
+   - Confluence parent page URL (PARENT_URL parameter or interactive input)
 2. REST API credentials are configured (via config file or environment variables)
 
 ## Automatic Publishing Workflow
 
 ### Step 0: Handle Parameters (Hybrid Approach)
 
-**If $FILE is provided:**
-- Use it directly: `$FILE`
+**If FILE is provided:**
+- Use it directly
 - Validate the file exists
 
-**If $FILE is NOT provided:**
+**If FILE is NOT provided:**
 - List available documentation files:
   ```bash
   ls -1 .usecase/cases/*.md 2>/dev/null | head -20
   ```
 - Ask the user to select which file to publish
 
-**If $PARENT_URL is provided:**
-- Use it directly: `$PARENT_URL`
+**If PARENT_URL is provided:**
+- Use it directly
 
-**If $PARENT_URL is NOT provided:**
+**If PARENT_URL is NOT provided:**
 - Ask the user for the Confluence parent page URL
 - Expected format: `https://{site}.atlassian.net/wiki/spaces/{space}/pages/{pageId}/{title}`
 
@@ -128,7 +128,7 @@ FILENAME=$(basename "<markdown-file>")
 
 ### Step 5: Preview or Publish
 
-**If $DRY_RUN is "true":**
+**If DRY_RUN is "true":**
 Show preview without publishing:
 ```bash
 scripts/core/publish-confluence.sh \

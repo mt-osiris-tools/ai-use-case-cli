@@ -1,17 +1,24 @@
 #!/bin/bash
 # Configuration Manager for AI Use Case CLI - Unified Facade
 #
+# DEPRECATION NOTICE:
+#   This facade is deprecated and exists only for backward compatibility with existing scripts.
+#   NEW CODE SHOULD SOURCE THE SPECIFIC MODULES DIRECTLY (see below).
+#   This file is scheduled for removal after 2026-06-30. Please migrate any usage to the
+#   specific modules listed below as soon as possible.
+#
 # This file provides a unified facade for backward compatibility with the old
 # config-manager.sh interface. All implementation has been split into focused
 # modules in lib/config/ as part of the layered architecture refactor.
 #
 # NEW CODE SHOULD SOURCE THE SPECIFIC MODULES DIRECTLY:
-#   source lib/core/constants.sh
-#   source lib/config/config-core.sh
-#   source lib/config/config-hub.sh
-#   source lib/config/config-features.sh
-#   source lib/config/config-tracing.sh
-#   source lib/config/config-confluence.sh
+#   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+#   source "$SCRIPT_DIR/../../lib/core/constants.sh"
+#   source "$SCRIPT_DIR/../../lib/config/config-core.sh"
+#   source "$SCRIPT_DIR/../../lib/config/config-hub.sh"
+#   source "$SCRIPT_DIR/../../lib/config/config-features.sh"
+#   source "$SCRIPT_DIR/../../lib/config/config-tracing.sh"
+#   source "$SCRIPT_DIR/../../lib/config/config-confluence.sh"
 #
 # This facade exists only for backward compatibility with existing scripts.
 #
@@ -27,16 +34,16 @@
 # Module Loading
 # ============================================================================
 
-# Get script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Get script directory (use local variable to avoid collision with caller's SCRIPT_DIR)
+_CONFIG_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Source all configuration modules
-source "$SCRIPT_DIR/../../lib/core/constants.sh"
-source "$SCRIPT_DIR/../../lib/config/config-core.sh"
-source "$SCRIPT_DIR/../../lib/config/config-hub.sh"
-source "$SCRIPT_DIR/../../lib/config/config-features.sh"
-source "$SCRIPT_DIR/../../lib/config/config-tracing.sh"
-source "$SCRIPT_DIR/../../lib/config/config-confluence.sh"
+source "$_CONFIG_SCRIPT_DIR/../../lib/core/constants.sh"
+source "$_CONFIG_SCRIPT_DIR/../../lib/config/config-core.sh"
+source "$_CONFIG_SCRIPT_DIR/../../lib/config/config-hub.sh"
+source "$_CONFIG_SCRIPT_DIR/../../lib/config/config-features.sh"
+source "$_CONFIG_SCRIPT_DIR/../../lib/config/config-tracing.sh"
+source "$_CONFIG_SCRIPT_DIR/../../lib/config/config-confluence.sh"
 
 # ============================================================================
 # Backward Compatibility Wrappers

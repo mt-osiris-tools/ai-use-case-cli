@@ -7,21 +7,74 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **ANSI Color Code Rendering**: Fixed literal escape sequences displaying in terminal output
+  - **Root Cause**: Color codes in `lib/core/constants.sh` were defined using incorrect bash syntax (`'\033[0;32m'` instead of `$'\033[0;32m'`)
+  - **Impact**: Terminal output showed literal `\033[0;34m` escape codes instead of rendered colors
+  - **Solution**:
+    - Fixed color variable syntax in `lib/core/constants.sh` to use `$'...'` format for proper escape sequence interpretation
+    - Added TTY detection to automatically disable colors when output is not to a terminal (piped, redirected)
+    - Added support for `FORCE_COLOR` and `NO_COLOR` environment variables for explicit color control
+  - **Behavior**: Colors now render correctly in terminals and are automatically disabled in non-TTY contexts (logs, pipes)
+
+- **Missing prompt_agent_selection Function**: Fixed "command not found" error during project initialization
+  - **Root Cause**: In the buggy version, the `setup-project.sh` script called `prompt_agent_selection()` at line 255 (now implemented at lines 113-215), but the function was never implemented
+  - **Impact**: `ai-use-case init` command failed with error message: `prompt_agent_selection: command not found`
+  - **Solution**: Implemented the missing function with interactive prompt for AI agent selection (Claude Code, GitHub Copilot, Codex)
+  - **Features**:
+    - Supports single selection, multiple selection (comma-separated), select all, or skip agent integration
+    - Prevents duplicate selections when using comma-separated input (e.g., "1,1" is deduplicated to "claude")
+    - Clear prompt messaging: "Select one (1-3, A, N) or multiple with commas (e.g., 1,2,3)"
+    - Non-interactive mode support: Automatically defaults to all agents when running without TTY (e.g., in tests)
+  - **User Experience**: Users are now prompted during initialization to choose which AI agents to integrate with their project
+
+- **Codex Prompt Parameter Parsing**: Fixed internal bash variables appearing as user-facing parameters in Codex CLI
+  - Changed parameter references in documentation from `$UPPERCASE` to `UPPERCASE` (removed $ prefix) to prevent Codex from displaying them as parameters
+  - Changed internal bash variables in code blocks from `$UPPERCASE` to lowercase with `$` prefix (e.g., `$USER_EMAIL` → `$user_email`)
+  - Applied consistent parameter naming to both Codex prompt files (`use-case-document-session.md` and `use-case-publish-confluence.md`)
+  - Only intended parameters now appear: `SCAN_TYPE` and `SESSION_TYPE` for document-session; `FILE`, `PARENT_URL`, and `DRY_RUN` for publish-confluence
+  - Removed spurious parameters: `USER_EMAIL`, `GH_USERNAME`, and `LATEST_USER_COMMIT` from parameter list
+  - Enhanced template usage instructions with explicit "MUST use templates" guidance
+  - Emphasized complete documentation requirements (no placeholders or TODO text)
+
+- **GitHub Copilot Custom Prompts Not Working in VS Code**: Fixed missing VS Code settings configuration
+  - **Root Cause**: The `--setup-copilot` command only created `.github/prompts/` directory structure but did not configure required VS Code settings
+  - **Impact**: GitHub Copilot custom prompts (e.g., `/use-case:document-session`) did not appear in VS Code Copilot Chat, even though prompt files were present
+  - **Why It Failed**: GitHub Copilot requires explicit VS Code settings (`chat.promptFiles: true` and `chat.promptFilesLocations`) to enable custom prompts - merely having `.prompt.md` files in `.github/prompts/` is insufficient
+  - **Solution**: Updated `scripts/project/setup-copilot.sh` to automatically create/update `.vscode/settings.json` with required Copilot settings
+  - **Implementation Details**:
+    - Creates `.vscode/settings.json` if it doesn't exist (with required settings)
+    - If settings file exists, uses `jq` (when available) to safely merge settings without overwriting existing configuration
+    - Falls back to manual instructions if `jq` is not available or JSON parsing fails
+    - Detects if settings are already configured to avoid redundant updates
+    - Provides clear feedback at each step (created, updated, already configured, or manual action needed)
+  - **Updated Documentation**:
+    - `docs/agents/copilot/GUIDE.md`: Added "Verify VS Code Settings" as first troubleshooting step with auto-fix and manual fix instructions
+    - Updated "What Gets Set Up" section to include `.vscode/settings.json` in file tree and explain VS Code configuration
+    - `.github/prompts/use-case/quick-start.prompt.md`: Added "GitHub Copilot prompts not appearing" troubleshooting section
+    - Updated setup completion messages to emphasize reloading VS Code window
+  - **User Experience**: GitHub Copilot custom prompts now work out-of-the-box after running `ai-use-case --setup-copilot` (or `ai-use-case --init` with Copilot selected)
+
 ### Added
 
-- **Phase 4: Session Selector Agent** - Intelligent session analysis and prioritization for documentation
-  - **New Agent**: Session Selector Agent (`use-case-session-selector-agent`) for analyzing and scoring documentation sessions
-  - **New Flag**: `--intelligent` flag for `/use-case:document-session` command enables AI-powered session prioritization
-  - **Priority Scoring**: Assigns scores (0-10) to PRs, commits, and research sessions based on documentation value
-  - **Priority Levels**: Groups sessions as HIGH (8-10), MEDIUM (5-7), LOW (2-4), or SKIP (0-1) with clear recommendations
-  - **Commit Grouping**: Automatically groups related commits by time proximity, file overlap, and message similarity
-  - **Metadata Extraction**: Pre-populates template fields (ticket number, complexity, time saved, technologies) for faster documentation
-  - **Already Documented Detection**: Identifies and filters out sessions that have already been documented
-  - **Enhanced Presentation**: Shows prioritized sessions with scores, reasoning, and recommendations in document-session workflow
-  - **Agent Prompt**: Comprehensive scoring criteria based on complexity, novelty, reusability, impact, and quality
-  - **Agent Registry**: Session-selector agent enabled by default in agent registry template
-  - **Documentation**: Updated COMMANDS.md with detailed --intelligent flag usage guide and examples
-  - **Documentation**: Updated agents framework README with Phase 4 implementation details
+- **Enhanced CLAUDE.md Documentation**: Comprehensive guidance for Claude Code instances working in this repository
+  - **Project Overview**: Clear explanation of CLI structure, shell scripts, git hooks, slash commands, and library modules
+  - **Essential Commands**: Testing and development commands with examples
+  - **Code Architecture**: Repository structure, main CLI flow, dual-repository architecture, configuration system, and script patterns
+  - **Critical Development Rules**: Branch workflow, version management, documentation revision rules, shell script standards, and security guidelines
+  - **Session Documentation Types**: Implementation vs research sessions with formats and templates
+  - **Advanced Features**: Gating, cross-platform compatibility, and integration points
+  - **Common Development Tasks**: Step-by-step guides for adding commands, modifying hub interaction, and adding feature flags
+  - **Anti-Patterns**: Clear DO/DON'T examples for best practices
+
+- **Markdown Linting Validation for Confluence Publishing**: Automatically validate and fix markdown formatting issues when publishing to Confluence
+  - **Auto-fix by default**: When `markdownlint-cli` is installed, the `publish-confluence` script automatically fixes markdown linting issues using all default markdownlint rules
+  - **New Flag**: `--no-autofix` option to skip automatic markdown fixes
+  - **Graceful degradation**: Works seamlessly whether markdownlint is installed or not
+  - **Configuration file**: Added `.markdownlint.json` with project-standard linting rules (disables line-length, inline-html, and first-line-heading checks while enabling all other standard rules)
+  - **User-friendly messages**: Clear feedback when linting/fixing occurs or when markdownlint is not installed
+  - **Documentation**: Updated README.md with optional dependency installation instructions
 
 - **Phase 5: Organization Intelligence Agent** - Hub organization analysis and optimization for better discoverability
   - **New Agent**: Organization Optimizer Agent (`use-case-organization-agent`) for analyzing hub structure and suggesting improvements
@@ -41,15 +94,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Phase 5.1 Roadmap**: Tags system, search optimization, and CLI wrapper deferred to Phase 5.1
 
 ## [3.13.0] - 2025-12-15
+
 ### Added
+
+- **Phase 4: Session Selector Agent** - Intelligent session analysis and prioritization for documentation
+  - **New Agent**: Session Selector Agent (`use-case-session-selector-agent`) for analyzing and scoring documentation sessions
+  - **New Flag**: `--intelligent` flag for `/use-case:document-session` command enables AI-powered session prioritization
+  - **Priority Scoring**: Assigns scores (0-10) to PRs, commits, and research sessions based on documentation value
+  - **Priority Levels**: Groups sessions as HIGH (8-10), MEDIUM (5-7), LOW (2-4), or SKIP (0-1) with clear recommendations
+  - **Commit Grouping**: Automatically groups related commits by time proximity, file overlap, and message similarity
+  - **Metadata Extraction**: Pre-populates template fields (ticket number, complexity, time saved, technologies) for faster documentation
+  - **Already Documented Detection**: Identifies and filters out sessions that have already been documented
+  - **Enhanced Presentation**: Shows prioritized sessions with scores, reasoning, and recommendations in document-session workflow
+  - **Agent Prompt**: Comprehensive scoring criteria based on complexity, novelty, reusability, impact, and quality
+  - **Agent Registry**: Session-selector agent enabled by default in agent registry template
+  - **Documentation**: Updated COMMANDS.md with detailed --intelligent flag usage guide and examples
+  - **Documentation**: Updated agents framework README with Phase 4 implementation details
+
+- **GitHub Copilot Custom Prompts Integration**: Full support for GitHub Copilot custom prompts in VS Code
+  - **New Command**: `ai-use-case --setup-copilot` to configure GitHub Copilot custom prompts
+  - **Custom Prompts**: Workspace-specific `.github/prompts/use-case/` directory with 5 core prompts:
+    - `document-session.prompt.md` - Document AI coding sessions automatically
+    - `setup-project.prompt.md` - Setup project for documentation
+    - `sync-usecases.prompt.md` - Sync use cases from project to hub
+    - `search-usecases.prompt.md` - Search documented use cases
+    - `quick-start.prompt.md` - Quick start guide for first-time users
+  - **Symlink Architecture**: Project prompts symlink to CLI installation for automatic updates
+  - **Agent Selection**: GitHub Copilot added to agent selection menu during `--init`
+  - **Multiple Agent Support**: Enhanced agent selection to support multiple simultaneous agents (Claude + Copilot + Codex)
+  - **Setup Script**: `scripts/project/setup-copilot.sh` handles prompt symlink creation
+  - **Documentation**: New `docs/agents/copilot/GUIDE.md` with comprehensive setup and usage instructions
+  - **YAML Frontmatter**: All prompts include description metadata for discoverability in VS Code
+
 
 - **Codex CLI Integration**: Support for Codex-style CLI tools with slash commands
   - **Note**: This integration provides slash command prompts compatible with CLI tools that use
     the Codex CLI pattern (YAML frontmatter, `/prompts:` invocation). This does NOT use the
-    deprecated OpenAI Codex completion API, but rather provides project-local prompt files for
+    deprecated OpenAI Codex completion API, but rather provides user-global prompt files for
     compatible CLI coding assistants.
-  - **New Command**: `ai-use-case --setup-codex` to install Codex prompts into project
-  - **Codex Prompts**: Project-local `.codex/prompts/` directory with YAML frontmatter
+  - **New Command**: `ai-use-case --setup-codex` to install Codex prompts into user's home directory
+  - **Codex Prompts**: User-global `~/.codex/prompts/` directory with YAML frontmatter
     - `use-case-document-session.md` - Document AI sessions with hybrid parameters
     - `use-case-publish-confluence.md` - Publish to Confluence via REST API
   - **Hybrid Parameters**: Optional named parameters with interactive fallback
@@ -112,6 +196,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **BREAKING: Codex Prompts Now Global**: Codex-style CLI prompts are now installed in the home directory (`~/.codex/prompts/`) instead of project-local directories
+  - **Migration**: Project-local `.codex/prompts/` directories are no longer used and can be safely deleted
+  - **Benefit**: Prompts are now available globally across all projects
+  - **Affected Files**: `scripts/project/setup-codex.sh`, tests, and documentation updated
+  - **User Action Required**: Run `ai-use-case --setup-codex` again to install prompts in home directory, then delete old project-local `.codex/` folders
+
 - **README.md Streamlined**: Reduced from 526 to 322 lines (39% reduction) for better readability
   - Removed version-specific noise (v3.x.x+ annotations throughout)
   - Condensed features list from 13 to 8 high-level points
@@ -122,6 +212,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CONTRIBUTING.md**: Updated documentation references to include new guide structure
   - Added references to USAGE-GUIDE.md, CONFIGURATION.md, and FEATURES.md
   - Updated version consistency table with new documentation files
+
+### Fixed
+
+- **Symlink Creation - Absolute Paths**: Simplified symlink creation by using absolute paths instead of Python-based relative paths
+  - **Issue**: Initial implementation used Python (`python3 -c "import os; print(os.path.relpath(...))"`) for cross-platform relative path calculation to avoid macOS `realpath` unavailability
+  - **Decision**: Switched to absolute paths for simplicity - no external dependencies required
+  - **Trade-off**: Symlinks break if CLI installation moves, but user can re-run setup command (rare scenario)
+  - **Benefit**: No Python dependency, simpler code, works on all platforms without additional tools
+  - **Affected files**:
+    - `scripts/project/setup-copilot.sh:78-80` - Copilot prompt symlink creation
+    - `scripts/core/sync-ai-use-cases.sh:275-280` - By-date symlink creation
+    - `scripts/core/sync-ai-use-cases.sh:297-302` - By-topic symlink creation
+  - **Impact**: Cleaner implementation with zero external dependencies beyond bash and ln
+
+- **Documentation Accuracy**: Ensured correct slash format in quick-start.prompt.md during development (PR #178)
+  - Claude Code commands use `/use-case:command` (colon) instead of `/use-case/command` (slash)
+  - Following old instructions would have failed to match any command, but the file was added with the correct format from the start
+  - File added in PR #178 with correct format: `.github/prompts/use-case/quick-start.prompt.md:91-95`
 
 ## [3.12.0] - 2025-12-07
 
@@ -271,6 +379,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Diagrams now accurately represent v3.11.0 architecture with Agent Framework (Phases 1 & 2)
 
 ### Fixed
+
+- **ANSI Escape Codes in Piped Output**: Fixed literal escape codes appearing when CLI output is piped or redirected
+  - Added TTY detection to automatically disable colors when stdout is not a terminal
+  - Colors now work correctly in terminals but appear as clean text when piped (e.g., `ai-use-case --help | cat`)
+  - Respects `NO_COLOR` environment variable standard (https://no-color.org/)
+  - Added `FORCE_COLOR` environment variable to override TTY detection (useful for testing)
+  - Updated `config-manager.sh` to only set colors if not already defined by parent script
+  - Updated test suite to use `FORCE_COLOR=1` for color-related tests
+  - Extracted color setup logic into reusable `setup_colors()` function to avoid duplication
+  - Improves user experience when copying help text, saving output to files, or using CLI in scripts
 
 - **Self-Update Color Rendering**: Fixed ANSI color codes displaying as literal text in `scripts/utils/self-update.sh`
   - Changed `echo` to `echo -e` at line 102 to properly interpret color escape sequences

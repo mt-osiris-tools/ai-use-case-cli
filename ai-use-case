@@ -7,20 +7,21 @@
 
 set -e
 
-# Colors
-GREEN=$'\033[0;32m'
-BLUE=$'\033[0;34m'
-YELLOW=$'\033[1;33m'
-RED=$'\033[0;31m'
-CYAN=$'\033[0;36m'
-NC=$'\033[0m'
-
 # Get script directory (resolve symlinks)
 SCRIPT_PATH="${BASH_SOURCE[0]}"
 if [ -L "$SCRIPT_PATH" ]; then
     SCRIPT_PATH="$(readlink -f "$SCRIPT_PATH")"
 fi
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+
+# Source core constants (includes color setup with TTY detection)
+if [ -f "$SCRIPT_DIR/lib/core/constants.sh" ]; then
+    source "$SCRIPT_DIR/lib/core/constants.sh"
+else
+    # Fallback color definitions if constants.sh is missing
+    echo "Warning: lib/core/constants.sh not found, using fallback colors" >&2
+    GREEN='' BLUE='' YELLOW='' RED='' CYAN='' GRAY='' BOLD='' NC=''
+fi
 
 # Source version configuration (single source of truth)
 if [ -f "$SCRIPT_DIR/scripts/utils/version.sh" ]; then
@@ -103,6 +104,7 @@ ${YELLOW}USAGE${NC}
 ${YELLOW}COMMANDS${NC}
   ${GREEN}--init, init [--update]${NC}   Setup current project (use --update to refresh)
   ${GREEN}--link-claude${NC}             Create Claude Code symlinks (after Claude setup)
+  ${GREEN}--setup-copilot${NC}           Setup GitHub Copilot custom prompts (after Copilot setup)
   ${GREEN}--setup-codex${NC}             Setup Codex-style CLI prompts (after Codex setup)
   ${GREEN}config [show|reconfigure]${NC} Show or reconfigure hub settings
   ${GREEN}sync${NC}                      Sync use cases from project to hub
@@ -170,6 +172,12 @@ EOF
     cat <<EOF
 
 ${YELLOW}CODEX-STYLE CLI INTEGRATION${NC}
+  For GitHub Copilot in VS Code (type / in Copilot Chat):
+  ${GREEN}/use-case:document-session${NC}   Document AI session
+  ${GREEN}/use-case:setup-project${NC}      Setup another project
+  ${GREEN}/use-case:sync-usecases${NC}      Sync to hub
+  Setup: ${CYAN}ai-use-case --setup-copilot${NC}
+
   For Codex-style CLI tools with hybrid parameter support:
   ${GREEN}/prompts:use-case-document-session${NC}   Document AI session
   ${GREEN}/prompts:use-case-publish-confluence${NC} Publish to Confluence
@@ -179,6 +187,7 @@ ${YELLOW}EXAMPLES${NC}
   ai-use-case --init              # Setup current project
   ai-use-case --init --update     # Update project installation
   ai-use-case --link-claude       # Create Claude Code symlinks
+  ai-use-case --setup-copilot     # Setup GitHub Copilot custom prompts
   ai-use-case --setup-codex       # Setup Codex CLI prompts
   ai-use-case config show         # Show current hub configuration
   ai-use-case sync                # Sync use cases to hub
@@ -237,6 +246,17 @@ case "${1:-}" in
         else
             trace_event "error" "command=link-claude" "error=script_not_found" "script=link-claude.sh"
             echo -e "${RED}Error: link-claude.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    --setup-copilot|setup-copilot)
+        trace_event "command_start" "command=setup-copilot" "working_dir=$(pwd)"
+        echo -e "${BLUE}Setting up GitHub Copilot custom prompts...${NC}"
+        if [ -f "$SCRIPT_DIR/scripts/project/setup-copilot.sh" ]; then
+            trace_run "setup-copilot" bash "$SCRIPT_DIR/scripts/project/setup-copilot.sh" .
+        else
+            trace_event "error" "command=setup-copilot" "error=script_not_found" "script=setup-copilot.sh"
+            echo -e "${RED}Error: setup-copilot.sh not found${NC}"
             exit 1
         fi
         ;;
@@ -368,9 +388,11 @@ case "${1:-}" in
         fi
         ;;
     publish-confluence)
-        trace_event "command_start" "command=publish-confluence" "arg=${2:-}"
+        trace_event "command_start" "command=publish-confluence" "args=$*"
         if [ -f "$SCRIPT_DIR/scripts/core/publish-confluence.sh" ]; then
-            trace_run "publish-confluence" bash "$SCRIPT_DIR/scripts/core/publish-confluence.sh" "${2:-}"
+            # Pass all arguments to the script
+            shift
+            trace_run "publish-confluence" bash "$SCRIPT_DIR/scripts/core/publish-confluence.sh" "$@"
         else
             trace_event "error" "command=publish-confluence" "error=script_not_found" "script=publish-confluence.sh"
             echo -e "${RED}Error: publish-confluence.sh not found${NC}"
