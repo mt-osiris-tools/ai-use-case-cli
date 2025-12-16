@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **ANSI Color Code Rendering**: Fixed literal escape sequences displaying in terminal output
+  - **Root Cause**: Color codes in `lib/core/constants.sh` were defined using incorrect bash syntax (`'\033[0;32m'` instead of `$'\033[0;32m'`)
+  - **Impact**: Terminal output showed literal `\033[0;34m` escape codes instead of rendered colors
+  - **Solution**:
+    - Fixed color variable syntax in `lib/core/constants.sh` to use `$'...'` format for proper escape sequence interpretation
+    - Added TTY detection to automatically disable colors when output is not to a terminal (piped, redirected)
+    - Added support for `FORCE_COLOR` and `NO_COLOR` environment variables for explicit color control
+  - **Behavior**: Colors now render correctly in terminals and are automatically disabled in non-TTY contexts (logs, pipes)
+
 - **Missing prompt_agent_selection Function**: Fixed "command not found" error during project initialization
   - **Root Cause**: In the buggy version, the `setup-project.sh` script called `prompt_agent_selection()` at line 255 (now implemented at lines 113-215), but the function was never implemented
   - **Impact**: `ai-use-case init` command failed with error message: `prompt_agent_selection: command not found`
