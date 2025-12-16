@@ -9,13 +9,13 @@ argument-hint: [SCAN_TYPE=<conversation|git|both>] [SESSION_TYPE=<implementation
 
 ## Parameters
 
-- **$SCAN_TYPE** (optional): What to scan for documentation
+- **SCAN_TYPE** (optional): What to scan for documentation
   - `conversation` - Document current AI session only (no git scanning)
   - `git` - Scan git history for recent PRs and commits
   - `both` - Show all options (conversation + git)
   - If not provided, prompt the user to choose
 
-- **$SESSION_TYPE** (optional): Type of session to document
+- **SESSION_TYPE** (optional): Type of session to document
   - `implementation` - Code changes with commits
   - `research` - Exploratory conversation, no commits
   - If not provided, auto-detect from git history
@@ -58,11 +58,11 @@ Help the user select which work session to document, then automatically generate
 
 ### Step 0: Handle SCAN_TYPE Parameter
 
-**If $SCAN_TYPE is provided:**
+**If SCAN_TYPE is provided:**
 - Use the provided value directly
 - Skip to appropriate detection step
 
-**If $SCAN_TYPE is NOT provided:**
+**If SCAN_TYPE is NOT provided:**
 Ask the user:
 ```
 What would you like to document?
@@ -79,12 +79,12 @@ Please choose (1, 2, or 3):
 Always needed regardless of scan type:
 ```bash
 # Get current user's git email and GitHub username
-USER_EMAIL=$(git config user.email)
-GH_USERNAME=$(gh api user --jq '.login' 2>/dev/null)
+user_email=$(git config user.email)
+gh_username=$(gh api user --jq '.login' 2>/dev/null)
 
-echo "Git user: $USER_EMAIL"
-if [ -n "$GH_USERNAME" ]; then
-    echo "GitHub user: $GH_USERNAME"
+echo "Git user: $user_email"
+if [ -n "$gh_username" ]; then
+    echo "GitHub user: $gh_username"
 else
     echo "GitHub CLI not configured (PR detection will be skipped)"
 fi
@@ -119,16 +119,16 @@ If not set up, offer to run: `ai-use-case --init`
 
 **If SCAN_TYPE is "git" or "both":**
 ```bash
-USER_EMAIL=$(git config user.email)
-GH_USERNAME=$(gh api user --jq '.login' 2>/dev/null)
+user_email=$(git config user.email)
+gh_username=$(gh api user --jq '.login' 2>/dev/null)
 
 # Get recent merged PRs by current user (last 24 hours)
-if [ -n "$GH_USERNAME" ]; then
-    gh pr list --limit 20 --state merged --author="$GH_USERNAME" --json number,title,mergedAt,headRefName,author --jq '.[] | select(.mergedAt | fromdateiso8601 > (now - 86400)) | "PR #\(.number): \(.title) (branch: \(.headRefName))"'
+if [ -n "$gh_username" ]; then
+    gh pr list --limit 20 --state merged --author="$gh_username" --json number,title,mergedAt,headRefName,author --jq '.[] | select(.mergedAt | fromdateiso8601 > (now - 86400)) | "PR #\(.number): \(.title) (branch: \(.headRefName))"'
 fi
 
 # Get recent commits by current user
-git log --since="24 hours ago" --author="$USER_EMAIL" --pretty=format:"%h - %s (%ar)" --first-parent
+git log --since="24 hours ago" --author="$user_email" --pretty=format:"%h - %s (%ar)" --first-parent
 
 # Check existing documentation
 ls -1 .usecase/cases/ 2>/dev/null | grep -E '^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{2}_.*\.md$'
@@ -169,15 +169,15 @@ Based on selection, determine if implementation or research:
 
 **For Implementation Sessions:**
 ```bash
-USER_EMAIL=$(git config user.email)
+user_email=$(git config user.email)
 
 # Recent commits with details
-git log --since="24 hours ago" --author="$USER_EMAIL" --pretty=format:"%h - %s (%ar)" | head -20
+git log --since="24 hours ago" --author="$user_email" --pretty=format:"%h - %s (%ar)" | head -20
 
 # Latest commit stats
-LATEST_USER_COMMIT=$(git log --author="$USER_EMAIL" --format="%H" -n 1 2>/dev/null)
-if [ -n "$LATEST_USER_COMMIT" ]; then
-    git show --stat "$LATEST_USER_COMMIT"
+latest_commit=$(git log --author="$user_email" --format="%H" -n 1 2>/dev/null)
+if [ -n "$latest_commit" ]; then
+    git show --stat "$latest_commit"
 fi
 
 # Current status
@@ -206,22 +206,31 @@ git status --short
 
 ### Step 9: Read Template
 
+**IMPORTANT**: You MUST use the templates to generate the documentation. Do not create documentation from scratch.
+
 Templates are located in the CLI installation directory (default: `~/.local/share/ai-use-case-cli/docs/`):
 
 ```bash
 # Get CLI root from ai-use-case script location
-CLI_ROOT=$(dirname "$(dirname "$(which ai-use-case)")")/share/ai-use-case-cli
+cli_root=$(dirname "$(dirname "$(which ai-use-case)")")/share/ai-use-case-cli
 
-# Implementation template
-cat "${CLI_ROOT}/docs/TEMPLATE.md"
+# For Implementation sessions, read this template:
+cat "${cli_root}/docs/TEMPLATE.md"
 
-# Research template
-cat "${CLI_ROOT}/docs/TEMPLATE-RESEARCH.md"
+# For Research sessions, read this template:
+cat "${cli_root}/docs/TEMPLATE-RESEARCH.md"
 ```
 
-**Note**: If templates aren't found, the CLI may be installed in a custom location.
+**If templates aren't found at the standard location**, check if the CLI is installed in a custom location:
+```bash
+# Alternative: check project's .ai-tools directory
+cat .ai-tools/templates/TEMPLATE.md
+cat .ai-tools/templates/TEMPLATE-RESEARCH.md
+```
 
 ### Step 10: Generate Documentation
+
+**CRITICAL**: Use the template structure you read in Step 9. Fill in ALL sections with real data.
 
 Create markdown file following template structure:
 
@@ -230,10 +239,12 @@ Create markdown file following template structure:
 - Research: `.usecase/cases/YYYY-Www-MM-DD_RESEARCH-XXX_brief-description.md`
 
 **Requirements:**
-- All sections filled with real data (NO "TODO" placeholders)
+- Follow the EXACT structure from the template (TEMPLATE.md or TEMPLATE-RESEARCH.md)
+- All sections filled with real data (NO "TODO" or placeholder text)
 - Actual git statistics (files changed, lines added/removed)
 - Code examples from conversation where relevant
 - Professional formatting
+- Complete sentences and paragraphs (not bullet points unless template specifies)
 
 ### Step 11: Commit and Sync
 
@@ -256,6 +267,12 @@ ai-use-case sync
 
 ## Example Invocations
 
+### Interactive (Recommended)
+```
+/prompts:use-case-document-session
+```
+Then follow prompts to select what to document.
+
 ### With Parameters (Quick)
 ```
 /prompts:use-case-document-session SCAN_TYPE=git
@@ -265,12 +282,6 @@ ai-use-case sync
 ```
 /prompts:use-case-document-session SCAN_TYPE=conversation SESSION_TYPE=research
 ```
-
-### Interactive (Recommended)
-```
-/prompts:use-case-document-session
-```
-Then follow prompts to select what to document.
 
 ## Key Principles
 
