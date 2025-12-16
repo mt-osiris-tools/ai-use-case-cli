@@ -97,14 +97,8 @@ class TracingManager:
     def _get_cli_version(self) -> str:
         """Get CLI version from version.sh file.
 
-        Note: This assumes the file structure established in Phase 1:
-        lib/observability/tracing.py → lib/core/version.sh
-
-        If the directory structure changes in future phases (see project CHANGELOG.md
-        or migration notes for phase details), update the path below to point to the
-        new location of version.sh. To verify correctness, ensure that version.sh
-        exists at the specified path, or consult the documentation in docs/HUB-FILES.md
-        and the project root for any updates to file locations.
+        Returns 'unknown' with warning if version.sh is not found at
+        the expected path (lib/core/version.sh).
         """
         try:
             cli_root = Path(__file__).parent.parent.parent
