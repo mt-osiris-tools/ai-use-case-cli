@@ -141,12 +141,14 @@ else
     if command -v jq >/dev/null 2>&1; then
         # Use jq to safely merge settings
         TEMP_SETTINGS=$(mktemp)
-        jq '. + {"chat.promptFiles": true} | .["chat.promptFilesLocations"] = (.["chat.promptFilesLocations"] // {}) + {".github/prompts": true}' "$VSCODE_SETTINGS" > "$TEMP_SETTINGS" 2>/dev/null
+        trap "rm -f '$TEMP_SETTINGS'" EXIT
 
-        if [ $? -eq 0 ]; then
+        if jq '. + {"chat.promptFiles": true} | .["chat.promptFilesLocations"] = (.["chat.promptFilesLocations"] // {}) + {".github/prompts": true}' "$VSCODE_SETTINGS" > "$TEMP_SETTINGS" 2>/dev/null && [ -s "$TEMP_SETTINGS" ]; then
             mv "$TEMP_SETTINGS" "$VSCODE_SETTINGS"
+            trap - EXIT
             echo -e "${GREEN}✓${NC} Updated: .vscode/settings.json with Copilot settings"
         else
+            trap - EXIT
             rm -f "$TEMP_SETTINGS"
             echo -e "${YELLOW}⚠${NC} Could not auto-update .vscode/settings.json (invalid JSON)"
             echo -e "${YELLOW}⚠${NC} Please manually add these settings:"
