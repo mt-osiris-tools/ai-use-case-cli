@@ -378,7 +378,7 @@ What would you like to do?
 - When: Topic name is vague or doesn't match content
 - Impact: Better searchability
 
-**ADD Relationships** (HIGH priority: Confidence 0.75-0.8+; MEDIUM/LOW: lower confidence possible, minimum 0.7)
+**ADD Relationships** (HIGH priority: Confidence varies by type - sequential 0.8+, prerequisite 0.75+, technical/alternative 0.7+; MEDIUM/LOW: lower confidence possible, minimum 0.7)
 - Sequential: TICKET-001 → TICKET-002 (builds upon, requires 0.8+)
 - Technical: Similar technologies/patterns (requires 0.7+)
 - Prerequisite: Frontend needs backend API (requires 0.75+)
