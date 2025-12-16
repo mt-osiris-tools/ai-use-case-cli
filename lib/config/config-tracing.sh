@@ -167,8 +167,12 @@ set_tracing_config() {
     fi
 
     local temp_file=$(mktemp)
-    # Trap EXIT INT TERM to ensure cleanup on interruption/termination
-    trap "rm -f '$temp_file'" EXIT INT TERM
+
+    # Ensure temp file is cleaned up on exit or interruption
+    cleanup_temp_file() {
+        [ -f "$temp_file" ] && rm -f "$temp_file"
+    }
+    trap cleanup_temp_file EXIT INT TERM
 
     # Use --argjson for boolean/numeric keys, --arg for strings
     case "$key" in
@@ -194,14 +198,14 @@ set_tracing_config() {
     if [ ! -s "$temp_file" ]; then
         echo -e "${RED}Error: Failed to update configuration (empty result)${NC}" >&2
         trap - EXIT INT TERM
-        rm -f "$temp_file"
+        unset -f cleanup_temp_file
         return 1
     fi
 
     if ! jq empty "$temp_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to update configuration (invalid JSON)${NC}" >&2
         trap - EXIT INT TERM
-        rm -f "$temp_file"
+        unset -f cleanup_temp_file
         return 1
     fi
 
@@ -209,11 +213,14 @@ set_tracing_config() {
     if ! mv "$temp_file" "$tracing_config_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to save configuration${NC}" >&2
         trap - EXIT INT TERM
-        rm -f "$temp_file"
+        unset -f cleanup_temp_file
         return 1
     fi
 
+    # Remove trap and cleanup function
     trap - EXIT INT TERM
+    unset -f cleanup_temp_file
+
     echo "Updated tracing.$key = $value"
     return 0
 }

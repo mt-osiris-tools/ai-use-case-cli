@@ -158,7 +158,12 @@ configure_confluence() {
     fi
 
     local temp_file=$(mktemp)
-    trap "rm -f '$temp_file'" EXIT INT TERM
+
+    # Ensure temp file is cleaned up on exit or interruption
+    cleanup_temp_file() {
+        [ -f "$temp_file" ] && rm -f "$temp_file"
+    }
+    trap cleanup_temp_file EXIT INT TERM
 
     # Add or update confluence section
     if [ ! -f "$CONFIG_FILE" ]; then
@@ -197,13 +202,16 @@ configure_confluence() {
     if [ ! -s "$temp_file" ] || ! jq empty "$temp_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to update configuration${NC}" >&2
         trap - EXIT INT TERM
-        rm -f "$temp_file"
+        unset -f cleanup_temp_file
         return 1
     fi
 
     # Atomic move
     mv "$temp_file" "$CONFIG_FILE"
+
+    # Remove trap and cleanup function
     trap - EXIT INT TERM
+    unset -f cleanup_temp_file
 
     # Set restrictive permissions on config file (contains API token)
     chmod 600 "$CONFIG_FILE"

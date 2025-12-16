@@ -1,6 +1,12 @@
 #!/bin/bash
 # Configuration Manager for AI Use Case CLI - Unified Facade
 #
+# DEPRECATION NOTICE:
+#   This facade is deprecated and exists only for backward compatibility with existing scripts.
+#   NEW CODE SHOULD SOURCE THE SPECIFIC MODULES DIRECTLY (see below).
+#   This file is scheduled for removal after 2026-06-30. Please migrate any usage to the
+#   specific modules listed below as soon as possible.
+#
 # This file provides a unified facade for backward compatibility with the old
 # config-manager.sh interface. All implementation has been split into focused
 # modules in lib/config/ as part of the layered architecture refactor.

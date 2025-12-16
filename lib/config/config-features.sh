@@ -102,7 +102,12 @@ set_install_mode() {
     # Use jq if available for proper JSON handling, fallback to sed
     if command -v jq &> /dev/null; then
         local temp_file=$(mktemp)
-        trap "rm -f '$temp_file'" EXIT INT TERM
+
+        # Ensure temp file is cleaned up on exit or interruption
+        cleanup_temp_file() {
+            [ -f "$temp_file" ] && rm -f "$temp_file"
+        }
+        trap cleanup_temp_file EXIT INT TERM
 
         # Add or update installMode field
         if grep -q '"installMode"' "$CONFIG_FILE"; then
@@ -114,10 +119,11 @@ set_install_mode() {
         if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
             mv "$temp_file" "$CONFIG_FILE"
             trap - EXIT INT TERM
+            unset -f cleanup_temp_file
         else
             echo -e "${RED}Error: Failed to update configuration${NC}" >&2
-            rm -f "$temp_file"
             trap - EXIT INT TERM
+            unset -f cleanup_temp_file
             return 1
         fi
     else
@@ -232,7 +238,12 @@ set_advanced_enabled() {
     # Use jq if available for proper JSON handling
     if command -v jq &> /dev/null; then
         local temp_file=$(mktemp)
-        trap "rm -f '$temp_file'" EXIT INT TERM
+
+        # Ensure temp file is cleaned up on exit or interruption
+        cleanup_temp_file() {
+            [ -f "$temp_file" ] && rm -f "$temp_file"
+        }
+        trap cleanup_temp_file EXIT INT TERM
 
         # Convert string to boolean for jq
         local bool_value=$( [ "$value" = "true" ] && echo "true" || echo "false" )
@@ -247,10 +258,11 @@ set_advanced_enabled() {
         if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
             mv "$temp_file" "$CONFIG_FILE"
             trap - EXIT INT TERM
+            unset -f cleanup_temp_file
         else
             echo -e "${RED}Error: Failed to update configuration${NC}" >&2
             trap - EXIT INT TERM
-            rm -f "$temp_file"
+            unset -f cleanup_temp_file
             return 1
         fi
     else

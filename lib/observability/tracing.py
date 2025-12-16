@@ -108,12 +108,12 @@ class TracingManager:
         """
         try:
             cli_root = Path(__file__).parent.parent.parent
-            # Path dependency: Assumes version.sh is in lib/core/. If this changes, update the path per the comment above.
             version_file = cli_root / 'lib' / 'core' / 'version.sh'
 
             if not version_file.exists():
-                print(f"Warning: version.sh not found at expected path: {version_file}", file=sys.stderr)
-                print(f"Falling back to 'unknown' version. Check installation or file structure.", file=sys.stderr)
+                print(f"Warning: version.sh not found at expected path: {version_file}\n"
+                      f"Falling back to 'unknown' version. Check installation or file structure.",
+                      file=sys.stderr)
                 return 'unknown'
 
             with open(version_file) as f:
