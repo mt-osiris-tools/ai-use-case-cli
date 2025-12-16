@@ -6,12 +6,13 @@
 #   ./setup-project.sh [project_path]
 #   If no path provided, uses current directory
 
-set -e
+set -euo pipefail
 
 # Colors for output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
@@ -109,6 +110,110 @@ ensure_hub_exists() {
     echo "$hub_dir"
 }
 
+# Prompt for AI agent selection
+# Returns space-separated list of selected agents (e.g., "claude copilot")
+# In non-interactive mode (no TTY), defaults to all agents
+prompt_agent_selection() {
+    # Check if running non-interactively (e.g., in tests)
+    if [ ! -t 0 ]; then
+        echo "claude copilot codex"
+        return 0
+    fi
+
+    echo -e "${BLUE}=== AI Agent Integration ===${NC}" >&2
+    echo "" >&2
+    echo "Which AI agents would you like to integrate with this project?" >&2
+    echo "" >&2
+    echo -e "  ${GREEN}1${NC}. Claude Code" >&2
+    echo "     AI-powered coding assistant with slash commands" >&2
+    echo "     Integrates via .claude/commands/ directory" >&2
+    echo "" >&2
+    echo -e "  ${GREEN}2${NC}. GitHub Copilot" >&2
+    echo "     GitHub's AI pair programmer" >&2
+    echo "     Integrates via .github/prompts/ directory" >&2
+    echo "" >&2
+    echo -e "  ${GREEN}3${NC}. Codex" >&2
+    echo "     AI coding assistant" >&2
+    echo "     Installs prompts to ~/.codex/prompts/" >&2
+    echo "" >&2
+    echo -e "  ${GREEN}A${NC}. All agents" >&2
+    echo "" >&2
+    echo -e "  ${GREEN}N${NC}. None (skip agent integration)" >&2
+    echo "" >&2
+
+    while true; do
+        read -p "Select one (1-3, A, N) or multiple with commas (e.g., 1,2,3) [A]: " choice
+        choice=${choice:-A}
+
+        # Convert to uppercase and remove whitespace
+        choice=$(echo "$choice" | tr '[:lower:]' '[:upper:]' | tr -d ' ')
+
+        # Use associative array to prevent duplicates
+        declare -A agents_map
+        local selected=""
+
+        case $choice in
+            A)
+                selected="claude copilot codex"
+                echo -e "${BLUE}Selected: All agents${NC}" >&2
+                ;;
+            N)
+                selected=""
+                echo -e "${BLUE}Selected: None${NC}" >&2
+                ;;
+            1)
+                selected="claude"
+                echo -e "${BLUE}Selected: Claude Code${NC}" >&2
+                ;;
+            2)
+                selected="copilot"
+                echo -e "${BLUE}Selected: GitHub Copilot${NC}" >&2
+                ;;
+            3)
+                selected="codex"
+                echo -e "${BLUE}Selected: Codex${NC}" >&2
+                ;;
+            *,*)
+                # Handle comma-separated values with deduplication
+                IFS=',' read -ra AGENTS <<< "$choice"
+                for agent in "${AGENTS[@]}"; do
+                    case $agent in
+                        1)
+                            agents_map["claude"]=1
+                            ;;
+                        2)
+                            agents_map["copilot"]=1
+                            ;;
+                        3)
+                            agents_map["codex"]=1
+                            ;;
+                        *)
+                            echo -e "${RED}Invalid option: $agent${NC}" >&2
+                            continue 2
+                            ;;
+                    esac
+                done
+                # Build deduplicated space-separated list
+                for agent in claude copilot codex; do
+                    if [ "${agents_map[$agent]:-}" = "1" ]; then
+                        selected="$selected $agent"
+                    fi
+                done
+                # Remove leading/trailing spaces
+                selected=$(echo "$selected" | xargs)
+                echo -e "${BLUE}Selected: $selected${NC}" >&2
+                ;;
+            *)
+                echo -e "${RED}Invalid choice. Please select 1-3, A, N, or use commas for multiple (e.g., 1,2).${NC}" >&2
+                continue
+                ;;
+        esac
+
+        echo "$selected"
+        return 0
+    done
+}
+
 # Configuration - Auto-detect locations
 # SCRIPT_DIR = Script's parent directory (scripts/project) - already set above
 # CLI_ROOT = CLI installation root directory (for scripts and hooks)
@@ -123,6 +228,7 @@ SYNC_SCRIPT="$CLI_ROOT/scripts/core/sync-ai-use-cases.sh"
 # Parse flags
 UPDATE_MODE=false
 PROJECT_PATH=""
+VERBOSE=${VERBOSE:-false}
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -171,14 +277,26 @@ if [ ! -d "$PROJECT_PATH" ]; then
     exit 1
 fi
 
-# Check if it's a git repository
-if [ ! -d "$PROJECT_PATH/.git" ]; then
-    echo -e "${RED}Error: $PROJECT_PATH is not a git repository${NC}"
-    echo "Initialize git first: cd $PROJECT_PATH && git init"
-    exit 1
+# Check git requirement and availability
+GIT_AVAILABLE=false
+if [ -d "$PROJECT_PATH/.git" ]; then
+    GIT_AVAILABLE=true
+    PROJECT_NAME=$(basename "$(git -C "$PROJECT_PATH" rev-parse --show-toplevel)")
+else
+    # Not a git repository - check if git is required
+    if is_git_required; then
+        echo -e "${RED}Error: $PROJECT_PATH is not a git repository${NC}"
+        echo "Git is required by configuration. Either:"
+        echo "  1. Initialize git: cd $PROJECT_PATH && git init"
+        echo "  2. Disable git requirement: ai-use-case config set-git-required false"
+        exit 1
+    else
+        # Git not required - use directory name
+        PROJECT_NAME=$(basename "$PROJECT_PATH")
+        echo -e "${YELLOW}⚠${NC} Project is not a git repository - git features will be disabled"
+        echo -e "${BLUE}ℹ${NC} To enable git features: cd $PROJECT_PATH && git init"
+    fi
 fi
-
-PROJECT_NAME=$(basename "$(git -C "$PROJECT_PATH" rev-parse --show-toplevel)")
 
 echo -e "${BLUE}=== AI Use Cases Project Setup ===${NC}"
 echo "Project: $PROJECT_NAME"
@@ -188,20 +306,36 @@ echo ""
 # Initialize progress tracking
 if [ "$PROGRESS_ENABLED" = true ]; then
     if [ "$UPDATE_MODE" = true ]; then
-        progress_init \
-            "Validate project structure" \
-            "Update AI tool slash commands" \
-            "Update git hooks" \
-            "Verify configuration"
+        if [ "$GIT_AVAILABLE" = true ]; then
+            progress_init \
+                "Validate project structure" \
+                "Update AI tool slash commands" \
+                "Update git hooks" \
+                "Verify configuration"
+        else
+            progress_init \
+                "Validate project structure" \
+                "Update AI tool slash commands" \
+                "Verify configuration"
+        fi
     else
-        progress_init \
-            "Validate project structure" \
-            "Setup use case directory" \
-            "Install AI tool slash commands" \
-            "Install git hooks" \
-            "Configure .gitignore" \
-            "Perform initial sync" \
-            "Register project"
+        if [ "$GIT_AVAILABLE" = true ]; then
+            progress_init \
+                "Validate project structure" \
+                "Setup use case directory" \
+                "Install AI tool slash commands" \
+                "Install git hooks" \
+                "Configure .gitignore" \
+                "Perform initial sync" \
+                "Register project"
+        else
+            progress_init \
+                "Validate project structure" \
+                "Setup use case directory" \
+                "Install AI tool slash commands" \
+                "Perform initial sync" \
+                "Register project"
+        fi
     fi
 fi
 
@@ -217,6 +351,14 @@ if [ -z "$AI_USECASES_SYNC_SCRIPT" ]; then
 fi
 
 [ "$PROGRESS_ENABLED" = true ] && progress_complete "Validate project structure"
+
+# Prompt for agent selection (only in non-update mode)
+SELECTED_AGENTS=""
+if [ "$UPDATE_MODE" = false ]; then
+    echo ""
+    SELECTED_AGENTS=$(prompt_agent_selection)
+    echo ""
+fi
 
 # Check for old structure and migrate if needed
 [ "$PROGRESS_ENABLED" = true ] && [ "$UPDATE_MODE" = false ] && progress_start "Setup use case directory"
@@ -386,16 +528,17 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
         echo -e "${YELLOW}⚠${NC} AI tool slash commands already installed (use --update to refresh)"
     fi
 
-    # Create symlink for Claude Code compatibility
+    # Create symlink for Claude Code compatibility (if Claude was selected)
     # Claude Code only discovers commands in .claude/commands/, not .ai-tools/commands/
     # We symlink only the use-case subdirectory to preserve any custom user commands
-    CLAUDE_DIR="$PROJECT_PATH/.claude"
-    CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
-    CLAUDE_USECASE_SYMLINK="$CLAUDE_COMMANDS_DIR/use-case"
-    EXPECTED_LINK_TARGET="../../.ai-tools/commands/use-case"
+    if [[ "$SELECTED_AGENTS" == *"claude"* ]] || [ "$UPDATE_MODE" = true ]; then
+        CLAUDE_DIR="$PROJECT_PATH/.claude"
+        CLAUDE_COMMANDS_DIR="$PROJECT_PATH/.claude/commands"
+        CLAUDE_USECASE_SYMLINK="$CLAUDE_COMMANDS_DIR/use-case"
+        EXPECTED_LINK_TARGET="../../.ai-tools/commands/use-case"
 
-    # Check if .claude folder exists before creating symlinks
-    if [ -d "$CLAUDE_DIR" ] || [ -L "$CLAUDE_COMMANDS_DIR" ]; then
+        # Check if .claude folder exists before creating symlinks
+        if [ -d "$CLAUDE_DIR" ] || [ -L "$CLAUDE_COMMANDS_DIR" ]; then
         # Migrate from old full-directory symlink structure (if needed)
         if [ -L "$CLAUDE_COMMANDS_DIR" ]; then
             OLD_TARGET=$(readlink "$CLAUDE_COMMANDS_DIR")
@@ -432,13 +575,59 @@ if [ -d "$AI_COMMANDS_SOURCE" ]; then
                 echo -e "${YELLOW}⚠${NC} Claude Code symlink points to: $LINK_TARGET (expected: $EXPECTED_LINK_TARGET)"
             fi
         fi
+        else
+            # .claude folder doesn't exist - skip symlink creation and inform user
+            echo -e "${BLUE}ℹ${NC} .claude folder not found - skipping Claude Code symlink creation"
+            echo -e "${BLUE}ℹ${NC} Run '${GREEN}ai-use-case --link-claude${NC}' after setting up Claude Code to create symlinks"
+        fi
     else
-        # .claude folder doesn't exist - skip symlink creation and inform user
-        echo -e "${BLUE}ℹ${NC} .claude folder not found - skipping Claude Code symlink creation"
-        echo -e "${BLUE}ℹ${NC} Run '${GREEN}ai-use-case --link-claude${NC}' after setting up Claude Code to create symlinks"
+        echo -e "${BLUE}ℹ${NC} Claude Code not selected - skipping Claude Code integration"
+        echo -e "${BLUE}ℹ${NC} To add Claude Code later, run: ${GREEN}ai-use-case --link-claude${NC}"
     fi
 else
     echo -e "${YELLOW}⚠${NC} AI tool commands not found in CLI installation"
+fi
+
+# Setup Codex integration (if Codex was selected, init mode only)
+# NOTE: Unlike Claude Code integration (which runs in both init and update modes to maintain
+# project-specific symlink structure), Codex setup is intentionally init-only because it's a
+# one-time global setup (installs prompts to ~/.codex/prompts/). Users who need to add or update
+# Codex integration later can run: ai-use-case --setup-codex
+if [[ "$SELECTED_AGENTS" == *"codex"* ]] && [ "$UPDATE_MODE" = false ]; then
+    echo ""
+    echo -e "${BLUE}Setting up Codex integration...${NC}"
+    SETUP_CODEX_SCRIPT="$SCRIPT_DIR/setup-codex.sh"
+    if [ -f "$SETUP_CODEX_SCRIPT" ]; then
+        if bash "$SETUP_CODEX_SCRIPT" "$PROJECT_PATH"; then
+            echo -e "${GREEN}✓${NC} Codex integration configured"
+        else
+            echo -e "${YELLOW}⚠${NC} Codex integration setup encountered issues"
+            echo -e "${BLUE}ℹ${NC} You can run it manually later: ${GREEN}ai-use-case --setup-codex${NC}"
+        fi
+    else
+        echo -e "${RED}Error: Codex setup script not found: $SETUP_CODEX_SCRIPT${NC}"
+    fi
+fi
+
+# Setup Copilot integration (if Copilot was selected, init mode only)
+# NOTE: Unlike Codex (which copies files globally), Copilot setup uses workspace-specific symlinks.
+# The symlinks point to CLI installation, so updates automatically propagate. This is init-only
+# because symlinks remain stable across CLI updates. Users who need to add Copilot integration
+# later can run: ai-use-case --setup-copilot
+if [[ "$SELECTED_AGENTS" == *"copilot"* ]] && [ "$UPDATE_MODE" = false ]; then
+    echo ""
+    echo -e "${BLUE}Setting up GitHub Copilot integration...${NC}"
+    SETUP_COPILOT_SCRIPT="$SCRIPT_DIR/setup-copilot.sh"
+    if [ -f "$SETUP_COPILOT_SCRIPT" ]; then
+        if bash "$SETUP_COPILOT_SCRIPT" "$PROJECT_PATH"; then
+            echo -e "${GREEN}✓${NC} GitHub Copilot integration configured"
+        else
+            echo -e "${YELLOW}⚠${NC} Copilot integration setup encountered issues"
+            echo -e "${BLUE}ℹ${NC} You can run it manually later: ${GREEN}ai-use-case --setup-copilot${NC}"
+        fi
+    else
+        echo -e "${RED}Error: Copilot setup script not found: $SETUP_COPILOT_SCRIPT${NC}"
+    fi
 fi
 
 if [ "$PROGRESS_ENABLED" = true ]; then
@@ -449,164 +638,188 @@ if [ "$PROGRESS_ENABLED" = true ]; then
     fi
 fi
 
-# Install git hooks
-if [ "$PROGRESS_ENABLED" = true ]; then
-    if [ "$UPDATE_MODE" = true ]; then
-        progress_start "Update git hooks"
-    else
-        progress_start "Install git hooks"
-    fi
-fi
-GIT_HOOKS_DIR="$PROJECT_PATH/.git/hooks"
-POST_COMMIT_HOOK="$GIT_HOOKS_DIR/post-commit"
-PRE_COMMIT_HOOK="$GIT_HOOKS_DIR/pre-commit"
-
-# Verify hook sources exist
-if [ ! -f "$POST_COMMIT_HOOK_SOURCE" ]; then
-    echo -e "${RED}Error: Hook source not found: $POST_COMMIT_HOOK_SOURCE${NC}"
-    exit 1
-fi
-
-if [ ! -f "$PRE_COMMIT_HOOK_SOURCE" ]; then
-    echo -e "${RED}Error: Hook source not found: $PRE_COMMIT_HOOK_SOURCE${NC}"
-    exit 1
-fi
-
-# Install post-commit hook
-if [ -f "$POST_COMMIT_HOOK" ]; then
-    # Check if our hook is already installed
-    if grep -q "AI Use Cases" "$POST_COMMIT_HOOK"; then
+# Install git hooks (only if git is available)
+if [ "$GIT_AVAILABLE" = true ]; then
+    if [ "$PROGRESS_ENABLED" = true ]; then
         if [ "$UPDATE_MODE" = true ]; then
-            # Check if existing hook is identical to our source (no customizations)
-            if cmp -s "$POST_COMMIT_HOOK" "$POST_COMMIT_HOOK_SOURCE"; then
-                # Safe to replace - hook contains only our code
-                cp "$POST_COMMIT_HOOK_SOURCE" "$POST_COMMIT_HOOK"
-                chmod +x "$POST_COMMIT_HOOK"
-                echo -e "${GREEN}✓${NC} Git post-commit hook updated"
-            else
-                # Hook has customizations - do not overwrite
-                echo -e "${YELLOW}⚠${NC} Git post-commit hook contains customizations"
-                echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes"
-                echo -e "${BLUE}ℹ${NC} To manually update: compare your hook with $POST_COMMIT_HOOK_SOURCE"
-            fi
+            progress_start "Update git hooks"
         else
-            echo -e "${YELLOW}⚠${NC} Git post-commit hook already installed (use --update to refresh)"
+            progress_start "Install git hooks"
         fi
-    else
-        # Append our hook to existing hook
-        echo -e "${BLUE}ℹ${NC} Existing post-commit hook detected - appending our hook"
-        echo "" >> "$POST_COMMIT_HOOK"
-        cat "$POST_COMMIT_HOOK_SOURCE" >> "$POST_COMMIT_HOOK"
-        echo -e "${GREEN}✓${NC} Git post-commit hook appended to existing hook"
     fi
-else
-    # Install fresh hook
-    cp "$POST_COMMIT_HOOK_SOURCE" "$POST_COMMIT_HOOK"
-    chmod +x "$POST_COMMIT_HOOK"
-    echo -e "${GREEN}✓${NC} Git post-commit hook installed"
-fi
+    GIT_HOOKS_DIR="$PROJECT_PATH/.git/hooks"
+    POST_COMMIT_HOOK="$GIT_HOOKS_DIR/post-commit"
+    PRE_COMMIT_HOOK="$GIT_HOOKS_DIR/pre-commit"
 
-# Install pre-commit hook
-if [ -f "$PRE_COMMIT_HOOK" ]; then
-    # Check if our hook is already installed
-    if grep -q "Branch Protection" "$PRE_COMMIT_HOOK"; then
-        if [ "$UPDATE_MODE" = true ]; then
-            # Check if existing hook is identical to our source (no customizations)
-            if cmp -s "$PRE_COMMIT_HOOK" "$PRE_COMMIT_HOOK_SOURCE"; then
-                # Safe to replace - hook contains only our code
-                cp "$PRE_COMMIT_HOOK_SOURCE" "$PRE_COMMIT_HOOK"
-                chmod +x "$PRE_COMMIT_HOOK"
-                echo -e "${GREEN}✓${NC} Git pre-commit hook updated"
-            else
-                # Hook has customizations - do not overwrite
-                echo -e "${YELLOW}⚠${NC} Git pre-commit hook contains customizations"
-                echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes"
-                echo -e "${BLUE}ℹ${NC} To manually update: compare your hook with $PRE_COMMIT_HOOK_SOURCE"
-            fi
-        else
-            echo -e "${YELLOW}⚠${NC} Git pre-commit hook already installed (use --update to refresh)"
-        fi
-    else
-        # Append our hook to existing hook
-        echo -e "${BLUE}ℹ${NC} Existing pre-commit hook detected - appending our hook"
-        echo "" >> "$PRE_COMMIT_HOOK"
-        cat "$PRE_COMMIT_HOOK_SOURCE" >> "$PRE_COMMIT_HOOK"
-        echo -e "${GREEN}✓${NC} Git pre-commit hook appended to existing hook"
+    # Verify hook sources exist
+    if [ ! -f "$POST_COMMIT_HOOK_SOURCE" ]; then
+        echo -e "${RED}Error: Hook source not found: $POST_COMMIT_HOOK_SOURCE${NC}"
+        exit 1
     fi
-else
-    # Install fresh hook
-    cp "$PRE_COMMIT_HOOK_SOURCE" "$PRE_COMMIT_HOOK"
-    chmod +x "$PRE_COMMIT_HOOK"
-    echo -e "${GREEN}✓${NC} Git pre-commit hook installed (prevents direct commits to main)"
-fi
 
-# Install Claude Code SessionEnd hook
-CLAUDE_HOOKS_DIR=".claude/hooks"
-mkdir -p "$CLAUDE_HOOKS_DIR"
-SESSION_END_HOOK="$CLAUDE_HOOKS_DIR/SessionEnd"
+    if [ ! -f "$PRE_COMMIT_HOOK_SOURCE" ]; then
+        echo -e "${RED}Error: Hook source not found: $PRE_COMMIT_HOOK_SOURCE${NC}"
+        exit 1
+    fi
 
-if [ -f "$SESSION_END_HOOK_SOURCE" ]; then
-    if [ -f "$SESSION_END_HOOK" ]; then
-        # Check if existing hook matches our template
-        if cmp -s "$SESSION_END_HOOK" "$SESSION_END_HOOK_SOURCE"; then
-            if [ "$VERBOSE" = true ]; then
-                echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook already up-to-date"
-            fi
-        else
-            # Backup existing hook if it has customizations
+    # Install post-commit hook
+    if [ -f "$POST_COMMIT_HOOK" ]; then
+        # Check if our hook is already installed
+        if grep -q "AI Use Cases" "$POST_COMMIT_HOOK"; then
             if [ "$UPDATE_MODE" = true ]; then
-                echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook contains customizations"
-                echo -e "  ${YELLOW}→${NC} Backup created at: $SESSION_END_HOOK.backup"
-                cp "$SESSION_END_HOOK" "$SESSION_END_HOOK.backup"
-                cp "$SESSION_END_HOOK_SOURCE" "$SESSION_END_HOOK"
-                chmod +x "$SESSION_END_HOOK"
-                echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook updated"
+                # Check if existing hook is identical to our source (no customizations)
+                if cmp -s "$POST_COMMIT_HOOK" "$POST_COMMIT_HOOK_SOURCE"; then
+                    # Safe to replace - hook contains only our code
+                    cp "$POST_COMMIT_HOOK_SOURCE" "$POST_COMMIT_HOOK"
+                    chmod +x "$POST_COMMIT_HOOK"
+                    echo -e "${GREEN}✓${NC} Git post-commit hook updated"
+                else
+                    # Hook has customizations - do not overwrite
+                    echo -e "${YELLOW}⚠${NC} Git post-commit hook contains customizations"
+                    echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes"
+                    echo -e "${BLUE}ℹ${NC} To manually update: compare your hook with $POST_COMMIT_HOOK_SOURCE"
+                fi
             else
-                echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook differs from template"
+                echo -e "${YELLOW}⚠${NC} Git post-commit hook already installed (use --update to refresh)"
             fi
+        else
+            # Append our hook to existing hook
+            echo -e "${BLUE}ℹ${NC} Existing post-commit hook detected - appending our hook"
+            echo "" >> "$POST_COMMIT_HOOK"
+            cat "$POST_COMMIT_HOOK_SOURCE" >> "$POST_COMMIT_HOOK"
+            echo -e "${GREEN}✓${NC} Git post-commit hook appended to existing hook"
         fi
     else
         # Install fresh hook
-        cp "$SESSION_END_HOOK_SOURCE" "$SESSION_END_HOOK"
-        chmod +x "$SESSION_END_HOOK"
-        echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook installed"
+        cp "$POST_COMMIT_HOOK_SOURCE" "$POST_COMMIT_HOOK"
+        chmod +x "$POST_COMMIT_HOOK"
+        echo -e "${GREEN}✓${NC} Git post-commit hook installed"
+    fi
+
+    # Install pre-commit hook
+    if [ -f "$PRE_COMMIT_HOOK" ]; then
+        # Check if our hook is already installed
+        if grep -q "Branch Protection" "$PRE_COMMIT_HOOK"; then
+            if [ "$UPDATE_MODE" = true ]; then
+                # Check if existing hook is identical to our source (no customizations)
+                if cmp -s "$PRE_COMMIT_HOOK" "$PRE_COMMIT_HOOK_SOURCE"; then
+                    # Safe to replace - hook contains only our code
+                    cp "$PRE_COMMIT_HOOK_SOURCE" "$PRE_COMMIT_HOOK"
+                    chmod +x "$PRE_COMMIT_HOOK"
+                    echo -e "${GREEN}✓${NC} Git pre-commit hook updated"
+                else
+                    # Hook has customizations - do not overwrite
+                    echo -e "${YELLOW}⚠${NC} Git pre-commit hook contains customizations"
+                    echo -e "${YELLOW}⚠${NC} Update skipped to preserve your changes"
+                    echo -e "${BLUE}ℹ${NC} To manually update: compare your hook with $PRE_COMMIT_HOOK_SOURCE"
+                fi
+            else
+                echo -e "${YELLOW}⚠${NC} Git pre-commit hook already installed (use --update to refresh)"
+            fi
+        else
+            # Append our hook to existing hook
+            echo -e "${BLUE}ℹ${NC} Existing pre-commit hook detected - appending our hook"
+            echo "" >> "$PRE_COMMIT_HOOK"
+            cat "$PRE_COMMIT_HOOK_SOURCE" >> "$PRE_COMMIT_HOOK"
+            echo -e "${GREEN}✓${NC} Git pre-commit hook appended to existing hook"
+        fi
+    else
+        # Install fresh hook
+        cp "$PRE_COMMIT_HOOK_SOURCE" "$PRE_COMMIT_HOOK"
+        chmod +x "$PRE_COMMIT_HOOK"
+        echo -e "${GREEN}✓${NC} Git pre-commit hook installed (prevents direct commits to main)"
+    fi
+
+    # Install Claude Code SessionEnd hook
+    CLAUDE_HOOKS_DIR=".claude/hooks"
+    mkdir -p "$CLAUDE_HOOKS_DIR"
+    SESSION_END_HOOK="$CLAUDE_HOOKS_DIR/SessionEnd"
+
+    if [ -f "$SESSION_END_HOOK_SOURCE" ]; then
+        if [ -f "$SESSION_END_HOOK" ]; then
+            # Check if existing hook matches our template
+            if cmp -s "$SESSION_END_HOOK" "$SESSION_END_HOOK_SOURCE"; then
+                if [ "$VERBOSE" = true ]; then
+                    echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook already up-to-date"
+                fi
+            else
+                # Backup existing hook if it has customizations
+                if [ "$UPDATE_MODE" = true ]; then
+                    echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook contains customizations"
+                    echo -e "  ${YELLOW}→${NC} Backup created at: $SESSION_END_HOOK.backup"
+                    cp "$SESSION_END_HOOK" "$SESSION_END_HOOK.backup"
+                    cp "$SESSION_END_HOOK_SOURCE" "$SESSION_END_HOOK"
+                    chmod +x "$SESSION_END_HOOK"
+                    echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook updated"
+                else
+                    echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook differs from template"
+                fi
+            fi
+        else
+            # Install fresh hook
+            cp "$SESSION_END_HOOK_SOURCE" "$SESSION_END_HOOK"
+            chmod +x "$SESSION_END_HOOK"
+            echo -e "${GREEN}✓${NC} Claude Code SessionEnd hook installed"
+        fi
+    else
+        if [ "$VERBOSE" = true ]; then
+            echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook source not found: $SESSION_END_HOOK_SOURCE"
+            echo -e "  ${BLUE}ℹ${NC} This feature may not be available in your CLI version"
+        fi
+    fi
+
+    # Create session stats directory
+    mkdir -p ".usecase/session-stats"
+
+    if [ "$PROGRESS_ENABLED" = true ]; then
+        if [ "$UPDATE_MODE" = true ]; then
+            progress_complete "Update git hooks"
+            progress_start "Verify configuration"
+            progress_complete "Verify configuration"
+
+            # Show progress summary and exit for UPDATE_MODE
+            progress_summary
+
+            echo ""
+            echo -e "${GREEN}=== Update Complete! ===${NC}"
+            echo ""
+            echo "Updated components:"
+            echo "  - Claude Code slash commands"
+            echo "  - Git hooks"
+            echo ""
+            exit 0
+        else
+            progress_complete "Install git hooks"
+            progress_start "Configure .gitignore"
+        fi
     fi
 else
-    if [ "$VERBOSE" = true ]; then
-        echo -e "${YELLOW}⚠${NC} Claude Code SessionEnd hook source not found: $SESSION_END_HOOK_SOURCE"
-        echo -e "  ${BLUE}ℹ${NC} This feature may not be available in your CLI version"
+    # Git not available - skip git hooks
+    echo -e "${BLUE}ℹ${NC} Skipping git hooks installation (no git repository)"
+    if [ "$PROGRESS_ENABLED" = true ]; then
+        if [ "$UPDATE_MODE" = true ]; then
+            progress_start "Verify configuration"
+            progress_complete "Verify configuration"
+
+            # Show progress summary and exit for UPDATE_MODE
+            progress_summary
+
+            echo ""
+            echo -e "${GREEN}=== Update Complete! ===${NC}"
+            echo ""
+            echo "Updated components:"
+            echo "  - Claude Code slash commands"
+            echo ""
+            exit 0
+        fi
+        # No else needed - we don't have Configure .gitignore in non-git mode
     fi
 fi
 
-# Create session stats directory
-mkdir -p ".usecase/session-stats"
-
-if [ "$PROGRESS_ENABLED" = true ]; then
-    if [ "$UPDATE_MODE" = true ]; then
-        progress_complete "Update git hooks"
-        progress_start "Verify configuration"
-        progress_complete "Verify configuration"
-
-        # Show progress summary and exit for UPDATE_MODE
-        progress_summary
-
-        echo ""
-        echo -e "${GREEN}=== Update Complete! ===${NC}"
-        echo ""
-        echo "Updated components:"
-        echo "  - Claude Code slash commands"
-        echo "  - Git hooks"
-        echo ""
-        exit 0
-    else
-        progress_complete "Install git hooks"
-        progress_start "Configure .gitignore"
-    fi
-fi
-
-# Add to .gitignore if not already present
-GITIGNORE="$PROJECT_PATH/.gitignore"
-if [ -f "$GITIGNORE" ]; then
+# Add to .gitignore if not already present (only if git is available)
+if [ "$GIT_AVAILABLE" = true ]; then
+    GITIGNORE="$PROJECT_PATH/.gitignore"
+    if [ -f "$GITIGNORE" ]; then
     # Check for old patterns and remove them
     if grep -q "^# AI Use Cases - ignore local notes" "$GITIGNORE"; then
         # Remove old patterns (platform-compatible)
@@ -628,14 +841,18 @@ if [ -f "$GITIGNORE" ]; then
     if ! grep -q "^# Use Case Documentation" "$GITIGNORE"; then
         echo "" >> "$GITIGNORE"
         echo "# Use Case Documentation" >> "$GITIGNORE"
-        echo ".usecase/cases/" >> "$GITIGNORE"
-        echo -e "${GREEN}✓${NC} Added .usecase/cases/ to .gitignore"
+        echo ".usecase/" >> "$GITIGNORE"
+        echo -e "${GREEN}✓${NC} Added .usecase/ to .gitignore"
     else
         echo -e "${YELLOW}⚠${NC} .gitignore already configured"
     fi
-fi
+    fi
 
-[ "$PROGRESS_ENABLED" = true ] && [ "$UPDATE_MODE" = false ] && progress_complete "Configure .gitignore"
+    [ "$PROGRESS_ENABLED" = true ] && [ "$UPDATE_MODE" = false ] && progress_complete "Configure .gitignore"
+else
+    # Git not available - skip .gitignore
+    echo -e "${BLUE}ℹ${NC} Skipping .gitignore configuration (no git repository)"
+fi
 
 # Perform initial sync
 [ "$PROGRESS_ENABLED" = true ] && [ "$UPDATE_MODE" = false ] && progress_start "Perform initial sync"
@@ -666,7 +883,12 @@ if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
     echo "What's next?"
     echo "1. Create use case docs in: $AI_USECASES_DIR"
     echo "2. Use format: YYYY-Www-MM-DD_TICKET-XXXXX_description.md"
-    echo "3. Commit changes - use cases will auto-sync!"
+    if [ "$GIT_AVAILABLE" = true ]; then
+        echo "3. Commit changes - use cases will auto-sync!"
+    else
+        echo "3. Run 'ai-use-case sync' to sync use cases manually"
+        echo "   (Auto-sync requires git repository)"
+    fi
     echo ""
     echo "Available commands:"
     echo "  ai-use-case document      # Document an AI session"
@@ -674,12 +896,20 @@ if "$SYNC_SCRIPT" "$PROJECT_PATH"; then
     echo "  ai-use-case search <term> # Search use cases"
     echo ""
     if [ -d "$AI_COMMANDS_DIR" ]; then
-        echo "AI tool slash commands (Claude Code, GitHub Copilot, etc.):"
-        echo "  /use-case:document-session    # Document AI session automatically"
-        echo "  /use-case:setup-project       # Setup another project"
-        echo "  /use-case:sync-usecases       # Sync to hub"
-        echo "  /use-case:search-usecases     # Search past use cases"
-        echo "  /use-case:publish-confluence  # Publish to Confluence"
+        echo "AI tool slash commands:"
+        echo "  Claude Code:"
+        echo "    /use-case:document-session    # Document AI session automatically"
+        echo "    /use-case:setup-project       # Setup another project"
+        echo "    /use-case:sync-usecases       # Sync to hub"
+        echo "    /use-case:search-usecases     # Search past use cases"
+        echo "    /use-case:publish-confluence  # Publish to Confluence"
+        echo ""
+        echo "  GitHub Copilot (in VS Code Copilot Chat - type /):"
+        echo "    /use-case:document-session    # Document AI session automatically"
+        echo "    /use-case:setup-project       # Setup another project"
+        echo "    /use-case:sync-usecases       # Sync to hub"
+        echo "    /use-case:search-usecases     # Search past use cases"
+        echo "    /use-case:quick-start         # Quick start guide"
         echo ""
     fi
     echo "View synced: ls $CENTRAL_DIR/by-project/$PROJECT_NAME/"

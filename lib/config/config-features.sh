@@ -32,10 +32,11 @@ if [ -n "${_CONFIG_FEATURES_SH_LOADED:-}" ]; then
 fi
 readonly _CONFIG_FEATURES_SH_LOADED=1
 
-# Source dependencies
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../core/constants.sh"
-source "$SCRIPT_DIR/config-core.sh"
+# Source dependencies (use local variable to avoid collision with caller's SCRIPT_DIR)
+_LIB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_LIB_SCRIPT_DIR/../core/constants.sh"
+source "$_LIB_SCRIPT_DIR/config-core.sh"
+source "$_LIB_SCRIPT_DIR/../utils/file-utils.sh"
 
 # ============================================================================
 # Installation Mode
@@ -102,7 +103,7 @@ set_install_mode() {
     # Use jq if available for proper JSON handling, fallback to sed
     if command -v jq &> /dev/null; then
         local temp_file=$(mktemp)
-        trap "rm -f '$temp_file'" EXIT INT TERM
+        setup_temp_file_cleanup "$temp_file"
 
         # Add or update installMode field
         if grep -q '"installMode"' "$CONFIG_FILE"; then
@@ -113,11 +114,10 @@ set_install_mode() {
 
         if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
             mv "$temp_file" "$CONFIG_FILE"
-            trap - EXIT INT TERM
+            teardown_temp_file_cleanup
         else
             echo -e "${RED}Error: Failed to update configuration${NC}" >&2
-            rm -f "$temp_file"
-            trap - EXIT INT TERM
+            teardown_temp_file_cleanup
             return 1
         fi
     else
@@ -232,7 +232,7 @@ set_advanced_enabled() {
     # Use jq if available for proper JSON handling
     if command -v jq &> /dev/null; then
         local temp_file=$(mktemp)
-        trap "rm -f '$temp_file'" EXIT INT TERM
+        setup_temp_file_cleanup "$temp_file"
 
         # Convert string to boolean for jq
         local bool_value=$( [ "$value" = "true" ] && echo "true" || echo "false" )
@@ -246,11 +246,10 @@ set_advanced_enabled() {
 
         if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
             mv "$temp_file" "$CONFIG_FILE"
-            trap - EXIT INT TERM
+            teardown_temp_file_cleanup
         else
             echo -e "${RED}Error: Failed to update configuration${NC}" >&2
-            trap - EXIT INT TERM
-            rm -f "$temp_file"
+            teardown_temp_file_cleanup
             return 1
         fi
     else

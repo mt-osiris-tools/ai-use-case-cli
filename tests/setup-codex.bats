@@ -49,7 +49,7 @@ CLI="$(script_path ai-use-case)"
 # Setup Structure Tests
 # ============================================
 
-@test "setup-codex: creates .codex directory" {
+@test "setup-codex: creates .codex directory in home" {
     local project_dir
     project_dir="$(create_test_git_repo)"
 
@@ -58,10 +58,10 @@ CLI="$(script_path ai-use-case)"
 
     run bash "$SETUP_CODEX_SCRIPT" "$project_dir"
     assert_success
-    assert_dir_exists "${project_dir}/.codex"
+    assert_dir_exists "$HOME/.codex"
 }
 
-@test "setup-codex: creates .codex/prompts directory" {
+@test "setup-codex: creates .codex/prompts directory in home" {
     local project_dir
     project_dir="$(create_test_git_repo)"
 
@@ -70,10 +70,10 @@ CLI="$(script_path ai-use-case)"
 
     run bash "$SETUP_CODEX_SCRIPT" "$project_dir"
     assert_success
-    assert_dir_exists "${project_dir}/.codex/prompts"
+    assert_dir_exists "$HOME/.codex/prompts"
 }
 
-@test "setup-codex: copies document-session prompt" {
+@test "setup-codex: copies document-session prompt to home" {
     local project_dir
     project_dir="$(create_test_git_repo)"
 
@@ -82,13 +82,13 @@ CLI="$(script_path ai-use-case)"
 
     run bash "$SETUP_CODEX_SCRIPT" "$project_dir"
     assert_success
-    assert_file_exists "${project_dir}/.codex/prompts/use-case-document-session.md"
+    assert_file_exists "$HOME/.codex/prompts/use-case-document-session.md"
     # Verify it's a copy, not a symlink
-    run test ! -L "${project_dir}/.codex/prompts/use-case-document-session.md"
+    run test ! -L "$HOME/.codex/prompts/use-case-document-session.md"
     assert_success
 }
 
-@test "setup-codex: copies publish-confluence prompt" {
+@test "setup-codex: copies publish-confluence prompt to home" {
     local project_dir
     project_dir="$(create_test_git_repo)"
 
@@ -97,7 +97,7 @@ CLI="$(script_path ai-use-case)"
 
     run bash "$SETUP_CODEX_SCRIPT" "$project_dir"
     assert_success
-    assert_file_exists "${project_dir}/.codex/prompts/use-case-publish-confluence.md"
+    assert_file_exists "$HOME/.codex/prompts/use-case-publish-confluence.md"
 }
 
 @test "setup-codex: creates copies not symlinks (key difference from Claude)" {
@@ -109,9 +109,9 @@ CLI="$(script_path ai-use-case)"
     bash "$SETUP_CODEX_SCRIPT" "$project_dir"
 
     # Verify files are NOT symlinks (unlike Claude integration which uses symlinks)
-    run test ! -L "${project_dir}/.codex/prompts/use-case-document-session.md"
+    run test ! -L "$HOME/.codex/prompts/use-case-document-session.md"
     assert_success
-    run test ! -L "${project_dir}/.codex/prompts/use-case-publish-confluence.md"
+    run test ! -L "$HOME/.codex/prompts/use-case-publish-confluence.md"
     assert_success
 }
 
@@ -128,9 +128,9 @@ CLI="$(script_path ai-use-case)"
     bash "$SETUP_CODEX_SCRIPT" "$project_dir"
 
     # Check that files start with ---
-    run grep -q "^---$" <(head -1 "${project_dir}/.codex/prompts/use-case-document-session.md")
+    run grep -q "^---$" <(head -1 "$HOME/.codex/prompts/use-case-document-session.md")
     assert_success
-    run grep -q "^---$" <(head -1 "${project_dir}/.codex/prompts/use-case-publish-confluence.md")
+    run grep -q "^---$" <(head -1 "$HOME/.codex/prompts/use-case-publish-confluence.md")
     assert_success
 }
 
@@ -143,9 +143,9 @@ CLI="$(script_path ai-use-case)"
     bash "$SETUP_CODEX_SCRIPT" "$project_dir"
 
     # Check for description field
-    run grep "^description:" "${project_dir}/.codex/prompts/use-case-document-session.md"
+    run grep "^description:" "$HOME/.codex/prompts/use-case-document-session.md"
     assert_success
-    run grep "^description:" "${project_dir}/.codex/prompts/use-case-publish-confluence.md"
+    run grep "^description:" "$HOME/.codex/prompts/use-case-publish-confluence.md"
     assert_success
 }
 
@@ -161,8 +161,8 @@ CLI="$(script_path ai-use-case)"
     bash "$SETUP_PROJECT_SCRIPT" "$project_dir"
     bash "$SETUP_CODEX_SCRIPT" "$project_dir"
 
-    # Modify one of the prompts
-    echo "# Modified" >> "${project_dir}/.codex/prompts/use-case-document-session.md"
+    # Modify one of the prompts in home directory
+    echo "# Modified" >> "$HOME/.codex/prompts/use-case-document-session.md"
 
     # Run again - should update
     run bash "$SETUP_CODEX_SCRIPT" "$project_dir"
@@ -202,9 +202,9 @@ CLI="$(script_path ai-use-case)"
     run bash "$SETUP_CODEX_SCRIPT" "$project_dir"
     assert_success
 
-    # Files should still exist
-    assert_file_exists "${project_dir}/.codex/prompts/use-case-document-session.md"
-    assert_file_exists "${project_dir}/.codex/prompts/use-case-publish-confluence.md"
+    # Files should still exist in home directory
+    assert_file_exists "$HOME/.codex/prompts/use-case-document-session.md"
+    assert_file_exists "$HOME/.codex/prompts/use-case-publish-confluence.md"
 }
 
 # ============================================
@@ -277,7 +277,7 @@ CLI="$(script_path ai-use-case)"
     # Run setup-codex via CLI
     run "$CLI" --setup-codex
     assert_success
-    assert_dir_exists "${project_dir}/.codex/prompts"
+    assert_dir_exists "$HOME/.codex/prompts"
 }
 
 @test "ai-use-case setup-codex: works via CLI (without dashes)" {
@@ -291,5 +291,5 @@ CLI="$(script_path ai-use-case)"
     # Run setup-codex via CLI (without dashes)
     run "$CLI" setup-codex
     assert_success
-    assert_dir_exists "${project_dir}/.codex/prompts"
+    assert_dir_exists "$HOME/.codex/prompts"
 }

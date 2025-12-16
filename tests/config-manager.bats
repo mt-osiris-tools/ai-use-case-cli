@@ -286,3 +286,87 @@ teardown() {
 
     assert_file_contains "${TEST_CONFIG_DIR}/config.json" "version"
 }
+
+# ============================================
+# Git Required Configuration Tests
+# ============================================
+
+@test "init_config: sets gitRequired to false by default" {
+    source "$(script_path scripts/utils/config-manager.sh)"
+
+    init_config "local" "$TEST_HUB_DIR"
+    run get_git_required
+    assert_success
+    assert_output "false"
+}
+
+@test "get_git_required: returns false by default" {
+    create_test_config "local" "$TEST_HUB_DIR"
+    source "$(script_path scripts/utils/config-manager.sh)"
+
+    run get_git_required
+    assert_success
+    assert_output "false"
+}
+
+@test "set_git_required: sets git required to true" {
+    create_test_config "local" "$TEST_HUB_DIR"
+    source "$(script_path scripts/utils/config-manager.sh)"
+
+    run set_git_required "true"
+    assert_success
+
+    run get_git_required
+    assert_output "true"
+}
+
+@test "set_git_required: sets git required to false" {
+    create_test_config "local" "$TEST_HUB_DIR"
+    source "$(script_path scripts/utils/config-manager.sh)"
+
+    # First set to true
+    set_git_required "true"
+
+    # Then set to false
+    run set_git_required "false"
+    assert_success
+
+    run get_git_required
+    assert_output "false"
+}
+
+@test "set_git_required: fails with invalid value" {
+    create_test_config "local" "$TEST_HUB_DIR"
+    source "$(script_path scripts/utils/config-manager.sh)"
+
+    run set_git_required "invalid"
+    assert_failure
+    assert_output --partial "Invalid value"
+}
+
+@test "is_git_required: returns true when git is required" {
+    create_test_config "local" "$TEST_HUB_DIR"
+    source "$(script_path scripts/utils/config-manager.sh)"
+
+    set_git_required "true"
+    run is_git_required
+    assert_success
+}
+
+@test "is_git_required: returns false when git is not required" {
+    create_test_config "local" "$TEST_HUB_DIR"
+    source "$(script_path scripts/utils/config-manager.sh)"
+
+    set_git_required "false"
+    run is_git_required
+    assert_failure
+}
+
+@test "show_config: displays git required status" {
+    create_test_config "local" "$TEST_HUB_DIR"
+    source "$(script_path scripts/utils/config-manager.sh)"
+
+    run show_config
+    assert_success
+    assert_output --partial "Git Required"
+}

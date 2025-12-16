@@ -22,15 +22,34 @@ readonly _CONSTANTS_SH_LOADED=1
 # ============================================================================
 # Color Codes - ANSI terminal colors for consistent output formatting
 # ============================================================================
+# Note: Colors are defined with TTY detection for proper rendering
+# They will be disabled when output is not to a terminal or NO_COLOR is set
 
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-RED='\033[0;31m'
-CYAN='\033[0;36m'
-GRAY='\033[0;90m'
-BOLD='\033[1m'
-NC='\033[0m' # No Color
+# Detect if we should use colors
+if [[ -t 1 || -n "${FORCE_COLOR:-}" ]] && [[ -z "${NO_COLOR:-}" ]]; then
+    # Colors enabled (TTY detected or FORCE_COLOR set, and NO_COLOR not set)
+    GREEN=$'\033[0;32m'
+    YELLOW=$'\033[1;33m'
+    BLUE=$'\033[0;34m'
+    RED=$'\033[0;31m'
+    CYAN=$'\033[0;36m'
+    GRAY=$'\033[0;90m'
+    BOLD=$'\033[1m'
+    NC=$'\033[0m' # No Color
+else
+    # Colors disabled (not a TTY, piped, redirected, or NO_COLOR set)
+    GREEN=''
+    YELLOW=''
+    BLUE=''
+    RED=''
+    CYAN=''
+    GRAY=''
+    BOLD=''
+    NC=''
+fi
+
+# Make color variables readonly to prevent accidental modification
+readonly GREEN YELLOW BLUE RED CYAN GRAY BOLD NC
 
 # ============================================================================
 # Default Paths - Standard locations for config, data, and hub

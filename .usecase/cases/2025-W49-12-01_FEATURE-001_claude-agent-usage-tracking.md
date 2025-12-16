@@ -29,6 +29,7 @@
 **For detailed guidance on capturing these metrics, see [AI_SESSION_STATISTICS_GUIDE.md](https://github.com/mt-osiris-tools/ai-use-case-cli/blob/main/docs/AI_SESSION_STATISTICS_GUIDE.md)**
 
 ### Engagement Level
+
 - **Total Interactions:** 35 back-and-forth exchanges between user and AI
 - **User Prompts:** 8 total prompts/messages from user
 - **AI Responses:** 35 total responses from AI
@@ -39,6 +40,7 @@
 - **Session Flow:** Iterative
 
 ### Token Usage Summary
+
 - **Total Tokens Used:** ~166,000 tokens
   - **Input Tokens:** ~60,000 (prompt, context, code read, templates)
   - **Output Tokens:** ~106,000 (AI responses, code generated, documentation)
@@ -48,6 +50,7 @@
 - **Average Tokens per Interaction:** ~4,740 tokens
 
 ### Tool Usage Breakdown
+
 - **Total Tool Uses:** 68
   - **Read:** 12 (template files, script analysis, feature docs)
   - **Write:** 8 (feature docs, templates, documentation generation)
@@ -57,6 +60,7 @@
   - **TodoWrite:** 4 (progress tracking throughout session)
 
 ### Commands Executed by AI
+
 ```bash
 # Branch and version management
 git checkout -b feature/claude-agents-tracking
@@ -82,6 +86,7 @@ git push origin main --tags
   - **Value:** Provided clear progress indicators to user, ensured systematic completion of all tasks
 
 **Agent Effectiveness Summary:**
+
 - Total agent invocations: 4
 - Most valuable agent: TodoWrite - enabled transparent progress tracking through complex multi-phase implementation
 
@@ -90,6 +95,7 @@ git push origin main --tags
 ## 💬 Key User Queries
 
 ### Query #1: Initial Feature Request
+
 **User:** "can we add to the document session if we have used claude agents in session ?"
 
 **AI Response:** Analyzed current template structure, identified insertion point in AI Interaction Metrics section, proposed structured approach with agent type, count, purpose, and value tracking
@@ -103,6 +109,7 @@ git push origin main --tags
 ---
 
 ### Query #2: Feature Planning Structure
+
 **User:** "let's create inside docs a folder named features where we are going to add this plan and the second step will be generate the requirements and the last step we will generate the neccesary tasks as checklist to follow the implementation of the plan"
 
 **AI Response:** Created comprehensive feature planning structure with three core documents (plan, requirements, checklist), reusable templates, and documentation
@@ -116,6 +123,7 @@ git push origin main --tags
 ---
 
 ### Query #3: Start Implementation
+
 **User:** "start implementation"
 
 **AI Response:** Began systematic implementation following checklist, created feature branch, updated templates, added interactive prompts, implemented automatic detection
@@ -129,6 +137,7 @@ git push origin main --tags
 ---
 
 ### Query #4: Create PR
+
 **User:** "let's commit push and create a pr"
 
 **AI Response:** Pushed branch, created comprehensive PR with detailed description covering all changes, capabilities, and impact
@@ -142,6 +151,7 @@ git push origin main --tags
 ---
 
 ### Query #5: Version Management
+
 **User:** "why we did not changed the version?"
 
 **AI Response:** Explained project's version management workflow - versions bump separately after PR merge as part of release process using automated bump-version command
@@ -155,6 +165,7 @@ git push origin main --tags
 ---
 
 ### Query #6: Version Bump Decision
+
 **User:** "done, then shouldn't we update the documentaion with the new version?"
 
 **AI Response:** Agreed, executed version bump from 3.9.1 to 3.10.0 using automated script, created tag, pushed to remote
@@ -168,6 +179,7 @@ git push origin main --tags
 ---
 
 ### Query #7: PR Review Response
+
 **User:** "address the pr comments and respond"
 
 **AI Response:** Analyzed 5 Copilot review comments, implemented all fixes (validation, error handling, placeholder removal), committed fixes, posted detailed response
@@ -181,6 +193,7 @@ git push origin main --tags
 ---
 
 ### Query #8: Document Session
+
 **User:** "/use-case:document-session"
 
 **AI Response:** Executing automated documentation workflow for PR #109
@@ -194,12 +207,15 @@ git push origin main --tags
 ---
 
 ### Prompt Effectiveness Analysis
+
 **High-Quality Prompts (worked first time):**
+
 - ✅ "start implementation" - Clear directive to begin work, AI used checklist to proceed systematically
 - ✅ "let's commit push and create a pr" - Specific action request, AI executed full git workflow
 - ✅ "address the pr comments and respond" - Clear scope, AI handled all 5 comments comprehensively
 
 **Prompts Needing Iteration:**
+
 - None - all prompts were clear and actionable
 
 ---
@@ -215,6 +231,7 @@ git push origin main --tags
 **Background:** Existing AI session documentation tracked tool usage (Read, Write, Edit, Bash) but didn't capture when specialized Claude agents (Explore, Plan, general-purpose) were used via the Task tool. This missing information made it harder to identify which advanced AI capabilities were valuable and replicate successful patterns.
 
 **Expected Benefits:**
+
 - Visibility into specialized AI capability usage
 - Data-driven insights about which agents provide most value
 - Ability to replicate successful agent-assisted workflows
@@ -225,6 +242,7 @@ git push origin main --tags
 ## ⏱️ Time Analysis
 
 ### Manual Estimate (without AI): 10-12 hours
+
 - Understanding codebase and templates: 1.5h
 - Designing feature structure: 2h
 - Writing documentation templates: 1h
@@ -235,6 +253,7 @@ git push origin main --tags
 - Documentation updates: 1h
 
 ### Actual Time (with AI): 2.5 hours
+
 - AI-assisted planning: 0.5h (created comprehensive plan, requirements, checklist)
 - Guided implementation: 1.2h (templates, interactive mode, automatic detection)
 - AI-assisted code review: 0.3h (addressed 5 review comments)
@@ -242,6 +261,7 @@ git push origin main --tags
 - Version management: 0.2h (bump to 3.10.0)
 
 ### Results
+
 - **Time Saved:** 8 hours (76% faster)
 - **Efficiency Multiplier:** 4.4x
 - **Blockers Avoided:** Input validation bugs caught by code review, no rework needed due to comprehensive planning
@@ -251,6 +271,7 @@ git push origin main --tags
 ## 🔄 Workflow Steps
 
 ### 1. **Feature Planning & Structure Creation**
+
 - Created `docs/features/` directory structure
 - Generated feature plan with problem statement, goals, solution design
 - Created detailed requirements document with 32 functional requirements
@@ -259,6 +280,7 @@ git push origin main --tags
 - **Time:** 45 minutes
 
 ### 2. **Phase 1: Template Updates**
+
 - Updated TEMPLATE.md with "Claude Agents Used" section
 - Updated TEMPLATE-RESEARCH.md with identical section
 - Added agent types, invocation counts, purpose, value fields
@@ -266,6 +288,7 @@ git push origin main --tags
 - **Time:** 15 minutes
 
 ### 3. **Phase 2: Interactive Mode Implementation**
+
 - Added interactive prompts to document-ai-session.sh (after line 530)
 - Implemented agent list collection (comma-separated input)
 - Created arrays for agent data storage
@@ -274,6 +297,7 @@ git push origin main --tags
 - **Time:** 30 minutes
 
 ### 4. **Phase 3: Automatic Detection Documentation**
+
 - Updated /use-case:document-session slash command
 - Added comprehensive detection instructions
 - Documented agent types, extraction methods, outcome inference
@@ -281,12 +305,14 @@ git push origin main --tags
 - **Time:** 20 minutes
 
 ### 5. **Phase 5: Documentation Updates**
+
 - Updated CHANGELOG.md with detailed feature entry
 - Added feature to README.md features list
 - Committed all changes with conventional commits
 - **Time:** 10 minutes
 
 ### 6. **PR Creation & Review**
+
 - Pushed feature branch to remote
 - Created comprehensive PR with detailed description
 - Analyzed 5 Copilot review comments
@@ -295,6 +321,7 @@ git push origin main --tags
 - **Time:** 35 minutes
 
 ### 7. **Version Management**
+
 - Bumped version from 3.9.1 to 3.10.0 (minor)
 - Updated version.sh, README.md, CHANGELOG.md
 - Created git tag v3.10.0
@@ -306,6 +333,7 @@ git push origin main --tags
 ## 🛠️ Technical Details
 
 ### Tools & Technologies Used
+
 - **Primary AI Tool:** Claude Code (Sonnet 4.5)
 - **Version Control:** Git (branch-based workflow, conventional commits)
 - **Testing:** Manual testing of interactive prompts
@@ -322,6 +350,7 @@ git push origin main --tags
 | **Total** | **~60,000** | **~106,000** | **~40,000** | **~166,000** | **~$1.50** | **Full workflow** |
 
 **Model Pricing Reference:** (Sonnet 4.5)
+
 - Input: $3 per 1M tokens
 - Output: $15 per 1M tokens
 - Cache hits: $0.30 per 1M tokens
@@ -338,6 +367,7 @@ git push origin main --tags
 | **Total** | **35** | **8** | **35** | **~4,740 avg** |
 
 ### Cost Efficiency Analysis
+
 - **Manual Alternative:** 10 hours × $75/hour = $750
 - **AI-Assisted:** 2.5 hours × $75/hour + $1.50 (tokens) = $189
 - **Net Savings:** $561 (75% cost reduction)
@@ -378,6 +408,7 @@ done
 ## 📊 Results & Impact
 
 ### Quantitative Results
+
 - **Files Modified:** 14 files
 - **Lines Added:** +3,168
 - **Lines Removed:** -10
@@ -389,6 +420,7 @@ done
 - **Regressions:** 0
 
 ### Code Quality Metrics
+
 - **Test Coverage:** Manual testing (interactive prompts verified)
 - **Code Standards:** ✅ Bash best practices followed
 - **Type Safety:** ✅ Input validation added for all user inputs
@@ -408,6 +440,7 @@ done
 | 3ef0efe | 1 | Address 5 Copilot review comments (validation fixes) |
 
 ### Business Impact
+
 - ✅ **Enhanced Documentation Value:** Developers can now track which AI capabilities were used, enabling workflow replication
 - ✅ **Knowledge Building:** Creates data about which agents provide most value for different task types
 - ✅ **Process Improvement:** Feature planning structure enables consistent, high-quality feature development
@@ -509,20 +542,25 @@ done
 ### Files Modified (14 total)
 
 **Templates (2):**
+
 - `docs/TEMPLATE.md` - Added Claude Agents section
 - `docs/TEMPLATE-RESEARCH.md` - Added Claude Agents section
 
 **Scripts (1):**
+
 - `scripts/core/document-ai-session.sh` - Interactive prompts + generation logic
 
 **Slash Commands (1):**
+
 - `.claude/commands/use-case/document-session.md` - Automatic detection instructions
 
 **Documentation (2):**
+
 - `CHANGELOG.md` - Feature entry under v3.10.0
 - `README.md` - Added to features list
 
 **Feature Planning Structure (8):**
+
 - `docs/features/README.md` - Overview and guidelines
 - `docs/features/FEATURE-TEMPLATE/01-feature-plan.md` - Reusable plan template
 - `docs/features/FEATURE-TEMPLATE/02-requirements.md` - Reusable requirements template

@@ -31,10 +31,11 @@ if [ -n "${_CONFIG_TRACING_SH_LOADED:-}" ]; then
 fi
 readonly _CONFIG_TRACING_SH_LOADED=1
 
-# Source dependencies
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../core/constants.sh"
-source "$SCRIPT_DIR/config-core.sh"
+# Source dependencies (use local variable to avoid collision with caller's SCRIPT_DIR)
+_LIB_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_LIB_SCRIPT_DIR/../core/constants.sh"
+source "$_LIB_SCRIPT_DIR/config-core.sh"
+source "$_LIB_SCRIPT_DIR/../utils/file-utils.sh"
 
 # ============================================================================
 # Tracing Configuration Constants
@@ -167,8 +168,7 @@ set_tracing_config() {
     fi
 
     local temp_file=$(mktemp)
-    # Setup cleanup trap (EXIT, INT, TERM to ensure cleanup on interruption/termination)
-    trap "rm -f '$temp_file'" EXIT INT TERM
+    setup_temp_file_cleanup "$temp_file"
 
     # Use --argjson for boolean/numeric keys, --arg for strings
     case "$key" in
@@ -193,27 +193,26 @@ set_tracing_config() {
     # Validate temp file before moving
     if [ ! -s "$temp_file" ]; then
         echo -e "${RED}Error: Failed to update configuration (empty result)${NC}" >&2
-        trap - EXIT INT TERM
-        rm -f "$temp_file"
+        teardown_temp_file_cleanup
         return 1
     fi
 
     if ! jq empty "$temp_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to update configuration (invalid JSON)${NC}" >&2
-        trap - EXIT INT TERM
-        rm -f "$temp_file"
+        teardown_temp_file_cleanup
         return 1
     fi
 
     # Atomic move
     if ! mv "$temp_file" "$tracing_config_file" 2>/dev/null; then
         echo -e "${RED}Error: Failed to save configuration${NC}" >&2
-        trap - EXIT INT TERM
-        rm -f "$temp_file"
+        teardown_temp_file_cleanup
         return 1
     fi
 
-    trap - EXIT INT TERM
+    # Remove trap and cleanup function
+    teardown_temp_file_cleanup
+
     echo "Updated tracing.$key = $value"
     return 0
 }
