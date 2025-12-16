@@ -42,6 +42,59 @@ else
     PROGRESS_ENABLED=false
 fi
 
+# Function to prompt user for AI agent selection
+prompt_agent_selection() {
+    echo -e "${BLUE}=== AI Agent Selection ===${NC}" >&2
+    echo "" >&2
+    echo "Which AI coding agents would you like to set up?" >&2
+    echo "You can select multiple agents by entering their numbers separated by spaces." >&2
+    echo "" >&2
+    echo "Available agents:" >&2
+    echo "  1) Claude Code (Claude AI CLI tool)" >&2
+    echo "  2) Codex (AI coding assistant)" >&2
+    echo "  3) GitHub Copilot (VS Code extension)" >&2
+    echo "  4) All agents" >&2
+    echo "  5) None (skip agent setup)" >&2
+    echo "" >&2
+
+    local selected=""
+    local valid=false
+
+    while [ "$valid" = false ]; do
+        read -p "Enter your selection(s) [1-5]: " -r selection >&2
+
+        # Validate input
+        if [[ "$selection" =~ ^[1-5\ ]+$ ]]; then
+            valid=true
+
+            # Check if "All agents" or "None" was selected
+            if [[ "$selection" == *"4"* ]]; then
+                selected="claude codex copilot"
+            elif [[ "$selection" == *"5"* ]]; then
+                selected=""
+            else
+                # Process individual selections
+                [[ "$selection" == *"1"* ]] && selected="$selected claude"
+                [[ "$selection" == *"2"* ]] && selected="$selected codex"
+                [[ "$selection" == *"3"* ]] && selected="$selected copilot"
+                selected=$(echo "$selected" | xargs)  # trim whitespace
+            fi
+        else
+            echo -e "${YELLOW}Invalid selection. Please enter numbers 1-5 separated by spaces.${NC}" >&2
+        fi
+    done
+
+    # Display selection
+    if [ -z "$selected" ]; then
+        echo -e "${YELLOW}No agents selected - agent-specific integrations will be skipped${NC}" >&2
+    else
+        echo -e "${GREEN}Selected agents: $selected${NC}" >&2
+    fi
+    echo "" >&2
+
+    echo "$selected"
+}
+
 # Function to setup and initialize hub repository
 # NOTE: This function is specifically for setup and includes interactive prompts.
 # It differs from ensure_hub_exists() in hub-utils.sh which is for validation only.
