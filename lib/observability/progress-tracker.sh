@@ -30,18 +30,18 @@ if [ -L "$_LIB_SCRIPT_SOURCE" ]; then
         # Fallback: POSIX-compatible symlink resolution
         # Save current directory
         _ORIG_PWD="$PWD"
-        cd "$(dirname "$_LIB_SCRIPT_SOURCE")" || exit 1
+        cd "$(dirname "$_LIB_SCRIPT_SOURCE")" || return 1
         _LIB_SCRIPT_SOURCE="$(basename "$_LIB_SCRIPT_SOURCE")"
         # Follow symlinks until we find the real file
         while [ -L "$_LIB_SCRIPT_SOURCE" ]; do
             _LIB_SCRIPT_SOURCE="$(readlink "$_LIB_SCRIPT_SOURCE")"
-            cd "$(dirname "$_LIB_SCRIPT_SOURCE")" || exit 1
+            cd "$(dirname "$_LIB_SCRIPT_SOURCE")" || return 1
             _LIB_SCRIPT_SOURCE="$(basename "$_LIB_SCRIPT_SOURCE")"
         done
         # Get the physical directory and append the filename
         _LIB_SCRIPT_SOURCE="$(pwd -P)/$_LIB_SCRIPT_SOURCE"
         # Restore original directory
-        cd "$_ORIG_PWD" || exit 1
+        cd "$_ORIG_PWD" || return 1
         unset _ORIG_PWD
     fi
 fi
