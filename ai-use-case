@@ -7,37 +7,21 @@
 
 set -e
 
-# Function to setup color variables based on TTY detection
-# Respects NO_COLOR (https://no-color.org/) and FORCE_COLOR environment variables
-setup_colors() {
-    if [[ -t 1 || -n "${FORCE_COLOR:-}" ]] && [[ -z "${NO_COLOR:-}" ]]; then
-        # Colors enabled (TTY detected or FORCE_COLOR set, and NO_COLOR not set)
-        GREEN=$'\033[0;32m'
-        BLUE=$'\033[0;34m'
-        YELLOW=$'\033[1;33m'
-        RED=$'\033[0;31m'
-        CYAN=$'\033[0;36m'
-        NC=$'\033[0m'
-    else
-        # Colors disabled (not a TTY, piped, redirected, or NO_COLOR set)
-        GREEN=''
-        BLUE=''
-        YELLOW=''
-        RED=''
-        CYAN=''
-        NC=''
-    fi
-}
-
-# Initialize colors
-setup_colors
-
 # Get script directory (resolve symlinks)
 SCRIPT_PATH="${BASH_SOURCE[0]}"
 if [ -L "$SCRIPT_PATH" ]; then
     SCRIPT_PATH="$(readlink -f "$SCRIPT_PATH")"
 fi
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+
+# Source core constants (includes color setup with TTY detection)
+if [ -f "$SCRIPT_DIR/lib/core/constants.sh" ]; then
+    source "$SCRIPT_DIR/lib/core/constants.sh"
+else
+    # Fallback color definitions if constants.sh is missing
+    echo "Warning: lib/core/constants.sh not found, using fallback colors" >&2
+    GREEN='' BLUE='' YELLOW='' RED='' CYAN='' GRAY='' BOLD='' NC=''
+fi
 
 # Source version configuration (single source of truth)
 if [ -f "$SCRIPT_DIR/scripts/utils/version.sh" ]; then
