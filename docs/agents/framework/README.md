@@ -257,23 +257,32 @@ ai-use-case analyze-patterns --period 6months
 /use-case:analyze-patterns [options]
 ```
 
-#### 3. Session Selector (Phase 4 - Planned)
+#### 3. Session Selector ✅ (Phase 4 - Implemented)
 
 **ID:** `session-selector`
 **Subagent Type:** `use-case-session-selector-agent`
+**Status:** Implemented (v3.14.0)
 
 **Purpose:** Intelligently analyzes and prioritizes sessions for documentation
 
 **Capabilities:**
-- Smart PR analysis
-- Commit grouping
-- Priority scoring
-- Context extraction
+- Smart PR analysis with documentation value scoring
+- Commit grouping by time, files, and message similarity
+- Priority scoring (0-10 scale) with HIGH/MEDIUM/LOW levels
+- Context extraction for template pre-population
+- Already documented session detection
 
-**Usage (when implemented):**
+**Usage:**
 ```bash
 /use-case:document-session --intelligent
 ```
+
+**Features:**
+- Analyzes PRs, commits, and conversations
+- Assigns priority scores and provides reasoning
+- Pre-extracts metadata (ticket, complexity, time saved, technologies)
+- Groups related commits into logical sessions
+- Provides clear recommendations on what to document first
 
 #### 4. Organization Optimizer (Phase 5 - Planned)
 
@@ -633,11 +642,13 @@ ai-use-case agents info quality-reviewer
 - ✅ Slash command: `/use-case:analyze-patterns`
 - ✅ Hub-wide analysis with comparison
 
-### Phase 4: Session Selector (Next)
-- Intelligent PR analysis
-- Commit grouping
-- Priority scoring
-- Context extraction
+### Phase 4: Session Selector ✅ (Complete - v3.14.0)
+- ✅ Intelligent PR analysis with documentation value scoring
+- ✅ Commit grouping by time, files, and message similarity
+- ✅ Priority scoring (0-10 scale)
+- ✅ Context extraction for template pre-population
+- ✅ CLI integration via `--intelligent` flag
+- ✅ Already documented session detection
 
 ### Phase 5: Organization Intelligence
 - Hub organization optimization

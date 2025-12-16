@@ -21,6 +21,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 4: Session Selector Agent** - Intelligent session analysis and prioritization for documentation
+  - **New Agent**: Session Selector Agent (`use-case-session-selector-agent`) for analyzing and scoring documentation sessions
+  - **New Flag**: `--intelligent` flag for `/use-case:document-session` command enables AI-powered session prioritization
+  - **Priority Scoring**: Assigns scores (0-10) to PRs, commits, and research sessions based on documentation value
+  - **Priority Levels**: Groups sessions as HIGH (8-10), MEDIUM (5-7), LOW (2-4), or SKIP (0-1) with clear recommendations
+  - **Commit Grouping**: Automatically groups related commits by time proximity, file overlap, and message similarity
+  - **Metadata Extraction**: Pre-populates template fields (ticket number, complexity, time saved, technologies) for faster documentation
+  - **Already Documented Detection**: Identifies and filters out sessions that have already been documented
+  - **Enhanced Presentation**: Shows prioritized sessions with scores, reasoning, and recommendations in document-session workflow
+  - **Agent Prompt**: Comprehensive scoring criteria based on complexity, novelty, reusability, impact, and quality
+  - **Agent Registry**: Session-selector agent enabled by default in agent registry template
+  - **Documentation**: Updated COMMANDS.md with detailed --intelligent flag usage guide and examples
+  - **Documentation**: Updated agents framework README with Phase 4 implementation details
+
 - **GitHub Copilot Custom Prompts Integration**: Full support for GitHub Copilot custom prompts in VS Code
   - **New Command**: `ai-use-case --setup-copilot` to configure GitHub Copilot custom prompts
   - **Custom Prompts**: Workspace-specific `.github/prompts/use-case/` directory with 5 core prompts:

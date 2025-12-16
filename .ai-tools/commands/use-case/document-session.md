@@ -2,6 +2,15 @@
 
 **IMPORTANT**: You are an AI coding assistant, and you should **first ask the user which session to document**, then automatically generate documentation for the selected session. Do NOT run the interactive `document-ai-session.sh` script or ask the user to fill in details after selection.
 
+## Command Flags
+
+- `--intelligent` (optional): Use AI agent to analyze and prioritize sessions before selection
+  - **What it does**: Analyzes PRs, commits, and conversations to assign priority scores (0-10) and provide recommendations
+  - **When to use**: When you have multiple PRs/commits and want guidance on what's most valuable to document
+  - **Trade-off**: Adds 15-30 seconds for AI analysis, costs ~500-1000 tokens
+  - **Benefits**: Better prioritization, pre-extracted metadata, clearer recommendations
+  - **Default**: false (standard workflow without AI analysis)
+
 ## 📋 Documentation Workflow - What Will Happen
 
 Before we start, here's the complete workflow you'll see:
@@ -270,9 +279,139 @@ ls -1 .usecase/cases/ 2>/dev/null | grep -E '^[0-9]{4}-W[0-9]{2}-[0-9]{2}-[0-9]{
 > This distinction is by design: AI assistant users get a personalized, user-scoped view, while shell script users get a team-wide view.
 > If you need to see all work (not just your own), use the shell script directly.
 
+#### 0.4.5: Intelligent Session Analysis (ONLY IF --intelligent FLAG PROVIDED)
+
+**CRITICAL**: Skip this entire step if the `--intelligent` flag was NOT provided. This step is opt-in only.
+
+**When to run this step:**
+- User invoked with `/use-case:document-session --intelligent`
+- User selected "Recent PRs and commits" or "Both" in Step 0.2
+- Git detection in Step 0.4 has completed
+
+**What this step does:**
+Invokes the session-selector AI agent to analyze all detected sessions (PRs, commits, conversation) and provide:
+- Priority scores (0-10) for each session
+- HIGH/MEDIUM/LOW/SKIP priority levels
+- Reasoning for each score
+- Pre-extracted metadata (complexity, time saved, technologies)
+- Clear recommendations on what to document first
+
+**Implementation:**
+
+1. **Show progress message:**
+   ```
+   "Analyzing sessions for documentation value... (this may take 15-30 seconds)"
+   ```
+
+2. **Prepare agent input context:**
+   Build a JSON object with all detected data from previous steps:
+
+   ```javascript
+   {
+     "analysis_type": "session_selection",
+     "user_selection": "recent_prs", // or "both" or "current_conversation"
+     "raw_data": {
+       "prs": [
+         // Array of PR objects from Step 0.4
+         // Each with: number, title, branch, merged_at, files_changed, commits, author, description
+       ],
+       "commits": [
+         // Array of commit objects from Step 0.4
+         // Each with: hash, message, author, timestamp, files, stats
+       ],
+       "conversation": {
+         // From Step 0.3 if applicable
+         "substantial": true/false,
+         "exchanges": 12,
+         "topic": "Brief description of conversation topic",
+         "iterations": 3
+       }
+     },
+     "existing_documentation": [
+       // List of filenames from .usecase/cases/
+     ],
+     "options": {
+       "include_scoring": true,
+       "group_commits": true,
+       "extract_metadata": true
+     }
+   }
+   ```
+
+3. **Invoke session-selector agent using Task tool:**
+
+   ```javascript
+   Task({
+     subagent_type: "use-case-session-selector-agent",
+     description: "Analyze and prioritize documentation sessions",
+     prompt: `You are the Session Selector Agent. Analyze the following sessions and provide priority scores with recommendations.
+
+INPUT DATA:
+${JSON.stringify(agent_context, null, 2)}
+
+Analyze each PR, commit group, and conversation. Return a JSON response with:
+- Priority scores (0-10) for each session
+- Priority levels (HIGH/MEDIUM/LOW/SKIP)
+- Reasoning for each score
+- Pre-extracted metadata (ticket, complexity, time saved, technologies)
+- Overall recommendation on which sessions to document first
+
+Follow the scoring criteria defined in your agent prompt. Be decisive, specific, and helpful.`
+   })
+   ```
+
+4. **Store agent response in variable:**
+   Store the complete JSON response as `AGENT_ANALYSIS`
+
+5. **Show completion message:**
+   ```
+   "✓ Analysis complete - Found ${summary.total_sessions} sessions (${summary.high_priority} HIGH, ${summary.medium_priority} MEDIUM, ${summary.low_priority} LOW)"
+   ```
+
+**Error handling:**
+- If agent fails or times out, fall back to Step 0.5 without agent data
+- Show warning: "Agent analysis failed, showing standard view"
+- Continue with normal workflow
+
+**Note:** The AGENT_ANALYSIS variable will be used in Steps 0.5 and 0.6 to enhance the presentation with priority scores and recommendations.
+
 #### 0.5: Build Options List (Based on User's Initial Choice)
 
-Create a prioritized list of documentation options based on what was requested:
+Create a prioritized list of documentation options based on what was requested.
+
+**IMPORTANT - Check for Agent Analysis:**
+- If `AGENT_ANALYSIS` variable exists (from Step 0.4.5), use the prioritized sessions from the agent
+- If `AGENT_ANALYSIS` does not exist, use the standard approach below
+
+---
+
+### Option A: With Agent Analysis (--intelligent flag was used)
+
+**If AGENT_ANALYSIS exists:**
+
+1. **Extract sessions from agent response:**
+   ```javascript
+   const sessions = AGENT_ANALYSIS.sessions;
+   const summary = AGENT_ANALYSIS.summary;
+   ```
+
+2. **Sessions are already:**
+   - Sorted by priority_score (highest first)
+   - Grouped by priority_level (HIGH/MEDIUM/LOW/SKIP)
+   - Enriched with scores, reasoning, and metadata
+   - Filtered (already documented sessions marked as SKIP)
+
+3. **Use agent data directly in Step 0.6:**
+   - Priority scores already calculated
+   - Recommendations already generated
+   - Metadata already extracted
+   - No additional processing needed
+
+---
+
+### Option B: Standard Approach (without agent analysis)
+
+**If AGENT_ANALYSIS does NOT exist, build options manually:**
 
 **If user chose "Current conversation only"**:
 - Skip PRs and commits detection entirely
@@ -313,7 +452,75 @@ Create a prioritized list of documentation options based on what was requested:
 - Proceed directly to Step 0.7 with that single option
 - No need to ask user to "choose" when there's only one choice
 
-**If Step 0.5 found multiple options**, use the `AskUserQuestion` tool to present detailed options:
+**If Step 0.5 found multiple options**, present them to the user.
+
+---
+
+### Option A: Enhanced Presentation (with AGENT_ANALYSIS)
+
+**If AGENT_ANALYSIS exists (--intelligent flag was used):**
+
+Present sessions grouped by priority level with scores, reasoning, and recommendations.
+
+**Before AskUserQuestion, show analysis summary:**
+```
+Analyzing sessions... ✓ Analysis complete
+
+Found ${summary.total_sessions} sessions:
+- ${summary.high_priority} HIGH priority (strongly recommend)
+- ${summary.medium_priority} MEDIUM priority (consider documenting)
+- ${summary.low_priority} LOW priority (optional)
+
+Overall recommendation: ${summary.recommendation}
+```
+
+**Then use AskUserQuestion with enhanced formatting:**
+
+```markdown
+**Question**: "Which session would you like to document?"
+
+**HIGH PRIORITY** (Strongly recommend):
+
+1. **🌟 [9.2] PR #123: Add JWT authentication system**
+   - Description: "${session.reasoning}"
+   - Files: ${session.metadata.files_changed} | Complexity: ${session.metadata.estimated_complexity} | Time saved: ${session.metadata.estimated_time_saved}
+   - Technologies: ${session.metadata.technologies.join(', ')}
+   - Recommendation: ${session.recommendation}
+
+2. **🌟 [8.5] Research: Authentication strategy evaluation**
+   - Description: "${session.reasoning}"
+   - Iterations: ${session.metadata.iterations} | Approaches: ${session.metadata.approaches_evaluated.join(', ')}
+   - Recommendation: ${session.recommendation}
+
+**MEDIUM PRIORITY** (Consider documenting):
+
+3. **⭐ [6.5] Grouped commits: Database optimization**
+   - Description: "${session.reasoning}"
+   - Files: ${session.metadata.files_changed} | Complexity: ${session.metadata.estimated_complexity}
+   - Recommendation: ${session.recommendation}
+
+**LOW PRIORITY** (Optional):
+
+4. **○ [3.5] PR #119: Add unit tests**
+   - Description: "${session.reasoning}"
+   - Recommendation: ${session.recommendation}
+
+**ALREADY DOCUMENTED**:
+
+✓ PR #122 - Already documented as ${session.existing_documentation}
+```
+
+**Visual indicators for priority:**
+- HIGH: 🌟 emoji + score [8-10]
+- MEDIUM: ⭐ emoji + score [5-7]
+- LOW: ○ emoji + score [2-4]
+- SKIP: ✓ emoji + "Already documented"
+
+---
+
+### Option B: Standard Presentation (without agent analysis)
+
+**If AGENT_ANALYSIS does NOT exist, use standard format:**
 
 ```markdown
 **Question**: "Which work session would you like to document?"
@@ -337,12 +544,14 @@ Create a prioritized list of documentation options based on what was requested:
    - Status: ⚠️ Not yet documented
 ```
 
-**IMPORTANT**: Use the `AskUserQuestion` tool with:
+---
+
+**IMPORTANT - AskUserQuestion parameters:**
 - `multiSelect: false` (user picks ONE session)
-- Clear labels like "PR #59: Enhance copilot instructions" or "Research: Authentication Approaches"
-- Descriptions that explain what will be documented
-- Visual indicators (⚠️/✅ for PRs, 🔬 for research sessions)
-- **Include research session option if conversation is substantial AND user chose "Both"**
+- Clear labels with context (PR number/title, research topic, commits)
+- Descriptions that explain value and what will be documented
+- Visual indicators appropriate to presentation mode
+- **Include research session if conversation is substantial AND user chose "Both"**
 
 #### 0.7: Process User Selection
 
