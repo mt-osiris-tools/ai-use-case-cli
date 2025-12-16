@@ -221,12 +221,7 @@ cat "${cli_root}/docs/TEMPLATE.md"
 cat "${cli_root}/docs/TEMPLATE-RESEARCH.md"
 ```
 
-**If templates aren't found at the standard location**, check if the CLI is installed in a custom location:
-```bash
-# Alternative: check project's .ai-tools directory
-cat .ai-tools/templates/TEMPLATE.md
-cat .ai-tools/templates/TEMPLATE-RESEARCH.md
-```
+**Note**: Templates are only stored in the CLI installation directory. If the above path doesn't work, the CLI may be installed in a non-standard location - check with `which ai-use-case` to find the installation path.
 
 ### Step 10: Generate Documentation
 
