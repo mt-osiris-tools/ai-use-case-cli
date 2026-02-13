@@ -59,7 +59,8 @@ CLI="$(script_path ai-use-case)"
     mkdir -p "$non_git_dir"
 
     # Set git as required
-    bash "$(script_path scripts/utils/config-manager.sh)" set-git-required true
+    source "$(script_path scripts/utils/config-manager.sh)"
+    set_git_required "true"
 
     run bash "$SETUP_SCRIPT" "$non_git_dir"
     assert_failure
@@ -67,7 +68,7 @@ CLI="$(script_path ai-use-case)"
     assert_output --partial "Git is required"
 
     # Reset to default
-    bash "$(script_path scripts/utils/config-manager.sh)" set-git-required false
+    set_git_required "false"
 }
 
 @test "setup-project: skips git hooks for non-git projects" {
@@ -295,7 +296,7 @@ CLI="$(script_path ai-use-case)"
     assert_success
 
     # Registry file should exist
-    assert_file_exists "${TEST_CONFIG_DIR}/registry.json"
+    assert_file_exists "${HOME}/.local/share/ai-use-case-cli/projects-registry.json"
 }
 
 # ============================================

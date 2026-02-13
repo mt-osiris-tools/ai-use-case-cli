@@ -9,13 +9,18 @@ REGISTRY_DIR="$HOME/.local/share/ai-use-case-cli"
 REGISTRY_FILE="$REGISTRY_DIR/projects-registry.json"
 REGISTRY_VERSION="1.0.0"
 
-# Colors for output
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-RED='\033[0;31m'
-CYAN='\033[0;36m'
-NC='\033[0m' # No Color
+_REGISTRY_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONSTANTS_SH="$_REGISTRY_SCRIPT_DIR/../../lib/core/constants.sh"
+if [ -f "$CONSTANTS_SH" ]; then
+    source "$CONSTANTS_SH"
+else
+    GREEN=''
+    YELLOW=''
+    BLUE=''
+    RED=''
+    CYAN=''
+    NC=''
+fi
 
 # Ensure registry directory exists
 ensure_registry_dir() {
