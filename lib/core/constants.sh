@@ -25,7 +25,6 @@ readonly _CONSTANTS_SH_LOADED=1
 # Note: Colors are defined with TTY detection for proper rendering
 # They will be disabled when output is not to a terminal or NO_COLOR is set
 
-# Detect if we should use colors
 if [[ -t 1 || -n "${FORCE_COLOR:-}" ]] && [[ -z "${NO_COLOR:-}" ]]; then
     # Colors enabled (TTY detected or FORCE_COLOR set, and NO_COLOR not set)
     GREEN=$'\033[0;32m'
