@@ -27,7 +27,13 @@ else
 fi
 
 # Ensure hub exists
-HUB_DIR=$(ensure_hub_exists)
+HUB_DIR=$(ensure_hub_exists 2>/dev/null || true)
+if [ -z "${HUB_DIR:-}" ]; then
+    hub_dir=$(get_hub_dir)
+    echo -e "${RED}Error: Hub directory not found at: $hub_dir${NC}" >&2
+    echo -e "${YELLOW}Tip:${NC} Run ${CYAN}ai-use-case --init${NC} to initialize the documentation hub before listing projects." >&2
+    exit 1
+fi
 
 # Source registry manager if available
 SHOW_REGISTRY=false
