@@ -231,7 +231,7 @@ case "${1:-}" in
         if [ -f "$SCRIPT_DIR/scripts/project/setup-project.sh" ]; then
             # Pass through all remaining arguments (e.g., --update)
             shift
-            trace_run "init" bash "$SCRIPT_DIR/scripts/project/setup-project.sh" "$@" .
+            trace_run "init" bash "$SCRIPT_DIR/scripts/project/setup-project.sh" "$@"
         else
             trace_event "error" "command=init" "error=script_not_found" "script=setup-project.sh"
             echo -e "${RED}Error: setup-project.sh not found${NC}"
