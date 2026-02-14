@@ -378,14 +378,14 @@ What would you like to do?
 - When: Topic name is vague or doesn't match content
 - Impact: Better searchability
 
-**ADD Relationships** (HIGH priority: Confidence varies by type - sequential 0.8+, prerequisite 0.75+, technical/alternative 0.7+; MEDIUM/LOW: lower confidence possible, minimum 0.7)
+**ADD Relationships** (HIGH priority: Confidence varies by type - sequential 0.8+, prerequisite 0.75+, technical/alternative 0.7+; MEDIUM/LOW: lower confidence possible while still meeting each type's minimum)
 - Sequential: TICKET-001 → TICKET-002 (builds upon, requires 0.8+)
 - Technical: Similar technologies/patterns (requires 0.7+)
 - Prerequisite: Frontend needs backend API (requires 0.75+)
 - Alternative: OAuth vs JWT (different solutions, requires 0.7+)
 - Impact: Makes knowledge connections explicit
 
-**Note:** Confidence thresholds shown above are for HIGH priority recommendations. The agent can also recommend changes at MEDIUM/LOW priority with lower confidence (minimum 0.7 threshold applies to all recommendations).
+**Note:** Confidence thresholds shown above are for HIGH priority recommendations. MEDIUM/LOW recommendations can use lower confidence when impact is lower. Type-specific relationship minimums still apply at all priorities (sequential >= 0.8, prerequisite >= 0.75, technical/alternative >= 0.7).
 
 **When to use:**
 - Hub has 20+ documents (analysis works best with more data)

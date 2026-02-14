@@ -154,7 +154,8 @@ init_config() {
   "version": "1.0.0",
   "hubMode": "$hub_mode",
   "hubPath": "$hub_path",
-  "gitUrl": "$git_url"
+  "gitUrl": "$git_url",
+  "gitRequired": false
 }
 EOF
 

@@ -41,6 +41,14 @@ if [ -f "$CONFIG_MANAGER" ]; then
     source "$CONFIG_MANAGER"
 fi
 
+HUB_UTILS="$SCRIPT_DIR/../utils/hub-utils.sh"
+if [ -f "$HUB_UTILS" ]; then
+    source "$HUB_UTILS"
+else
+    echo -e "${RED}Error: hub-utils.sh not found: $HUB_UTILS${NC}" >&2
+    exit 1
+fi
+
 # Source progress tracker
 PROGRESS_TRACKER="$SCRIPT_DIR/../utils/progress-tracker.sh"
 if [ -f "$PROGRESS_TRACKER" ]; then
@@ -49,38 +57,6 @@ if [ -f "$PROGRESS_TRACKER" ]; then
 else
     PROGRESS_ENABLED=false
 fi
-
-# Function to ensure hub repository exists
-ensure_hub_exists() {
-    local hub_dir
-    local hub_mode
-
-    # Check if configuration exists
-    if [ -f "$HOME/.config/ai-use-case-cli/config.json" ]; then
-        hub_mode=$(get_hub_mode)
-        hub_dir=$(get_hub_path)
-    else
-        # Fallback to local mode if no config
-        echo -e "${YELLOW}Warning: No configuration found. Using local mode.${NC}" >&2
-        echo -e "${BLUE}Run 'ai-use-case --init' to configure hub mode.${NC}" >&2
-        hub_dir="${AI_USECASES_DIR:-$HOME/.local/share/ai-use-case-cli/hub}"
-        hub_mode="local"
-    fi
-
-    # Check if hub exists
-    if [ ! -d "$hub_dir" ]; then
-        echo -e "${RED}Error: Hub directory not found at: $hub_dir${NC}" >&2
-        echo "Please run 'ai-use-case --init' to setup the hub" >&2
-        exit 1
-    fi
-
-    # Verify hub structure
-    if [ ! -d "$hub_dir/by-project" ]; then
-        mkdir -p "$hub_dir/by-project" "$hub_dir/by-date" "$hub_dir/by-topic"
-    fi
-
-    echo "$hub_dir"
-}
 
 # Source version configuration (single source of truth)
 if [ -f "$SCRIPT_DIR/../utils/version.sh" ]; then

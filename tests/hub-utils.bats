@@ -87,9 +87,14 @@ teardown() {
     rm -f "${TEST_CONFIG_DIR}/config.json"
     source "$(script_path scripts/utils/hub-utils.sh)"
 
+    local original_ai_usecases_dir="${AI_USECASES_DIR-}"
+    unset AI_USECASES_DIR
+
     run get_hub_dir
     assert_success
     assert_output --partial ".local/share/ai-use-case-cli/hub"
+
+    export AI_USECASES_DIR="$original_ai_usecases_dir"
 }
 
 @test "get_hub_dir: respects AI_USECASES_DIR env var when no config" {

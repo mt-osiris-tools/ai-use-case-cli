@@ -2,16 +2,21 @@
 # Hub Utilities for AI Use Case CLI
 # Common functions for hub operations across all scripts
 
-# Colors for output
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-RED='\033[0;31m'
-CYAN='\033[0;36m'
-NC='\033[0m' # No Color
-
 # Source configuration manager if available
 UTILS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+CONSTANTS_SH="$UTILS_DIR/../../lib/core/constants.sh"
+if [ -f "$CONSTANTS_SH" ]; then
+    source "$CONSTANTS_SH"
+else
+    GREEN=''
+    YELLOW=''
+    BLUE=''
+    RED=''
+    CYAN=''
+    NC=''
+fi
+
 CONFIG_MANAGER="$UTILS_DIR/config-manager.sh"
 if [ -f "$CONFIG_MANAGER" ]; then
     source "$CONFIG_MANAGER"
