@@ -71,6 +71,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Hub Auto-Clone Removed From Non-Setup Commands**: Commands like `list-projects` and session documentation now require a pre-initialized hub directory instead of cloning a default hub repo when missing
   - **What To Do**: Run `ai-use-case --init` to configure and create the hub before using commands that read/write hub content
 
+- **Session Selector Agent Documentation**: Documented the weighted priority scoring formula (0-10) with an explicit example calculation
+
 ### Added
 
 - **Enhanced CLAUDE.md Documentation**: Comprehensive guidance for Claude Code instances working in this repository
