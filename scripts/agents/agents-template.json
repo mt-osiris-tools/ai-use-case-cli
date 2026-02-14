@@ -95,9 +95,7 @@
       "version": "1.0.0",
       "capabilities": [
         "topic-analysis",
-        "relationship-mapping",
-        "tag-suggestion",
-        "search-optimization"
+        "relationship-mapping"
       ],
       "dependencies": [
         "claude-code"
