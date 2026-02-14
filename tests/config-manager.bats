@@ -84,9 +84,15 @@ teardown() {
     source "$(script_path scripts/utils/config-manager.sh)"
 
     init_config "local"
+
+    local original_ai_usecases_dir="${AI_USECASES_DIR-}"
+    unset AI_USECASES_DIR
+
     run get_hub_path
     assert_success
     assert_output --partial ".local/share/ai-use-case-cli/hub"
+
+    export AI_USECASES_DIR="$original_ai_usecases_dir"
 }
 
 # ============================================
@@ -119,9 +125,14 @@ teardown() {
     # Don't create config
     source "$(script_path scripts/utils/config-manager.sh)"
 
+    local original_ai_usecases_dir="${AI_USECASES_DIR-}"
+    unset AI_USECASES_DIR
+
     run get_hub_path
     assert_success
     assert_output --partial ".local/share/ai-use-case-cli/hub"
+
+    export AI_USECASES_DIR="$original_ai_usecases_dir"
 }
 
 @test "get_hub_path: environment variable takes precedence over config" {

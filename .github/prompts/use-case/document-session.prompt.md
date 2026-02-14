@@ -564,19 +564,17 @@ The CLI installation includes the complete repository structure, including the d
 - **Slash commands** (this file): Use `${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}` to support custom installation paths
 - **Bash scripts**: Use `$SCRIPT_DIR` variable which is resolved at runtime
 
+**IMPORTANT: Use the Read tool** to silently load the template (do NOT use bash cat which displays output to the user):
+
 **For Implementation Sessions:**
-```bash
-cat "${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE.md"
-```
+- Use the Read tool with path: `${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE.md`
 
 **For Research Sessions:**
-```bash
-cat "${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE-RESEARCH.md"
-```
+- Use the Read tool with path: `${AI_USECASES_CLI_ROOT:-~/.local/share/ai-use-case-cli}/docs/TEMPLATE-RESEARCH.md`
 
-**Note**: The environment variable `AI_USECASES_CLI_ROOT` allows users to install the CLI in custom locations. If not set, it defaults to `~/.local/share/ai-use-case-cli`.
+**Note**: The environment variable `AI_USECASES_CLI_ROOT` allows users to install the CLI in custom locations. If not set, it defaults to `~/.local/share/ai-use-case-cli`. The Read tool loads files internally without displaying them to the user.
 
-Use the Read tool to read the template file from this path. This is your source of truth for:
+The template you read is your source of truth for:
 - All sections that must be included
 - Exact formatting and structure
 - Order of sections

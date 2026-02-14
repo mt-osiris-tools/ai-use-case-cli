@@ -53,7 +53,7 @@ cd "$HUB_DIR"
 
 trace_operation "search_files" "term=$1"
 echo -e "${GREEN}📁 Files matching '$1':${NC}"
-FILE_MATCHES=$(find by-project -name "*$1*" -type f 2>/dev/null | head -20)
+FILE_MATCHES=$(find by-project -type f -path "*$1*" 2>/dev/null | head -20)
 if [ -n "$FILE_MATCHES" ]; then
     echo "$FILE_MATCHES"
     FILE_COUNT=$(echo "$FILE_MATCHES" | wc -l)
