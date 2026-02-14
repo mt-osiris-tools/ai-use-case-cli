@@ -262,6 +262,10 @@ show_hub_config() {
     echo -e "Hub Mode:  ${GREEN}$(get_hub_mode)${NC}"
     echo -e "Hub Path:  ${CYAN}$(get_hub_path)${NC}"
 
+    if declare -F get_git_required >/dev/null 2>&1; then
+        echo -e "Git Required: ${CYAN}$(get_git_required)${NC}"
+    fi
+
     if is_git_mode; then
         echo -e "Git URL:   ${CYAN}$(get_git_url)${NC}"
     fi

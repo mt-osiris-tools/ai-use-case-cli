@@ -6,6 +6,7 @@ load 'test_helper'
 setup() {
     common_setup
     create_test_config "local" "$TEST_HUB_DIR"
+    REGISTRY_FILE_PATH="${HOME}/.local/share/ai-use-case-cli/projects-registry.json"
 }
 
 teardown() {
@@ -27,7 +28,7 @@ REGISTRY_SCRIPT="$(script_path scripts/project/registry-manager.sh)"
     source "$REGISTRY_SCRIPT"
     # Check that key functions exist
     type register_project &>/dev/null
-    type get_registered_projects &>/dev/null
+    type list_projects &>/dev/null
 }
 
 # ============================================
@@ -63,7 +64,7 @@ REGISTRY_SCRIPT="$(script_path scripts/project/registry-manager.sh)"
     assert_success
 
     # Registry file should exist
-    assert_file_exists "${TEST_CONFIG_DIR}/registry.json"
+    assert_file_exists "$REGISTRY_FILE_PATH"
 }
 
 @test "registry-manager: register_project returns 'registered' for new project" {
@@ -98,29 +99,29 @@ REGISTRY_SCRIPT="$(script_path scripts/project/registry-manager.sh)"
     register_project "$project_dir" "3.12.0" ".usecase/cases"
 
     # Check registry contains version
-    assert_file_contains "${TEST_CONFIG_DIR}/registry.json" "3.12.0"
+    assert_file_contains "$REGISTRY_FILE_PATH" "3.12.0"
 }
 
 # ============================================
-# get_registered_projects() Tests
+# list_projects() Tests
 # ============================================
 
-@test "registry-manager: get_registered_projects returns empty for no projects" {
+@test "registry-manager: list_projects returns empty for no projects" {
     source "$REGISTRY_SCRIPT"
 
-    run get_registered_projects
+    run list_projects
     # Should succeed with empty output or JSON array
     assert_success
 }
 
-@test "registry-manager: get_registered_projects returns registered projects" {
+@test "registry-manager: list_projects returns registered projects" {
     source "$REGISTRY_SCRIPT"
     local project_dir
     project_dir="$(create_test_git_repo)"
 
     register_project "$project_dir" "3.12.0" ".usecase/cases"
 
-    run get_registered_projects
+    run list_projects
     assert_success
     assert_output --partial "$project_dir"
 }
@@ -137,7 +138,7 @@ REGISTRY_SCRIPT="$(script_path scripts/project/registry-manager.sh)"
     register_project "$project_dir" "3.12.0" ".usecase/cases"
 
     if command -v jq &> /dev/null; then
-        run jq '.' "${TEST_CONFIG_DIR}/registry.json"
+        run jq '.' "$REGISTRY_FILE_PATH"
         assert_success
     fi
 }
@@ -149,7 +150,7 @@ REGISTRY_SCRIPT="$(script_path scripts/project/registry-manager.sh)"
 
     register_project "$project_dir" "3.12.0" ".usecase/cases"
 
-    assert_file_contains "${TEST_CONFIG_DIR}/registry.json" "$project_dir"
+    assert_file_contains "$REGISTRY_FILE_PATH" "$project_dir"
 }
 
 # ============================================
@@ -165,8 +166,8 @@ REGISTRY_SCRIPT="$(script_path scripts/project/registry-manager.sh)"
     register_project "$project1" "3.12.0" ".usecase/cases"
     register_project "$project2" "3.12.0" ".usecase/cases"
 
-    assert_file_contains "${TEST_CONFIG_DIR}/registry.json" "$project1"
-    assert_file_contains "${TEST_CONFIG_DIR}/registry.json" "$project2"
+    assert_file_contains "$REGISTRY_FILE_PATH" "$project1"
+    assert_file_contains "$REGISTRY_FILE_PATH" "$project2"
 }
 
 # ============================================

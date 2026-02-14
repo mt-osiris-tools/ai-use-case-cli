@@ -142,6 +142,83 @@ set_install_mode() {
     echo -e "${GREEN}✓${NC} Installation mode set to: $mode"
 }
 
+get_git_required() {
+    if [ ! -f "$CONFIG_FILE" ]; then
+        echo "false"
+        return 0
+    fi
+
+    if grep -q '"gitRequired"' "$CONFIG_FILE"; then
+        local value
+        value=$(grep '"gitRequired"' "$CONFIG_FILE" | sed 's/.*: *\([^,}]*\).*/\1/' | tr -d ' "')
+        if [ "$value" = "true" ]; then
+            echo "true"
+        else
+            echo "false"
+        fi
+    else
+        echo "false"
+    fi
+}
+
+set_git_required() {
+    local value="$1"
+
+    if [ "$value" != "true" ] && [ "$value" != "false" ]; then
+        echo -e "${RED}Error: Invalid value. Use 'true' or 'false'${NC}" >&2
+        return 1
+    fi
+
+    if [ ! -f "$CONFIG_FILE" ]; then
+        echo -e "${RED}Error: Configuration file not found${NC}" >&2
+        return 1
+    fi
+
+    if command -v jq &> /dev/null; then
+        local temp_file
+        temp_file=$(mktemp)
+        setup_temp_file_cleanup "$temp_file"
+
+        local bool_value
+        bool_value=$([ "$value" = "true" ] && echo "true" || echo "false")
+
+        if grep -q '"gitRequired"' "$CONFIG_FILE"; then
+            jq --argjson required "$bool_value" '.gitRequired = $required' "$CONFIG_FILE" > "$temp_file"
+        else
+            jq --argjson required "$bool_value" '. + {gitRequired: $required}' "$CONFIG_FILE" > "$temp_file"
+        fi
+
+        if [ -s "$temp_file" ] && jq empty "$temp_file" 2>/dev/null; then
+            mv "$temp_file" "$CONFIG_FILE"
+            teardown_temp_file_cleanup
+        else
+            echo -e "${RED}Error: Failed to update configuration${NC}" >&2
+            teardown_temp_file_cleanup
+            return 1
+        fi
+    else
+        if grep -q '"gitRequired"' "$CONFIG_FILE"; then
+            if [[ "$(uname)" == "Darwin" ]]; then
+                sed -i '' "s|\"gitRequired\": [^,}]*|\"gitRequired\": $value|" "$CONFIG_FILE"
+            else
+                sed -i "s|\"gitRequired\": [^,}]*|\"gitRequired\": $value|" "$CONFIG_FILE"
+            fi
+        else
+            if [[ "$(uname)" == "Darwin" ]]; then
+                sed -i '' "s|}$|,\n  \"gitRequired\": $value\n}|" "$CONFIG_FILE"
+            else
+                sed -i "s|}$|,\n  \"gitRequired\": $value\n}|" "$CONFIG_FILE"
+            fi
+        fi
+    fi
+}
+
+is_git_required() {
+    local required
+    required=$(get_git_required)
+    [ "$required" = "true" ]
+}
+
 # ============================================================================
 # Advanced Features
 # ============================================================================

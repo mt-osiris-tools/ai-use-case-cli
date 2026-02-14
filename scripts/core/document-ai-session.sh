@@ -165,44 +165,13 @@ check_cli_version() {
     fi
 }
 
-# Function to ensure hub repository exists
-ensure_hub_exists() {
-    local hub_dir
-    local default_hub="$HOME/.local/share/ai-use-case-cli/hub"
-
-    # Check if AI_USECASES_DIR is set
-    if [ -n "${AI_USECASES_DIR:-}" ]; then
-        hub_dir="$AI_USECASES_DIR"
-    else
-        hub_dir="$default_hub"
-    fi
-
-    # Check if hub exists
-    if [ ! -d "$hub_dir" ]; then
-        echo -e "${YELLOW}Hub repository not found at: $hub_dir${NC}" >&2
-        echo -e "${BLUE}Cloning ai-use-case-hub repository...${NC}" >&2
-
-        # Create parent directory if needed
-        mkdir -p "$(dirname "$hub_dir")"
-
-        # Clone the repository
-        if git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git "$hub_dir" 2>/dev/null; then
-            echo -e "${GREEN}✓${NC} Hub repository cloned successfully" >&2
-        else
-            echo -e "${RED}Error: Failed to clone hub repository${NC}" >&2
-            echo "Please clone manually:" >&2
-            echo "  git clone https://github.com/mt-osiris-tools/ai-use-case-hub.git $hub_dir" >&2
-            exit 1
-        fi
-    fi
-
-    # Verify hub structure
-    if [ ! -d "$hub_dir/by-project" ]; then
-        mkdir -p "$hub_dir/by-project" "$hub_dir/by-date" "$hub_dir/by-topic"
-    fi
-
-    echo "$hub_dir"
-}
+HUB_UTILS="$SCRIPT_DIR/../utils/hub-utils.sh"
+if [ -f "$HUB_UTILS" ]; then
+    source "$HUB_UTILS"
+else
+    echo -e "${RED}Error: hub-utils.sh not found: $HUB_UTILS${NC}" >&2
+    exit 1
+fi
 
 # Configuration - Auto-detect locations
 # SCRIPT_DIR = CLI installation directory (for scripts and templates) - defined above for version checking
@@ -547,7 +516,7 @@ if [[ "$AGENTS_USED" =~ ^[Yy]$ ]]; then
     IFS=',' read -ra AGENT_ARRAY <<< "$AGENTS_LIST"
 
     # Collect details for each agent
-    local agent_index=0
+    agent_index=0
     for i in "${!AGENT_ARRAY[@]}"; do
         agent=$(echo "${AGENT_ARRAY[$i]}" | xargs) # trim whitespace
 
