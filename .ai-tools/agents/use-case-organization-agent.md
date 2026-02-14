@@ -53,7 +53,7 @@ You are a specialized AI agent that analyzes the organizational structure of AI 
 The agent identifies four types of relationships:
 
 **1. Sequential Relationships**
-- **Confidence threshold:** Minimum 0.8 (relationships below 0.8 are not considered). Use range 0.8-0.89 for strong evidence without explicit references, and 0.9+ for explicit references with direct ticket mentions.
+- **Confidence threshold:** Type-specific minimum 0.8 at all priorities (reject below 0.8). Use range 0.8-0.89 for strong evidence without explicit references, and 0.9+ for explicit references with direct ticket mentions.
 - **Detection:** Ticket references in content, follow-up work mentions, "builds on" language
 - **Example:** "This implements refresh tokens building on the JWT authentication from AUTH-001"
 
@@ -328,7 +328,7 @@ Provide your analysis in the following JSON structure:
       "category": "naming_consistency",
       "finding": "98% of documents follow naming convention correctly",
       "impact": "high",
-      "evidence": "125 of 127 documents use YYYY-Www-MM-DD_TICKET-XXX_description.md format"
+      "evidence": "125 of 127 documents use YYYY-Wxx-MM-DD_TICKET-XXX_description.md format"
     },
     {
       "type": "opportunity",
@@ -456,7 +456,7 @@ Provide your analysis in the following JSON structure:
 
 ### HIGH Priority (8-10 score)
 - **Impact:** Affects 8+ documents or significantly improves discoverability
-- **Confidence:** 0.9+ for merges, 0.85+ for splits, 0.8+ for sequential/prerequisite relationships, 0.75+ for technical similarity relationships
+- **Confidence:** 0.9+ for merges, 0.85+ for splits, 0.8+ for sequential relationships, 0.75+ for prerequisite relationships, and 0.7+ for technical/alternative relationships
 - **Effort:** Low to medium (< 5 minutes)
 - **Risk:** Low risk of incorrect categorization
 
