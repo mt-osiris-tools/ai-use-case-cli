@@ -373,7 +373,7 @@ Follow the scoring criteria defined in your agent prompt. Be decisive, specific,
 - Show warning: "Agent analysis failed, showing standard view"
 - Continue with normal workflow
 
-**Note:** The AGENT_ANALYSIS variable will be used in Steps 0.5 and 0.6 to enhance the presentation with priority scores and recommendations.
+**Note:** The AGENT_ANALYSIS variable will be used in the "Option A: Enhanced Presentation (with AGENT_ANALYSIS)" and "Option B: Standard Presentation (without agent analysis)" sections below to enhance the presentation with priority scores and recommendations.
 
 #### 0.5: Build Options List (Based on User's Initial Choice)
 

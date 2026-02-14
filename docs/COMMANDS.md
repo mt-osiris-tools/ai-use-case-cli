@@ -223,6 +223,12 @@ For AI-assisted documentation with automatic context capture:
                             # - Project or hub-wide analysis
                             # - Trend visualization
                             # - Prioritized recommendations
+
+/use-case:optimize-organization  # Optimize hub organization (v3.15.0+)
+                            # - Topic analysis (merge/split/rename)
+                            # - Relationship mapping
+                            # - Confidence-based recommendations
+                            # - Dry-run first with user confirmation
 ```
 
 ### Intelligent Session Selection (v3.14.0+)
@@ -284,6 +290,118 @@ MEDIUM PRIORITY (Consider documenting):
 
 (Recommendation: Start with PR #123 - highest value)
 ```
+
+### Organization Optimization (v3.15.0+)
+
+The `optimize-organization` command analyzes your hub's organization and suggests improvements for better documentation discoverability.
+
+**Usage:**
+```
+/use-case:optimize-organization
+```
+
+**What it does:**
+- Analyzes hub structure and all documentation files
+- Detects suboptimal topic organization (fragmented or too broad)
+- Maps relationships between documents (sequential, technical similarity, prerequisite, alternative)
+- Provides prioritized recommendations (HIGH/MEDIUM/LOW)
+- Suggests specific actions (merge topics, split topics, rename, add relationships)
+
+**Benefits:**
+- **Better discoverability**: Merge fragmented topics, split overly broad topics
+- **Knowledge connections**: Map relationships between related documents
+- **Confidence-based**: Only recommends changes with 0.7+ confidence
+- **Safe workflow**: Always previews changes, requires confirmation
+- **Preserves history**: Only updates symlinks, never modifies source files
+
+**Features:**
+- Analyzes 100+ documents in < 2 minutes
+- Hub health scoring (0-10 scale)
+- Dry-run first (preview recommendations before applying)
+- Complete audit trail in `.meta/optimization-history.json`
+- Backup creation before applying changes
+
+**Example output:**
+```
+Organization Analysis Complete
+
+Hub: ~/.local/share/ai-use-case-cli/hub
+Analyzed: 127 documents across 12 projects
+
+Key Findings:
+✓ Strong: Consistent naming (98% compliance)
+✓ Good: Clear topic structure (34 topics)
+⚠ Opportunity: 3 topic groups could be merged
+⚠ Info: 156 relationships detected
+
+Recommendations:
+  8 HIGH priority (+25% discoverability)
+  12 MEDIUM priority
+  10 LOW priority
+
+What would you like to do?
+1. Review all recommendations (detailed view)
+2. Apply HIGH priority recommendations
+3. Apply specific recommendations
+4. Save and exit
+```
+
+**Workflow:**
+1. Run analysis (read-only, 30-90 seconds)
+2. Review recommendations with confidence scores and rationale
+3. Select which recommendations to apply
+4. Confirm changes (shows exact files affected)
+5. Apply changes (symlinks updated, source files unchanged)
+6. View results summary
+
+**Phase 5.0 Scope:**
+- ✅ Topic analysis (merge/split/rename)
+- ✅ Relationship mapping
+- ⏳ Tag suggestions (deferred to Phase 5.1)
+- ⏳ Search optimization (deferred to Phase 5.1)
+- ⏳ CLI wrapper: `ai-use-case optimize-organization` (deferred to Phase 5.1)
+
+**Recommendation Types:**
+
+**MERGE Topics** (HIGH priority: Confidence 0.90+; MEDIUM/LOW: lower confidence possible)
+- Example: `auth` + `authentication` + `jwt-auth` → `authentication`
+- When: Multiple topics covering same domain with 80%+ overlap
+- Impact: Consolidates fragmented knowledge
+
+**SPLIT Topics** (HIGH priority: Confidence 0.85+; MEDIUM/LOW: lower confidence possible)
+- Example: `database-work` → `database-migrations` + `database-optimization` + `database-schema`
+- When: Large topic (20+ docs) with low similarity (< 0.5)
+- Impact: Better organization by intent
+
+**RENAME Topics** (HIGH priority: Confidence 0.80+; MEDIUM/LOW: lower confidence possible)
+- Example: `api-stuff` → `api-development`
+- When: Topic name is vague or doesn't match content
+- Impact: Better searchability
+
+**ADD Relationships** (HIGH priority: Confidence varies by type - sequential 0.8+, prerequisite 0.75+, technical/alternative 0.7+; MEDIUM/LOW: lower confidence possible while still meeting each type's minimum)
+- Sequential: TICKET-001 → TICKET-002 (builds upon, requires 0.8+)
+- Technical: Similar technologies/patterns (requires 0.7+)
+- Prerequisite: Frontend needs backend API (requires 0.75+)
+- Alternative: OAuth vs JWT (different solutions, requires 0.7+)
+- Impact: Makes knowledge connections explicit
+
+**Note:** Confidence thresholds shown above are for HIGH priority recommendations. MEDIUM/LOW recommendations can use lower confidence when impact is lower. Type-specific relationship minimums still apply at all priorities (sequential >= 0.8, prerequisite >= 0.75, technical/alternative >= 0.7).
+
+**When to use:**
+- Hub has 20+ documents (analysis works best with more data)
+- You want to improve documentation discoverability
+- Topics feel disorganized or hard to navigate
+- You're unsure what relationships exist between documents
+
+**When to skip:**
+- Hub is small (< 10 documents) - insufficient data
+- Hub is already well-organized - no improvements needed
+- You prefer manual organization
+
+**Requirements:**
+- Claude Code (uses Task tool with organization agent)
+- Hub initialized with documentation
+- Organization optimizer agent enabled (auto-enabled in v3.15.0+)
 
 ## Direct Script Access (Advanced)
 

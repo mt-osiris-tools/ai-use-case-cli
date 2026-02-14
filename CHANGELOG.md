@@ -71,6 +71,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Hub Auto-Clone Removed From Non-Setup Commands**: Commands like `list-projects` and session documentation now require a pre-initialized hub directory instead of cloning a default hub repo when missing
   - **What To Do**: Run `ai-use-case --init` to configure and create the hub before using commands that read/write hub content
 
+- **Session Selector Agent Documentation**: Documented the weighted priority scoring formula (0-10) with an explicit example calculation
+
 ### Added
 
 - **Enhanced CLAUDE.md Documentation**: Comprehensive guidance for Claude Code instances working in this repository
@@ -90,6 +92,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Configuration file**: Added `.markdownlint.json` with project-standard linting rules (disables line-length, inline-html, and first-line-heading checks while enabling all other standard rules)
   - **User-friendly messages**: Clear feedback when linting/fixing occurs or when markdownlint is not installed
   - **Documentation**: Updated README.md with optional dependency installation instructions
+
+- **Phase 5: Organization Intelligence Agent** - Hub organization analysis and optimization for better discoverability
+  - **New Agent**: Organization Optimizer Agent (`use-case-organization-agent`) for analyzing hub structure and suggesting improvements
+  - **New Command**: `/use-case:optimize-organization` slash command for interactive hub optimization
+  - **Topic Analysis**: Suggests topic merges, splits, and renames based on content similarity and organization patterns
+  - **Relationship Mapping**: Identifies related documents (sequential, technical similarity, prerequisite, alternative approaches)
+  - **Metadata Storage**: `.meta/` directory for relationships graph and audit logs
+  - **Dry-Run Workflow**: Preview recommendations before applying (always requires user confirmation)
+  - **Confidence Scoring**: 0.7-1.0 scale with threshold filtering ensures high-quality recommendations
+  - **Smart Symlink Updates**: Reorganize topics without modifying source files (preserves git history)
+  - **Audit Trail**: Complete history in `.meta/optimization-history.json` for all applied changes
+  - **Hub Health Scoring**: Overall organization score (0-10) with breakdown by category
+  - **Agent Prompt**: Comprehensive analysis methodology with 4-step process (inventory, content analysis, topic clustering, relationship detection)
+  - **Agent Registry**: Organization optimizer agent enabled by default in agent registry template
+  - **Documentation**: Updated COMMANDS.md with detailed optimization workflow and examples
+  - **Documentation**: Updated agents framework README with Phase 5 implementation details
+  - **Phase 5.1 Roadmap**: Tags system, search optimization, and CLI wrapper deferred to Phase 5.1
 
 ## [3.13.0] - 2025-12-15
 
@@ -123,6 +142,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Setup Script**: `scripts/project/setup-copilot.sh` handles prompt symlink creation
   - **Documentation**: New `docs/agents/copilot/GUIDE.md` with comprehensive setup and usage instructions
   - **YAML Frontmatter**: All prompts include description metadata for discoverability in VS Code
+
 
 - **Codex CLI Integration**: Support for Codex-style CLI tools with slash commands
   - **Note**: This integration provides slash command prompts compatible with CLI tools that use
