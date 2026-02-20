@@ -165,6 +165,9 @@ is_git_mode() {
 prompt_hub_mode() {
     if [ ! -t 0 ]; then
         local hub_path="${AI_USECASES_DIR:-$DEFAULT_HUB_DIR}"
+
+        hub_path="${hub_path/#\~/$HOME}"
+
         if ! validate_path "$hub_path"; then
             echo -e "${RED}Error: Invalid hub path: $hub_path${NC}" >&2
             return 1
