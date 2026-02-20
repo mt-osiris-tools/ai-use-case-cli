@@ -2,6 +2,14 @@
 
 **IMPORTANT**: You are an AI coding assistant, and you should **first ask the user which session to document**, then automatically generate documentation for the selected session. Do NOT run the interactive `document-ai-session.sh` script or ask the user to fill in details after selection.
 
+## Tooling Notes (for OpenCode and other runtimes)
+
+This command uses some tool names as concepts. Map them to whatever your agent runtime provides:
+
+- "TodoWrite" => todo list tool (OpenCode: `todowrite`)
+- "AskUserQuestion" => user question tool (OpenCode: `question`)
+- "Task tool" / `subagent_type` => subagent invocation tool (OpenCode: `task`)
+
 ## Command Flags
 
 - `--intelligent` (optional): Use AI agent to analyze and prioritize sessions before selection

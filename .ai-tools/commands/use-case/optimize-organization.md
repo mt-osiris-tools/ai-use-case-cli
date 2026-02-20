@@ -4,6 +4,12 @@
 **Purpose:** Analyze hub organization and suggest improvements for better documentation discoverability
 **Agent:** Organization Optimizer (Phase 5)
 
+## Tooling Notes (for OpenCode and other runtimes)
+
+Tool names referenced in this command are conceptual:
+
+- "Task tool" / `subagent_type` => subagent invocation tool (OpenCode: `task`)
+
 ---
 
 ## Your Task
