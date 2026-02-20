@@ -53,7 +53,7 @@ ensure_hub_exists() {
     local config_exists=false
 
     # Check if configuration exists
-    if [ -f "$HOME/.config/ai-use-case-cli/config.json" ]; then
+    if [ -f "$CONFIG_FILE" ]; then
         config_exists=true
         hub_mode=$(get_hub_mode)
         hub_dir=$(get_hub_path)
@@ -93,7 +93,7 @@ ensure_hub_exists() {
                     echo "  git clone $git_url $hub_dir" >&2
                     echo "" >&2
                     echo "Or reconfigure:" >&2
-                    echo "  rm ~/.config/ai-use-case-cli/config.json" >&2
+                    echo "  rm $CONFIG_FILE" >&2
                     echo "  ai-use-case --init" >&2
                     exit 1
                 fi

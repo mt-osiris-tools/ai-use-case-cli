@@ -353,7 +353,7 @@ if [ "$RUN_CONFIG_AFTER" = true ]; then
 fi
 
 # Write installation mode to config (v3.13.0+)
-CONFIG_DIR="$HOME/.config/ai-use-case-cli"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli"
 CONFIG_FILE="$CONFIG_DIR/config.json"
 
 # Ensure config directory exists

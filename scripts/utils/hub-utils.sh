@@ -31,7 +31,7 @@ ensure_hub_exists() {
     local hub_mode
 
     # Check if configuration exists
-    if [ -f "$HOME/.config/ai-use-case-cli/config.json" ]; then
+    if [ -f "$CONFIG_FILE" ]; then
         hub_mode=$(get_hub_mode)
         hub_dir=$(get_hub_path)
     else
@@ -66,7 +66,7 @@ ensure_hub_exists() {
 # Function to get hub directory without ensuring it exists
 # Useful for scripts that just need to know the configured path
 get_hub_dir() {
-    if [ -f "$HOME/.config/ai-use-case-cli/config.json" ]; then
+    if [ -f "$CONFIG_FILE" ]; then
         get_hub_path
     else
         echo "${AI_USECASES_DIR:-$HOME/.local/share/ai-use-case-cli/hub}"
@@ -75,7 +75,7 @@ get_hub_dir() {
 
 # Function to check if hub uses git
 is_hub_git() {
-    if [ -f "$HOME/.config/ai-use-case-cli/config.json" ]; then
+    if [ -f "$CONFIG_FILE" ]; then
         is_git_mode
     else
         return 1
