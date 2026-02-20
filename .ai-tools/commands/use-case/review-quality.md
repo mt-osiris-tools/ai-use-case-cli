@@ -4,6 +4,12 @@
 **Purpose:** Analyze AI Use Case documentation quality and provide improvement suggestions
 **Agent:** Quality Reviewer (Phase 2)
 
+## Tooling Notes (for OpenCode and other runtimes)
+
+Tool names referenced in this command are conceptual:
+
+- "Task tool" / `subagent_type` => subagent invocation tool (OpenCode: `task`)
+
 ---
 
 ## Your Task

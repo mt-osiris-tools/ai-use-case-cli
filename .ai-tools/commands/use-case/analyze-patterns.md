@@ -4,6 +4,12 @@
 **Purpose:** Analyze patterns in AI Use Case documentation across projects and hubs
 **Agent:** Pattern Analyzer (Phase 3)
 
+## Tooling Notes (for OpenCode and other runtimes)
+
+Tool names referenced in this command are conceptual:
+
+- "Task tool" / `subagent_type` => subagent invocation tool (OpenCode: `task`)
+
 ---
 
 ## Your Task
