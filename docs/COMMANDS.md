@@ -563,7 +563,7 @@ export AI_USECASES_DIR="/custom/path/to/hub"
 export AI_USE_CASE_CLI_HOME="~/.local/share/ai-use-case-cli"
 
 # Configuration directory (advanced)
-export XDG_CONFIG_HOME="~/.config"
+export XDG_CONFIG_HOME="$HOME/.config"
 ```
 
 ## File Locations
@@ -584,7 +584,7 @@ export XDG_CONFIG_HOME="~/.config"
 ~/.local/bin/ai-use-case                              # CLI entry point
 ~/.local/share/ai-use-case-cli/                       # CLI installation
 ~/.local/share/ai-use-case-cli/projects-registry.json # Project registry
-$XDG_CONFIG_HOME/ai-use-case-cli/config.json          # Hub configuration (default: ~/.config/ai-use-case-cli/config.json)
+$XDG_CONFIG_HOME/ai-use-case-cli/config.json          # Hub configuration (default: $HOME/.config/ai-use-case-cli/config.json)
 ~/.local/share/ai-use-case-cli/hub/                   # Hub (local-only mode)
 ```
 
