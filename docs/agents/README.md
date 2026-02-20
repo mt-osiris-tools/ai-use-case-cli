@@ -27,6 +27,11 @@ GitHub Copilot is GitHub's AI pair programmer.
 - Project structure reference
 - Testing and workflow guidelines
 
+### [OpenCode](opencode/)
+OpenCode is an agentic coding environment that reads repo instructions (like `AGENTS.md`) and can run CLI workflows.
+
+- **[Integration Notes](opencode/README.md)** - Tool mapping and non-interactive setup guidance
+
 ### [Agent Framework](framework/)
 Built-in agent system for automated tasks and quality checks.
 
