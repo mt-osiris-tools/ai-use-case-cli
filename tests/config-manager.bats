@@ -95,6 +95,24 @@ teardown() {
     export AI_USECASES_DIR="$original_ai_usecases_dir"
 }
 
+@test "init_config: honors XDG_CONFIG_HOME when set" {
+    local original_xdg_config_home="${XDG_CONFIG_HOME:-}"
+
+    export XDG_CONFIG_HOME="${TEST_TEMP_DIR}/xdg-config"
+    rm -rf "$XDG_CONFIG_HOME"
+
+    source "$(script_path scripts/utils/config-manager.sh)"
+    init_config "local" "$TEST_HUB_DIR"
+
+    assert_file_exists "$XDG_CONFIG_HOME/ai-use-case-cli/config.json"
+
+    if [ -n "$original_xdg_config_home" ]; then
+        export XDG_CONFIG_HOME="$original_xdg_config_home"
+    else
+        unset XDG_CONFIG_HOME
+    fi
+}
+
 # ============================================
 # get_hub_path() tests
 # ============================================

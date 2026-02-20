@@ -149,7 +149,7 @@ else
 fi
 
 # Ask about config directory cleanup
-CONFIG_DIR="$HOME/.config/ai-use-case-cli"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli"
 if [ -d "$CONFIG_DIR" ]; then
     echo ""
     read -p "Remove configuration directory ($CONFIG_DIR)? (y/N): " remove_config

@@ -38,7 +38,6 @@ source "$_LIB_SCRIPT_DIR/../utils/file-utils.sh"
 # ============================================================================
 
 # Ensure config directory exists
-# Creates ~/.config/ai-use-case-cli if it doesn't exist
 #
 # Usage:
 #   ensure_config_dir

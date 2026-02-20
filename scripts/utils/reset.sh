@@ -4,20 +4,21 @@
 
 set -euo pipefail
 
-# Colors for output
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-RED='\033[0;31m'
-CYAN='\033[0;36m'
-BOLD='\033[1m'
-NC='\033[0m' # No Color
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Configuration paths
-CONFIG_DIR="$HOME/.config/ai-use-case-cli"
+CONSTANTS_SH="$SCRIPT_DIR/../../lib/core/constants.sh"
+if [ -f "$CONSTANTS_SH" ]; then
+    source "$CONSTANTS_SH"
+else
+    GREEN='' YELLOW='' BLUE='' RED='' CYAN='' BOLD='' NC=''
+    CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli"
+    CONFIG_FILE="$CONFIG_DIR/config.json"
+    TRACING_CONFIG="$CONFIG_DIR/tracing.json"
+fi
+
+TRACING_CONFIG="${TRACING_CONFIG:-${TRACING_CONFIG_FILE:-$CONFIG_DIR/tracing.json}}"
+
 DATA_DIR="$HOME/.local/share/ai-use-case-cli"
-CONFIG_FILE="$CONFIG_DIR/config.json"
-TRACING_CONFIG="$CONFIG_DIR/tracing.json"
 REGISTRY_FILE="$DATA_DIR/projects-registry.json"
 TRACING_VENV="$DATA_DIR/tracing-venv"
 HUB_DIR="$DATA_DIR/hub"

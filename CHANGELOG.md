@@ -44,6 +44,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Solution**: Default to local hub configuration non-interactively and auto-create missing parent directories during validation
   - **User Experience**: Non-interactive setup now completes reliably and creates the hub directory structure
 
+- **XDG Config Directory**: Honor `XDG_CONFIG_HOME` for configuration files instead of always using `~/.config`
+
 - **Codex Prompt Parameter Parsing**: Fixed internal bash variables appearing as user-facing parameters in Codex CLI
   - Changed parameter references in documentation from `$UPPERCASE` to `UPPERCASE` (removed $ prefix) to prevent Codex from displaying them as parameters
   - Changed internal bash variables in code blocks from `$UPPERCASE` to lowercase with `$` prefix (e.g., `$USER_EMAIL` → `$user_email`)

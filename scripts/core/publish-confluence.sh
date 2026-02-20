@@ -22,7 +22,7 @@
 # Authentication Methods (in order of precedence):
 #   1. Command-line options (--api-token, --base-url, --email)
 #   2. Environment variables (CONFLUENCE_API_TOKEN, CONFLUENCE_BASE_URL, CONFLUENCE_EMAIL)
-#   3. Configuration file (~/.config/ai-use-case-cli/config.json)
+#   3. Configuration file ($XDG_CONFIG_HOME/ai-use-case-cli/config.json, default: ~/.config/ai-use-case-cli/config.json)
 #   4. MCP server (if available - for AI assistants only)
 #
 # Prerequisites:
@@ -42,6 +42,11 @@ NC=$'\033[0m'
 
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+CONSTANTS_SH="$SCRIPT_DIR/../../lib/core/constants.sh"
+if [ -f "$CONSTANTS_SH" ]; then
+    source "$CONSTANTS_SH"
+fi
 CONFIG_MANAGER="$SCRIPT_DIR/../utils/config-manager.sh"
 DRY_RUN=false
 CUSTOM_TITLE=""
@@ -77,7 +82,7 @@ ${YELLOW}Options:${NC}
 ${YELLOW}Authentication Methods:${NC}
   1. Command-line options (--api-token, --base-url, --email)
   2. Environment variables (CONFLUENCE_API_TOKEN, CONFLUENCE_BASE_URL, CONFLUENCE_EMAIL)
-  3. Configuration file (~/.config/ai-use-case-cli/config.json)
+    3. Configuration file ($XDG_CONFIG_HOME/ai-use-case-cli/config.json, default: ~/.config/ai-use-case-cli/config.json)
 
 ${YELLOW}Prerequisites:${NC}
   - One authentication method configured (see above)
@@ -319,7 +324,7 @@ get_file_size() {
 load_confluence_config() {
     if [ -f "$CONFIG_MANAGER" ]; then
         # Try to get confluence config from config file
-        local config_file="$HOME/.config/ai-use-case-cli/config.json"
+        local config_file="${CONFIG_FILE:-${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/config.json}"
         if [ -f "$config_file" ] && command -v jq &>/dev/null; then
             # Load from config if not already set via command line or env
             if [ -z "$API_TOKEN" ] && [ -z "$CONFLUENCE_API_TOKEN" ]; then
