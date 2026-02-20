@@ -1,151 +1,165 @@
 # Agent Guide (ai-use-case-cli)
-This file is the short, pragmatic guide for autonomous coding agents working in this repository.
 
-## Canonical Rules (read these first)
-- `CLAUDE.md` (repo root): primary engineering + workflow rules.
-- `CONTRIBUTING.md`: PR workflow, docs requirements, version rules.
-- `.github/copilot-instructions.md`: AI-agent-specific constraints and architecture guardrails.
-- `docs/WORKFLOW.md` + `docs/COMMANDS.md`: detailed workflow + command reference.
+Short, practical guidance for coding agents working in this repository.
 
-Cursor rules: none found in `.cursor/rules/` or `.cursorrules`.
+## Canonical Sources (read first)
 
-## Build / Test / Lint (commands you actually run)
-There is no "build" step (this is primarily Bash). Validate by running CLI commands + tests.
+- `CLAUDE.md`: primary engineering and workflow rules.
+- `CONTRIBUTING.md`: PR process, required docs updates, version checks.
+- `.github/copilot-instructions.md`: architecture and AI-agent constraints.
+- `docs/WORKFLOW.md` and `docs/COMMANDS.md`: detailed workflows and command reference.
 
-### One-time setup (tests)
-Tests use vendored bats submodules under `tests/bats/`.
+## Cursor and Copilot Rules
+
+- Cursor rules: none found in `.cursor/rules/` or `.cursorrules`.
+- Copilot rules: always apply `.github/copilot-instructions.md`.
+- OpenCode notes: see `docs/agents/opencode/README.md` (tool mapping and non-interactive setup).
+- Preserve dual-repo design: this repo is CLI/tooling; hub content lives in the separate hub repo.
+- Any hub operation in scripts must go through `ensure_hub_exists()`.
+
+## Quick Commands (build/lint/test)
+
+There is no traditional build step for the root Bash CLI. Validate using CLI checks, tests, and lint.
+
+### One-time test setup
+
 ```bash
 git submodule update --init --recursive
 ```
 
-### Automated tests (Bats)
-Entry point: `./run-tests.sh`
-```bash
-./run-tests.sh
-./run-tests.sh --help
+### Test runner (`run-tests.sh`)
 
-# Run a single test file (name without .bats)
+```bash
+# All tests
+./run-tests.sh
+
+# Single test file (without .bats)
 ./run-tests.sh version
 
-# Run multiple test files
+# Multiple test files
 ./run-tests.sh version config-manager
 
-# Filter by test name/description
+# Match test names/descriptions
 ./run-tests.sh --filter "help"
 
-# Useful utilities
+# Discoverability/debug
+./run-tests.sh --help
 ./run-tests.sh --list
 ./run-tests.sh --count
 ./run-tests.sh --verbose
 ./run-tests.sh --tap
 ```
 
-### Quick manual checks (CLI)
+### Manual CLI smoke checks
+
 ```bash
 ./ai-use-case --help
 ./ai-use-case --version
 ```
 
-### Version consistency (must pass before PRs)
-```bash
-./scripts/utils/validate-versions.sh --unreleased  # during development
-./scripts/utils/validate-versions.sh               # before release / strict
-```
-Source of truth: `scripts/utils/version.sh` (`export CLI_VERSION="..."`).
+### Shell lint
 
-### Shell linting (recommended)
-There is no single repo-wide wrapper script for shellcheck; run it on what you touched.
 ```bash
 shellcheck -x ai-use-case run-tests.sh
 shopt -s globstar && shellcheck -x scripts/**/*.sh lib/**/*.sh
 ```
-Guidelines: prefer fixing warnings; if you must suppress, use targeted `# shellcheck disable=SCXXXX` with a short reason.
 
-### Markdown linting (optional)
-- Repo config: `.markdownlint.json`
-- `publish-confluence` auto-lints/auto-fixes if `markdownlint` is installed.
-```bash
-npm install -g markdownlint-cli
-markdownlint "docs/**/*.md"
-```
+Prefer fixing warnings. If suppression is required, use targeted `# shellcheck disable=SCXXXX` with a short reason.
 
-## Workflow Constraints (non-negotiable)
-- Never commit directly to `main`.
-- Branch prefixes: `feature/`, `fix/`, `docs/`, `refactor/`, `test/`.
-- Conventional commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`.
-- Documentation revision rule: update `CHANGELOG.md` (Unreleased) for all changes; update `README.md` + `docs/` for user-facing/behavior changes.
-- Dual-repo architecture: CLI tooling lives here; hub content lives in a separate hub repo.
-  - Never bake hub repo assumptions into this repo beyond the documented interface.
-
-## Repository Architecture (how code is organized)
-- `ai-use-case`: main command router; delegates to scripts under `scripts/`.
-- `scripts/`: executable commands (setup, sync, document, publish, search, utils).
-- `lib/`: shared modules (constants, config, observability, utils). Prefer shared modules over copy/paste.
-- `tests/`: Bats tests + helper library; `tests/test_helper.bash` creates isolated temp env.
-
-Hub interactions: use `ensure_hub_exists()` before reading/writing hub paths; prefer `scripts/utils/hub-utils.sh`.
-
-Config interactions: `scripts/utils/config-manager.sh` is a deprecated facade; new code should source specific modules:
+### Version consistency checks
 
 ```bash
-_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$_SCRIPT_DIR/../../lib/core/constants.sh"
-source "$_SCRIPT_DIR/../../lib/config/config-core.sh"
-source "$_SCRIPT_DIR/../../lib/config/config-hub.sh"
-source "$_SCRIPT_DIR/../../lib/config/config-features.sh"
-source "$_SCRIPT_DIR/../../lib/config/config-tracing.sh"
-source "$_SCRIPT_DIR/../../lib/config/config-confluence.sh"
+# During development
+./scripts/utils/validate-versions.sh --unreleased
+
+# Before release / strict checks
+./scripts/utils/validate-versions.sh
 ```
 
-## Bash Style Guide (match existing patterns)
-### Strict mode
-- New scripts: `set -euo pipefail`.
-- Some legacy scripts use `set -e`; don't "fix" that unless you are already changing the file and you understand implications.
+Version source of truth: `scripts/utils/version.sh` (`CLI_VERSION`).
 
-### Sourcing ("imports")
-- Resolve paths from the current file, not the caller:
+## Repository Architecture
+
+- `ai-use-case`: top-level command router.
+- `scripts/`: executable command implementations (`core/`, `project/`, `search/`, `utils/`, etc.).
+- `lib/`: shared modules (`core`, `config`, `observability`, `utils`).
+- `tests/`: Bats tests and helpers.
+- `vscode-extension/`: TypeScript extension that delegates many actions to the CLI.
+
+Core rule: do not hardcode hub layout assumptions in CLI logic beyond documented interfaces.
+
+## Code Style and Engineering Conventions
+
+### Imports and module sourcing (Bash)
+
+- Resolve paths from the current script, not the caller:
+
 ```bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ```
-- Source shared constants for colors and paths when practical:
-  - `source "$SCRIPT_DIR/../../lib/core/constants.sh"`
+
+- Source shared modules from `lib/` and prefer existing helpers over duplicate logic.
+- For config logic, prefer direct modules (`lib/config/config-*.sh`) over expanding deprecated facades.
+
+### Formatting and structure
+
+- New scripts should use `set -euo pipefail`.
+- Keep functions small and focused; favor early validation and early exits.
+- Keep command output concise and actionable.
+
+### Types and language-specific guidance
+
+- Bash has no static types; compensate with strict input validation and defensive checks.
+- In `vscode-extension/` (TypeScript), keep strict typing; avoid `any` unless unavoidable and justified.
+- Keep version values synchronized across CLI and extension files when version-affecting changes are made.
 
 ### Naming
-- Functions: `snake_case` (e.g., `ensure_hub_exists`).
-- Locals: `snake_case` and declared `local` inside functions.
-- Constants/globals: `UPPER_SNAKE_CASE` + `readonly` where applicable.
-- Scripts/modules: `kebab-case.sh`.
 
-### Quoting and safety
-- Quote all variable expansions unless you explicitly need word-splitting.
-- Treat user-provided paths/strings as hostile; validate and sanitize (see `lib/config/config-core.sh`).
-- Prefer arrays over stringly-typed argument lists.
+- Functions: `snake_case`.
+- Local variables: `snake_case` with `local` declarations.
+- Constants/global vars: `UPPER_SNAKE_CASE`, use `readonly` when appropriate.
+- Script/module filenames: `kebab-case.sh`.
 
-### Errors and exit codes
-- Errors go to stderr (`>&2`) and must be actionable.
-- Exit codes:
-  - `0` success
-  - `1` general failure
-  - `2` misuse / invalid arguments
+### Quoting, safety, and portability
 
-### Output formatting
-- Prefer color constants from `lib/core/constants.sh` (TTY-aware) over re-defining ANSI codes.
-- Keep user messaging consistent: "Error: ...", warnings, and success checkmarks.
+- Quote variable expansions unless intentional splitting is required.
+- Treat user-provided input as untrusted; validate/sanitize paths and arguments.
+- Prefer arrays over space-delimited strings for argument lists.
+- Assume paths can contain spaces.
+- Avoid GNU-only flags unless guarded; account for macOS vs Linux differences (`sed -i` behavior especially).
 
-### Cross-platform compatibility (macOS/Linux/WSL)
-- Avoid GNU-only flags unless guarded.
-- `sed -i` differs between macOS and Linux; if you must do in-place edits, use platform detection (see `docs/WORKFLOW.md`).
-- Assume paths may contain spaces; always quote.
+### Error handling and exit codes
 
-## Testing Conventions (when adding/changing tests)
-- Tests live in `tests/*.bats`.
-- Use `tests/test_helper.bash`:
-  - `load 'test_helper'`
-  - call `common_setup` / `common_teardown` for isolation
-- Tests should not depend on real user config; the helper overrides `HOME`, `XDG_CONFIG_HOME`, and `AI_USECASES_DIR`.
+- Send errors to stderr and make messages actionable (`Error: <what failed>`, plus fix hints when useful).
+- Use stable exit codes:
+  - `0`: success
+  - `1`: general failure
+  - `2`: misuse/invalid arguments
+- Check required command availability (`command -v ...`) before use when relevant.
 
-## Agent Safety (how to make changes safely)
-- Prefer the smallest change that solves the problem; avoid drive-by refactors.
-- Don't add new dependencies unless required; prefer existing scripts/modules.
-- Don't introduce TODO/FIXME placeholders in generated docs/templates.
-- When changing behavior, update docs and add/adjust tests in the same PR.
+### Output and UX consistency
+
+- Prefer color constants from `lib/core/constants.sh` (TTY-aware), not ad-hoc ANSI definitions.
+- Keep messaging consistent across scripts (errors, warnings, success confirmations).
+
+## Testing Conventions
+
+- Tests are Bats files in `tests/*.bats`.
+- Use `tests/test_helper.bash` for isolation (`common_setup` / `common_teardown`).
+- Tests must not rely on real user environment; helper overrides `HOME`, `XDG_CONFIG_HOME`, and `AI_USECASES_DIR`.
+- When changing behavior, add/update tests in the same PR.
+
+## Workflow Constraints (non-negotiable)
+
+- Never commit directly to `main`.
+- Use branch prefixes: `feature/`, `fix/`, `docs/`, `refactor/`, `test/`.
+- Use Conventional Commits: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`.
+- Update `CHANGELOG.md` (`[Unreleased]`) for all changes.
+- Update `README.md` and related `docs/` for user-facing changes.
+
+## Agent Safety Checklist
+
+- Make minimal, targeted changes; avoid drive-by refactors.
+- Reuse existing `lib/` and script patterns before introducing new abstractions.
+- Do not leave TODO/FIXME placeholders in generated documentation.
+- Validate changes with relevant tests/lint before handing off.

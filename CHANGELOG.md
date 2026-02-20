@@ -39,6 +39,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Non-interactive mode support: Automatically defaults to all agents when running without TTY (e.g., in tests)
   - **User Experience**: Users are now prompted during initialization to choose which AI agents to integrate with their project
 
+- **Non-Interactive Hub Setup**: Fixed `ai-use-case --init` getting stuck when running without a TTY (e.g., OpenCode/CI with stdin redirected)
+  - **Root Cause**: First-time hub configuration required interactive input and path validation could not create parent directories without a prompt
+  - **Solution**: Default to local hub configuration non-interactively and auto-create missing parent directories during validation
+  - **User Experience**: Non-interactive setup now completes reliably and creates the hub directory structure
+
 - **Codex Prompt Parameter Parsing**: Fixed internal bash variables appearing as user-facing parameters in Codex CLI
   - Changed parameter references in documentation from `$UPPERCASE` to `UPPERCASE` (removed $ prefix) to prevent Codex from displaying them as parameters
   - Changed internal bash variables in code blocks from `$UPPERCASE` to lowercase with `$` prefix (e.g., `$USER_EMAIL` → `$user_email`)
@@ -78,6 +83,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Enhanced CLAUDE.md Documentation**: Comprehensive guidance for Claude Code instances working in this repository
   - **Project Overview**: Clear explanation of CLI structure, shell scripts, git hooks, slash commands, and library modules
   - **Essential Commands**: Testing and development commands with examples
+
+- **OpenCode Integration Notes**: Added `docs/agents/opencode/README.md` with tool mapping and non-interactive setup verification
   - **Code Architecture**: Repository structure, main CLI flow, dual-repository architecture, configuration system, and script patterns
   - **Critical Development Rules**: Branch workflow, version management, documentation revision rules, shell script standards, and security guidelines
   - **Session Documentation Types**: Implementation vs research sessions with formats and templates

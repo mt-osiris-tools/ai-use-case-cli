@@ -163,6 +163,20 @@ is_git_mode() {
 #   1. Local only - No git repository, local storage only
 #   2. Private git - Connect to private git repository for version control
 prompt_hub_mode() {
+    if [ ! -t 0 ]; then
+        local hub_path="${AI_USECASES_DIR:-$DEFAULT_HUB_DIR}"
+
+        hub_path="${hub_path/#\~/$HOME}"
+
+        if ! validate_path "$hub_path"; then
+            echo -e "${RED}Error: Invalid hub path: $hub_path${NC}" >&2
+            return 1
+        fi
+        init_config "local" "$hub_path" ""
+        echo "$hub_path"
+        return 0
+    fi
+
     echo -e "${BLUE}=== Hub Configuration ===${NC}" >&2
     echo "" >&2
     echo "How would you like to store AI use case documentation?" >&2

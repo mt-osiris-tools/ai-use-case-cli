@@ -211,6 +211,34 @@ CLI="$(script_path ai-use-case)"
     assert_success
 }
 
+@test "ai-use-case --init: first-time non-interactive init succeeds" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    cd "$project_dir"
+
+    # Remove the test config created in setup() to simulate first-time init
+    rm -f "$HOME/.config/ai-use-case-cli/config.json"
+
+    # Use a hub path that (a) starts with ~ and (b) has a missing parent dir
+    rm -rf "$HOME/noninteractive-parent"
+    export AI_USECASES_DIR="~/noninteractive-parent/hub"
+
+    run bash -c "exec </dev/null; \"$CLI\" --init"
+    assert_success
+
+    assert_file_exists "$HOME/.config/ai-use-case-cli/config.json"
+    assert_dir_exists "$HOME/noninteractive-parent/hub/by-project"
+
+    # Ensure the stored hub path is normalized (no literal ~)
+    run grep -F "\"hubPath\": \"$HOME/noninteractive-parent/hub\"" \
+        "$HOME/.config/ai-use-case-cli/config.json"
+    assert_success
+
+    # Ensure we didn't create a literal '~' directory inside the project
+    [ ! -d "$project_dir/~" ]
+ }
+
 @test "ai-use-case init: works via CLI" {
     local project_dir
     project_dir="$(create_test_git_repo)"
