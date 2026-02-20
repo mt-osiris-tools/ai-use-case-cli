@@ -224,7 +224,7 @@ For AI-assisted documentation with automatic context capture:
                             # - Trend visualization
                             # - Prioritized recommendations
 
-/use-case:optimize-organization  # Optimize hub organization
+/use-case:optimize-organization  # [Unreleased/Planned] Optimize hub organization
                              # - Topic analysis (merge/split/rename)
                              # - Relationship mapping
                              # - Confidence-based recommendations
@@ -257,7 +257,7 @@ The `document-session` command supports an `--intelligent` flag that uses AI to 
 **Trade-offs:**
 - **Slower**: Adds 15-30 seconds for AI analysis
 - **Token cost**: Uses ~500-1000 tokens per invocation
-    - **Requires agent subtask support**: Uses subagent invocation (e.g., Claude Code Task tool / OpenCode `task`)
+- **Requires agent subtask support**: Uses subagent invocation (e.g., Claude Code Task tool / OpenCode `task`)
 
 **When to use:**
 - You have multiple PRs/commits to choose from
@@ -401,7 +401,7 @@ What would you like to do?
 **Requirements:**
 - Agent subtask support (uses subagent invocation with organization agent)
 - Hub initialized with documentation
-- Organization optimizer agent enabled
+- Organization optimizer agent enabled (Unreleased/Planned)
 
 ## Direct Script Access (Advanced)
 
