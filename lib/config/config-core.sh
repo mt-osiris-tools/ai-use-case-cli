@@ -93,14 +93,22 @@ validate_path() {
     local parent_dir=$(dirname "$path")
     if [ ! -d "$parent_dir" ]; then
         echo -e "${YELLOW}Warning: Parent directory $parent_dir does not exist${NC}" >&2
-        read -p "Create parent directory? (y/n) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            return 1
-        fi
-        if ! mkdir -p "$parent_dir" 2>/dev/null; then
-            echo -e "${RED}Error: Cannot create parent directory $parent_dir${NC}" >&2
-            return 1
+
+        if [ ! -t 0 ]; then
+            if ! mkdir -p "$parent_dir" 2>/dev/null; then
+                echo -e "${RED}Error: Cannot create parent directory $parent_dir${NC}" >&2
+                return 1
+            fi
+        else
+            read -p "Create parent directory? (y/n) " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                return 1
+            fi
+            if ! mkdir -p "$parent_dir" 2>/dev/null; then
+                echo -e "${RED}Error: Cannot create parent directory $parent_dir${NC}" >&2
+                return 1
+            fi
         fi
     fi
 
