@@ -30,7 +30,7 @@
 
 - **Requirement:** System MUST provide a JSON-based agent registry that tracks all available agents
 - **Rationale:** Centralized management of agents, their capabilities, and status
-- **Validation:** Registry file exists at `~/.config/ai-use-case-cli/agents.json` with valid schema
+- **Validation:** Registry file exists at `$XDG_CONFIG_HOME/ai-use-case-cli/agents.json` with valid schema (default: `$HOME/.config/ai-use-case-cli/agents.json`)
 - **Schema:**
   ```json
   {
@@ -487,7 +487,7 @@
 
 ### AC-1: Agent Framework
 
-- [ ] Agent registry exists at `~/.config/ai-use-case-cli/agents.json`
+- [ ] Agent registry exists at `$XDG_CONFIG_HOME/ai-use-case-cli/agents.json` (default: `$HOME/.config/ai-use-case-cli/agents.json`)
 - [ ] CLI command `ai-use-case agents list` works and shows all agents
 - [ ] Can enable/disable agents: `ai-use-case agents enable/disable <id>`
 - [ ] Agent statistics tracked correctly (invocations, success rate)
@@ -544,7 +544,7 @@
 
 ### DR-1: Agent Registry Schema
 
-**File:** `~/.config/ai-use-case-cli/agents.json`
+**File:** `$XDG_CONFIG_HOME/ai-use-case-cli/agents.json` (default: `$HOME/.config/ai-use-case-cli/agents.json`)
 
 **Schema:**
 ```json
@@ -736,7 +736,7 @@ ai-use-case agents config reset
 - **Bash Version:** Requires bash 4.0+ for associative arrays
 - **jq Dependency:** Required for JSON manipulation in agent registry
 - **Claude Code:** Agents require Claude Code, but CLI must work without it
-- **File System:** Agent registry and cache stored in `~/.config/ai-use-case-cli/`
+- **File System:** Agent registry and cache stored in `$XDG_CONFIG_HOME/ai-use-case-cli/` (default: `$HOME/.config/ai-use-case-cli/`)
 
 ### C-2: Performance Constraints
 
