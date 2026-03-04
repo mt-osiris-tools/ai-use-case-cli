@@ -196,11 +196,11 @@ For AI-assisted documentation with automatic context capture:
 
 ```
 /use-case:document-session   # Document AI session
-                            # - Interactive session selection
-                            # - Auto-generates complete documentation
-                            # - NO placeholders
-                            # - v3.9.0+: Real-time TodoWrite progress tracking
-                            # - v3.14.0+: --intelligent flag for AI-powered prioritization
+                             # - Interactive session selection
+                             # - Auto-generates complete documentation
+                             # - NO placeholders
+                             # - v3.9.0+: Real-time TodoWrite progress tracking
+                             # - --intelligent flag for AI-powered prioritization
 
 /use-case:setup-project      # Setup project (alternative to --init)
 /use-case:sync-usecases      # Sync to hub (alternative to sync)
@@ -224,14 +224,14 @@ For AI-assisted documentation with automatic context capture:
                             # - Trend visualization
                             # - Prioritized recommendations
 
-/use-case:optimize-organization  # Optimize hub organization (v3.15.0+)
-                            # - Topic analysis (merge/split/rename)
-                            # - Relationship mapping
-                            # - Confidence-based recommendations
-                            # - Dry-run first with user confirmation
+/use-case:optimize-organization  # [Unreleased/Planned] Optimize hub organization
+                             # - Topic analysis (merge/split/rename)
+                             # - Relationship mapping
+                             # - Confidence-based recommendations
+                             # - Dry-run first with user confirmation
 ```
 
-### Intelligent Session Selection (v3.14.0+)
+### Intelligent Session Selection
 
 The `document-session` command supports an `--intelligent` flag that uses AI to analyze and prioritize sessions before documentation.
 
@@ -257,7 +257,7 @@ The `document-session` command supports an `--intelligent` flag that uses AI to 
 **Trade-offs:**
 - **Slower**: Adds 15-30 seconds for AI analysis
 - **Token cost**: Uses ~500-1000 tokens per invocation
-- **Requires Claude Code**: Uses Task tool with session-selector agent
+- **Requires agent subtask support**: Uses subagent invocation (e.g., Claude Code Task tool / OpenCode `task`)
 
 **When to use:**
 - You have multiple PRs/commits to choose from
@@ -291,7 +291,7 @@ MEDIUM PRIORITY (Consider documenting):
 (Recommendation: Start with PR #123 - highest value)
 ```
 
-### Organization Optimization (v3.15.0+)
+### Organization Optimization
 
 The `optimize-organization` command analyzes your hub's organization and suggests improvements for better documentation discoverability.
 
@@ -399,9 +399,9 @@ What would you like to do?
 - You prefer manual organization
 
 **Requirements:**
-- Claude Code (uses Task tool with organization agent)
+- Agent subtask support (uses subagent invocation with organization agent)
 - Hub initialized with documentation
-- Organization optimizer agent enabled (auto-enabled in v3.15.0+)
+- Organization optimizer agent enabled (Unreleased/Planned)
 
 ## Direct Script Access (Advanced)
 
