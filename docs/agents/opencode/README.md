@@ -6,7 +6,7 @@ This document maps those concepts to OpenCode and lists the practical checks to 
 ## What OpenCode Needs
 
 - `AGENTS.md` at repo root: primary instructions OpenCode agents should follow.
-- Config is stored at `$XDG_CONFIG_HOME/ai-use-case-cli/config.json` (default: `~/.config/ai-use-case-cli/config.json`).
+- Config is stored at `$XDG_CONFIG_HOME/ai-use-case-cli/config.json` (default: `$HOME/.config/ai-use-case-cli/config.json`).
 - Project setup creates:
   - `.usecase/cases/`
   - `.ai-tools/commands/use-case/` (source-of-truth slash commands)

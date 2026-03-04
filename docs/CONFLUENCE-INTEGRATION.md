@@ -77,7 +77,7 @@ The AI assistant will automatically handle the publishing using MCP tools.
 
 ### Method 1: Configuration File (Persistent)
 
-Store credentials in `~/.config/ai-use-case-cli/config.json`:
+Store credentials in `$XDG_CONFIG_HOME/ai-use-case-cli/config.json` (default: `$HOME/.config/ai-use-case-cli/config.json`):
 
 ```bash
 ai-use-case config confluence
@@ -278,12 +278,12 @@ The CLI automatically sets secure permissions:
 
 ```bash
 # Config file permissions (owner read/write only)
-chmod 600 ~/.config/ai-use-case-cli/config.json
+chmod 600 "${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/config.json"
 ```
 
 **Check permissions:**
 ```bash
-ls -la ~/.config/ai-use-case-cli/config.json
+ls -la "${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/config.json"
 # Should show: -rw------- (600)
 ```
 
@@ -296,7 +296,7 @@ To update your API token:
 ai-use-case config confluence
 
 # Or manually edit config
-vim ~/.config/ai-use-case-cli/config.json
+vim "${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/config.json"
 ```
 
 ### Revoking Access
@@ -366,7 +366,7 @@ ai-use-case publish-confluence \
 
 **Reset configuration:**
 ```bash
-rm ~/.config/ai-use-case-cli/config.json
+rm "${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/config.json"
 ai-use-case config confluence
 ```
 

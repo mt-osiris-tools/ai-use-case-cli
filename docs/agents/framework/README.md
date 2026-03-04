@@ -425,12 +425,20 @@ ai-use-case agents reset
 
 ### Registry Location
 
+<<<<<<< HEAD
 - **Registry File:** `${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json`
+=======
+- **Registry File:** `$XDG_CONFIG_HOME/ai-use-case-cli/agents.json` (default: `$HOME/.config/ai-use-case-cli/agents.json`)
+>>>>>>> 40fde50 (docs: prefer XDG_CONFIG_HOME paths)
 - **Cache Directory:** `~/.cache/ai-use-case-cli/agents/`
 
 ### Configuration Options
 
+<<<<<<< HEAD
 Edit `${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json`:
+=======
+Edit `$XDG_CONFIG_HOME/ai-use-case-cli/agents.json`:
+>>>>>>> 40fde50 (docs: prefer XDG_CONFIG_HOME paths)
 
 ```json
 {

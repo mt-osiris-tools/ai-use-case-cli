@@ -181,7 +181,7 @@ ls -la .claude/commands/use-case    # Should show symlink → ../../.ai-tools/co
 
 **System files:**
 - `~/.local/share/ai-use-case-cli/projects-registry.json` - Project registry (v3.1.0+)
-- `~/.config/ai-use-case-cli/config.json` - Hub configuration (v3.2.0+)
+- `${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/config.json` - Hub configuration (v3.2.0+)
 
 ## Hub Configuration (v3.2.0+)
 
