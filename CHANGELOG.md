@@ -48,6 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **XDG Config Directory**: Honor `XDG_CONFIG_HOME` for configuration files instead of always using `~/.config`
 
+- **Docs XDG Paths**: Updated documentation to prefer `$XDG_CONFIG_HOME/ai-use-case-cli/*` paths with `$HOME/.config` defaults (instead of hardcoding `~/.config`)
+
 - **Codex Prompt Parameter Parsing**: Fixed internal bash variables appearing as user-facing parameters in Codex CLI
   - Changed parameter references in documentation from `$UPPERCASE` to `UPPERCASE` (removed $ prefix) to prevent Codex from displaying them as parameters
   - Changed internal bash variables in code blocks from `$UPPERCASE` to lowercase with `$` prefix (e.g., `$USER_EMAIL` → `$user_email`)

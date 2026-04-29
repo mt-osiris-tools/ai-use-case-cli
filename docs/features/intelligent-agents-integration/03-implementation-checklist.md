@@ -56,7 +56,7 @@
 ### Task 1.1: Create Agent Registry Schema
 
 **Files:**
-- `~/.config/ai-use-case-cli/agents.json` (runtime)
+- `$XDG_CONFIG_HOME/ai-use-case-cli/agents.json` (runtime, default: `$HOME/.config/ai-use-case-cli/agents.json`)
 - `scripts/agents/agent-registry.sh` (management script)
 
 **Priority:** High

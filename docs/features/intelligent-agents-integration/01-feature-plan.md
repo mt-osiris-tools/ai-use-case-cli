@@ -98,7 +98,7 @@ Users invoke agents explicitly via:
   - Parameter validation and context preparation
   - Result handling and error recovery
 
-- **Agent Configuration** (`~/.config/ai-use-case-cli/agents.json`)
+- **Agent Configuration** (`$XDG_CONFIG_HOME/ai-use-case-cli/agents.json`, default: `$HOME/.config/ai-use-case-cli/agents.json`)
   - User preferences for agent behavior
   - Enable/disable specific agents
   - Customization parameters per agent
@@ -342,7 +342,7 @@ ai-use-case optimize-organization
    - Add `analyze-patterns.md` - Pattern analysis command
    - Add `optimize-organization.md` - Organization command
 
-5. **New: `~/.config/ai-use-case-cli/agents.json`** - Agent configuration
+5. **New: `$XDG_CONFIG_HOME/ai-use-case-cli/agents.json`** - Agent configuration (default: `$HOME/.config/ai-use-case-cli/agents.json`)
    - Enable/disable agents
    - Customize agent behavior
    - Track agent usage statistics
@@ -415,7 +415,7 @@ User Reviews & Applies
 - Create `scripts/agents/` directory structure
 - Implement `agent-registry.sh` with JSON-based registry
 - Implement `invoke-agent.sh` wrapper for Claude Code Task tool
-- Create `~/.config/ai-use-case-cli/agents.json` schema
+- Create `$XDG_CONFIG_HOME/ai-use-case-cli/agents.json` schema (default: `$HOME/.config/ai-use-case-cli/agents.json`)
 - Add `ai-use-case agents` subcommand to CLI
 - Write unit tests for agent framework
 - Document agent architecture in `docs/AGENTS.md`

@@ -372,16 +372,16 @@
 **Requirement:** No changes to existing data structures
 
 **Configuration Files:**
-- `~/.config/ai-use-case-cli/config.json` - Unchanged
-- `~/.config/ai-use-case-cli/tracing.json` - Unchanged
-- `~/.config/ai-use-case-cli/agents.json` - Unchanged
+- `$XDG_CONFIG_HOME/ai-use-case-cli/config.json` - Unchanged (default: `$HOME/.config/ai-use-case-cli/config.json`)
+- `$XDG_CONFIG_HOME/ai-use-case-cli/tracing.json` - Unchanged (default: `$HOME/.config/ai-use-case-cli/tracing.json`)
+- `$XDG_CONFIG_HOME/ai-use-case-cli/agents.json` - Unchanged (default: `$HOME/.config/ai-use-case-cli/agents.json`)
 - `~/.local/share/ai-use-case-cli/projects-registry.json` - Unchanged
 
 **Rationale:** Data format stability ensures backward compatibility
 
 ### DR-2: Storage Locations
 
-- **Configuration:** `~/.config/ai-use-case-cli/` (unchanged)
+- **Configuration:** `$XDG_CONFIG_HOME/ai-use-case-cli/` (unchanged; default: `$HOME/.config/ai-use-case-cli/`)
 - **Registry:** `~/.local/share/ai-use-case-cli/` (unchanged)
 - **Hub:** Configured path (unchanged)
 - **Format:** JSON (unchanged)

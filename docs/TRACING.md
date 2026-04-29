@@ -54,7 +54,7 @@ ai-use-case tracing test
 
 ### Configuration File
 
-Location: `~/.config/ai-use-case-cli/tracing.json`
+Location: `$XDG_CONFIG_HOME/ai-use-case-cli/tracing.json` (default: `$HOME/.config/ai-use-case-cli/tracing.json`)
 
 ```json
 {
@@ -388,7 +388,7 @@ When upgrading the CLI:
 
 - Check troubleshooting section above
 - Use `ai-use-case tracing status` for diagnostic information
-- Review logs in `~/.config/ai-use-case-cli/`
+- Review logs in `$XDG_CONFIG_HOME/ai-use-case-cli/` (default: `$HOME/.config/ai-use-case-cli/`)
 
 ### Feature Requests
 

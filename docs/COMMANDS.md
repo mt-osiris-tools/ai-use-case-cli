@@ -118,7 +118,7 @@ ai-use-case tracing set <key> <value>
 ```
 
 **Configuration:**
-- Config file: `$XDG_CONFIG_HOME/ai-use-case-cli/tracing.json` (default: `~/.config/ai-use-case-cli/tracing.json`)
+- Config file: `$XDG_CONFIG_HOME/ai-use-case-cli/tracing.json` (default: `$HOME/.config/ai-use-case-cli/tracing.json`)
 - Environment variables: `AI_USECASE_TRACING_ENABLED`, `AI_USECASE_TRACING_ENDPOINT`, `AI_USECASE_TRACING_SAMPLING`
 - See [docs/TRACING.md](TRACING.md) for complete guide
 
@@ -178,7 +178,7 @@ ai-use-case analyze-patterns --format json
 ```
 
 **Agent Configuration:**
-- Registry file: `$XDG_CONFIG_HOME/ai-use-case-cli/agents.json` (default: `~/.config/ai-use-case-cli/agents.json`)
+- Registry file: `$XDG_CONFIG_HOME/ai-use-case-cli/agents.json` (default: `$HOME/.config/ai-use-case-cli/agents.json`)
 - Cache directory: `~/.cache/ai-use-case-cli/agents/`
 - See [docs/agents/framework/README.md](agents/framework/README.md) for complete guide
 
