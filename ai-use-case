@@ -20,6 +20,7 @@ if [ -f "$SCRIPT_DIR/lib/core/constants.sh" ]; then
 else
     # Fallback color definitions if constants.sh is missing
     echo "Warning: lib/core/constants.sh not found, using fallback colors" >&2
+    # shellcheck disable=SC2034 # fallback color variables; may be unused in some runs
     GREEN='' BLUE='' YELLOW='' RED='' CYAN='' GRAY='' BOLD='' NC=''
 fi
 
@@ -632,7 +633,7 @@ EOF
             exit 0
         fi
 
-        read -p "Enable advanced features? (y/N): " confirm
+        read -r -p "Enable advanced features? (y/N): " confirm
         if [[ "$confirm" =~ ^[Yy]$ ]]; then
             if type set_advanced_enabled >/dev/null 2>&1; then
                 set_advanced_enabled "true"
