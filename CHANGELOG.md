@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Documentation Path Consistency**: Standardized agent registry examples to use `${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json` and quoted shell snippets so examples remain portable
+
 - **AI Tool Prompt Template Display**: Fixed template being displayed to user instead of used internally
   - **Root Cause**: AI tool prompt files (Codex, Claude Code, GitHub Copilot) instructed AI to use bash `cat` commands to read templates, causing the full template content to be displayed in the terminal
   - **Impact**: When running `/use-case:document-session` in Codex or other AI tools, users saw the entire documentation template printed to screen instead of it being used internally to generate documentation

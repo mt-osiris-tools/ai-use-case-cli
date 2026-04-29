@@ -56,7 +56,7 @@ Phase 1 provides the foundation for all intelligent agents:
 # Initialize the agent registry
 ai-use-case agents init
 
-# Registry created at: ~/.config/ai-use-case-cli/agents.json
+# Registry created at: ${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json
 ```
 
 ### 2. List Available Agents
@@ -140,7 +140,7 @@ ai-use-case agents stats quality-reviewer
 
 ### Components
 
-#### 1. Agent Registry (`~/.config/ai-use-case-cli/agents.json`)
+#### 1. Agent Registry (`${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json`)
 
 JSON-based registry tracking all available agents:
 
@@ -425,12 +425,12 @@ ai-use-case agents reset
 
 ### Registry Location
 
-- **Registry File:** `~/.config/ai-use-case-cli/agents.json`
+- **Registry File:** `${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json`
 - **Cache Directory:** `~/.cache/ai-use-case-cli/agents/`
 
 ### Configuration Options
 
-Edit `~/.config/ai-use-case-cli/agents.json`:
+Edit `${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json`:
 
 ```json
 {
@@ -456,10 +456,10 @@ Edit `~/.config/ai-use-case-cli/agents.json`:
 
 ```bash
 # View current configuration
-cat ~/.config/ai-use-case-cli/agents.json | jq '.config'
+cat "${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json" | jq '.config'
 
 # Edit configuration
-vi ~/.config/ai-use-case-cli/agents.json
+vi "${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json"
 ```
 
 ---
@@ -513,10 +513,10 @@ ai-use-case agents enable agent-id
 **Solution:**
 ```bash
 # Fix registry permissions
-chmod 600 ~/.config/ai-use-case-cli/agents.json
+chmod 600 "${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json"
 
 # Recreate registry if needed
-rm ~/.config/ai-use-case-cli/agents.json
+rm "${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json"
 ai-use-case agents init
 ```
 
