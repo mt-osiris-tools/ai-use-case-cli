@@ -137,7 +137,7 @@ vim scripts/agents/agent-registry.sh
 ```
 
 **Success Criteria:**
-- ✅ Registry exists at `~/.config/ai-use-case-cli/agents.json`
+- ✅ Registry exists at `${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json`
 - ✅ Can list, enable, disable agents via CLI
 - ✅ Framework adds < 10ms overhead
 
@@ -365,11 +365,11 @@ ai-use-case stats
 **Check Agent Registry:**
 ```bash
 # View registry
-cat ~/.config/ai-use-case-cli/agents.json | jq '.'
+cat "${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json" | jq '.'
 
 # Verify agent enabled
 jq '.agents[] | select(.id=="quality-reviewer") | .enabled' \
-  ~/.config/ai-use-case-cli/agents.json
+  "${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json"
 ```
 
 **Test Agent Invocation:**
@@ -380,7 +380,7 @@ bash -x ./scripts/agents/invoke-agent.sh quality-reviewer \
 
 # Check statistics
 jq '.agents[] | select(.id=="quality-reviewer") | .statistics' \
-  ~/.config/ai-use-case-cli/agents.json
+  "${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json"
 ```
 
 **Verify Claude Code Connection:**
