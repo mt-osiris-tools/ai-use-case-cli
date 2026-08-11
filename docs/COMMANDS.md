@@ -79,6 +79,9 @@ ai-use-case list                # List all registered projects
 ai-use-case list-projects       # Same as list
 ai-use-case check-updates       # Check which projects need CLI updates
 ai-use-case update-project <path> # Update a project to latest CLI version
+ai-use-case update              # Update the CLI installation
+ai-use-case update --check      # Check for a CLI update without installing it
+ai-use-case update --dry-run    # Preview a CLI update without installing it
 ```
 
 ### Hub Operations

@@ -273,6 +273,8 @@ To update to the latest version:
 
 ```bash
 ai-use-case update         # Update CLI to latest version
+ai-use-case update --check # Check for an update without installing it
+ai-use-case update --dry-run # Preview an available update
 ```
 
 The `update` command:
@@ -280,6 +282,7 @@ The `update` command:
 - Shows recent changes from CHANGELOG
 - Automatically installs the update with confirmation
 - Supports `--check` flag to only check without installing
+- Supports `--dry-run` flag to preview the update without installing
 - Supports `--yes` flag to skip confirmation (useful for automation)
 
 Manual update method (if needed):

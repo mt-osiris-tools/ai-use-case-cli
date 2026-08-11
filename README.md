@@ -135,6 +135,7 @@ ai-use-case extract
 | `ai-use-case --link-claude` | Create Claude Code symlinks (after Claude setup) |
 | `ai-use-case --setup-copilot` | Setup GitHub Copilot custom prompts + VS Code settings |
 | `ai-use-case --setup-codex [--global\|--local] [--dry-run] [--force]` | Setup Codex skill and prompt adapters |
+| `ai-use-case update [options]` | Update the CLI installation (`--check`, `--dry-run`, `--yes`) |
 | `ai-use-case sync` | Manually sync to hub |
 | `ai-use-case search <term>` | Search use cases |
 | `ai-use-case stats` | View statistics |
@@ -336,6 +337,9 @@ Update to latest:
 ```bash
 # Recommended
 ai-use-case update
+
+# Check without installing
+ai-use-case update --check
 
 # Or re-run install script
 curl -fsSL https://raw.githubusercontent.com/mt-osiris-tools/ai-use-case-cli/main/scripts/install/install.sh | bash

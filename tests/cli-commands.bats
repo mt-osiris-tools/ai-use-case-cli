@@ -101,6 +101,24 @@ CLI="$(script_path ai-use-case)"
 }
 
 # ============================================
+# Update Command Tests
+# ============================================
+
+@test "ai-use-case update: exposes self-update help" {
+    run "$CLI" update --help
+    assert_success
+    assert_output --partial "Self Update"
+    assert_output --partial "--check"
+    assert_output --partial "--dry-run"
+}
+
+@test "ai-use-case self-update: is an alias for update" {
+    run "$CLI" self-update --help
+    assert_success
+    assert_output --partial "Self Update"
+}
+
+# ============================================
 # Unknown Command Tests
 # ============================================
 
