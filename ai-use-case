@@ -106,7 +106,7 @@ ${YELLOW}COMMANDS${NC}
   ${GREEN}--init, init [--update]${NC}   Setup current project (use --update to refresh)
   ${GREEN}--link-claude${NC}             Create Claude Code symlinks (after Claude setup)
   ${GREEN}--setup-copilot${NC}           Setup GitHub Copilot custom prompts (after Copilot setup)
-  ${GREEN}--setup-codex${NC}             Setup Codex-style CLI prompts (after Codex setup)
+  ${GREEN}--setup-codex${NC}             Setup Codex skill and prompt adapters
   ${GREEN}config [show|reconfigure]${NC} Show or reconfigure hub settings
   ${GREEN}sync${NC}                      Sync use cases from project to hub
   ${GREEN}search <term>${NC}             Search documented use cases
@@ -172,24 +172,24 @@ EOF
 
     cat <<EOF
 
-${YELLOW}CODEX-STYLE CLI INTEGRATION${NC}
+${YELLOW}CODEX INTEGRATION${NC}
   For GitHub Copilot in VS Code (type / in Copilot Chat):
   ${GREEN}/use-case:document-session${NC}   Document AI session
   ${GREEN}/use-case:setup-project${NC}      Setup another project
   ${GREEN}/use-case:sync-usecases${NC}      Sync to hub
   Setup: ${CYAN}ai-use-case --setup-copilot${NC}
 
-  For Codex-style CLI tools with hybrid parameter support:
+  Legacy prompt adapters for Codex:
   ${GREEN}/prompts:use-case-document-session${NC}   Document AI session
   ${GREEN}/prompts:use-case-publish-confluence${NC} Publish to Confluence
-  Setup: ${CYAN}ai-use-case --setup-codex${NC}
+  Setup: ${CYAN}ai-use-case --setup-codex [--global|--local]${NC}
 
 ${YELLOW}EXAMPLES${NC}
   ai-use-case --init              # Setup current project
   ai-use-case --init --update     # Update project installation
   ai-use-case --link-claude       # Create Claude Code symlinks
   ai-use-case --setup-copilot     # Setup GitHub Copilot custom prompts
-  ai-use-case --setup-codex       # Setup Codex CLI prompts
+  ai-use-case --setup-codex --local  # Setup project-local Codex skill
   ai-use-case config show         # Show current hub configuration
   ai-use-case sync                # Sync use cases to hub
   ai-use-case search "auth"       # Search for auth-related use cases
@@ -263,9 +263,19 @@ case "${1:-}" in
         ;;
     --setup-codex|setup-codex)
         trace_event "command_start" "command=setup-codex" "working_dir=$(pwd)"
-        echo -e "${BLUE}Setting up Codex CLI prompts...${NC}"
+        setup_codex_json=false
+        for setup_codex_arg in "$@"; do
+            if [ "$setup_codex_arg" = "--json" ]; then
+                setup_codex_json=true
+                break
+            fi
+        done
+        if [ "$setup_codex_json" = false ]; then
+            echo -e "${BLUE}Setting up Codex skill and prompt adapters...${NC}"
+        fi
         if [ -f "$SCRIPT_DIR/scripts/project/setup-codex.sh" ]; then
-            trace_run "setup-codex" bash "$SCRIPT_DIR/scripts/project/setup-codex.sh" .
+            shift
+            trace_run "setup-codex" bash "$SCRIPT_DIR/scripts/project/setup-codex.sh" . "$@"
         else
             trace_event "error" "command=setup-codex" "error=script_not_found" "script=setup-codex.sh"
             echo -e "${RED}Error: setup-codex.sh not found${NC}"

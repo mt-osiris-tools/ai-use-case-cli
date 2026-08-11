@@ -32,6 +32,13 @@ OpenCode is an agentic coding environment that reads repo instructions (like `AG
 
 - **[Integration Notes](opencode/README.md)** - Tool mapping and non-interactive setup guidance
 
+### Codex
+
+Codex uses the repository's `AGENTS.md` for durable project instructions. The
+AI Use Case workflow is packaged as a reusable skill at
+`.codex/skills/ai-use-case-documentation/SKILL.md`; legacy prompt adapters remain
+available under `.codex/prompts/` for compatibility.
+
 ### [Agent Framework](framework/)
 Built-in agent system for automated tasks and quality checks.
 

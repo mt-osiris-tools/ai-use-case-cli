@@ -1,139 +1,123 @@
 #!/bin/bash
-# Setup Codex CLI Commands Script
-# Creates .codex/prompts/ directory with ai-use-case command wrappers
-#
-# Usage:
-#   ./setup-codex.sh [project_path]
-#   If no path provided, uses current directory
+# Install AI Use Case workflows for Codex.
 
 set -euo pipefail
 
-# Colors for output
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
-
-# Get script directory and CLI root
+GREEN='\033[0;32m'; YELLOW='\033[1;33m'; BLUE='\033[0;34m'; RED='\033[0;31m'; NC='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLI_ROOT="${AI_USECASES_CLI_ROOT:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
+PROJECT_PATH="."
+INSTALL_MODE="global"
+DRY_RUN=false
+FORCE=false
+JSON_OUTPUT=false
 
-# Parse arguments
-PROJECT_PATH="${1:-.}"
+show_help() {
+    cat <<'EOF'
+Usage: setup-codex.sh [options] [project_path]
 
-# Verify directory exists before trying to resolve absolute path
-if [ ! -d "$PROJECT_PATH" ]; then
-    echo -e "${RED}Error: Directory $PROJECT_PATH does not exist${NC}"
-    exit 1
-fi
+Install AI Use Case documentation workflows for Codex.
 
-# Resolve to absolute path
+Options:
+  --global       Install to the configured Codex home (default)
+  --local        Install to <project>/.codex/
+  --dry-run      Show planned changes without writing files
+  --force        Replace files that differ from packaged versions
+  --json         Emit one machine-readable result object
+  -h, --help     Show this help
+EOF
+}
+
+error() {
+    echo -e "${RED}Error:${NC} $*" >&2
+    exit 2
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --global) INSTALL_MODE="global"; shift ;;
+        --local) INSTALL_MODE="local"; shift ;;
+        --dry-run) DRY_RUN=true; shift ;;
+        --force) FORCE=true; shift ;;
+        --json) JSON_OUTPUT=true; shift ;;
+        -h|--help) show_help; exit 0 ;;
+        --*) error "Unknown option: $1" ;;
+        *)
+            if [ "$PROJECT_PATH" != "." ]; then error "Only one project path may be provided"; fi
+            PROJECT_PATH="$1"
+            shift
+            ;;
+    esac
+done
+
+[ -d "$PROJECT_PATH" ] || error "Directory does not exist: $PROJECT_PATH"
 PROJECT_PATH="$(cd "$PROJECT_PATH" && pwd)"
+PROMPTS_SOURCE="$CLI_ROOT/.codex/prompts"
+SKILL_SOURCE="$CLI_ROOT/codex-skills/ai-use-case-documentation"
+[ -d "$PROMPTS_SOURCE" ] || error "Packaged Codex prompts not found: $PROMPTS_SOURCE"
+[ -f "$SKILL_SOURCE/SKILL.md" ] || error "Packaged Codex skill not found: $SKILL_SOURCE/SKILL.md"
 
-# Define paths
-AI_TOOLS_COMMANDS="$PROJECT_PATH/.ai-tools/commands/use-case"
-CODEX_DIR="$HOME/.codex"
-CODEX_PROMPTS_DIR="$HOME/.codex/prompts"
-CLI_CODEX_PROMPTS="$CLI_ROOT/.codex/prompts"
+codex_home="${CODEX_HOME:-$HOME/.codex}"
+if [ "$INSTALL_MODE" = "local" ]; then target_root="$PROJECT_PATH/.codex"; else target_root="$codex_home"; fi
+target_prompts="$target_root/prompts"
+target_skill="$target_root/skills/ai-use-case-documentation"
 
-echo -e "${BLUE}=== Setup Codex CLI Commands ===${NC}"
-echo "Project: $PROJECT_PATH"
-echo "CLI Root: $CLI_ROOT"
-echo ""
-
-# Check if .ai-tools exists (project should be initialized first)
-if [ ! -d "$AI_TOOLS_COMMANDS" ]; then
-    echo -e "${RED}Error: .ai-tools/commands/use-case/ not found${NC}"
+log() { [ "$JSON_OUTPUT" = true ] || echo -e "$*"; }
+if [ "$JSON_OUTPUT" = false ]; then
+    echo -e "${BLUE}=== Setup Codex integration ===${NC}"
+    echo "Project: $PROJECT_PATH"
+    echo "Install mode: $INSTALL_MODE"
+    echo "Target: $target_root"
     echo ""
-    echo "This project hasn't been set up with ai-use-case yet."
-    echo "Please run 'ai-use-case --init' first."
-    exit 1
 fi
 
-# Check if CLI has Codex prompts
-if [ ! -d "$CLI_CODEX_PROMPTS" ]; then
-    echo -e "${RED}Error: CLI Codex prompts not found at $CLI_CODEX_PROMPTS${NC}"
-    echo ""
-    echo "Please update your ai-use-case-cli installation to get Codex support."
-    exit 1
-fi
-
-# Count available Codex prompts
-PROMPT_COUNT=$(find "$CLI_CODEX_PROMPTS" -name "*.md" -type f 2>/dev/null | wc -l)
-echo -e "${GREEN}✓${NC} Found $PROMPT_COUNT Codex prompt(s) in CLI"
-
-# Create .codex directory if needed
-if [ ! -d "$CODEX_DIR" ]; then
-    mkdir -p "$CODEX_DIR"
-    echo -e "${GREEN}✓${NC} Created: ~/.codex/"
-fi
-
-# Create .codex/prompts directory if needed
-if [ ! -d "$CODEX_PROMPTS_DIR" ]; then
-    mkdir -p "$CODEX_PROMPTS_DIR"
-    echo -e "${GREEN}✓${NC} Created: ~/.codex/prompts/"
-fi
-
-# Copy Codex prompt files (with frontmatter, can't use symlinks)
-echo ""
-echo "Installing Codex prompts..."
-
-# Enable nullglob so glob expands to nothing if no files match
-shopt -s nullglob
-
-INSTALLED_COUNT=0
-for prompt_file in "$CLI_CODEX_PROMPTS"/*.md; do
-    prompt_name=$(basename "$prompt_file")
-    target_file="$CODEX_PROMPTS_DIR/$prompt_name"
-
+planned=0; installed=0; updated=0; skipped=0
+install_file() {
+    local source_file="$1" target_file="$2" label="$3"
+    planned=$((planned + 1))
     if [ -f "$target_file" ]; then
-        # Check if files are different
-        if ! diff -q "$prompt_file" "$target_file" > /dev/null 2>&1; then
-            echo -e "${YELLOW}⚠${NC} Updating: $prompt_name (file changed)"
-            cp "$prompt_file" "$target_file"
-        else
-            echo -e "${GREEN}✓${NC} Already current: $prompt_name"
+        if cmp -s "$source_file" "$target_file"; then
+            skipped=$((skipped + 1)); log "${GREEN}✓${NC} Already current: $label"; return 0
         fi
+        if [ "$FORCE" = false ]; then
+            skipped=$((skipped + 1)); log "${YELLOW}⚠${NC} Preserved modified file: $target_file (use --force to replace)"; return 0
+        fi
+        updated=$((updated + 1)); log "${YELLOW}⚠${NC} Updating: $label"
     else
-        cp "$prompt_file" "$target_file"
-        echo -e "${GREEN}✓${NC} Installed: $prompt_name"
+        installed=$((installed + 1)); log "${GREEN}✓${NC} Installing: $label"
     fi
-    INSTALLED_COUNT=$((INSTALLED_COUNT + 1))
-done
+    if [ "$DRY_RUN" = false ]; then
+        mkdir -p "$(dirname "$target_file")"
+        cp "$source_file" "$target_file"
+    fi
+}
 
-# Restore default glob behavior
+if [ "$DRY_RUN" = false ]; then mkdir -p "$target_prompts" "$target_skill"; fi
+shopt -s nullglob
+prompt_files=("$PROMPTS_SOURCE"/*.md)
 shopt -u nullglob
-
-echo -e "${GREEN}✓${NC} Processed $INSTALLED_COUNT prompt file(s)"
-
-echo ""
-echo -e "${GREEN}=== Setup Complete! ===${NC}"
-echo ""
-echo "Codex CLI can now use the ai-use-case prompts."
-echo ""
-echo "Available commands (invoke in Codex CLI):"
-for prompt_file in "$CODEX_PROMPTS_DIR"/*.md; do
-    if [ -f "$prompt_file" ]; then
-        prompt_name=$(basename "$prompt_file" .md)
-        # Extract description from YAML frontmatter at the top of the file
-        description=$(sed -n '/^---$/,/^---$/p' "$prompt_file" | grep "^description:" | cut -d':' -f2- | sed 's/^ *//' | head -1)
-        echo "  /prompts:$prompt_name"
-        if [ -n "$description" ]; then
-            echo "    └─ $description"
-        fi
-    fi
+[ "${#prompt_files[@]}" -gt 0 ] || error "No packaged Codex prompts found in $PROMPTS_SOURCE"
+for prompt_file in "${prompt_files[@]}"; do
+    install_file "$prompt_file" "$target_prompts/$(basename "$prompt_file")" "$(basename "$prompt_file")"
 done
-echo ""
-echo "Example usage:"
-echo "  /prompts:use-case-document-session"
-echo "  /prompts:use-case-publish-confluence FILE=myfile.md"
-echo ""
-echo -e "${YELLOW}Note:${NC} Codex prompts are installed in your home directory (~/.codex/prompts/)."
-echo "These prompts are available globally across all projects."
-echo "You may need to restart Codex CLI to detect new prompts."
-echo ""
-echo -e "${YELLOW}Migration guidance:${NC} If you previously ran setup-codex, you may have old project-local"
-echo ".codex/prompts/ directories that are no longer used. Delete them from your project roots"
-echo "to avoid confusion."
-echo ""
+install_file "$SKILL_SOURCE/SKILL.md" "$target_skill/SKILL.md" "ai-use-case-documentation/SKILL.md"
+
+if [ "$DRY_RUN" = false ] && [ -d "$target_prompts" ]; then
+    shopt -s nullglob
+    for installed_prompt in "$target_prompts"/use-case-*.md; do
+        prompt_name="$(basename "$installed_prompt")"
+        if [ ! -f "$PROMPTS_SOURCE/$prompt_name" ]; then log "${YELLOW}⚠${NC} Stale installed prompt retained: $installed_prompt"; fi
+    done
+    shopt -u nullglob
+fi
+
+if [ "$JSON_OUTPUT" = true ]; then
+    printf '{"mode":"%s","target":"%s","dry_run":%s,"force":%s,"planned":%d,"installed":%d,"updated":%d,"skipped":%d}\n' "$INSTALL_MODE" "$target_root" "$DRY_RUN" "$FORCE" "$planned" "$installed" "$updated" "$skipped"
+else
+    echo ""
+    echo -e "${GREEN}=== Setup complete ===${NC}"
+    echo "Prompts: $target_prompts"
+    echo "Skill:   $target_skill"
+    echo "Planned: $planned | Installed: $installed | Updated: $updated | Skipped: $skipped"
+    [ "$INSTALL_MODE" = "global" ] && echo "Use --local to install a project-scoped copy instead."
+fi

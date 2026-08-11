@@ -4,9 +4,10 @@ Short, practical guidance for coding agents working in this repository.
 
 ## Canonical Sources (read first)
 
-- `CLAUDE.md`: primary engineering and workflow rules.
+- `AGENTS.md`: primary Codex/repository engineering and workflow rules.
+- `CLAUDE.md`: Claude-specific compatibility guidance and historical workflow detail.
 - `CONTRIBUTING.md`: PR process, required docs updates, version checks.
-- `.github/copilot-instructions.md`: architecture and AI-agent constraints.
+- `.github/copilot-instructions.md`: Copilot-specific architecture and AI-agent constraints.
 - `docs/WORKFLOW.md` and `docs/COMMANDS.md`: detailed workflows and command reference.
 
 ## Cursor and Copilot Rules
@@ -14,8 +15,13 @@ Short, practical guidance for coding agents working in this repository.
 - Cursor rules: none found in `.cursor/rules/` or `.cursorrules`.
 - Copilot rules: always apply `.github/copilot-instructions.md`.
 - OpenCode notes: see `docs/agents/opencode/README.md` (tool mapping and non-interactive setup).
+- Codex workflow source: see `codex-skills/ai-use-case-documentation/SKILL.md`; install it with `ai-use-case --setup-codex --local`.
 - Preserve dual-repo design: this repo is CLI/tooling; hub content lives in the separate hub repo.
 - Any hub operation in scripts must go through `ensure_hub_exists()`.
+
+Codex-specific guidance belongs here only when it applies to repository work. Keep
+agent-specific prompt syntax and tool mappings in the corresponding integration
+docs or skill so Codex does not need to load unrelated Copilot or Claude rules.
 
 ## Quick Commands (build/lint/test)
 

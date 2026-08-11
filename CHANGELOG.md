@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Codex Skill Integration**: Added a reusable repository skill for AI Use Case documentation, project-local or global setup modes, safe preservation of modified installed files, dry-run support, structured JSON output, and compatibility prompt adapters.
+
 ### Fixed
 
 - **Documentation Path Consistency**: Standardized agent registry examples to use `${XDG_CONFIG_HOME:-$HOME/.config}/ai-use-case-cli/agents.json` and quoted shell snippets so examples remain portable

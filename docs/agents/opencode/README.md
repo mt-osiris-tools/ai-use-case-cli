@@ -12,7 +12,8 @@ This document maps those concepts to OpenCode and lists the practical checks to 
   - `.ai-tools/commands/use-case/` (source-of-truth slash commands)
   - Optional tool-specific wiring:
     - `.github/prompts/use-case/` (Copilot prompt symlink)
-    - `~/.codex/prompts/` (Codex prompt copies)
+    - `.codex/skills/ai-use-case-documentation/` (Codex repository skill)
+    - `~/.codex/prompts/` (optional legacy Codex prompt copies)
     - `.claude/commands/use-case/` (Claude Code discovery symlink, only created if `.claude/` exists or via `ai-use-case --link-claude`)
 
 ## Concept-to-Tool Mapping
@@ -55,7 +56,8 @@ Expected outcomes:
 - `.usecase/cases/` exists
 - `.ai-tools/commands/use-case/` exists and contains the command markdown files
 - `.github/prompts/use-case/` is a symlink when Copilot integration is selected (non-interactive defaults select all agents)
-- `~/.codex/prompts/` contains `use-case-*.md` when Codex integration runs
+- `.codex/skills/ai-use-case-documentation/SKILL.md` exists after project-local Codex setup
+- `~/.codex/prompts/` contains `use-case-*.md` when global legacy Codex adapters are selected
 
 ## Notes on "Advanced" Agent Commands
 

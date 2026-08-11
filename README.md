@@ -82,7 +82,7 @@ During initialization, you'll choose:
 **AI Agent(s):**
 - **Claude Code** (default): Creates `.claude/commands/use-case/` symlink
 - **GitHub Copilot**: Creates `.github/prompts/use-case/` symlink + `.vscode/settings.json` config
-- **Codex**: Installs prompts in `~/.codex/prompts/`
+- **Codex**: Installs a reusable skill and backward-compatible prompt adapters
 - **Multiple**: Configure multiple agents together
 - **None**: Skip agent setup (configure later)
 
@@ -134,7 +134,7 @@ ai-use-case extract
 | `ai-use-case --init --update` | Update project installation |
 | `ai-use-case --link-claude` | Create Claude Code symlinks (after Claude setup) |
 | `ai-use-case --setup-copilot` | Setup GitHub Copilot custom prompts + VS Code settings |
-| `ai-use-case --setup-codex` | Setup Codex-style CLI prompts |
+| `ai-use-case --setup-codex [--global\|--local] [--dry-run] [--force]` | Setup Codex skill and prompt adapters |
 | `ai-use-case sync` | Manually sync to hub |
 | `ai-use-case search <term>` | Search use cases |
 | `ai-use-case stats` | View statistics |
@@ -166,14 +166,22 @@ Setup: `ai-use-case --setup-copilot`
 
 **Note**: Setup automatically configures `.vscode/settings.json` with required Copilot settings (`chat.promptFiles: true`). Reload VS Code window after setup.
 
-### Slash Commands (Codex-Style CLI)
+### Codex Integration
 
 | Command | Description |
 |---------|-------------|
-| `/prompts:use-case-document-session` | Document current session |
-| `/prompts:use-case-publish-confluence` | Publish to Confluence |
+| `/prompts:use-case-document-session` | Legacy prompt adapter for documenting a session |
+| `/prompts:use-case-publish-confluence` | Legacy prompt adapter for publishing documentation |
 
-Setup: `ai-use-case --setup-codex`
+The preferred integration is the repository-local skill at
+`.codex/skills/ai-use-case-documentation/SKILL.md`. Install it with:
+
+```bash
+ai-use-case --setup-codex --local
+```
+
+Use `--global` for personal Codex defaults, `--dry-run` to preview changes, and
+`--force` only when replacing modified installed adapters is intentional.
 
 ### Configuration Commands
 

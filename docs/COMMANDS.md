@@ -6,10 +6,11 @@ Complete command reference for AI Use Case CLI. For quick reference, see [CLAUDE
 
 **v3.1.0+: Hybrid approach** - Standalone CLI + Claude Code integration
 
-The CLI provides three ways to interact:
+The CLI provides four ways to interact:
 1. **Standalone CLI commands** - Traditional command-line interface
 2. **Claude Code slash commands** - AI-assisted with automatic context
 3. **Direct script access** - Advanced usage for scripting
+4. **Codex repository skill** - Reusable project-scoped workflow with legacy prompt adapters
 
 ## Standalone CLI Commands
 
@@ -28,6 +29,19 @@ ai-use-case --init --update    # Update existing project installation
                                # - Updates git hooks (pre-commit, post-commit)
                                # - Preserves existing documentation
 ```
+
+### Codex Integration
+
+```bash
+ai-use-case --setup-codex --local                 # Install the project-scoped skill
+ai-use-case --setup-codex --global                # Install global adapters and skill
+ai-use-case --setup-codex --local --dry-run --json # Preview changes for automation
+ai-use-case --setup-codex --global --force        # Replace modified installed files
+```
+
+The preferred workflow is `codex-skills/ai-use-case-documentation/SKILL.md`,
+installed at `.codex/skills/ai-use-case-documentation/SKILL.md`. The legacy
+prompt adapters remain available under `.codex/prompts/`.
 
 ### Configuration Management (v3.2.0+)
 

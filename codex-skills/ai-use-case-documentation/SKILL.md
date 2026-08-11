@@ -1,0 +1,49 @@
+---
+name: ai-use-case-documentation
+description: Document and sync Codex coding sessions for repositories using AI Use Case CLI. Use when recording implementation or research work, extracting session metadata, syncing use cases, searching the hub, or publishing a documented use case.
+---
+
+# AI Use Case Documentation
+
+Use this skill for the AI Use Case CLI workflow. Prefer the repository's CLI commands for deterministic operations and treat conversation context as supplied context, not as data that can be recovered from shell history.
+
+## Repository setup
+
+Confirm the current repository is initialized before writing documentation:
+
+```bash
+git rev-parse --show-toplevel
+test -d .usecase/cases || ai-use-case --init
+```
+
+The CLI source of truth is the installed repository referenced by `AI_USECASES_CLI_ROOT` (otherwise `~/.local/share/ai-use-case-cli`). Use `ai-use-case --help` when command availability is uncertain.
+
+## Document a session
+
+1. Decide whether the session is `implementation` (code or committed changes) or `research` (analysis without code changes).
+2. Use conversation context for the user goal, decisions, alternatives, and outcome.
+3. Use git commands only for repository evidence:
+
+```bash
+git status --short
+git log --since="24 hours ago" --first-parent --oneline
+git diff --stat
+```
+
+4. Generate a complete document using `docs/TEMPLATE.md` or `docs/TEMPLATE-RESEARCH.md`. Do not invent conversation details and do not leave TODO or placeholder text.
+5. Write the result below `.usecase/cases/` using the repository naming convention, then run:
+
+```bash
+ai-use-case sync
+```
+
+Ask before committing or publishing. Never expose credentials in output.
+
+## Deterministic commands
+
+- `ai-use-case sync` synchronizes local use cases to the configured hub.
+- `ai-use-case search <term>` searches documented use cases.
+- `ai-use-case stats` reports documentation statistics.
+- `ai-use-case publish-confluence` publishes only after the user confirms the target and credentials.
+
+If an interactive prompt cannot be answered safely, stop and ask the user instead of guessing. Prefer direct CLI fallbacks over agent-specific tool names.
