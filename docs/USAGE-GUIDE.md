@@ -12,7 +12,7 @@ Complete guide for using AI Use Case CLI in your daily workflow.
 
 ## Slash Commands for AI Coding Assistants
 
-This CLI provides slash commands for AI coding assistants like Claude Code, Codex-style CLI tools, and GitHub Copilot. After running `ai-use-case --init`, slash commands are automatically available in your project.
+This CLI provides workflows for Claude Code, Codex, GitHub Copilot, and direct CLI use. After running `ai-use-case --init`, the agent-agnostic commands are available in your project.
 
 ### How It Works
 
@@ -25,7 +25,7 @@ This CLI provides slash commands for AI coding assistants like Claude Code, Code
 - Preserves any custom commands you add to `.claude/commands/`
 - Commands are invoked as `/use-case:command-name`
 
-**Codex-Style CLI Integration:**
+**Codex Integration:**
 - Codex-specific wrappers installed in `~/.codex/prompts/` (home directory) with YAML frontmatter
 - Prompts are available globally across all projects
 - Uses hybrid parameters (optional with interactive fallback)
@@ -42,13 +42,13 @@ ai-use-case --init
 
 During `--init`, you'll be prompted to choose which AI agent(s) to configure:
 - **Claude Code** (default): Automatic symlink setup in `.claude/commands/use-case/`
-- **Codex**: Installs prompts globally in `~/.codex/prompts/`
+- **Codex**: Installs a reusable skill plus backward-compatible prompt adapters
 - **Both**: Configures both Claude Code and Codex
 - **None**: Skip agent configuration (can be configured later)
 
 You can also set up Codex separately after initialization:
 ```bash
-ai-use-case --setup-codex
+ai-use-case --setup-codex --local
 ```
 
 ### Verification
@@ -59,20 +59,21 @@ ls -la .claude/commands/use-case    # Should show: use-case → ../../.ai-tools/
 ls .ai-tools/commands/use-case/     # Should list all available commands
 ```
 
-**Codex-Style CLI:**
+**Codex:**
 ```bash
-ls ~/.codex/prompts/                # Should list Codex prompt files (in home directory)
+ls .codex/skills/ai-use-case-documentation/  # Project-local Codex skill
+ls ~/.codex/prompts/                         # Optional global prompt adapters
 ```
 
 ## Core Commands
 
-Use standalone CLI, Claude Code slash commands, or Codex CLI prompts—whatever fits your workflow:
+Use standalone CLI, Claude Code slash commands, or the Codex skill—whatever fits your workflow:
 
 | Task | CLI Command | Claude Code | Codex CLI |
 |------|-------------|-------------|-----------|
 | Setup project | `ai-use-case --init` | `/use-case:setup-project` | |
 | Update project installation | `ai-use-case --init --update` | | |
-| Setup Codex CLI | `ai-use-case --setup-codex` | | |
+| Setup Codex | `ai-use-case --setup-codex [--global\|--local] [--dry-run] [--force]` | Installs the Codex skill and prompt adapters | |
 | Show hub config | `ai-use-case config show` | | |
 | Reconfigure hub | `ai-use-case config reconfigure` | | |
 | Document session | N/A – use AI assistant | `/use-case:document-session` | `/prompts:use-case-document-session` |

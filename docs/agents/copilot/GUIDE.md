@@ -412,7 +412,7 @@ gh auth login
 
 - **Claude Code**: Deep code analysis, complex refactoring
 - **GitHub Copilot**: Quick documentation, inline suggestions
-- **Codex**: Cross-project workflows, global prompts
+- **Codex**: Repository instructions and reusable skills, with optional global prompt adapters
 
 **Setup All Three**:
 ```bash
@@ -538,7 +538,7 @@ If you currently use Codex and want to add Copilot:
 ai-use-case --setup-copilot
 ```
 
-**Difference**: Codex prompts are global (`~/.codex/prompts/`), Copilot prompts are per-project (`.github/prompts/`).
+**Difference**: Codex skills can be project-scoped (`.codex/skills/`) or user-scoped, while legacy prompt adapters may be installed globally; Copilot prompts are per-project (`.github/prompts/`).
 
 ### From No Agent
 

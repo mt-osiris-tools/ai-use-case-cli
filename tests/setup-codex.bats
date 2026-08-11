@@ -26,23 +26,13 @@ CLI="$(script_path ai-use-case)"
     assert_output --partial "Error"
 }
 
-@test "setup-codex: fails without .ai-tools directory" {
+@test "setup-codex: does not require project initialization" {
     local project_dir
     project_dir="$(create_test_git_repo)"
 
-    # Don't run setup, so no .ai-tools exists
-    run bash "$SETUP_CODEX_SCRIPT" "$project_dir"
-    assert_failure
-    assert_output --partial ".ai-tools"
-}
-
-@test "setup-codex: shows helpful message about running --init first" {
-    local project_dir
-    project_dir="$(create_test_git_repo)"
-
-    run bash "$SETUP_CODEX_SCRIPT" "$project_dir"
-    assert_failure
-    assert_output --partial "ai-use-case --init"
+    run bash "$SETUP_CODEX_SCRIPT" --local "$project_dir"
+    assert_success
+    assert_file_exists "$project_dir/.codex/skills/ai-use-case-documentation/SKILL.md"
 }
 
 # ============================================
@@ -153,7 +143,7 @@ CLI="$(script_path ai-use-case)"
 # Update Tests
 # ============================================
 
-@test "setup-codex: updates files when they differ" {
+@test "setup-codex: preserves files when they differ unless forced" {
     local project_dir
     project_dir="$(create_test_git_repo)"
 
@@ -164,10 +154,44 @@ CLI="$(script_path ai-use-case)"
     # Modify one of the prompts in home directory
     echo "# Modified" >> "$HOME/.codex/prompts/use-case-document-session.md"
 
-    # Run again - should update
+    # Run again - should preserve the user modification
     run bash "$SETUP_CODEX_SCRIPT" "$project_dir"
     assert_success
+    assert_output --partial "Preserved modified file"
+}
+
+@test "setup-codex: force updates files when they differ" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    bash "$SETUP_PROJECT_SCRIPT" "$project_dir"
+    bash "$SETUP_CODEX_SCRIPT" "$project_dir"
+    echo "# Modified" >> "$HOME/.codex/prompts/use-case-document-session.md"
+
+    run bash "$SETUP_CODEX_SCRIPT" --force "$project_dir"
+    assert_success
     assert_output --partial "Updating"
+}
+
+@test "setup-codex: supports project-local installation without project initialization" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    run bash "$SETUP_CODEX_SCRIPT" --local "$project_dir"
+    assert_success
+    assert_file_exists "$project_dir/.codex/prompts/use-case-document-session.md"
+    assert_file_exists "$project_dir/.codex/skills/ai-use-case-documentation/SKILL.md"
+}
+
+@test "setup-codex: supports dry-run JSON output without writing" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    run bash "$SETUP_CODEX_SCRIPT" --local --dry-run --json "$project_dir"
+    assert_success
+    assert_output --partial '"dry_run":true'
+    run test ! -e "$project_dir/.codex"
+    assert_success
 }
 
 @test "setup-codex: reports already current when files unchanged" {
@@ -220,10 +244,10 @@ CLI="$(script_path ai-use-case)"
 
     run bash "$SETUP_CODEX_SCRIPT" "$project_dir"
     assert_success
-    assert_output --partial "Setup Complete"
+    assert_output --partial "Setup complete"
 }
 
-@test "setup-codex: displays available commands" {
+@test "setup-codex: displays installed targets" {
     local project_dir
     project_dir="$(create_test_git_repo)"
 
@@ -232,11 +256,11 @@ CLI="$(script_path ai-use-case)"
 
     run bash "$SETUP_CODEX_SCRIPT" "$project_dir"
     assert_success
-    assert_output --partial "/prompts:use-case-document-session"
-    assert_output --partial "/prompts:use-case-publish-confluence"
+    assert_output --partial "Prompts:"
+    assert_output --partial "Skill:"
 }
 
-@test "setup-codex: extracts and displays descriptions" {
+@test "setup-codex: reports installation counts" {
     local project_dir
     project_dir="$(create_test_git_repo)"
 
@@ -245,9 +269,8 @@ CLI="$(script_path ai-use-case)"
 
     run bash "$SETUP_CODEX_SCRIPT" "$project_dir"
     assert_success
-    # Should show descriptions from frontmatter
-    assert_output --partial "Document an AI coding session"
-    assert_output --partial "Publish AI use case documentation"
+    assert_output --partial "Installed:"
+    assert_output --partial "Skipped:"
 }
 
 @test "setup-codex: output is colored" {
@@ -292,4 +315,24 @@ CLI="$(script_path ai-use-case)"
     run "$CLI" setup-codex
     assert_success
     assert_dir_exists "$HOME/.codex/prompts"
+}
+
+@test "ai-use-case setup-codex: forwards local mode" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    cd "$project_dir"
+    run "$CLI" setup-codex --local
+    assert_success
+    assert_file_exists "$project_dir/.codex/skills/ai-use-case-documentation/SKILL.md"
+}
+
+@test "ai-use-case setup-codex: JSON output is machine-readable" {
+    local project_dir
+    project_dir="$(create_test_git_repo)"
+
+    cd "$project_dir"
+    run "$CLI" setup-codex --local --json
+    assert_success
+    [[ "$output" == \{"mode":"local"*\} ]]
 }

@@ -590,9 +590,9 @@ fi
 
 # Setup Codex integration (if Codex was selected, init mode only)
 # NOTE: Unlike Claude Code integration (which runs in both init and update modes to maintain
-# project-specific symlink structure), Codex setup is intentionally init-only because it's a
-# one-time global setup (installs prompts to ~/.codex/prompts/). Users who need to add or update
-# Codex integration later can run: ai-use-case --setup-codex
+# project-specific symlink structure), Codex setup is intentionally init-only. It installs the
+# legacy prompt adapters globally by default and also packages a repository-local skill for users
+# who run `ai-use-case --setup-codex --local`.
 if [[ "$SELECTED_AGENTS" == *"codex"* ]] && [ "$UPDATE_MODE" = false ]; then
     echo ""
     echo -e "${BLUE}Setting up Codex integration...${NC}"
