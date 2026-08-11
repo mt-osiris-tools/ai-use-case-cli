@@ -22,6 +22,7 @@ CLI_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 AUTO_CONFIRM=false
 UPDATE_PROJECTS=false
 DRY_RUN=false
+CHECK_ONLY=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -37,6 +38,10 @@ while [[ $# -gt 0 ]]; do
             DRY_RUN=true
             shift
             ;;
+        --check)
+            CHECK_ONLY=true
+            shift
+            ;;
         -h|--help)
             cat <<EOF
 ${BLUE}AI Use Case CLI - Self Update${NC}
@@ -50,6 +55,7 @@ ${YELLOW}Options:${NC}
   -y, --yes              Skip confirmation and update automatically
   --update-projects      Also update all registered projects after CLI update
   --dry-run              Show what would be updated without making changes
+  --check                Check for an update without installing it
   -h, --help             Show this help message
 
 ${YELLOW}Examples:${NC}
@@ -57,6 +63,7 @@ ${YELLOW}Examples:${NC}
   $0 -y                     # Update CLI automatically
   $0 -y --update-projects   # Update CLI and all registered projects
   $0 --dry-run              # See what would be updated
+  $0 --check                # Check the current installation without changing it
 
 ${YELLOW}Description:${NC}
   This command updates the CLI installation by pulling the latest changes
@@ -91,10 +98,24 @@ if [ ! -d "$CLI_ROOT/.git" ]; then
     exit 1
 fi
 
-# Get current version and commit
 cd "$CLI_ROOT"
+
+if ! git remote get-url origin >/dev/null 2>&1; then
+    echo -e "${RED}Error: Git remote 'origin' is not configured${NC}"
+    echo "Location: $CLI_ROOT"
+    echo "Configure the repository remote or reinstall the CLI from Git."
+    exit 1
+fi
+
+# Get current version and commit
 CURRENT_COMMIT=$(git rev-parse --short HEAD)
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+CURRENT_BRANCH=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)
+if [ -z "$CURRENT_BRANCH" ]; then
+    echo -e "${RED}Error: CLI installation is in a detached HEAD state${NC}"
+    echo "Checkout a branch before updating, for example:"
+    echo "  cd $CLI_ROOT && git checkout main"
+    exit 1
+fi
 CURRENT_VERSION=$(grep 'export CLI_VERSION=' "$CLI_ROOT/scripts/utils/version.sh" 2>/dev/null | head -1 | cut -d'"' -f2 || echo "unknown")
 
 echo "Current installation:"
@@ -124,14 +145,24 @@ fi
 
 # Fetch latest changes
 echo -e "${BLUE}Checking for updates...${NC}"
-git fetch origin --quiet
+if ! git fetch origin --quiet; then
+    echo -e "${RED}Error: Could not fetch updates from the 'origin' remote${NC}"
+    echo "Check network access and the configured remote URL, then try again."
+    exit 1
+fi
 
 # Get remote version
-REMOTE_COMMIT=$(git rev-parse --short "origin/$CURRENT_BRANCH")
+if ! git show-ref --verify --quiet "refs/remotes/origin/$CURRENT_BRANCH"; then
+    echo -e "${RED}Error: Remote branch 'origin/$CURRENT_BRANCH' was not found${NC}"
+    echo "The CLI installation branch '$CURRENT_BRANCH' does not have a matching origin branch."
+    exit 1
+fi
+
+REMOTE_COMMIT=$(git rev-parse "origin/$CURRENT_BRANCH")
 REMOTE_VERSION=$(git show "origin/$CURRENT_BRANCH:scripts/utils/version.sh" 2>/dev/null | grep 'export CLI_VERSION=' | head -1 | cut -d'"' -f2 || echo "unknown")
 
 # Check if update is needed
-if [ "$CURRENT_COMMIT" = "$REMOTE_COMMIT" ]; then
+if [ "$(git rev-parse HEAD)" = "$REMOTE_COMMIT" ]; then
     echo -e "${GREEN}✓ CLI is already up to date!${NC}"
     echo ""
     echo "Current version: $CURRENT_VERSION ($CURRENT_COMMIT)"
@@ -141,12 +172,12 @@ fi
 # Show what will be updated
 echo -e "${YELLOW}Update available:${NC}"
 echo "  Current: $CURRENT_VERSION ($CURRENT_COMMIT)"
-echo "  Latest:  ${GREEN}$REMOTE_VERSION ($REMOTE_COMMIT)${NC}"
+echo "  Latest:  ${GREEN}$REMOTE_VERSION ($(git rev-parse --short "$REMOTE_COMMIT"))${NC}"
 echo ""
 
 # Show changes
 echo -e "${CYAN}Changes:${NC}"
-git --no-pager log --oneline --pretty=format:"  %C(yellow)%h%C(reset) - %s %C(green)(%ar)%C(reset)" HEAD..origin/"$CURRENT_BRANCH" | head -10
+git --no-pager log --oneline --pretty=format:"  %C(yellow)%h%C(reset) - %s %C(green)(%ar)%C(reset)" HEAD.."$REMOTE_COMMIT" | head -10
 echo ""
 echo ""
 
@@ -159,12 +190,18 @@ if [ "$DRY_RUN" = true ]; then
     exit 0
 fi
 
+if [ "$CHECK_ONLY" = true ]; then
+    echo -e "${BLUE}[CHECK]${NC} Update available: $CURRENT_VERSION → $REMOTE_VERSION"
+    echo "No changes were applied."
+    exit 0
+fi
+
 # Confirm update
 if [ "$AUTO_CONFIRM" = false ]; then
     echo -e "${YELLOW}Update CLI to version $REMOTE_VERSION?${NC}"
     read -p "[Y/n] " -n 1 -r
     echo ""
-    if [[ ! $REPLY =~ ^[Yy]$ ]] && [[ ! -z $REPLY ]]; then
+    if [[ ! $REPLY =~ ^[Yy]$ ]] && [[ -n "$REPLY" ]]; then
         echo "Update cancelled"
         exit 0
     fi
@@ -174,28 +211,9 @@ fi
 echo ""
 echo -e "${BLUE}Updating CLI...${NC}"
 
-# Stash local changes if any
-if ! git diff-index --quiet HEAD -- 2>/dev/null; then
-    echo -e "${CYAN}Stashing local changes...${NC}"
-    git stash push -m "auto-stash before self-update at $(date)" --quiet
-    STASHED=true
-else
-    STASHED=false
-fi
+STASHED=false
 
-# Pull latest changes
-NEW_VERSION="unknown"  # Initialize to prevent undefined variable errors
-NEW_COMMIT="unknown"
-
-if git pull origin "$CURRENT_BRANCH" --quiet; then
-    NEW_COMMIT=$(git rev-parse --short HEAD)
-    NEW_VERSION=$(grep 'export CLI_VERSION=' "$CLI_ROOT/scripts/utils/version.sh" 2>/dev/null | head -1 | cut -d'"' -f2 || echo "unknown")
-
-    echo -e "${GREEN}✓ CLI updated successfully!${NC}"
-    echo ""
-    echo "Updated to: ${GREEN}$NEW_VERSION ($NEW_COMMIT)${NC}"
-
-    # Restore stashed changes
+restore_stashed_changes() {
     if [ "$STASHED" = true ]; then
         echo ""
         echo -e "${CYAN}Restoring local changes...${NC}"
@@ -203,12 +221,39 @@ if git pull origin "$CURRENT_BRANCH" --quiet; then
             echo -e "${GREEN}✓${NC} Local changes restored"
         else
             echo -e "${YELLOW}⚠${NC} Could not restore local changes automatically"
-            echo "Changes saved in: git stash list"
+            echo "Changes remain preserved in: git stash list"
         fi
+        STASHED=false
     fi
+}
+
+# Stash local changes if any
+if ! git diff-index --quiet HEAD -- 2>/dev/null; then
+    echo -e "${CYAN}Stashing local changes...${NC}"
+    if ! git stash push -m "auto-stash before self-update at $(date)" --quiet; then
+        echo -e "${RED}Error: Could not safely stash local changes${NC}"
+        exit 1
+    fi
+    STASHED=true
+fi
+
+# Pull latest changes
+NEW_VERSION="unknown"  # Initialize to prevent undefined variable errors
+NEW_COMMIT="unknown"
+
+if git pull --ff-only origin "$CURRENT_BRANCH" --quiet; then
+    NEW_COMMIT=$(git rev-parse --short HEAD)
+    NEW_VERSION=$(grep 'export CLI_VERSION=' "$CLI_ROOT/scripts/utils/version.sh" 2>/dev/null | head -1 | cut -d'"' -f2 || echo "unknown")
+
+    echo -e "${GREEN}✓ CLI updated successfully!${NC}"
+    echo ""
+    echo "Updated to: ${GREEN}$NEW_VERSION ($NEW_COMMIT)${NC}"
+
+    restore_stashed_changes
 else
     echo -e "${RED}✗ Update failed${NC}"
     echo "Please check the error messages above"
+    restore_stashed_changes
     exit 1
 fi
 

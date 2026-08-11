@@ -84,6 +84,7 @@ Use standalone CLI, Claude Code slash commands, or the Codex skill—whatever fi
 | List projects | `ai-use-case list-projects` | `/use-case:list-projects` | |
 | Check for updates | `ai-use-case check-updates` | `/use-case:check-updates` | |
 | Update project | `ai-use-case update-project <path>` | `/use-case:update-project` | |
+| Update CLI | `ai-use-case update [--check|--dry-run|--yes]` | | Updates the installed CLI from its Git remote |
 | Reset configuration | `ai-use-case reset [options]` | | |
 | Publish to Confluence | `ai-use-case publish-confluence` | `/use-case:publish-confluence` | `/prompts:use-case-publish-confluence` |
 | View hub | `ai-use-case view` | | |
