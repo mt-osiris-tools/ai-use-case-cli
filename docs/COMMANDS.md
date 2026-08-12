@@ -43,6 +43,18 @@ The preferred workflow is `codex-skills/ai-use-case-documentation/SKILL.md`,
 installed at `.codex/skills/ai-use-case-documentation/SKILL.md`. The legacy
 prompt adapters remain available under `.codex/prompts/`.
 
+The Codex documentation workflow requires explicit session selection. It lists
+recent sessions recorded for the current repository and accepts a direct UUID:
+
+```text
+/prompts:use-case-document-session
+/prompts:use-case-document-session SESSION_UUID=<codex-session-uuid>
+```
+
+Session records are read from `~/.codex/sessions/` (or `CODEX_HOME`) and are
+used as the source for the generated document. The command does not silently
+document the current conversation or newest session.
+
 ### Configuration Management (v3.2.0+)
 
 ```bash
