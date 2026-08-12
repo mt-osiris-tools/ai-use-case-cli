@@ -25,12 +25,12 @@ else
 fi
 
 # Source version configuration (single source of truth)
-if [ -f "$SCRIPT_DIR/scripts/utils/version.sh" ]; then
-    source "$SCRIPT_DIR/scripts/utils/version.sh"
+if [ -f "$SCRIPT_DIR/lib/core/version.sh" ]; then
+    source "$SCRIPT_DIR/lib/core/version.sh"
     VERSION="$CLI_VERSION"
 else
     # Fallback if version.sh is missing
-    echo "Warning: version.sh not found, using fallback version" >&2
+    echo "Warning: lib/core/version.sh not found, using fallback version" >&2
     VERSION="unknown"
 fi
 
@@ -133,7 +133,8 @@ ${YELLOW}ADVANCED COMMANDS${NC}
   ${GREEN}analyze-patterns${NC}          Analyze documentation patterns with AI agent
   ${GREEN}extract [hours] [format]${NC}  Extract session data for reporting
   ${GREEN}tracing [subcommand]${NC}      Manage tracing configuration
-  ${GREEN}bump-version <type>${NC}       Bump version (major|minor|patch)
+  ${GREEN}release <action> ...${NC}      Prepare or publish a release
+  ${GREEN}bump-version <type>${NC}       Update version metadata safely
 EOF
     else
         cat <<EOF
@@ -612,6 +613,17 @@ EOF
         else
             trace_event "error" "command=bump-version" "error=script_not_found" "script=bump-version.sh"
             echo -e "${RED}Error: bump-version.sh not found${NC}"
+            exit 1
+        fi
+        ;;
+    release)
+        trace_event "command_start" "command=release" "args=$*"
+        if [ -f "$SCRIPT_DIR/scripts/utils/release.sh" ]; then
+            shift
+            trace_run "release" bash "$SCRIPT_DIR/scripts/utils/release.sh" "$@"
+        else
+            trace_event "error" "command=release" "error=script_not_found" "script=release.sh"
+            echo -e "${RED}Error: release.sh not found${NC}"
             exit 1
         fi
         ;;

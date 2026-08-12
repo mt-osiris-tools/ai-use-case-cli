@@ -127,7 +127,7 @@ Before creating any PR that touches version-related files, run:
 
 | File | What to Update |
 |------|----------------|
-| `scripts/utils/version.sh` | Source of truth (CLI_VERSION) |
+| `lib/core/version.sh` | Source of truth (CLI_VERSION) |
 | `README.md` | Header version badge + footer version |
 | `CHANGELOG.md` | Latest release section |
 | `docs/USAGE-GUIDE.md` | Version markers for new commands |
@@ -387,25 +387,30 @@ When reviewing pull requests:
 
 ## Release Process
 
-When ready to release a new version:
+When ready to release a new version, use the controlled release workflow:
 
 1. Create a release PR with version bump:
    ```bash
-   git checkout -b release/v2.3.0
-   # Update the VERSION constant in ./ai-use-case (at the top of the file)
-   # Move "Unreleased" changes in CHANGELOG.md to new version section
-   git commit -m "chore: prepare release v2.3.0"
-   git push -u origin release/v2.3.0
+   git checkout -b release/v3.14.0
+   ai-use-case release prepare minor
+   git diff
+   git add lib/core/version.sh scripts/utils/version.sh README.md CHANGELOG.md
+   git commit -m "chore: prepare release v3.14.0"
+   git push -u origin release/v3.14.0
    ```
 
 2. Create PR and get approval
 
 3. Merge to main
 
-4. Create GitHub release:
-   - Tag: `v2.3.0`
-   - Title: "Release v2.3.0"
-   - Description: Copy from CHANGELOG.md
+4. From an up-to-date local `main`, validate and publish the tag:
+   ```bash
+   git checkout main
+   git pull --ff-only origin main
+   ai-use-case release publish 3.14.0
+   ```
+
+5. The tag workflow validates the source and tests, then creates a draft GitHub Release from `CHANGELOG.md`. Review and publish the draft.
 
 5. Users will be notified via automatic version checking
 

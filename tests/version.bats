@@ -105,3 +105,18 @@ teardown() {
     major="${CLI_VERSION%%.*}"
     [ "$major" -ge 3 ]
 }
+
+@test "bump-version: dry run does not modify the working tree" {
+    local before after
+    before="$(git -C "$(script_path .)" status --porcelain)"
+    run "$(script_path scripts/utils/bump-version.sh)" patch --dry-run --yes
+    assert_success
+    after="$(git -C "$(script_path .)" status --porcelain)"
+    [ "$after" = "$before" ]
+}
+
+@test "release: rejects malformed publish versions" {
+    run "$(script_path scripts/utils/release.sh)" publish 3.13
+    assert_failure
+    assert_output --partial "X.Y.Z format"
+}

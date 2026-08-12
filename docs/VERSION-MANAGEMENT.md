@@ -23,40 +23,43 @@ MAJOR.MINOR.PATCH (e.g., 3.2.0)
 - **PATCH** (0.0.X): Backward compatible bug fixes
   - Examples: Fixing bugs, improving error messages, documentation updates
 
-## Automated Version Bump (Recommended)
+## Controlled Release Workflow (Recommended)
 
-**Since v3.2.0**, the CLI includes an automated version bump system that handles everything for you.
+The release workflow separates preparing a release from publishing it. Version changes are reviewed through a PR, and only a merged commit on `main` can receive a release tag.
 
 ### Quick Start
 
 ```bash
-# Bump patch version (3.2.0 -> 3.2.1)
-ai-use-case bump-version patch
+# Prepare a patch release on a release/* branch
+ai-use-case release prepare patch
 
-# Bump minor version (3.2.0 -> 3.3.0)
-ai-use-case bump-version minor
+# Prepare a minor release
+ai-use-case release prepare minor
 
-# Bump major version (3.2.0 -> 4.0.0)
-ai-use-case bump-version major
+# Prepare a major release
+ai-use-case release prepare major
 
-# Set specific version
-ai-use-case bump-version 3.5.0
+# Prepare a specific version
+ai-use-case release prepare 3.14.0
 
 # Preview changes without applying
 ai-use-case bump-version patch --dry-run
+
+# After the PR is merged to main, validate and publish the tag
+ai-use-case release publish 3.14.0
 ```
 
 ### What It Does Automatically
 
-The `bump-version` command handles the entire release process:
+`release prepare` updates:
 
 1. ✅ **Parses current version** from `version.sh`
 2. ✅ **Calculates new version** based on bump type
 3. ✅ **Updates version.sh** with new version
 4. ✅ **Updates CHANGELOG.md** (moves Unreleased to versioned section with date)
-5. ✅ **Creates git commit** with conventional commit message
-6. ✅ **Creates git tag** (vX.Y.Z)
-7. ✅ **Pushes to remote** with tags
+5. ✅ Leaves commit, tag, and push operations to the reviewed release workflow
+
+`release publish` runs strict validation and the full test suite, creates the annotated tag, and pushes it. The tag-triggered GitHub Actions workflow creates a draft GitHub Release.
 
 ### Command Options
 
@@ -71,9 +74,9 @@ Types:
 
 Options:
   --dry-run       Preview changes without applying
-  --no-commit     Update files but don't commit
-  --no-tag        Don't create git tag
-  --no-push       Don't push to remote
+  --no-commit     Update files but don't commit (default)
+  --no-tag        Don't create git tag (default)
+  --no-push       Don't push to remote (default)
   --yes, -y       Skip confirmations (for CI/CD)
   --help, -h      Show detailed help
 ```
@@ -82,9 +85,10 @@ Options:
 
 #### Standard Release (Patch)
 ```bash
-# Bump from 3.2.0 to 3.2.1
-ai-use-case bump-version patch
-# Automatically commits, tags, and pushes
+# Prepare from a release branch
+ai-use-case release prepare patch
+# Commit and open the release PR; publish the tag after merge
+ai-use-case release publish 3.13.1
 ```
 
 #### Preview Changes First
@@ -101,8 +105,8 @@ ai-use-case bump-version minor
 # Update files only, commit manually later
 ai-use-case bump-version patch --no-commit
 
-# Bump and commit, but don't push yet
-ai-use-case bump-version minor --no-push
+# Metadata-only compatibility command (the safe default)
+ai-use-case bump-version minor
 ```
 
 #### CI/CD Automation
@@ -169,13 +173,15 @@ Move Unreleased section to new version:
 ./sync-ai-use-cases.sh --help | head -1
 ```
 
-### 4. Commit and Tag
+### 4. Commit the Release PR
 
 ```bash
-git add version.sh CHANGELOG.md
+git add lib/core/version.sh README.md CHANGELOG.md
 git commit -m "chore: bump version to 3.3.0"
-git tag -a v3.3.0 -m "Release version 3.3.0"
-git push origin main --tags
+git push -u origin release/v3.3.0
+
+# After the PR is merged:
+ai-use-case release publish 3.3.0
 ```
 
 ## Version Verification Commands
@@ -216,7 +222,7 @@ Shows:
 3. New version: `2.4.0`
 4. Update both files
 5. Commit: `chore: Bump version to 2.4.0`
-6. Tag: `git tag -a v2.4.0 -m "Release version 2.4.0"`
+6. Publish: `ai-use-case release publish 2.4.0`
 
 ### Example: Fixing a Bug (Patch)
 
@@ -225,7 +231,7 @@ Shows:
 3. New version: `2.4.1`
 4. Update both files
 5. Commit: `chore: Bump version to 2.4.1`
-6. Tag: `git tag -a v2.4.1 -m "Release version 2.4.1"`
+6. Publish: `ai-use-case release publish 2.4.1`
 
 ### Example: Breaking Change (Major)
 
@@ -234,7 +240,7 @@ Shows:
 3. New version: `3.0.0`
 4. Update both files (document breaking changes clearly)
 5. Commit: `chore: Bump version to 3.0.0`
-6. Tag: `git tag -a v3.0.0 -m "Release version 3.0.0"`
+6. Publish: `ai-use-case release publish 3.0.0`
 
 ## Common Mistakes
 

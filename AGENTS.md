@@ -82,7 +82,7 @@ Prefer fixing warnings. If suppression is required, use targeted `# shellcheck d
 ./scripts/utils/validate-versions.sh
 ```
 
-Version source of truth: `scripts/utils/version.sh` (`CLI_VERSION`).
+Version source of truth: `lib/core/version.sh` (`CLI_VERSION`); `scripts/utils/version.sh` remains a compatibility symlink.
 
 ## Repository Architecture
 

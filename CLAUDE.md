@@ -165,10 +165,10 @@ Key requirements:
 
 ### Version Management
 
-**Source of truth**: `scripts/utils/version.sh` (line 21: `CLI_VERSION`)
+**Source of truth**: `lib/core/version.sh` (line 21: `CLI_VERSION`); `scripts/utils/version.sh` is a compatibility symlink.
 
 When bumping versions, ALL these files must be updated:
-- `scripts/utils/version.sh` - Source of truth
+- `lib/core/version.sh` - Source of truth
 - `README.md` - Header version (line ~4) and footer (line ~392 + date)
 - `CHANGELOG.md` - Move Unreleased section to new version section
 - `docs/USAGE-GUIDE.md` - Version markers for new commands (e.g., `v3.6.0+`)

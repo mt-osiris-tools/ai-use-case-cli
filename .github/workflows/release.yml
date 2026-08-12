@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-draft:
+    name: Validate tag and create draft release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Validate release metadata
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          tag_version="${RELEASE_TAG#v}"
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          source lib/core/version.sh
+          [[ "$CLI_VERSION" == "$tag_version" ]] || {
+            echo "Tag $RELEASE_TAG does not match CLI_VERSION $CLI_VERSION" >&2
+            exit 1
+          }
+          grep -q "^## \[$tag_version\] - " CHANGELOG.md || {
+            echo "CHANGELOG.md has no release section for $tag_version" >&2
+            exit 1
+          }
+
+      - name: Validate versions
+        run: ./scripts/utils/validate-versions.sh
+
+      - name: Run test suite
+        run: ./run-tests.sh
+
+      - name: Extract release notes
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          tag_version="${RELEASE_TAG#v}"
+          awk -v version="$tag_version" '
+            $0 == "## [" version "]" || index($0, "## [" version "] - ") == 1 { found=1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          test -s release-notes.md
+
+      - name: Create draft GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: gh release create "$RELEASE_TAG" --draft --title "Release $RELEASE_TAG" --notes-file release-notes.md

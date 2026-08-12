@@ -139,6 +139,8 @@ ai-use-case extract
 | `ai-use-case sync` | Manually sync to hub |
 | `ai-use-case search <term>` | Search use cases |
 | `ai-use-case stats` | View statistics |
+| `ai-use-case release prepare <type>` | Prepare a reviewed release PR |
+| `ai-use-case release publish <version>` | Validate and publish a post-merge release tag |
 | `ai-use-case --version` | Show version |
 | `ai-use-case --help` | Show help |
 
