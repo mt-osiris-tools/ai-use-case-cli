@@ -26,17 +26,22 @@ gh pr create --title "..." --body "..."
 
 ### When to Bump Versions
 
-1. **Update version** in `scripts/utils/version.sh` (line 21):
+1. **Prepare the version** on a `release/*` branch with `ai-use-case release prepare`:
    - **MAJOR** (X.0.0): Breaking changes that require user action
    - **MINOR** (0.X.0): New features, backward compatible
    - **PATCH** (0.0.X): Bug fixes, no new features
 
-2. **Update ALL version references** (see checklist):
+2. **Open and merge the release PR**, then publish the tag from an up-to-date `main` branch:
+   ```bash
+   ai-use-case release publish X.Y.Z
+   ```
+
+3. **Update ALL version references** (see checklist):
    - `README.md` (header on line ~4)
    - `README.md` (footer on line ~353 + date)
    - `CHANGELOG.md` (add new version section)
 
-3. **Test**: Run `./ai-use-case --version`
+4. **Test**: `release publish` runs strict validation and `./run-tests.sh`; verify the resulting draft GitHub Release before publishing it.
 
 See [VERSION-MANAGEMENT.md](VERSION-MANAGEMENT.md) for complete guide and [VERSION-UPDATE-CHECKLIST.md](VERSION-UPDATE-CHECKLIST.md) for verification checklist.
 
@@ -47,7 +52,7 @@ Before creating any PR, verify ALL items:
 - [ ] Created feature branch (not on `main`)
 - [ ] **MANDATORY: Updated CHANGELOG.md** (non-negotiable for ALL changes)
 - [ ] **MANDATORY: Updated README.md** (non-negotiable if user-facing changes)
-- [ ] Updated version if adding features (scripts/utils/version.sh)
+- [ ] Updated version if adding features (`lib/core/version.sh`, through `release prepare`)
 - [ ] Tested changes locally
 - [ ] **Verified cross-platform compatibility** (if shell scripts modified)
 - [ ] Updated all related documentation (docs/*, docs/agents/claude/README.md, CONTRIBUTING.md)
@@ -139,7 +144,7 @@ git checkout -b feature/new-command
 # - Test locally with ./ai-use-case
 
 # 3. Update version (e.g., 3.4.0 -> 3.5.0)
-# - Edit scripts/utils/version.sh line 21
+# - Run ai-use-case release prepare <type> on a release/* branch
 # - Update README.md (header + footer)
 # - Update CHANGELOG.md
 

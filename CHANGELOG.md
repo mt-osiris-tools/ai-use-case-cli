@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Controlled Release Workflow**: Added `ai-use-case release prepare` and `release publish` commands, strict post-merge validation, and tag-triggered draft GitHub Releases. Version preparation no longer commits, tags, or pushes implicitly.
+
 - **Codex Skill Integration**: Added a reusable repository skill for AI Use Case documentation, project-local or global setup modes, safe preservation of modified installed files, dry-run support, structured JSON output, and compatibility prompt adapters.
 
 - **Self-Update Reliability**: Hardened `ai-use-case update` with remote and branch validation, fast-forward-only pulls, non-installing `--check` support, and restoration of local changes when an update fails.

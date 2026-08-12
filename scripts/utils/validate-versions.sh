@@ -32,6 +32,8 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --fix)
+            # Reserved for the documented interactive fixer; validation is read-only.
+            # shellcheck disable=SC2034
             FIX_MODE=true
             shift
             ;;
@@ -49,7 +51,7 @@ ${YELLOW}Options:${NC}
 
 ${YELLOW}Description:${NC}
   Validates that version references are consistent across all documentation files:
-  - scripts/utils/version.sh (source of truth)
+  - lib/core/version.sh (source of truth; scripts/utils/version.sh is a compatibility symlink)
   - README.md (header and footer)
   - CHANGELOG.md (latest release)
   - docs/COMMANDS.md (feature version markers)
@@ -83,8 +85,8 @@ ERRORS=0
 WARNINGS=0
 
 # 1. Get source of truth version
-echo -e "${CYAN}[1/6] Checking source of truth (scripts/utils/version.sh)...${NC}"
-VERSION_FILE="$REPO_ROOT/scripts/utils/version.sh"
+echo -e "${CYAN}[1/6] Checking source of truth (lib/core/version.sh)...${NC}"
+VERSION_FILE="$REPO_ROOT/lib/core/version.sh"
 if [ ! -f "$VERSION_FILE" ]; then
     echo -e "${RED}✗ CRITICAL: version.sh not found at $VERSION_FILE${NC}"
     exit 2

@@ -8,16 +8,16 @@
 
 When bumping the version, **ALL** of these files MUST be updated. Missing even one can cause inconsistencies and confusion.
 
-### 1. Source of Truth: `scripts/utils/version.sh`
+### 1. Source of Truth: `lib/core/version.sh`
 
-**File**: `scripts/utils/version.sh` (Line 21)
+**File**: `lib/core/version.sh` (Line 21)
 
 ```bash
 export CLI_VERSION="X.Y.Z"
 ```
 
 **Action**: Update the version number
-**Note**: This is the single source of truth. The main `ai-use-case` script sources this file.
+**Note**: This is the single source of truth. `scripts/utils/version.sh` is a compatibility symlink.
 
 ---
 
@@ -78,7 +78,7 @@ export CLI_VERSION="X.Y.Z"
 
 **File**: `scripts/install/install.sh`
 
-**Note**: Sources `scripts/utils/version.sh`, so no manual update needed
+**Note**: Sources the canonical version module, so no manual update needed
 
 **Action**: No action required (automatically uses `$CLI_VERSION`)
 
@@ -102,7 +102,7 @@ Before releasing, always run the version validator to catch inconsistencies:
 ```
 
 **What it checks**:
-- ✅ `scripts/utils/version.sh` (source of truth)
+- ✅ `lib/core/version.sh` (source of truth)
 - ✅ `README.md` (header and footer)
 - ✅ `CHANGELOG.md` (latest release matches version.sh)
 - ✅ `docs/COMMANDS.md` (no future version references)
@@ -115,33 +115,31 @@ Before releasing, always run the version validator to catch inconsistencies:
 
 ---
 
-## Automated Version Update Script
+## Controlled Version Update Script
 
-Use the built-in bump-version script:
+Use the release preparation command on a `release/*` branch:
 
 ```bash
 # Bump patch version (3.3.0 -> 3.3.1)
-ai-use-case bump-version patch
+ai-use-case release prepare patch
 
 # Bump minor version (3.3.0 -> 3.4.0)
-ai-use-case bump-version minor
+ai-use-case release prepare minor
 
 # Bump major version (3.3.0 -> 4.0.0)
-ai-use-case bump-version major
+ai-use-case release prepare major
 
 # Set specific version
-ai-use-case bump-version 3.5.0
+ai-use-case release prepare 3.5.0
 ```
 
 **Script Location**: `scripts/utils/bump-version.sh`
 
-**What it automates**:
-- ✅ Updates `scripts/utils/version.sh`
+**What preparation automates**:
+- ✅ Updates `lib/core/version.sh` (compatibility symlink remains available)
 - ✅ Updates `README.md` (header version, footer version, and footer date)
 - ✅ Updates `CHANGELOG.md` (moves [Unreleased] to new version section with date)
-- ✅ Creates git commit with version bump message
-- ✅ Creates git tag
-- ✅ Pushes to remote (with --no-push to skip)
+- ✅ Leaves commit, tag, and push operations separate for PR review and post-merge publication
 
 **What it does NOT automate** (manual check required):
 - ❌ CHANGELOG.md content (you must write release notes in [Unreleased] section BEFORE bumping)
@@ -155,7 +153,7 @@ ai-use-case bump-version 3.5.0
 
 Before creating a release PR:
 
-- [ ] **1. Version Updated**: `scripts/utils/version.sh` line 21
+- [ ] **1. Version Updated**: `lib/core/version.sh` line 21 via `ai-use-case release prepare`
 - [ ] **2. README Header**: Line ~4 version badge updated
 - [ ] **3. README Footer**: Line ~353 version AND date updated
 - [ ] **4. CHANGELOG.md**: New version section with release date and changes
@@ -171,11 +169,7 @@ Before creating a release PR:
 
   Co-Authored-By: Claude <noreply@anthropic.com>
   ```
-- [ ] **10. Git Tag**: Create annotated tag after PR merge
-  ```bash
-  git tag -a vX.Y.Z -m "Release vX.Y.Z"
-  git push origin vX.Y.Z
-  ```
+- [ ] **10. Publish tag after PR merge**: `ai-use-case release publish X.Y.Z`
 
 ---
 
@@ -185,7 +179,7 @@ After updating, verify all locations:
 
 ```bash
 # 1. Check source of truth
-grep "export CLI_VERSION=" scripts/utils/version.sh
+grep "export CLI_VERSION=" lib/core/version.sh
 
 # 2. Check README header
 grep -n "v[0-9]\+\.[0-9]\+\.[0-9]\+" README.md | head -1
@@ -228,7 +222,7 @@ grep -r "3\.3\.0" --include="*.md" --include="*.sh" . | grep -v ".git" | grep -v
 
 ---
 
-### ❌ Mistake #2: Only updating `scripts/utils/version.sh`
+### ❌ Mistake #2: Only updating `lib/core/version.sh`
 
 **Problem**: README still shows old version, confusing users
 
@@ -328,7 +322,7 @@ Before creating any PR:
 
 - [ ] **MANDATORY: Updated CHANGELOG.md** (non-negotiable for ALL changes)
 - [ ] **MANDATORY: Updated README.md** (non-negotiable if user-facing changes)
-- [ ] **If adding features**: Updated version in scripts/utils/version.sh
+- [ ] **If adding features**: Prepared the version with `ai-use-case release prepare`
 - [ ] **If adding features**: Verified ALL version locations (see docs/VERSION-UPDATE-CHECKLIST.md)
 ```
 
@@ -338,7 +332,7 @@ Before creating any PR:
 
 | File | Lines | Purpose | Auto-Updated by bump-version.sh | Validated by validate-versions.sh |
 |------|-------|---------|----------------------------------|-----------------------------------|
-| `scripts/utils/version.sh` | 21 | Source of truth | ✅ Yes | ✅ Yes |
+| `lib/core/version.sh` | 21 | Source of truth | ✅ Yes | ✅ Yes |
 | `README.md` | 4, footer | User-facing docs | ✅ Yes (header + footer version + date) | ✅ Yes |
 | `CHANGELOG.md` | Top | Release history | ✅ Yes (structure), ❌ No (content - must be in [Unreleased] first) | ✅ Yes |
 | `docs/COMMANDS.md` | Various | Command reference with version markers | ❌ No (manual) | ✅ Yes |

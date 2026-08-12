@@ -1,6 +1,7 @@
 #!/bin/bash
 # AI Use Case CLI - Automated Version Bump Script
-# Automates the entire version update process: version.sh, CHANGELOG.md, commit, tag, push
+# Updates version metadata for a release. Commit, tag, and push are opt-in;
+# the controlled release workflow is provided by release.sh.
 #
 # Usage:
 #   ./bump-version.sh [major|minor|patch|X.Y.Z] [options]
@@ -11,13 +12,16 @@
 #   ./bump-version.sh major              # 3.2.0 -> 4.0.0
 #   ./bump-version.sh 3.5.0              # Set specific version
 #   ./bump-version.sh patch --dry-run    # Preview changes without applying
-#   ./bump-version.sh minor --no-push    # Bump and commit but don't push
+#   ./bump-version.sh patch --no-commit --no-tag --no-push
 #
 # Options:
 #   --dry-run         Preview changes without applying them
-#   --no-commit       Update files but don't commit
-#   --no-tag          Don't create git tag
-#   --no-push         Don't push to remote
+#   --no-commit       Update files but don't commit (default)
+#   --no-tag          Don't create git tag (default)
+#   --no-push         Don't push to remote (default)
+#   --commit          Explicitly create the version commit
+#   --tag             Explicitly create the version tag (requires --commit)
+#   --push            Explicitly push the commit/tag (requires --commit)
 #   --yes, -y         Skip confirmations (useful for CI/CD)
 #   --help, -h        Show this help message
 
@@ -35,14 +39,14 @@ NC='\033[0m'
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLI_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-VERSION_FILE="$SCRIPT_DIR/version.sh"
+VERSION_FILE="$CLI_ROOT/lib/core/version.sh"
 CHANGELOG_FILE="$CLI_ROOT/CHANGELOG.md"
 
 # Parse options
 DRY_RUN=false
-NO_COMMIT=false
-NO_TAG=false
-NO_PUSH=false
+NO_COMMIT=true
+NO_TAG=true
+NO_PUSH=true
 SKIP_CONFIRMATION=false
 BUMP_TYPE=""
 
@@ -64,6 +68,9 @@ ${CYAN}Options:${NC}
   --no-commit     Update files but don't commit
   --no-tag        Don't create git tag
   --no-push       Don't push to remote
+  --commit        Explicitly create the version commit
+  --tag           Explicitly create the version tag (requires --commit)
+  --push          Explicitly push the commit/tag (requires --commit)
   --yes, -y       Skip confirmations (useful for CI/CD)
   --help, -h      Show this help message
 
@@ -81,16 +88,13 @@ ${CYAN}What it does:${NC}
   3. Updates version.sh with new version
   4. Updates README.md header and footer (version + date)
   5. Updates CHANGELOG.md (moves Unreleased to versioned section)
-  6. Creates git commit with conventional commit message
-  7. Creates git tag (vX.Y.Z)
-  8. Pushes commit and tag to remote
+  6. Updates files only by default
+  7. Does not commit, tag, or push; use release.sh for the controlled workflow
 
 ${CYAN}Workflow:${NC}
   • Must be run from a clean git working directory
   • Requires Unreleased section in CHANGELOG.md
-  • Creates atomic commit with both version.sh and CHANGELOG.md
-  • Tags commit for GitHub releases
-  • Automatically pushes to remote on current branch (unless --no-push)
+  • Review and commit the prepared files through a release PR
 
 EOF
     exit 0
@@ -116,12 +120,24 @@ while [[ $# -gt 0 ]]; do
             NO_COMMIT=true
             shift
             ;;
+        --commit)
+            NO_COMMIT=false
+            shift
+            ;;
         --no-tag)
             NO_TAG=true
             shift
             ;;
+        --tag)
+            NO_TAG=false
+            shift
+            ;;
         --no-push)
             NO_PUSH=true
+            shift
+            ;;
+        --push)
+            NO_PUSH=false
             shift
             ;;
         --yes|-y)
@@ -145,6 +161,11 @@ if [ -z "$BUMP_TYPE" ]; then
     echo "Usage: $0 [major|minor|patch|X.Y.Z] [options]"
     echo "Run with --help for more information"
     exit 1
+fi
+
+if [ "$NO_COMMIT" = true ] && { [ "$NO_TAG" = false ] || [ "$NO_PUSH" = false ]; }; then
+    echo -e "${RED}Error: --tag and --push require --commit${NC}"
+    exit 2
 fi
 
 echo -e "${BLUE}${BOLD}=== AI Use Case CLI Version Bump ===${NC}"
@@ -253,7 +274,7 @@ fi
 
 # Confirmation prompt
 if [ "$SKIP_CONFIRMATION" = false ]; then
-    read -p "$(echo -e ${CYAN}Proceed with version bump? [y/N]:${NC} )" -n 1 -r
+    read -p "$(echo -e "${CYAN}Proceed with version bump? [y/N]:${NC} ")" -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         echo -e "${YELLOW}Version bump cancelled${NC}"

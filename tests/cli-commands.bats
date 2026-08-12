@@ -101,6 +101,23 @@ CLI="$(script_path ai-use-case)"
 }
 
 # ============================================
+# Release Command Tests
+# ============================================
+
+@test "ai-use-case release: exposes release workflow help" {
+    run "$CLI" release --help
+    assert_success
+    assert_output --partial "release prepare"
+    assert_output --partial "release publish"
+}
+
+@test "ai-use-case release: rejects malformed publish versions" {
+    run "$CLI" release publish 3.13
+    assert_failure
+    assert_output --partial "X.Y.Z format"
+}
+
+# ============================================
 # Update Command Tests
 # ============================================
 
