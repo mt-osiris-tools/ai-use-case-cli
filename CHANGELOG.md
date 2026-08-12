@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Release Test Environment**: Isolated Bats color settings from inherited `NO_COLOR` values so release validation tests remain deterministic while production commands continue honoring `NO_COLOR`.
+- **Local Codex Setup Exit Status**: Fixed successful non-JSON local Codex setup to return exit code 0 instead of failing on an optional informational message.
+- **Codex JSON Test Assertion**: Corrected the machine-readable output test to match valid JSON reliably.
+
 ## [3.14.0] - 2026-08-11
 
 ### Added

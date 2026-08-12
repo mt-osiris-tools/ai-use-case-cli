@@ -119,5 +119,7 @@ else
     echo "Prompts: $target_prompts"
     echo "Skill:   $target_skill"
     echo "Planned: $planned | Installed: $installed | Updated: $updated | Skipped: $skipped"
-    [ "$INSTALL_MODE" = "global" ] && echo "Use --local to install a project-scoped copy instead."
+    if [ "$INSTALL_MODE" = "global" ]; then
+        echo "Use --local to install a project-scoped copy instead."
+    fi
 fi
