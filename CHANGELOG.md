@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Codex session documentation now requires selecting a session from the current repository or providing its UUID, then documents only the resolved Codex JSONL session.
+
 ### Fixed
 
 - **Compact Release Output**: Reduced routine validation and passing-test noise during `release publish` while preserving full failure diagnostics.

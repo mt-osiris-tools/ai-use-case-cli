@@ -103,8 +103,9 @@ In your AI assistant:
 ```
 
 The AI assistant will:
-1. Show pre-flight checklist (git config, branch status)
-2. Ask what to scan (conversation/git/both)
+1. List recent Codex sessions for the current repository
+2. Ask you to select a session or provide its UUID
+3. Document only the selected session
 3. Present options (undocumented PRs, current session, recent commits)
 4. Generate complete documentation automatically
 5. Sync to hub via git hooks
@@ -185,6 +186,13 @@ ai-use-case --setup-codex --local
 
 Use `--global` for personal Codex defaults, `--dry-run` to preview changes, and
 `--force` only when replacing modified installed adapters is intentional.
+
+The documentation prompt lists sessions from `~/.codex/sessions/` (or
+`CODEX_HOME`) and accepts a direct UUID:
+
+```text
+/prompts:use-case-document-session SESSION_UUID=<codex-session-uuid>
+```
 
 ### Configuration Commands
 
