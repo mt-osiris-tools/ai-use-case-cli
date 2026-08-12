@@ -25,16 +25,24 @@ cd "$REPO_ROOT"
 # Parse arguments
 ALLOW_UNRELEASED=false
 FIX_MODE=false
+QUIET_MODE=false
+VALIDATOR_ARGS=()
 while [[ $# -gt 0 ]]; do
     case $1 in
         --unreleased)
             ALLOW_UNRELEASED=true
+            VALIDATOR_ARGS+=("$1")
             shift
             ;;
         --fix)
             # Reserved for the documented interactive fixer; validation is read-only.
             # shellcheck disable=SC2034
             FIX_MODE=true
+            VALIDATOR_ARGS+=("$1")
+            shift
+            ;;
+        --quiet|-q)
+            QUIET_MODE=true
             shift
             ;;
         --help|-h)
@@ -47,6 +55,7 @@ ${YELLOW}Usage:${NC}
 ${YELLOW}Options:${NC}
   --unreleased    Allow unreleased version references (e.g., v3.6.0 when current is v3.5.0)
   --fix           Interactive mode to fix version inconsistencies
+  --quiet, -q     Show only the summary unless validation fails
   --help, -h      Show this help message
 
 ${YELLOW}Description:${NC}
@@ -76,6 +85,22 @@ EOF
             ;;
     esac
 done
+
+if [ "$QUIET_MODE" = true ]; then
+    quiet_output="$(mktemp)"
+    if "$0" "${VALIDATOR_ARGS[@]}" >"$quiet_output" 2>&1; then
+        # shellcheck disable=SC1090
+        source "$REPO_ROOT/lib/core/version.sh"
+        rm -f "$quiet_output"
+        printf 'Version validation passed: %s\n' "$CLI_VERSION"
+    else
+        exit_code=$?
+        cat "$quiet_output"
+        rm -f "$quiet_output"
+        exit "$exit_code"
+    fi
+    exit 0
+fi
 
 echo -e "${BLUE}=== AI Use Case CLI - Version Validator ===${NC}"
 echo ""

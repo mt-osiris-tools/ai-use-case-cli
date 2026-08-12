@@ -44,6 +44,7 @@ ${YELLOW}USAGE${NC}
 ${YELLOW}OPTIONS${NC}
   --help, -h        Show this help message
   --verbose, -v     Run tests with verbose output
+  --quiet, -q       Show only the summary unless tests fail
   --tap             Output in TAP format
   --filter PATTERN  Only run tests matching PATTERN
   --list            List available test files
@@ -105,6 +106,7 @@ count_tests() {
 # Main
 main() {
     local verbose=false
+    local quiet=false
     local tap=false
     local filter=""
     local test_files=()
@@ -118,6 +120,10 @@ main() {
                 ;;
             --verbose|-v)
                 verbose=true
+                shift
+                ;;
+            --quiet|-q)
+                quiet=true
                 shift
                 ;;
             --tap)
@@ -195,17 +201,34 @@ main() {
         exit 0
     fi
 
-    echo -e "${BLUE}=== AI Use Case CLI Test Suite ===${NC}"
-    echo ""
-    echo -e "Test files: ${CYAN}${#files_to_run[@]}${NC}"
-    echo ""
+    if [ "$quiet" = true ]; then
+        echo "Running ${#files_to_run[@]} test file(s) in quiet mode..."
+    else
+        echo -e "${BLUE}=== AI Use Case CLI Test Suite ===${NC}"
+        echo ""
+        echo -e "Test files: ${CYAN}${#files_to_run[@]}${NC}"
+        echo ""
+    fi
 
-    # Run tests
-    "$BATS_BIN" "${bats_args[@]}" "${files_to_run[@]}"
+    # Run tests. Compact mode keeps successful releases readable while
+    # retaining the complete Bats output when a test fails.
+    local exit_code=0
+    if [ "$quiet" = true ]; then
+        local output_file
+        output_file="$(mktemp)"
+        if "$BATS_BIN" "${bats_args[@]}" "${files_to_run[@]}" >"$output_file" 2>&1; then
+            exit_code=0
+        else
+            exit_code=$?
+            cat "$output_file"
+        fi
+        rm -f "$output_file"
+    else
+        "$BATS_BIN" "${bats_args[@]}" "${files_to_run[@]}"
+        exit_code=$?
+    fi
 
-    local exit_code=$?
-
-    echo ""
+    [ "$quiet" = true ] || echo ""
     if [ $exit_code -eq 0 ]; then
         echo -e "${GREEN}All tests passed!${NC}"
     else

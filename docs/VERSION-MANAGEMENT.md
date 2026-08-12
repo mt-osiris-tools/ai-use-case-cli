@@ -59,7 +59,9 @@ ai-use-case release publish 3.14.0
 4. ✅ **Updates CHANGELOG.md** (moves Unreleased to versioned section with date)
 5. ✅ Leaves commit, tag, and push operations to the reviewed release workflow
 
-`release publish` runs strict validation and the full test suite, creates the annotated tag, and pushes it. The tag-triggered GitHub Actions workflow creates a draft GitHub Release.
+`release publish` runs strict validation and the full test suite in compact mode, creates the annotated tag, and pushes it. If validation or tests fail, their complete diagnostics are printed. The tag-triggered GitHub Actions workflow creates a draft GitHub Release.
+
+The underlying commands remain verbose by default. Use `./scripts/utils/validate-versions.sh --quiet` or `./run-tests.sh --quiet` when a summary-only result is preferred.
 
 ### Command Options
 
