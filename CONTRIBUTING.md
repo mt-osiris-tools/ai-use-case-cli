@@ -244,6 +244,9 @@ git submodule update --init --recursive
 # Run with verbose output
 ./run-tests.sh --verbose
 
+# Show only the summary unless tests fail
+./run-tests.sh --quiet
+
 # Run tests matching a pattern
 ./run-tests.sh --filter "help"
 

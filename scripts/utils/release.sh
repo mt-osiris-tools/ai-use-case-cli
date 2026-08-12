@@ -67,8 +67,8 @@ publish_release() {
     actual_version="$(current_version)"
     [[ "$actual_version" == "$version" ]] || fail "version.sh is $actual_version, expected $version"
     git -C "$REPO_ROOT" show-ref --verify --quiet "refs/tags/v$version" && fail "tag v$version already exists"
-    "$VALIDATE_SCRIPT"
-    "$REPO_ROOT/run-tests.sh"
+    "$VALIDATE_SCRIPT" --quiet
+    "$REPO_ROOT/run-tests.sh" --quiet
     git -C "$REPO_ROOT" tag -a "v$version" -m "Release v$version"
     git -C "$REPO_ROOT" push origin "v$version"
     echo "Published tag v$version. GitHub Actions will create a draft release."

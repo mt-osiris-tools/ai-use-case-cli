@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Compact Release Output**: Reduced routine validation and passing-test noise during `release publish` while preserving full failure diagnostics.
 - **Release Test Environment**: Isolated Bats color settings from inherited `NO_COLOR` values so release validation tests remain deterministic while production commands continue honoring `NO_COLOR`.
 - **Local Codex Setup Exit Status**: Fixed successful non-JSON local Codex setup to return exit code 0 instead of failing on an optional informational message.
 - **Codex JSON Test Assertion**: Corrected the machine-readable output test to match valid JSON reliably.
