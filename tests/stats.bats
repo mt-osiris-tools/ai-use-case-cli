@@ -159,3 +159,21 @@ CLI="$(script_path ai-use-case)"
     # Should only count the .md file
     assert_output --partial "1"
 }
+
+@test "stats-use-cases: includes yearly report for last and current year" {
+    local current_year
+    local last_year
+    current_year="$(date '+%Y')"
+    last_year="$((current_year - 1))"
+
+    mkdir -p "$TEST_HUB_DIR/by-project/yearly"
+    echo "# Last year" > "$TEST_HUB_DIR/by-project/yearly/${last_year}-W01-01-01_Y-001_last.md"
+    echo "# Current year" > "$TEST_HUB_DIR/by-project/yearly/${current_year}-W01-01-01_Y-002_current.md"
+    echo "# Current year 2" > "$TEST_HUB_DIR/by-project/yearly/${current_year}-W02-01-02_Y-003_current2.md"
+
+    run bash "$STATS_SCRIPT"
+    assert_success
+    assert_output --partial "Yearly report"
+    assert_output --partial "${last_year}: 1"
+    assert_output --partial "${current_year}: 2"
+}

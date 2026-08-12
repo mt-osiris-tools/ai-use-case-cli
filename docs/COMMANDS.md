@@ -79,9 +79,9 @@ ai-use-case search <term>       # Search documented use cases
                                # - Shows matching files with context
 
 ai-use-case stats               # View statistics
-                               # - Total use cases
-                               # - By project
-                               # - Recent activity
+                                # - Total use cases
+                                # - By project
+                                # - Yearly report (last year + current year)
 ```
 
 ### Project Registry (v3.1.0+)

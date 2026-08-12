@@ -8,13 +8,13 @@ set -e
 GREEN=$'\033[0;32m'
 BLUE=$'\033[0;34m'
 YELLOW=$'\033[1;33m'
-RED=$'\033[0;31m'
 NC=$'\033[0m'
 
 # Get script directory and source hub utilities
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HUB_UTILS="$SCRIPT_DIR/../utils/hub-utils.sh"
 if [ -f "$HUB_UTILS" ]; then
+    # shellcheck disable=SC1090 # Source uses SCRIPT_DIR-resolved path
     source "$HUB_UTILS"
 fi
 
@@ -59,8 +59,21 @@ echo ""
 echo -e "${YELLOW}Total time saved (from documented sessions):${NC}"
 time_saved=$(grep -h "Time Saved:" by-project/*/*.md 2>/dev/null | \
     grep -oP '\d+(\.\d+)?' | \
-    awk '{sum+=$1} END {print sum}' || echo "0")
+    awk '{sum+=$1} END {print sum+0}' || echo "0")
 echo "  ~${time_saved} hours"
+
+echo ""
+echo -e "${YELLOW}Yearly report (last year + current year):${NC}"
+current_year=$(date '+%Y')
+last_year=$((current_year - 1))
+
+for year in "$last_year" "$current_year"; do
+    year_count=$(find by-project -name "${year}-W??-??-??_*.md" -type f 2>/dev/null | wc -l)
+    year_time_saved=$(grep -h "Time Saved:" by-project/*/"${year}-W"*.md 2>/dev/null | \
+        grep -oP '\d+(\.\d+)?' | \
+        awk '{sum+=$1} END {print sum+0}' || echo "0")
+    echo "  ${year}: ${year_count} use case(s), ~${year_time_saved} hours saved"
+done
 
 echo ""
 echo -e "${GREEN}Hub location:${NC} $HUB_DIR"
