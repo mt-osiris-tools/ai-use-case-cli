@@ -21,6 +21,10 @@ export TEST_CONFIG_DIR=""
 export TEST_HUB_DIR=""
 export ORIGINAL_HOME=""
 export ORIGINAL_XDG_CONFIG_HOME=""
+export ORIGINAL_NO_COLOR=""
+export ORIGINAL_NO_COLOR_SET=false
+export ORIGINAL_FORCE_COLOR=""
+export ORIGINAL_FORCE_COLOR_SET=false
 
 # Colors (matching project conventions)
 export TEST_GREEN=$'\033[0;32m'
@@ -40,6 +44,18 @@ setup_test_environment() {
     # Save original environment
     ORIGINAL_HOME="$HOME"
     ORIGINAL_XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-}"
+    if [ "${NO_COLOR+x}" = x ]; then
+        ORIGINAL_NO_COLOR="$NO_COLOR"
+        ORIGINAL_NO_COLOR_SET=true
+    else
+        ORIGINAL_NO_COLOR_SET=false
+    fi
+    if [ "${FORCE_COLOR+x}" = x ]; then
+        ORIGINAL_FORCE_COLOR="$FORCE_COLOR"
+        ORIGINAL_FORCE_COLOR_SET=true
+    else
+        ORIGINAL_FORCE_COLOR_SET=false
+    fi
 
     # Create temporary directories for test isolation
     TEST_TEMP_DIR="$(mktemp -d)"
@@ -59,6 +75,7 @@ setup_test_environment() {
     export AI_USECASE_TRACING_ENABLED=false
 
     # Force color output for tests (since tests don't run in a TTY)
+    unset NO_COLOR
     export FORCE_COLOR=1
 
     # Set AI_USECASES_DIR to test hub (don't unset - scripts may use set -u)
@@ -78,6 +95,17 @@ teardown_test_environment() {
         export XDG_CONFIG_HOME="$ORIGINAL_XDG_CONFIG_HOME"
     else
         unset XDG_CONFIG_HOME
+    fi
+
+    if [ "$ORIGINAL_NO_COLOR_SET" = true ]; then
+        export NO_COLOR="$ORIGINAL_NO_COLOR"
+    else
+        unset NO_COLOR
+    fi
+    if [ "$ORIGINAL_FORCE_COLOR_SET" = true ]; then
+        export FORCE_COLOR="$ORIGINAL_FORCE_COLOR"
+    else
+        unset FORCE_COLOR
     fi
 
     # Clean up temporary directories

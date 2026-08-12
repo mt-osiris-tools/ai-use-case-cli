@@ -334,5 +334,5 @@ CLI="$(script_path ai-use-case)"
     cd "$project_dir"
     run "$CLI" setup-codex --local --json
     assert_success
-    [[ "$output" == \{"mode":"local"*\} ]]
+    [[ "$output" == '{"mode":"local"'*'}' ]]
 }

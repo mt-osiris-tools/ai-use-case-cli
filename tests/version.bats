@@ -120,3 +120,9 @@ teardown() {
     assert_failure
     assert_output --partial "X.Y.Z format"
 }
+
+@test "constants: NO_COLOR disables colors for production commands" {
+    run env NO_COLOR=1 bash -c "source '$(script_path lib/core/constants.sh)'; printf '%s' \"\$GREEN\""
+    assert_success
+    assert_output ""
+}
