@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.14.0] - 2026-08-11
+
 ### Added
 
 - **Controlled Release Workflow**: Added `ai-use-case release prepare` and `release publish` commands, strict post-merge validation, and tag-triggered draft GitHub Releases. Version preparation no longer commits, tags, or pushes implicitly.
